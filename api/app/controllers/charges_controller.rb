@@ -3,40 +3,42 @@ class ChargesController < ApplicationController
 
   # POST /charges
   def create
+    # TODO(jtmckibb): This is a secret, shhhh
     Stripe.api_key = 'sk_test_Vux9P2VnjEDHuR4Cg8DHWmhq00y6iKGY8x'
 
-    # TODO(jtmckibb): Get merchant name for merchant_id
-    merchant_name = charge_params[:merchant_id]
-    amount = charge_params[:amount].to_i
-    dollars = "%05.2f" % (amount / 100)
+    begin
+      merchant_id = charge_params[:merchant_id]
+      line_items = charge_params[:line_items].map(&:to_h)
 
-    # TODO(jtmckibb): Add Donation Support
-    session = Stripe::Checkout::Session.create(
-      payment_method_types: ['card'],
-      line_items: [{
-        name: 'Gift Card',
-        description: "$#{dollars} Gift Card for #{merchant_name}",
-        # TODO(jtmckibb): Add images if we need them
-        # images: ['https://example.com/t-shirt.png'],
-        amount: amount,
-        currency: 'usd',
-        quantity: 1,
-      }],
-      payment_intent_data: {
-        capture_method: 'manual',
-      },
-      # TODO(jtmckibb): Make real URLs
-      success_url: 'https://sendchinatownlove.com/charge-sucessful',
-      cancel_url: 'https://sendchinatownlove.com/charge-canceled',
-    )
-
-    json_response(session)
+      session = Stripe::Checkout::Session.create(
+        payment_method_types: ['card'],
+        # TODO(jtmckibb): Validate line items
+        #  - Amount should be greater than 1 and needs to be an integer
+        #  - Name should be 'Gift Card' or 'Donation'
+        #  - Amount, Currency, Name and Quantity are required
+        line_items: line_items,
+        payment_intent_data: {
+          capture_method: 'manual',
+        },
+        success_url: "https://sendchinatownlove.com/#{merchant_id}/thank-you?session_id={CHECKOUT_SESSION_ID}",
+        cancel_url: "https://sendchinatownlove.com/#{merchant_id}/canceled",
+        metadata: { merchant_id: merchant_id }
+      )
+      json_response(session)
+    rescue Stripe::StripeError => e
+      json_response(e.error.message, e.http_status)
+    rescue ActionController::ParameterMissing => e
+      json_response(e.message, :unprocessable_entity)
+    rescue => e
+      json_response(e, :internal_server_error)
+    end
   end
 
   private
 
   def charge_params
-    # whitelist params
-    params.permit(:merchant_id, :amount, :item)
+    params.require(:merchant_id)
+    params.require(:line_items)
+    params.permit(:merchant_id, line_items: [[:amount, :currency, :name, :quantity, :description]])
   end
 end
