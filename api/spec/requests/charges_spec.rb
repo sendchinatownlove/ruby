@@ -8,11 +8,11 @@ RSpec.describe 'Charges API', type: :request do
 
     context 'with a gift card' do
       let(:line_items) do
-        [{ amount: 5000,
+        [{ amount: 50,
            currency: 'usd',
            name: 'Gift Card',
            quantity: 1,
-           description: '$50.00 gift card for Shunfa Bakery'
+           description: '$0.50 gift card for Shunfa Bakery'
         }]
       end
 
@@ -21,10 +21,10 @@ RSpec.describe 'Charges API', type: :request do
       it 'returns stripe charges checkout session' do
         expect(json['id']).not_to be_empty
         expect(json['display_items']).to eq([{
-          amount: 5000,
+          amount: 50,
           currency: 'usd',
           custom: {
-            description: '$50.00 gift card for Shunfa Bakery',
+            description: '$0.50 gift card for Shunfa Bakery',
             images: nil,
             name: 'Gift Card'
           },
@@ -38,6 +38,160 @@ RSpec.describe 'Charges API', type: :request do
 
       it 'returns status code 200' do
         expect(response).to have_http_status(200)
+      end
+    end
+
+    context 'with line item with missing amount' do
+      let(:line_items) do
+        [{
+          currency: 'usd',
+          name: 'Gift Card',
+          quantity: 1,
+          description: '$50.00 gift card for Shunfa Bakery'
+        }]
+      end
+
+      before { post '/charges', params: params }
+
+      it 'returns status code 422' do
+        expect(response).to have_http_status(422)
+      end
+
+      it 'returns a validation failure message' do
+        expect(response.body)
+          .to match(/param is missing or the value is empty: amount/)
+      end
+    end
+
+    context 'with line item with missing currency' do
+      let(:line_items) do
+        [{
+          amount: 5000,
+          name: 'Gift Card',
+          quantity: 1,
+          description: '$50.00 gift card for Shunfa Bakery'
+        }]
+      end
+
+      before { post '/charges', params: params }
+
+      it 'returns status code 422' do
+        expect(response).to have_http_status(422)
+      end
+
+      it 'returns a validation failure message' do
+        expect(response.body)
+          .to match(/param is missing or the value is empty: currency/)
+      end
+    end
+
+    context 'with line item with missing name' do
+      let(:line_items) do
+        [{
+          amount: 5000,
+          currency: 'usd',
+          quantity: 1,
+          description: '$50.00 gift card for Shunfa Bakery'
+        }]
+      end
+
+      before { post '/charges', params: params }
+
+      it 'returns status code 422' do
+        expect(response).to have_http_status(422)
+      end
+
+      it 'returns a validation failure message' do
+        expect(response.body)
+          .to match(/param is missing or the value is empty: name/)
+      end
+    end
+
+    context 'with line item with missing quantity' do
+      let(:line_items) do
+        [{
+          amount: 5000,
+          currency: 'usd',
+          name: 'Gift Card',
+          description: '$50.00 gift card for Shunfa Bakery'
+        }]
+      end
+
+      before { post '/charges', params: params }
+
+      it 'returns status code 422' do
+        expect(response).to have_http_status(422)
+      end
+
+      it 'returns a validation failure message' do
+        expect(response.body)
+          .to match(/param is missing or the value is empty: quantity/)
+      end
+    end
+
+    context 'with an invalid name' do
+      let(:line_items) do
+        [{ amount: 5000,
+           currency: 'usd',
+           name: 'Foobar',
+           quantity: 1,
+           description: '$50.00 gift card for Shunfa Bakery'
+        }]
+      end
+
+      before { post '/charges', params: params }
+
+      it 'returns status code 422' do
+        expect(response).to have_http_status(422)
+      end
+
+      it 'returns a validation failure message' do
+        expect(response.body)
+          .to match(/line_item must be named `Gift Card` or `Donation`/)
+      end
+    end
+
+    context 'with a negative amount' do
+      let(:line_items) do
+        [{ amount: -1,
+           currency: 'usd',
+           name: 'Gift Card',
+           quantity: 1,
+           description: '$50.00 gift card for Shunfa Bakery'
+        }]
+      end
+
+      before { post '/charges', params: params }
+
+      it 'returns status code 422' do
+        expect(response).to have_http_status(422)
+      end
+
+      it 'returns a validation failure message' do
+        expect(response.body)
+          .to match("Amount must be at least $0.50 usd")
+      end
+    end
+
+    context 'with $.49 in the amount' do
+      let(:line_items) do
+        [{ amount: 49,
+           currency: 'usd',
+           name: 'Gift Card',
+           quantity: 1,
+           description: '$00.49 gift card for Shunfa Bakery'
+        }]
+      end
+
+      before { post '/charges', params: params }
+
+      it 'returns status code 422' do
+        expect(response).to have_http_status(422)
+      end
+
+      it 'returns a validation failure message' do
+        expect(response.body)
+          .to match("Amount must be at least $0.50 usd")
       end
     end
 
