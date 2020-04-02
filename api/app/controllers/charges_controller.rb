@@ -1,5 +1,6 @@
 
 class ChargesController < ApplicationController
+  class InvalidLineItem < StandardError; end
 
   # POST /charges
   def create
@@ -10,12 +11,12 @@ class ChargesController < ApplicationController
       merchant_id = charge_params[:merchant_id]
       line_items = charge_params[:line_items].map(&:to_h)
 
+      line_items.each { |item| validate(line_item: item) }
+
       session = Stripe::Checkout::Session.create(
         payment_method_types: ['card'],
         # TODO(jtmckibb): Validate line items
         #  - Amount should be greater than 1 and needs to be an integer
-        #  - Name should be 'Gift Card' or 'Donation'
-        #  - Amount, Currency, Name and Quantity are required
         line_items: line_items,
         payment_intent_data: {
           capture_method: 'manual',
@@ -29,6 +30,8 @@ class ChargesController < ApplicationController
       json_response(e.error.message, e.http_status)
     rescue ActionController::ParameterMissing => e
       json_response(e.message, :unprocessable_entity)
+    rescue InvalidLineItem => e
+      json_response(e.message, :unprocessable_entity)
     rescue => e
       json_response(e, :internal_server_error)
     end
@@ -40,5 +43,20 @@ class ChargesController < ApplicationController
     params.require(:merchant_id)
     params.require(:line_items)
     params.permit(:merchant_id, line_items: [[:amount, :currency, :name, :quantity, :description]])
+  end
+
+  def validate(line_item:)
+    [:amount, :currency, :name, :quantity].each do |attribute|
+      unless line_item.key?(attribute)
+        raise ActionController::ParameterMissing.new "param is missing or the value is empty: #{attribute}"
+      end
+    end
+
+    unless ['Gift Card', 'Donation'].include? line_item['name']
+      raise InvalidLineItem.new "line_item must be named `Gift Card` or `Donation`"
+    end
+
+    amount = line_item['amount'].to_i
+    raise InvalidLineItem.new "Amount must be at least $0.50 usd" unless amount >= 50
   end
 end
