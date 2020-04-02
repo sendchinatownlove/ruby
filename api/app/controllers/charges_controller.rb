@@ -15,8 +15,6 @@ class ChargesController < ApplicationController
 
       session = Stripe::Checkout::Session.create(
         payment_method_types: ['card'],
-        # TODO(jtmckibb): Validate line items
-        #  - Amount should be greater than 1 and needs to be an integer
         line_items: line_items,
         payment_intent_data: {
           capture_method: 'manual',
@@ -28,7 +26,7 @@ class ChargesController < ApplicationController
       json_response(session)
     rescue Stripe::StripeError => e
       json_response(e.error.message, e.http_status)
-    rescue ActionController::ParameterMissing => e
+    rescue ActionController::ParameterMissing, InvalidLineItem=> e
       json_response(e.message, :unprocessable_entity)
     rescue InvalidLineItem => e
       json_response(e.message, :unprocessable_entity)
@@ -56,7 +54,12 @@ class ChargesController < ApplicationController
       raise InvalidLineItem.new "line_item must be named `Gift Card` or `Donation`"
     end
 
+    amount_is_valid_int = line_item['amount'] == line_item['amount'].to_i.to_s
+    unless amount_is_valid_int
+      raise InvalidLineItem.new 'line_item.amount must be an Integer'
+    end
+
     amount = line_item['amount'].to_i
-    raise InvalidLineItem.new "Amount must be at least $0.50 usd" unless amount >= 50
+    raise InvalidLineItem.new 'Amount must be at least $0.50 usd' unless amount >= 50
   end
 end
