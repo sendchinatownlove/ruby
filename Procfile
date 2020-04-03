@@ -1,0 +1,1 @@
+web: cd api && bundle exec rails server -p $PORT
