@@ -23,8 +23,19 @@ requires
 
 ```
 docker volume create --name=postgres-data-volume
-docker-compose up
+cd api && docker-compose up
 # navigate to localhost:3000
+```
+accessing rail CLI after `docker-compose` is running.
+
+```
+docker exec -it api_web_1 bash
+# now inside docker container example of commands that can be run
+
+bundle exec rake db:create
+bundle exec rake db:migrate
+
+bundle exec rails g model Todo title:string created_by:string
 ```
 
 
