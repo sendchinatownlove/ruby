@@ -30,4 +30,8 @@ docker-compose up
 
 install [heroku-cli](https://devcenter.heroku.com/articles/heroku-cli)
 
+After `heroku login` and you are added the project
+
+`git subtree push --prefix api heroku master`
+
 or if pipelines already setup, push naturally to branches
