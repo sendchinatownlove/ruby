@@ -24,3 +24,10 @@ requires
 ```
 docker-compose up
 ```
+
+
+## deployment 
+
+install [heroku-cli](https://devcenter.heroku.com/articles/heroku-cli)
+
+or if pipelines already setup, push naturally to branches
