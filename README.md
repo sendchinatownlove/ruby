@@ -22,7 +22,9 @@ requires
 - docker-compose
 
 ```
+docker volume create --name=postgres-data-volume
 docker-compose up
+# navigate to localhost:3000
 ```
 
 
