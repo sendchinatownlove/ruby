@@ -3,4 +3,6 @@ Rails.application.routes.draw do
   end
   resources :gift_cards do
   end
+  resources :merchants do
+  end
 end
