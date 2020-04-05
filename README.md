@@ -47,13 +47,19 @@ install [heroku-cli](https://devcenter.heroku.com/articles/heroku-cli)
 After `heroku login` and you are added the project
 if you setup your heroku app, you should have a remote added; if not explicitly run 
 
-`
 git remote add heroku https://git.heroku.com/sendchinatownlove.git` 
 `git subtree push --prefix api heroku master`
 
 or if pipelines already setup, push naturally to branches
 
+### DNS & SSL
+Follow instructions to enable DNS. `https://devcenter.heroku.com/articles/custom-domains`
 
+
+heroku comes with auto-ssl for all hobby and up dynos 
+
+run 
+`heroku certs:auto:enable`
 
 ```
 This README would normally document whatever steps are necessary to get the
