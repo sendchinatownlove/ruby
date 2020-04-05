@@ -16,7 +16,7 @@ RSpec.describe 'Charges API', type: :request do
         }]
       end
 
-      before { post '/charges', params: params }
+      before { post '/charges', params: params, as: :json }
 
       it 'returns stripe charges checkout session' do
         expect(json['id']).not_to be_empty
@@ -51,7 +51,7 @@ RSpec.describe 'Charges API', type: :request do
         }]
       end
 
-      before { post '/charges', params: params }
+      before { post '/charges', params: params, as: :json }
 
       it 'returns status code 422' do
         expect(response).to have_http_status(422)
@@ -73,7 +73,7 @@ RSpec.describe 'Charges API', type: :request do
         }]
       end
 
-      before { post '/charges', params: params }
+      before { post '/charges', params: params, as: :json }
 
       it 'returns status code 422' do
         expect(response).to have_http_status(422)
@@ -95,7 +95,7 @@ RSpec.describe 'Charges API', type: :request do
         }]
       end
 
-      before { post '/charges', params: params }
+      before { post '/charges', params: params, as: :json }
 
       it 'returns status code 422' do
         expect(response).to have_http_status(422)
@@ -117,7 +117,7 @@ RSpec.describe 'Charges API', type: :request do
         }]
       end
 
-      before { post '/charges', params: params }
+      before { post '/charges', params: params, as: :json }
 
       it 'returns status code 422' do
         expect(response).to have_http_status(422)
@@ -139,7 +139,7 @@ RSpec.describe 'Charges API', type: :request do
         }]
       end
 
-      before { post '/charges', params: params }
+      before { post '/charges', params: params, as: :json }
 
       it 'returns status code 422' do
         expect(response).to have_http_status(422)
@@ -161,7 +161,7 @@ RSpec.describe 'Charges API', type: :request do
         }]
       end
 
-      before { post '/charges', params: params }
+      before { post '/charges', params: params, as: :json }
 
       it 'returns status code 422' do
         expect(response).to have_http_status(422)
@@ -169,7 +169,7 @@ RSpec.describe 'Charges API', type: :request do
 
       it 'returns a validation failure message' do
         expect(response.body)
-          .to match("Amount must be at least $0.50 usd")
+          .to match('Amount must be at least $0.50 usd')
       end
     end
 
@@ -183,7 +183,7 @@ RSpec.describe 'Charges API', type: :request do
         }]
       end
 
-      before { post '/charges', params: params }
+      before { post '/charges', params: params, as: :json }
 
       it 'returns status code 422' do
         expect(response).to have_http_status(422)
@@ -191,7 +191,7 @@ RSpec.describe 'Charges API', type: :request do
 
       it 'returns a validation failure message' do
         expect(response.body)
-          .to match("Amount must be at least $0.50 usd")
+          .to match('Amount must be at least $0.50 usd')
       end
     end
 
@@ -205,42 +205,7 @@ RSpec.describe 'Charges API', type: :request do
         }]
       end
 
-      before { post '/charges', params: params }
-
-      it 'returns stripe charges checkout session' do
-        expect(json['id']).not_to be_empty
-        expect(json['display_items']).to eq([{
-          amount: 50,
-          currency: 'usd',
-          custom: {
-            description: '$0.50 gift card for Shunfa Bakery',
-            images: nil,
-            name: 'Gift Card'
-          },
-          quantity: 1,
-          type: 'custom'
-        }.with_indifferent_access])
-        expect(json['success_url']).to eq('https://sendchinatownlove.com/shunfa-bakery/thank-you?session_id={CHECKOUT_SESSION_ID}')
-        expect(json['cancel_url']).to eq('https://sendchinatownlove.com/shunfa-bakery/canceled')
-        expect(json['metadata']).to eq({ merchant_id: 'shunfa-bakery' }.with_indifferent_access)
-      end
-
-      it 'returns status code 200' do
-        expect(response).to have_http_status(200)
-      end
-    end
-
-    context 'with string float amount' do
-      let(:line_items) do
-        [{ amount: '50.50',
-           currency: 'usd',
-           name: 'Gift Card',
-           quantity: 1,
-           description: '$50.50 gift card for Shunfa Bakery'
-        }]
-      end
-
-      before { post '/charges', params: params }
+      before { post '/charges', params: params, as: :json }
 
       it 'returns status code 422' do
         expect(response).to have_http_status(422)
@@ -252,17 +217,17 @@ RSpec.describe 'Charges API', type: :request do
       end
     end
 
-    context 'with string amount' do
+    context 'with float amount' do
       let(:line_items) do
-        [{ amount: 'foobar1234',
+        [{ amount: 50.5,
            currency: 'usd',
            name: 'Gift Card',
            quantity: 1,
-           description: '$50.50 gift card for Shunfa Bakery'
+           description: '$0.50 gift card for Shunfa Bakery'
         }]
       end
 
-      before { post '/charges', params: params }
+      before { post '/charges', params: params, as: :json }
 
       it 'returns status code 422' do
         expect(response).to have_http_status(422)
@@ -291,7 +256,7 @@ RSpec.describe 'Charges API', type: :request do
         }]
       end
 
-      before { post '/charges', params: params }
+      before { post '/charges', params: params, as: :json }
 
       it 'returns stripe charges checkout session' do
         expect(json['id']).not_to be_empty
@@ -330,7 +295,7 @@ RSpec.describe 'Charges API', type: :request do
     end
 
     context 'when the request is missing merchant_id' do
-      before { post '/charges', params: { title: 'Foobar', line_items: [] } }
+      before { post '/charges', params: { title: 'Foobar', line_items: [] }, as: :json }
 
       it 'returns status code 422' do
         expect(response).to have_http_status(422)
@@ -343,7 +308,7 @@ RSpec.describe 'Charges API', type: :request do
     end
 
     context 'when the request is missing line_items' do
-      before { post '/charges', params: { merchant_id: 'Foobar' } }
+      before { post '/charges', params: { merchant_id: 'Foobar' }, as: :json }
 
       it 'returns status code 422' do
         expect(response).to have_http_status(422)
