@@ -28,8 +28,6 @@ class ChargesController < ApplicationController
       json_response(e.error.message, e.http_status)
     rescue ActionController::ParameterMissing, InvalidLineItem => e
       json_response(e.message, :unprocessable_entity)
-    rescue InvalidLineItem => e
-      json_response(e.message, :unprocessable_entity)
     rescue => e
       json_response(e, :internal_server_error)
     end
@@ -54,12 +52,11 @@ class ChargesController < ApplicationController
       raise InvalidLineItem.new "line_item must be named `Gift Card` or `Donation`"
     end
 
-    convertable_to_int = line_item['amount'] == line_item['amount'].to_i.to_s
-    unless line_item['amount'].is_a? Integer || convertable_to_int
+    unless line_item['amount'].is_a? Integer
       raise InvalidLineItem.new 'line_item.amount must be an Integer'
     end
 
-    amount = line_item['amount'].to_i
+    amount = line_item['amount']
     raise InvalidLineItem.new 'Amount must be at least $0.50 usd' unless amount >= 50
   end
 end
