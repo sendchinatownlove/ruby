@@ -44,7 +44,10 @@ bundle exec rails g model Todo title:string created_by:string
 install [heroku-cli](https://devcenter.heroku.com/articles/heroku-cli)
 
 After `heroku login` and you are added the project
+if you setup your heroku app, you should have a remote added; if not explicitly run 
 
+`
+git remote add heroku https://git.heroku.com/sendchinatownlove.git` 
 `git subtree push --prefix api heroku master`
 
 or if pipelines already setup, push naturally to branches
