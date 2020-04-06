@@ -169,7 +169,7 @@ RSpec.describe 'Charges API', type: :request do
 
       it 'returns a validation failure message' do
         expect(response.body)
-          .to match('Amount must be at least $0.50 usd')
+          .to match('{"message":"Amount must be at least $0.50 usd"}')
       end
     end
 
@@ -191,7 +191,7 @@ RSpec.describe 'Charges API', type: :request do
 
       it 'returns a validation failure message' do
         expect(response.body)
-          .to match('Amount must be at least $0.50 usd')
+          .to match('{"message":"Amount must be at least $0.50 usd"}')
       end
     end
 
