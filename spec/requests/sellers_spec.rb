@@ -5,12 +5,12 @@ RSpec.describe 'Sellers API', type: :request do
   # initialize test data
   before { freeze_time }
   let(:current_time) { Time.current.utc.iso8601(3).to_s }
-  let(:url1) { seller1.url }
+  let(:seller_id1) { seller1.seller_id }
   let!(:seller1) do
     Seller.create(
-      url: 'shunfa-bakery',
+      seller_id: 'shunfa-bakery',
       cuisine_name: 'Chinese',
-      merchant_name: 'Shunfa Bakery',
+      name: 'Shunfa Bakery',
       story: 'I am but a small, small boy',
       owner_name: 'Ben Jerry',
       owner_image_url: 'https://www.aws.com/98nuw9e8unf9awnuefaiwenfoaijfosdf',
@@ -20,9 +20,9 @@ RSpec.describe 'Sellers API', type: :request do
   end
   let!(:seller2) do
     Seller.create(
-      url: '87-lan-zhou-handpooled-noods',
+      seller_id: '87-lan-zhou-handpooled-noods',
       cuisine_name: 'Noodle Soup',
-      merchant_name: '87 Lan Zhou Handpooled Noods',
+      name: '87 Lan Zhou Handpooled Noods',
       story: 'Been pullin noods since I was 2',
       owner_name: 'Tom Hanks',
       owner_image_url: 'https://www.aws.com/oawjeoiajwef9wuef09wuef09waeuf',
@@ -47,14 +47,14 @@ RSpec.describe 'Sellers API', type: :request do
     end
   end
 
-  # Test suite for GET /sellers/:url
-  describe 'GET /sellers/:url' do
-    before { get "/sellers/#{url1}" }
+  # Test suite for GET /sellers/:seller_id
+  describe 'GET /sellers/seller_id' do
+    before { get "/sellers/#{seller_id1}" }
 
     context 'when the record exists' do
       it 'returns the seller' do
         expect(json).not_to be_empty
-        expect(json['url']).to eq(url1)
+        expect(json['seller_id']).to eq(seller_id1)
       end
 
       it 'returns status code 200' do
@@ -63,7 +63,7 @@ RSpec.describe 'Sellers API', type: :request do
     end
 
     context 'when the record does not exist' do
-      let(:url1) { 'shunfa-baker' }
+      let(:seller_id1) { 'shunfa-baker' }
 
       it 'returns status code 404' do
         expect(response).to have_http_status(404)
@@ -80,9 +80,9 @@ RSpec.describe 'Sellers API', type: :request do
     # valid payload
     let(:valid_attributes) do
       {
-        url: 'the-pickle-guys',
+        seller_id: 'the-pickle-guys',
         cuisine_name: 'Pickles',
-        merchant_name: 'The Pickle Guys',
+        name: 'The Pickle Guys',
         story: 'i eat pickles everyday for every meal — i LOOOOOVE pickles',
         owner_name: 'Pickle Rick',
         owner_image_url: 'https://www.youtube.com/watch?v=tZp8sY06Qoc',
@@ -146,7 +146,7 @@ RSpec.describe 'Sellers API', type: :request do
 
     context 'with no url' do
       before do
-        post '/sellers', params: valid_attributes.except(:url), as: :json
+        post '/sellers', params: valid_attributes.except(:seller_id), as: :json
       end
 
       it 'returns status code 422' do
@@ -155,18 +155,18 @@ RSpec.describe 'Sellers API', type: :request do
 
       it 'returns a validation failure message' do
         expect(response.body)
-          .to match(/param is missing or the value is empty: url/)
+          .to match(/param is missing or the value is empty: seller_id/)
       end
     end
   end
 
-  # Test suite for PUT /sellers/:url
-  describe 'PUT /sellers/:url' do
+  # Test suite for PUT /sellers/seller_id
+  describe 'PUT /sellers/seller_id' do
     let(:valid_attributes) do
       {
-        url: 'new-url',
+        seller_id: 'new-url',
         cuisine_name: 'New Age Cuisine',
-        merchant_name: 'New Shunfa Bakery',
+        name: 'New Shunfa Bakery',
         story: "I'm on a new level I'm on a new level",
         owner_name: 'A$AP Ferg',
         owner_image_url: 'https://www.youtube.com/watch?v=Srns7NiO278',
@@ -176,7 +176,7 @@ RSpec.describe 'Sellers API', type: :request do
     end
 
     context 'when the record exists' do
-      before { put "/sellers/#{url1}", params: valid_attributes, as: :json }
+      before { put "/sellers/#{seller_id1}", params: valid_attributes, as: :json }
 
       it 'updates the record' do
         # Ignore id field since it's auto-incremented
@@ -192,7 +192,7 @@ RSpec.describe 'Sellers API', type: :request do
       end
 
       context 'when the record does not exist' do
-        let(:url1) { 'shunfa-baker' }
+        let(:seller_id1) { 'shunfa-baker' }
 
         it 'returns status code 404' do
           expect(response).to have_http_status(404)
