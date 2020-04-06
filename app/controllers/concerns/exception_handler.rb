@@ -1,6 +1,7 @@
 
 module ExceptionHandler
   class InvalidLineItem < StandardError; end
+  class InvalidGiftCardUpdate < StandardError; end
 
   # provides the more graceful `included` method
   extend ActiveSupport::Concern
@@ -10,7 +11,7 @@ module ExceptionHandler
       json_response({ message: e.message }, :not_found)
     end
 
-    rescue_from ActiveRecord::RecordInvalid, ActionController::ParameterMissing, InvalidLineItem do |e|
+    rescue_from ActiveRecord::RecordInvalid, ActionController::ParameterMissing, InvalidLineItem, InvalidGiftCardUpdate do |e|
       json_response({ message: e.message }, :unprocessable_entity)
     end
 
