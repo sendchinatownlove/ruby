@@ -13,12 +13,12 @@ class SellersController < ApplicationController
     json_response(@seller, :created)
   end
 
-  # GET /sellers/:url
+  # GET /sellers/:seller_id
   def show
     json_response(@seller)
   end
 
-  # PUT /sellers/:url
+  # PUT /sellers/:seller_id
   def update
     @seller.update(seller_params)
     json_response(@seller)
@@ -28,11 +28,11 @@ class SellersController < ApplicationController
 
   def seller_params
     # whitelist params
-    params.required(:url)
+    params.required(:seller_id)
     params.permit(
-      :url,
+      :seller_id,
       :cuisine_name,
-      :merchant_name,
+      :name,
       :story,
       :owner_name,
       :owner_image_url,
@@ -42,6 +42,6 @@ class SellersController < ApplicationController
   end
 
   def set_seller
-    @seller = Seller.find_by!(url: params[:id])
+    @seller = Seller.find_by!(seller_id: params[:id])
   end
 end

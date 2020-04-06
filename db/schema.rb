@@ -10,15 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_05_044159) do
+ActiveRecord::Schema.define(version: 2020_04_06_021657) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "sellers", force: :cascade do |t|
-    t.string "url", null: false
+    t.string "seller_id", null: false
     t.string "cuisine_name"
-    t.string "merchant_name"
+    t.string "name"
     t.string "story"
     t.boolean "accept_donations", default: true, null: false
     t.boolean "sell_gift_cards", default: false, null: false
@@ -26,7 +26,7 @@ ActiveRecord::Schema.define(version: 2020_04_05_044159) do
     t.string "owner_image_url"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["url"], name: "index_sellers_on_url"
+    t.index ["seller_id"], name: "index_sellers_on_seller_id"
   end
 
 end

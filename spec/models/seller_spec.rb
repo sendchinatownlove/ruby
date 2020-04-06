@@ -5,8 +5,8 @@ RSpec.describe Seller, type: :model do
   # ensure Seller model has a 1:m relationship with the MenuItem model
   # it { should have_many(:menu_items).dependent(:destroy) }
   # Validation tests
-  subject { Seller.create(url: 'oiawjefoiwjaef') }
-  it { should validate_uniqueness_of(:url) }
+  subject { Seller.create(seller_id: 'oiawjefoiwjaef') }
+  it { should validate_uniqueness_of(:seller_id) }
   it do
     should allow_value(%w[true false]).for(:sell_gift_cards)
   end
