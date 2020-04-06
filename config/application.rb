@@ -28,7 +28,7 @@ module Api
     config.middleware.insert_before 0, Rack::Cors do
       allow do
         origins 'localhost:3000', '127.0.0.1:3000',
-        'localhost:3000', '127.0.0.1:4000',
+        'localhost:4000', '127.0.0.1:4000',
         'https://sendchinatownlove.com', 'https://www.sendchinatownlove.com'
         resource '*', headers: :any, methods: [:get, :post, :options]
       end
