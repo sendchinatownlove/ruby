@@ -23,16 +23,6 @@ module Api
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 6.0
-
-    # Configure CORS
-    config.middleware.insert_before 0, Rack::Cors do
-      allow do
-        origins 'localhost:3000', '127.0.0.1:3000',
-        'localhost:4000', '127.0.0.1:4000',
-        'https://sendchinatownlove.com', 'https://www.sendchinatownlove.com'
-        resource '*', headers: :any, methods: [:get, :post, :options]
-      end
-    end
     
 
     # Settings in config/environments/* take precedence over those specified here.

@@ -9,6 +9,15 @@ Rails.application.configure do
   # Do not eager load code on boot.
   config.eager_load = false
 
+  # Configure CORS
+  config.middleware.insert_before 0, Rack::Cors do
+    allow do
+      origins 'localhost:3000', '127.0.0.1:3000',
+      'localhost:4000', '127.0.0.1:4000'
+      resource '*', headers: :any, methods: :any
+    end
+  end
+
   # Show full error reports.
   config.consider_all_requests_local = true
 
