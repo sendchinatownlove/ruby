@@ -10,6 +10,15 @@ Rails.application.configure do
   # Rake tasks automatically ignore this option for performance.
   config.eager_load = true
 
+  # Configure CORS
+  config.middleware.insert_before 0, Rack::Cors do
+    allow do
+      origins 'https://sendchinatownlove.com', 'https://www.sendchinatownlove.com'
+      resource '*', headers: :any, methods: :any
+    end
+  end
+  
+
   # Full error reports are disabled and caching is turned on.
   config.consider_all_requests_local       = false
 
