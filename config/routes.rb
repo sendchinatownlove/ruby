@@ -5,4 +5,6 @@ Rails.application.routes.draw do
   end
   resources :sellers do
   end
+  resources :webhooks do
+  end
 end

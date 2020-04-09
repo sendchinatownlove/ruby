@@ -3,15 +3,10 @@ require 'stripe'
 class GiftCardsController < ApplicationController
   before_action :set_gift_card, only: [:show, :update, :destroy]
 
-  # POST /gift_cards
-  def create
-    @gift_card = GiftCard.create!(create_params)
-    json_response(@gift_card, :created)
-  end
-
-  # GET /gift_cards/:d
+  # GET /gift_cards/:id
   def show
-    json_response(@gift_card)
+    item = Item.find_by(gift_card_detail_id: @gift_card_detail[:id])
+    json_response(item)
   end
 
   # PUT /gift_cards/:id
@@ -30,24 +25,14 @@ class GiftCardsController < ApplicationController
 
   private
 
-  def create_params
-    params.require(:charge_id)
-    charge = stripe_charge
-    {
-        charge_id: params[:charge_id],
-        merchant_id: charge[:metadata][:merchant_id],
-        customer_id: charge[:customer],
-        amount: charge[:display_items].first[:amount]
-    }
-  end
-
   def update_params
     params.require(:amount)
     params.permit(:amount)
   end
 
   def set_gift_card
-    @gift_card = GiftCard.find(params[:id])
+    params.require(:id)
+    @gift_card_detail = GiftCardDetail.find_by(gift_card_id: params[:id])
   end
 
   def stripe_charge
