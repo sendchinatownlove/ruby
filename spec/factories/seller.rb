@@ -1,7 +1,7 @@
 
 FactoryBot.define do
   factory :seller do
-    url { Faker::Lorem.word }
+    seller_id { Faker::Lorem.word }
     cuisine_name { Faker::Food.dish }
     name { Faker::Movies::StarWars.planet }
     story { Faker::Movies::StarWars.wookiee_sentence }
