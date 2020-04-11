@@ -6,6 +6,8 @@ class ChargesController < ApplicationController
     # TODO(jtmckibb): This is a secret, shhhh
     Stripe.api_key = 'sk_test_Vux9P2VnjEDHuR4Cg8DHWmhq00y6iKGY8x'
 
+    puts charge_params
+
     merchant_id = charge_params[:merchant_id]
     line_items = charge_params[:line_items].map(&:to_h)
 
@@ -21,7 +23,14 @@ class ChargesController < ApplicationController
       cancel_url: "https://sendchinatownlove.com/#{merchant_id}/canceled",
       metadata: { merchant_id: merchant_id }
     )
-    json_response(session)
+    
+    intent = Stripe::PaymentIntent.create({
+      amount: line_items[0]['amount'],
+      currency: 'usd',
+      # Verify your integration in this guide by including this parameter
+      metadata: {integration_check: 'accept_a_payment'},
+    })
+    json_response(intent)
   end
 
   private
