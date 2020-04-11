@@ -175,32 +175,30 @@ RSpec.describe 'Sellers API', type: :request do
       }
     end
 
-    context 'when the record exists' do
-      before { put "/sellers/#{seller_id1}", params: valid_attributes, as: :json }
+    before { put "/sellers/#{seller_id1}", params: valid_attributes, as: :json }
 
-      it 'updates the record' do
-        # Ignore id field since it's auto-incremented
-        actual_json = json.except('id')
-        expected_json = valid_attributes.except('id')
-        expected_json['created_at'] = current_time
-        expected_json['updated_at'] = current_time
-        expect(actual_json).to eq(expected_json.with_indifferent_access)
+    it 'updates the record' do
+      # Ignore id field since it's auto-incremented
+      actual_json = json.except('id')
+      expected_json = valid_attributes.except('id')
+      expected_json['created_at'] = current_time
+      expected_json['updated_at'] = current_time
+      expect(actual_json).to eq(expected_json.with_indifferent_access)
+    end
+
+    it 'returns status code 200' do
+      expect(response).to have_http_status(200)
+    end
+
+    context 'when the record does not exist' do
+      let(:seller_id1) { 'shunfa-baker' }
+
+      it 'returns status code 404' do
+        expect(response).to have_http_status(404)
       end
 
-      it 'returns status code 200' do
-        expect(response).to have_http_status(200)
-      end
-
-      context 'when the record does not exist' do
-        let(:seller_id1) { 'shunfa-baker' }
-
-        it 'returns status code 404' do
-          expect(response).to have_http_status(404)
-        end
-
-        it 'returns a not found message' do
-          expect(response.body).to match(/Couldn't find Seller/)
-        end
+      it 'returns a not found message' do
+        expect(response.body).to match(/Couldn't find Seller/)
       end
     end
   end

@@ -8,19 +8,10 @@ class WebhooksController < ApplicationController
     # See https://stripe.com/docs/webhooks/signatures for more information.
     sig_header = request.env['HTTP_STRIPE_SIGNATURE']
     endpoint_secret = 'whsec_8I8JI2kT6B3RdUR39usVosRMhRvLVrcH'
-    begin
-      event = Stripe::Webhook.construct_event(
-        payload, sig_header, endpoint_secret
-      )
-    rescue JSON::ParserError => e
-      # Invalid payload
-      status 400
-      return
-    rescue Stripe::SignatureVerificationError => e
-      # Invalid signature
-      status 400
-      return
-    end
+
+    event = Stripe::Webhook.construct_event(
+      payload, sig_header, endpoint_secret
+    )
 
     # Handle the checkout.session.completed event
     if event['type'] == 'checkout.session.completed'
@@ -41,45 +32,49 @@ class WebhooksController < ApplicationController
       amount = item['amount']
       case item['custom']['name']
       when 'Donation'
-        create_donation(amount: amount, customer_id: customer_id, seller_id: seller_id)
+        item = create_item(
+          item_type: :donation,
+          seller_id: seller_id,
+          customer_id: customer_id
+        )
+        create_donation(item: item, amount: amount)
       when 'Gift Card'
-        # TODO(jtmckibb): Create Gift Card object
-        # create_gift_card(amount: amount, customer_id: customer_id, seller_id: seller_id)
+        item = create_item(
+          item_type: :gift_card,
+          seller_id: seller_id,
+          customer_id: customer_id
+        )
+        create_gift_card(item: item, amount: amount)
       else
-        # TODO(jtmckibb): Replace with right json error
-        raise JSON::ParserError.new 'Unsupported ItemType'
+        raise InvalidLineItem.new 'Unsupported ItemType. Please verify the line_item.name.'
       end
     end
   end
 
-  def create_donation(amount:, customer_id:, seller_id:)
+  def create_donation(item:, amount:)
     # TODO(jtmckibb): Create Charge here
-    puts amount, customer_id, seller_id
-    seller = Seller.find_by(seller_id: seller_id)
-    item = Item.create!(
-      seller: seller,
-      stripe_customer_id: customer_id,
-      item_type: 'DONATION'
-    )
-
     DonationDetail.create!(
       item: item,
       amount: amount
     )
   end
 
-  def create_gift_card(amount:, customer_id:, seller_id:)
+  def create_gift_card(item:, amount:)
     # TODO(jtmckibb): Create Charge here
-
-    gift_card_amount = GiftCardAmount.create!(amount: amount)
     gift_card_detail = GiftCardDetail.create!(
-      gift_card_amount: gift_card_amount
+      expiration: Time.current + 100.days,
+      item: item,
+      gift_card_id: 'BOIWJEf'
     )
+    GiftCardAmount.create!(value: amount, gift_card_detail: gift_card_detail)
+  end
+
+  def create_item(item_type:, seller_id:, customer_id:)
+    seller = Seller.find_by(seller_id: seller_id)
     Item.create!(
-      seller_id: seller_id,
+      seller: seller,
       stripe_customer_id: customer_id,
-      item_type: 'GIFT-CARD',
-      gift_card_detail: gift_card_detail
+      item_type: item_type
     )
   end
 end
