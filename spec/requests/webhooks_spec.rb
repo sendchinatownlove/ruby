@@ -28,6 +28,7 @@ RSpec.describe 'Webhooks API', type: :request do
         'metadata': {
           'merchant_id': seller_id
         },
+        'payment_intent': 'pi_oiwjefoiawefoijwaef'
       }
     end
 
@@ -50,7 +51,7 @@ RSpec.describe 'Webhooks API', type: :request do
     context 'with donation' do
       let(:item_name) { 'Donation' }
 
-      it 'creates a Donation' do
+      it 'creates a donation' do
         donation_detail = DonationDetail.last
         expect(donation_detail).not_to be_nil
         expect(donation_detail['amount']).to eq(5000)
@@ -70,15 +71,25 @@ RSpec.describe 'Webhooks API', type: :request do
     context 'with gift card' do
       let(:item_name) { 'Gift Card' }
 
+      before do
+        allow(Digest::MD5).to receive(:hexdigest)
+          .and_return('abcdef123')
+        post '/webhooks'
+      end
+
       it 'creates a gift card' do
         gift_card_detail = GiftCardDetail.last
         expect(gift_card_detail).not_to be_nil
+        expect(gift_card_detail.gift_card_id).to eq('abcdef123')
+        expect(gift_card_detail.seller_gift_card_id).to eq('abcdef123')
+        expect(gift_card_detail.expiration).to eq(Date.today + 100.days)
+
         gift_card_amount = GiftCardAmount.find_by(
           gift_card_detail_id: gift_card_detail['id'])
         expect(gift_card_amount['value']).to eq(5000)
+
         item = Item.find(gift_card_detail['item_id'])
         expect(item).not_to be_nil
-        expect(item['stripe_customer_id']).to eq('justin_mckibben')
         expect(item.gift_card?).to be true
         seller = Seller.find_by(seller_id: seller_id)
         expect(item.seller).to eq(seller)

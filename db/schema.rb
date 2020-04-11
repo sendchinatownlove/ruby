@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_11_195852) do
+ActiveRecord::Schema.define(version: 2020_04_12_013817) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -34,10 +34,11 @@ ActiveRecord::Schema.define(version: 2020_04_11_195852) do
   create_table "gift_card_details", force: :cascade do |t|
     t.string "gift_card_id"
     t.string "receipt_id"
-    t.datetime "expiration"
+    t.date "expiration"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "item_id", null: false
+    t.string "seller_gift_card_id"
     t.index ["item_id"], name: "index_gift_card_details_on_item_id"
   end
 
