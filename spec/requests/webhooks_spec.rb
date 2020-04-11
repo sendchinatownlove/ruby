@@ -57,9 +57,29 @@ RSpec.describe 'Webhooks API', type: :request do
         item = Item.find(donation_detail['item_id'])
         expect(item).not_to be_nil
         expect(item['stripe_customer_id']).to eq('justin_mckibben')
-        # DONATION ENUM
-        # TODO(jtmckibb): Update this to import the actual ENUM
-        expect(item['item_type']).to eq(0)
+        expect(item.donation?).to be true
+        seller = Seller.find_by(seller_id: seller_id)
+        expect(item.seller).to eq(seller)
+      end
+
+      it 'returns status code 200' do
+        expect(response).to have_http_status(200)
+      end
+    end
+
+    context 'with gift card' do
+      let(:item_name) { 'Gift Card' }
+
+      it 'creates a gift card' do
+        gift_card_detail = GiftCardDetail.last
+        expect(gift_card_detail).not_to be_nil
+        gift_card_amount = GiftCardAmount.find_by(
+          gift_card_detail_id: gift_card_detail['id'])
+        expect(gift_card_amount['value']).to eq(5000)
+        item = Item.find(gift_card_detail['item_id'])
+        expect(item).not_to be_nil
+        expect(item['stripe_customer_id']).to eq('justin_mckibben')
+        expect(item.gift_card?).to be true
         seller = Seller.find_by(seller_id: seller_id)
         expect(item.seller).to eq(seller)
       end

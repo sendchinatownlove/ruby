@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_09_030628) do
+ActiveRecord::Schema.define(version: 2020_04_11_195852) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -27,8 +27,8 @@ ActiveRecord::Schema.define(version: 2020_04_09_030628) do
     t.integer "value"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.bigint "gift_card_details_id", null: false
-    t.index ["gift_card_details_id"], name: "index_gift_card_amounts_on_gift_card_details_id"
+    t.bigint "gift_card_detail_id", null: false
+    t.index ["gift_card_detail_id"], name: "index_gift_card_amounts_on_gift_card_detail_id"
   end
 
   create_table "gift_card_details", force: :cascade do |t|
@@ -65,7 +65,7 @@ ActiveRecord::Schema.define(version: 2020_04_09_030628) do
   end
 
   add_foreign_key "donation_details", "items"
-  add_foreign_key "gift_card_amounts", "gift_card_details", column: "gift_card_details_id"
+  add_foreign_key "gift_card_amounts", "gift_card_details"
   add_foreign_key "gift_card_details", "items"
   add_foreign_key "items", "sellers"
 end
