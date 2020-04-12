@@ -7,7 +7,8 @@ class WebhooksController < ApplicationController
     # Verify webhook signature and extract the event
     # See https://stripe.com/docs/webhooks/signatures for more information.
     sig_header = request.env['HTTP_STRIPE_SIGNATURE']
-    endpoint_secret = 'whsec_8I8JI2kT6B3RdUR39usVosRMhRvLVrcH'
+
+    endpoint_secret = ENV['STRIPE_WEBHOOK_KEY']
 
     event = Stripe::Webhook.construct_event(
       payload, sig_header, endpoint_secret
@@ -97,11 +98,8 @@ class WebhooksController < ApplicationController
   end
 
   def generate_gift_card_id(payment_intent_id:)
-    # TODO(jmckibb): Make this a secret
-    secret_hash_key = "some_secret_key123"
-
     for i in 1..50 do
-      seed = "#{Date.today}#{secret_hash_key}#{payment_intent_id}#{i}"
+      seed = "#{Date.today}#{ENV['HASH_KEY_CONSTANT']}#{payment_intent_id}#{i}"
 
       potential_id = Digest::MD5.hexdigest(seed)
       # Use this ID if it's not already taken
@@ -111,11 +109,8 @@ class WebhooksController < ApplicationController
   end
 
   def generate_seller_gift_card_id(payment_intent_id:, seller_id:)
-    # TODO(jmckibb): Make this a secret
-    secret_hash_key = "some_secret_key123"
-
     for i in 1..50 do
-      seed = "#{Time.current}#{secret_hash_key}#{payment_intent_id}#{i}#{seller_id}"
+      seed = "#{Time.current}#{ENV['HASH_KEY_CONSTANT']}#{payment_intent_id}#{i}#{seller_id}"
 
       hash = Digest::MD5.hexdigest(seed).upcase
       potential_id_prefix = hash[0...3]
