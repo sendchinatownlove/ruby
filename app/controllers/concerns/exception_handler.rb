@@ -2,6 +2,7 @@
 module ExceptionHandler
   class InvalidLineItem < StandardError; end
   class InvalidGiftCardUpdate < StandardError; end
+  class CannotGenerateUniqueHash < StandardError; end
 
   # provides the more graceful `included` method
   extend ActiveSupport::Concern

@@ -28,6 +28,7 @@ class WebhooksController < ApplicationController
     items = session['display_items']
     seller_id = session['metadata']['merchant_id']
     customer_id = session['customer']['id']
+    payment_intent_id = session['payment_intent']['id']
     items.each do |item|
       amount = item['amount']
       case item['custom']['name']
@@ -44,7 +45,13 @@ class WebhooksController < ApplicationController
           seller_id: seller_id,
           customer_id: customer_id
         )
-        create_gift_card(item: item, amount: amount)
+
+        create_gift_card(
+          item: item,
+          amount: amount,
+          payment_intent_id: payment_intent_id,
+          seller_id: seller_id
+        )
       else
         raise InvalidLineItem.new 'Unsupported ItemType. Please verify the line_item.name.'
       end
@@ -59,12 +66,51 @@ class WebhooksController < ApplicationController
     )
   end
 
-  def create_gift_card(item:, amount:)
+  def generate_gift_card_id(payment_intent_id:)
+    # TODO(jmckibb): Make this a secret
+    secret_hash_key = "some_secret_key123"
+
+    for i in 1..50 do
+      seed = "#{Date.today}#{secret_hash_key}#{payment_intent_id}#{i}"
+
+      potential_id = Digest::MD5.hexdigest(seed)
+      # Use this ID if it's not already taken
+      return potential_id if !GiftCardDetail.where(gift_card_id: potential_id).present?
+    end
+    raise CannotGenerateUniqueHash.new 'Error generating unique gift_card_id'
+  end
+
+  def generate_seller_gift_card_id(payment_intent_id:, seller_id:)
+    # TODO(jmckibb): Make this a secret
+    secret_hash_key = "some_secret_key123"
+
+    for i in 1..50 do
+      seed = "#{Time.current}#{secret_hash_key}#{payment_intent_id}#{i}#{seller_id}"
+
+      potential_id = Digest::MD5.hexdigest(seed)
+      # Use this ID if it's not already taken
+      return potential_id if !GiftCardDetail.where(seller_gift_card_id: potential_id)
+                                            .joins(:item)
+                                            .where(
+                                              items: { seller_id: seller_id }
+                                            ).present?
+    end
+    raise CannotGenerateUniqueHash.new 'Error generating unique gift_card_id'
+  end
+
+  def create_gift_card(item:, amount:, payment_intent_id:, seller_id:)
+    gift_card_id = generate_gift_card_id(payment_intent_id: payment_intent_id)
+    seller_gift_card_id = generate_seller_gift_card_id(
+      payment_intent_id: payment_intent_id,
+      seller_id: seller_id
+    )
+
     # TODO(jtmckibb): Create Charge here
     gift_card_detail = GiftCardDetail.create!(
-      expiration: Time.current + 100.days,
+      expiration: Date.today + 100.days,
       item: item,
-      gift_card_id: 'BOIWJEf'
+      gift_card_id: gift_card_id,
+      seller_gift_card_id: seller_gift_card_id
     )
     GiftCardAmount.create!(value: amount, gift_card_detail: gift_card_detail)
   end
