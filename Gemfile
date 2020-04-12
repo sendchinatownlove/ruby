@@ -28,7 +28,8 @@ gem 'sinatra'
 
 # Generates hashes
 # gem 'digest'
-
+gem 'devise'
+gem 'activeadmin'
 
 # rails admin
 gem 'rails_admin', '~> 2.0'
