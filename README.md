@@ -30,8 +30,8 @@ https://drive.google.com/drive/u/2/folders/1vDEWSwn2UFaGXBNCyt0qe60vOa5j6wfH
 `rails db:create && rails db:migrate`
 
 ### Useful commands
-Run the server: `heroku local:run rails server`
-Run the server on port 3001: `heroku local:run rails server -p 3001`
+Run the server: `heroku local web:run rails server`
+Run the server on port 3001: `heroku local web:run rails server -p 3001`
 You'll need to do this if you're getting cors errors from the frontend. Stop your frontend server, start the rails server on 3001, then start the local server again from port 3000 using `yarn start`
 Run all tests: `heroku local:run bundle exec rspec`
 Run specific tests: `heroku local:run bundle exec rspec -e "<insert string from test description>"`
