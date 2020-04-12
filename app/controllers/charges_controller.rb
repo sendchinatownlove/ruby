@@ -3,8 +3,7 @@ class ChargesController < ApplicationController
 
   # POST /charges
   def create
-    # TODO(jtmckibb): This is a secret, shhhh
-    Stripe.api_key = 'sk_test_Vux9P2VnjEDHuR4Cg8DHWmhq00y6iKGY8x'
+    Stripe.api_key = ENV['STRIPE_API_KEY']
 
     line_items = charge_params[:line_items].map(&:to_h)
     line_items.each { |item| validate(line_item: item) }
@@ -43,7 +42,7 @@ class ChargesController < ApplicationController
     end
 
     unless ['gift_card', 'donation'].include? line_item['item_type']
-      raise InvalidLineItem.new 'line_item must be named `Gift Card` or `Donation`'
+      raise InvalidLineItem.new 'line_item must be named `gift_card` or `donation`'
     end
 
     seller_id = line_item['seller_id']
