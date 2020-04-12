@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_12_013817) do
+ActiveRecord::Schema.define(version: 2020_04_12_045255) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -43,12 +43,23 @@ ActiveRecord::Schema.define(version: 2020_04_12_013817) do
   end
 
   create_table "items", force: :cascade do |t|
-    t.string "stripe_customer_id"
+    t.string "email"
     t.bigint "seller_id", null: false
     t.integer "item_type"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "payment_intent_id", null: false
+    t.index ["payment_intent_id"], name: "index_items_on_payment_intent_id"
     t.index ["seller_id"], name: "index_items_on_seller_id"
+  end
+
+  create_table "payment_intents", force: :cascade do |t|
+    t.string "stripe_id"
+    t.string "email"
+    t.text "line_items"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.boolean "successful", default: false
   end
 
   create_table "sellers", force: :cascade do |t|
@@ -68,5 +79,6 @@ ActiveRecord::Schema.define(version: 2020_04_12_013817) do
   add_foreign_key "donation_details", "items"
   add_foreign_key "gift_card_amounts", "gift_card_details"
   add_foreign_key "gift_card_details", "items"
+  add_foreign_key "items", "payment_intents"
   add_foreign_key "items", "sellers"
 end

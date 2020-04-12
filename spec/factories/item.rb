@@ -1,7 +1,8 @@
 FactoryBot.define do
   factory :item do
-    stripe_customer_id { Faker::Alphanumeric.alphanumeric(number: 64) }
+    email { Faker::Internet.email }
     association :seller
+    association :payment_intent
     item_type { Faker::Number.within(range: 0..1) }
   end
 end

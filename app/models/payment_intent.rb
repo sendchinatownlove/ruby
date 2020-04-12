@@ -1,0 +1,2 @@
+class PaymentIntent < ApplicationRecord
+end
