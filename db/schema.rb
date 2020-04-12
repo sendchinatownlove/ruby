@@ -76,6 +76,13 @@ ActiveRecord::Schema.define(version: 2020_04_12_045255) do
     t.index ["seller_id"], name: "index_sellers_on_seller_id"
   end
 
+  create_table "todos", force: :cascade do |t|
+    t.string "title"
+    t.string "created_by"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   add_foreign_key "donation_details", "items"
   add_foreign_key "gift_card_amounts", "gift_card_details"
   add_foreign_key "gift_card_details", "items"
