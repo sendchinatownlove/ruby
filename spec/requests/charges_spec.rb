@@ -6,7 +6,7 @@ RSpec.describe 'Charges API', type: :request do
     let(:email) { 'mrkrabs@thekrustykrab.com' }
     let(:params) { { email: email, line_items: line_items } }
     let(:seller_id) { 'shunfa-bakery' }
-    let!(:seller) { create(:seller, seller_id: seller_id) }
+    let!(:seller) { create(:seller, seller_id: seller_id, name: 'Shunfa Bakery') }
 
     context 'with a gift card' do
       let(:line_items) do
@@ -361,6 +361,93 @@ RSpec.describe 'Charges API', type: :request do
       it 'returns a validation failure message' do
         expect(response.body)
           .to match(/param is missing or the value is empty: line_items/)
+      end
+    end
+
+    describe 'PaymentIntent' do
+      context 'includes gift cards' do
+        let!(:seller2) { create(:seller, name: 'Uncle Boons') }
+
+        let(:line_items) do
+          [
+            {
+              amount: 5050,
+              currency: 'usd',
+              item_type: 'gift_card',
+              quantity: 2,
+              seller_id: seller.seller_id
+            },
+            {
+              amount: 3000,
+              currency: 'usd',
+              item_type: 'donation',
+              quantity: 1,
+              seller_id: seller2.seller_id
+            }
+          ]
+        end
+
+        it 'should include gift card details' do
+          thank_you = "Thank you for supporting #{seller.name}, and #{seller2.name}."
+          expect(Stripe::PaymentIntent).to receive(:create)
+            .with(
+              amount: 13100,
+              currency: 'usd',
+              payment_method_types: ['card'],
+              receipt_email: email,
+              description: thank_you + ' Your gift card(s) will be emailed to you when the seller opens back up.'
+            )
+            .and_call_original
+
+          post '/charges', params: params, as: :json
+        end
+      end
+
+      context 'when donations only' do
+        let!(:seller2) { create(:seller, name: 'Apple Bakery') }
+        let!(:seller3) { create(:seller, name: 'Zebra Stripes') }
+
+        let(:line_items) do
+          [
+            {
+              amount: 5050,
+              currency: 'usd',
+              item_type: 'donation',
+              quantity: 2,
+              seller_id: seller.seller_id
+            },
+            {
+              amount: 3000,
+              currency: 'usd',
+              item_type: 'donation',
+              quantity: 1,
+              seller_id: seller2.seller_id
+            },
+            {
+              amount: 3000,
+              currency: 'usd',
+              item_type: 'donation',
+              quantity: 1,
+              seller_id: seller3.seller_id
+            }
+          ]
+        end
+
+        before { post '/charges', params: params, as: :json }
+        it 'should not include gift card details' do
+          thank_you = "Thank you for supporting #{seller2.name}, #{seller.name}, and #{seller3.name}."
+          expect(Stripe::PaymentIntent).to receive(:create)
+            .with(
+              amount: 16100,
+              currency: 'usd',
+              receipt_email: email,
+              payment_method_types: ['card'],
+              description: thank_you
+            )
+            .and_call_original
+
+          post '/charges', params: params, as: :json
+        end
       end
     end
   end
