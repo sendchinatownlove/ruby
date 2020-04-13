@@ -5,7 +5,7 @@ RSpec.describe Seller, type: :model do
   # ensure Seller model has a 1:m relationship with the MenuItem model
   # it { should have_many(:menu_items).dependent(:destroy) }
   # Validation tests
-  subject { Seller.create(seller_id: 'oiawjefoiwjaef') }
+  let!(:seller) { Seller.create(seller_id: 'oiawjefoiwjaef') }
   it { should validate_uniqueness_of(:seller_id) }
   it do
     should allow_value(%w[true false]).for(:sell_gift_cards)
@@ -13,4 +13,7 @@ RSpec.describe Seller, type: :model do
   it do
     should allow_value(%w[true false]).for(:accept_donations)
   end
+  it { expect(seller.target_amount).to eq 1_000_000 }
+  it { expect(seller.accept_donations).to eq true }
+  it { expect(seller.sell_gift_cards).to eq false }
 end
