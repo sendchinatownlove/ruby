@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_13_001626) do
+ActiveRecord::Schema.define(version: 2020_04_13_200700) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -66,7 +66,7 @@ ActiveRecord::Schema.define(version: 2020_04_13_001626) do
     t.string "seller_id", null: false
     t.string "cuisine_name"
     t.string "name"
-    t.string "story"
+    t.text "story"
     t.boolean "accept_donations", default: true, null: false
     t.boolean "sell_gift_cards", default: false, null: false
     t.string "owner_name"
