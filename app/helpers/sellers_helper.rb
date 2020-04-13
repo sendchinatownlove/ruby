@@ -1,5 +1,11 @@
 module SellersHelper
-  def calculate_amount_raised(seller_id:)
+  def self.generate_seller_json(seller:)
+    seller = seller.as_json
+    seller['amount_raised'] = SellersHelper.calculate_amount_raised(seller_id: seller['seller_id'])
+    seller
+  end
+
+  def self.calculate_amount_raised(seller_id:)
     return 0 if Item.where(seller_id: seller_id).empty?
 
     donation_amount = DonationDetail.joins(:item)
@@ -7,14 +13,11 @@ module SellersHelper
                                     .inject(0) do |sum, donation|
       sum + donation.amount
     end
-    # SOS HALP MEEEEE
-    gift_card_amount_ids = GiftCardAmount.group(:gift_card_detail_id).maximum(:updated_at).keys
-    gift_card_amounts = GiftCardAmount(id: gift_card_amount_ids)
-                             .joins(:gift_card_detail)
-                             .joins(:item)
-                             .where(items: { seller_id: seller_id })
 
-    gift_card_amount = gift_card_amounts.inject(0) do |sum, gift_card|
+    # TODO(jmckibben): Make this a single SQL query instead of doing N queries
+    gift_card_amount = GiftCardDetail.joins(:item)
+                                     .where(items: { seller_id: seller_id })
+                                     .inject(0) do |sum, gift_card|
       sum + gift_card.amount
     end
 

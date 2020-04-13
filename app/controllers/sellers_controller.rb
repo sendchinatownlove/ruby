@@ -4,31 +4,38 @@ class SellersController < ApplicationController
   # GET /sellers
   def index
     @sellers = Seller.all
-    json_response(@sellers)
+    sellers = @sellers.map { |seller| SellersHelper.generate_seller_json(seller: seller) }
+    json_response(sellers)
   end
 
   # POST /sellers
   def create
     @seller = Seller.create!(seller_params)
-    json_response(@seller, :created)
+    seller = SellersHelper.generate_seller_json(seller: @seller)
+    json_response(seller, :created)
   end
 
   # GET /sellers/:seller_id
   def show
-    json_response(@seller)
+    seller = SellersHelper.generate_seller_json(seller: @seller)
+    json_response(seller)
   end
 
   # PUT /sellers/:seller_id
   def update
-    @seller.update(seller_params)
-    json_response(@seller)
+    @seller.update(update_params)
+    seller = SellersHelper.generate_seller_json(seller: @seller)
+    json_response(seller)
   end
 
   private
 
   def seller_params
-    # whitelist params
     params.required(:seller_id)
+    update_params
+  end
+
+  def update_params
     params.permit(
       :seller_id,
       :cuisine_name,

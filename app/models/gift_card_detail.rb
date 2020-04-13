@@ -4,6 +4,12 @@ class GiftCardDetail < ApplicationRecord
   validate :seller_gift_card_id_is_unique_per_seller
   has_many :gift_card_amount
 
+  # TODO(jmckibben): Being used in sellers_helper N times. Ideally we'd combine into a
+  # single query
+  def amount
+    GiftCardAmount.where(gift_card_detail_id: id).order(updated_at: :desc).first.value
+  end
+
   def seller_gift_card_id_is_unique_per_seller
     if seller_gift_card_id.present?
       seller_id = item.seller_id

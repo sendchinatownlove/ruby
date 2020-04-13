@@ -101,6 +101,7 @@ RSpec.describe 'Sellers API', type: :request do
         expected_json['created_at'] = current_time
         expected_json['updated_at'] = current_time
         expected_json['target_amount'] = 1_000_000
+        expected_json['amount_raised'] = 0
         expect(actual_json).to eq(expected_json.with_indifferent_access)
       end
 
@@ -120,6 +121,7 @@ RSpec.describe 'Sellers API', type: :request do
         expected_json['updated_at'] = current_time
         expected_json['accept_donations'] = true
         expected_json['target_amount'] = 1_000_000
+        expected_json['amount_raised'] = 0
         expect(actual_json).to eq(expected_json.with_indifferent_access)
       end
 
@@ -139,6 +141,7 @@ RSpec.describe 'Sellers API', type: :request do
         expected_json['updated_at'] = current_time
         expected_json['sell_gift_cards'] = false
         expected_json['target_amount'] = 1_000_000
+        expected_json['amount_raised'] = 0
         expect(actual_json).to eq(expected_json.with_indifferent_access)
       end
 
@@ -187,6 +190,7 @@ RSpec.describe 'Sellers API', type: :request do
       expected_json['created_at'] = current_time
       expected_json['updated_at'] = current_time
       expected_json['target_amount'] = 1_000_000
+      expected_json['amount_raised'] = 0
       expect(actual_json).to eq(expected_json.with_indifferent_access)
     end
 
