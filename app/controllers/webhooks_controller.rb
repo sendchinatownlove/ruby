@@ -99,7 +99,7 @@ class WebhooksController < ApplicationController
 
   def generate_gift_card_id(payment_intent_id:)
     for i in 1..50 do
-      seed = "#{Date.today}#{ENV['HASH_KEY_CONSTANT']}#{payment_intent_id}#{i}"
+      seed = "#{Time.current}#{ENV['HASH_KEY_CONSTANT']}#{payment_intent_id}#{i}"
 
       potential_id = Digest::MD5.hexdigest(seed)
       # Use this ID if it's not already taken
