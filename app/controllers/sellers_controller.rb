@@ -41,6 +41,7 @@ class SellersController < ApplicationController
       :cuisine_name,
       :name,
       :story,
+      :summary,
       :owner_name,
       :owner_image_url,
       :accept_donations,
