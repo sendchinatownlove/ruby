@@ -31,6 +31,20 @@ RSpec.describe 'Sellers API', type: :request do
     )
   end
 
+  let(:valid_attributes) do
+    {
+      seller_id: 'new-url',
+      cuisine_name: 'New Age Cuisine',
+      name: 'New Shunfa Bakery',
+      story: "I'm on a new level I'm on a new level",
+      summary: "Darold Durard Brown Ferguson Jr. (born October 20, 1988), known by his stage name ASAP Ferg (stylized A$AP Ferg), is an American rapper and songwriter from New York City's Harlem neighborhood.",
+      owner_name: 'A$AP Ferg',
+      owner_image_url: 'https://www.youtube.com/watch?v=Srns7NiO278',
+      accept_donations: true,
+      sell_gift_cards: true
+    }
+  end
+
   # Test suite for GET /sellers
   describe 'GET /sellers' do
     # make HTTP get request before each example
@@ -77,20 +91,6 @@ RSpec.describe 'Sellers API', type: :request do
 
   # Test suite for POST /sellers
   describe 'POST /sellers' do
-    # valid payload
-    let(:valid_attributes) do
-      {
-        seller_id: 'the-pickle-guys',
-        cuisine_name: 'Pickles',
-        name: 'The Pickle Guys',
-        story: 'i eat pickles everyday for every meal — i LOOOOOVE pickles',
-        owner_name: 'Pickle Rick',
-        owner_image_url: 'https://www.youtube.com/watch?v=tZp8sY06Qoc',
-        accept_donations: true,
-        sell_gift_cards: true
-      }
-    end
-
     context 'when the request is valid' do
       before { post '/sellers', params: valid_attributes, as: :json }
 
@@ -168,18 +168,6 @@ RSpec.describe 'Sellers API', type: :request do
 
   # Test suite for PUT /sellers/seller_id
   describe 'PUT /sellers/seller_id' do
-    let(:valid_attributes) do
-      {
-        seller_id: 'new-url',
-        cuisine_name: 'New Age Cuisine',
-        name: 'New Shunfa Bakery',
-        story: "I'm on a new level I'm on a new level",
-        owner_name: 'A$AP Ferg',
-        owner_image_url: 'https://www.youtube.com/watch?v=Srns7NiO278',
-        accept_donations: true,
-        sell_gift_cards: true
-      }
-    end
 
     before { put "/sellers/#{seller_id1}", params: valid_attributes, as: :json }
 
