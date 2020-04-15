@@ -1,8 +1,8 @@
 module SellersHelper
   def self.generate_seller_json(seller:)
-    addresses = seller.addresses
+    locations = seller.locations
     seller = seller.as_json
-    seller['addresses'] = addresses.as_json
+    seller['locations'] = locations.as_json
     seller['amount_raised'] = SellersHelper.calculate_amount_raised(seller_id: seller['seller_id'])
     seller
   end

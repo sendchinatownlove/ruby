@@ -17,7 +17,7 @@ Rails.application.configure do
       resource '*', headers: :any, methods: :any
     end
   end
-  
+
 
   # Full error reports are disabled and caching is turned on.
   config.consider_all_requests_local       = false
