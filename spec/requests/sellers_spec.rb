@@ -39,6 +39,7 @@ RSpec.describe 'Sellers API', type: :request do
       story: "I'm on a new level I'm on a new level",
       summary: "Darold Durard Brown Ferguson Jr. (born October 20, 1988), known by his stage name ASAP Ferg (stylized A$AP Ferg), is an American rapper and songwriter from New York City's Harlem neighborhood.",
       owner_name: 'A$AP Ferg',
+      phone_number: '(281) 330-8004',
       owner_image_url: 'https://www.youtube.com/watch?v=Srns7NiO278',
       accept_donations: true,
       sell_gift_cards: true
