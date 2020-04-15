@@ -1,6 +1,6 @@
 class Seller < ApplicationRecord
   # model association
-  has_many :addresses, dependent: :destroy
+  has_many :locations, dependent: :destroy
 
   validates_uniqueness_of :seller_id
   validates_inclusion_of :sell_gift_cards, in: [true, false]

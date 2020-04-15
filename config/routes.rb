@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   resources :gift_cards do
   end
   resources :sellers do
-    resources :addresses
+    resources :locations
   end
   resources :webhooks do
   end
