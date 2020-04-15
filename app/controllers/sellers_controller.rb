@@ -42,6 +42,7 @@ class SellersController < ApplicationController
       :name,
       :story,
       :summary,
+      :phone_number,
       :owner_name,
       :owner_image_url,
       :accept_donations,

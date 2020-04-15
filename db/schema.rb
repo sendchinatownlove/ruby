@@ -10,10 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_14_031644) do
+ActiveRecord::Schema.define(version: 2020_04_15_000701) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "addresses", force: :cascade do |t|
+    t.string "address1", null: false
+    t.string "address2"
+    t.string "city", null: false
+    t.string "state", null: false
+    t.string "zip_code", null: false
+    t.bigint "seller_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["seller_id"], name: "index_addresses_on_seller_id"
+  end
 
   create_table "donation_details", force: :cascade do |t|
     t.bigint "item_id", null: false
@@ -75,9 +87,11 @@ ActiveRecord::Schema.define(version: 2020_04_14_031644) do
     t.datetime "updated_at", precision: 6, null: false
     t.integer "target_amount", default: 1000000
     t.text "summary"
+    t.string "phone_number"
     t.index ["seller_id"], name: "index_sellers_on_seller_id"
   end
 
+  add_foreign_key "addresses", "sellers"
   add_foreign_key "donation_details", "items"
   add_foreign_key "gift_card_amounts", "gift_card_details"
   add_foreign_key "gift_card_details", "items"

@@ -39,6 +39,7 @@ RSpec.describe 'Sellers API', type: :request do
       story: "I'm on a new level I'm on a new level",
       summary: "Darold Durard Brown Ferguson Jr. (born October 20, 1988), known by his stage name ASAP Ferg (stylized A$AP Ferg), is an American rapper and songwriter from New York City's Harlem neighborhood.",
       owner_name: 'A$AP Ferg',
+      phone_number: '(281) 330-8004',
       owner_image_url: 'https://www.youtube.com/watch?v=Srns7NiO278',
       accept_donations: true,
       sell_gift_cards: true
@@ -102,6 +103,7 @@ RSpec.describe 'Sellers API', type: :request do
         expected_json['updated_at'] = current_time
         expected_json['target_amount'] = 1_000_000
         expected_json['amount_raised'] = 0
+        expected_json['addresses'] = []
         expect(actual_json).to eq(expected_json.with_indifferent_access)
       end
 
@@ -122,6 +124,7 @@ RSpec.describe 'Sellers API', type: :request do
         expected_json['accept_donations'] = true
         expected_json['target_amount'] = 1_000_000
         expected_json['amount_raised'] = 0
+        expected_json['addresses'] = []
         expect(actual_json).to eq(expected_json.with_indifferent_access)
       end
 
@@ -142,6 +145,7 @@ RSpec.describe 'Sellers API', type: :request do
         expected_json['sell_gift_cards'] = false
         expected_json['target_amount'] = 1_000_000
         expected_json['amount_raised'] = 0
+        expected_json['addresses'] = []
         expect(actual_json).to eq(expected_json.with_indifferent_access)
       end
 
@@ -179,6 +183,7 @@ RSpec.describe 'Sellers API', type: :request do
       expected_json['updated_at'] = current_time
       expected_json['target_amount'] = 1_000_000
       expected_json['amount_raised'] = 0
+      expected_json['addresses'] = []
       expect(actual_json).to eq(expected_json.with_indifferent_access)
     end
 
