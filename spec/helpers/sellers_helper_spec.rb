@@ -19,6 +19,8 @@ RSpec.describe SellersHelper, type: :helper do
         'updated_at': seller.updated_at,
         'target_amount': seller.target_amount,
         'summary': seller.summary,
+        'progress_bar_color': seller.progress_bar_color,
+        'hero_image_url': seller.hero_image_url,
         'locations': []
       }.as_json
     end

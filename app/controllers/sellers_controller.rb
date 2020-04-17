@@ -45,7 +45,9 @@ class SellersController < ApplicationController
       :owner_name,
       :owner_image_url,
       :accept_donations,
-      :sell_gift_cards
+      :sell_gift_cards,
+      :hero_image_url,
+      :progress_bar_color
     )
   end
 

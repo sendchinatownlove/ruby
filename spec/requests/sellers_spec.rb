@@ -41,7 +41,9 @@ RSpec.describe 'Sellers API', type: :request do
       owner_name: 'A$AP Ferg',
       owner_image_url: 'https://www.youtube.com/watch?v=Srns7NiO278',
       accept_donations: true,
-      sell_gift_cards: true
+      sell_gift_cards: true,
+      hero_image_url: 'superman-url',
+      progress_bar_color: '#1234'
     }
   end
 
