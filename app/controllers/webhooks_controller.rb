@@ -1,14 +1,13 @@
 class WebhooksController < ApplicationController
   # POST /webhooks
   def create
-    payload = request.body.read
-    event = nil
+    Stripe.api_key = ENV['STRIPE_API_KEY']
 
     # Verify webhook signature and extract the event
     # See https://stripe.com/docs/webhooks/signatures for more information.
     sig_header = request.env['HTTP_STRIPE_SIGNATURE']
-
     endpoint_secret = ENV['STRIPE_WEBHOOK_KEY']
+    payload = request.body.read
 
     event = Stripe::Webhook.construct_event(
       payload, sig_header, endpoint_secret

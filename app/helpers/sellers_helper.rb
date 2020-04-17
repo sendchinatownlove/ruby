@@ -3,10 +3,12 @@ module SellersHelper
     locations = seller.locations
     seller = seller.as_json
     seller['locations'] = locations.as_json
-    seller['amount_raised'] = SellersHelper.calculate_amount_raised(seller_id: seller['seller_id'])
+    seller['amount_raised'] = SellersHelper.calculate_amount_raised(seller_id: seller['id'])
     seller
   end
 
+  # Calculates the amount of money raised by the Seller so far.
+  # seller_id: the actual id of the Seller. Seller.id
   def self.calculate_amount_raised(seller_id:)
     return 0 if Item.where(seller_id: seller_id).empty?
 

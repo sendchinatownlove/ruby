@@ -31,7 +31,7 @@ module ExceptionHandler
 
     # Invalid signature
     rescue_from Stripe::SignatureVerificationError do |e|
-      json_response({ message: e.error.message }, e.http_status)
+      json_response({ message: e.message }, e.http_status)
     end
 
   end
