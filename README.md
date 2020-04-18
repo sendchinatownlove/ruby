@@ -20,7 +20,8 @@ If you don't have rvm, gem install rvm:
 - Download postgres
 `brew install postgresql`
 - Run `bundle install`. You might have to `gem install bundler`
-- Download the local deveopment `.env` file and place it in your ruby/
+- Download the local deveopment `.env` file (the secret sauce) and place it in your ruby/ (mac os might give you
+a warning about hiding files that begin with '.')
 https://drive.google.com/drive/u/2/folders/1vDEWSwn2UFaGXBNCyt0qe60vOa5j6wfH
 
 ### Create and migrate database
