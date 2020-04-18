@@ -1,46 +1,71 @@
+require 'securerandom'
 
 class ChargesController < ApplicationController
+  # TODO: remove and add square credentials to env
+  skip_before_action :verify_authenticity_token
 
   # POST /charges
   def create
-    Stripe.api_key = ENV['STRIPE_API_KEY']
+    if ENV['square']
+      api_client = Square::Client.new(
+        # TODO: put in ENV
+        access_token: 'EAAAEAQN-8I264d9ntPRq8iqR2I9jY94VEmdngHcGAghHSdAXjdFVcp7-DfECWXI',
+        # environment: ENV['IS_PRODUCTION'] == 'false' ? 'sandbox' : 'production'
+      )
 
-    line_items = charge_params[:line_items].map(&:to_h)
+      request_body = {
+        source_id: charge_params[:nonce],
+        idempotency_key: SecureRandom.uuid,
+        amount_money: {
+          amount: amount,
+          currency: 'USD',
+        },
+        buyer_email_address: charge_params[:email],
+        # note: 'seller: ' + seller_names.to_a + ', item_types: ' + item_types,
+      }
 
-    # Validate each Item and get all ItemTypes
-    item_types = Set.new
-    seller_names = Set.new
-    line_items.each do |item|
-      validate(line_item: item)
-      item_types.add item['item_type']
-      seller = Seller.find_by(seller_id: item['seller_id'])
-      seller_names.add seller.name
+      result = payments_api.create_payment(body: request_body)
+      json_response(result)
+    else
+      Stripe.api_key = ENV['STRIPE_API_KEY']
+
+      line_items = charge_params[:line_items].map(&:to_h)
+
+      # Validate each Item and get all ItemTypes
+      item_types = Set.new
+      seller_names = Set.new
+      line_items.each do |item|
+        validate(line_item: item)
+        item_types.add item['item_type']
+        seller = Seller.find_by(seller_id: item['seller_id'])
+        seller_names.add seller.name
+      end
+
+      # Total all Items
+      amount = line_items.inject(0) { |sum, item| sum + item['amount'] * item['quantity'] }
+
+      description = generate_description(
+        seller_names: seller_names.to_a,
+        item_types: item_types
+      )
+      intent = Stripe::PaymentIntent.create(
+        amount: amount,
+        currency: 'usd',
+        receipt_email: charge_params[:email],
+        payment_method_types: ['card'],
+        description: description
+      )
+
+      # Creates a pending PaymentIntent. See webhooks_controller to see what happens
+      # when the PaymentIntent is successful.
+      PaymentIntent.create!(
+        stripe_id: intent['id'],
+        email: charge_params[:email],
+        line_items: line_items.to_json
+      )
+
+      json_response(intent)
     end
-
-    # Total all Items
-    amount = line_items.inject(0) { |sum, item| sum + item['amount'] * item['quantity'] }
-
-    description = generate_description(
-      seller_names: seller_names.to_a,
-      item_types: item_types
-    )
-    intent = Stripe::PaymentIntent.create(
-      amount: amount,
-      currency: 'usd',
-      receipt_email: charge_params[:email],
-      payment_method_types: ['card'],
-      description: description
-    )
-
-    # Creates a pending PaymentIntent. See webhooks_controller to see what happens
-    # when the PaymentIntent is successful.
-    PaymentIntent.create!(
-      stripe_id: intent['id'],
-      email: charge_params[:email],
-      line_items: line_items.to_json
-    )
-
-    json_response(intent)
   end
 
   private
@@ -48,7 +73,8 @@ class ChargesController < ApplicationController
   def charge_params
     params.require(:line_items)
     params.require(:email)
-    params.permit(:email, line_items: [[:amount, :currency, :item_type, :quantity, :seller_id]])
+    params.rquire(:nonce)
+    params.permit(:email, , :nonce, line_items: [[:amount, :currency, :item_type, :quantity, :seller_id]])
   end
 
   def validate(line_item:)
