@@ -84,6 +84,7 @@ ActiveRecord::Schema.define(version: 2020_04_18_152517) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "successful", default: false
+    t.string "square_payment_id"
   end
 
   create_table "sellers", force: :cascade do |t|
