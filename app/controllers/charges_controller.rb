@@ -29,6 +29,7 @@ class ChargesController < ApplicationController
       payment = create_square_payment_request(
           source_id: charge_params[:nonce],
           amount: amount,
+          # TODO: email note to buyer
           note: description,
           email: email,
           line_items: line_items)
