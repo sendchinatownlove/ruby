@@ -2,9 +2,11 @@ require 'rails_helper'
 
 RSpec.describe 'MenuItems API' do
   # Initialize the test data
+  before { freeze_time }
+  let(:current_time) { Time.current.utc.iso8601(3).to_s }
   let!(:seller) { create(:seller) }
-  let!(:menu_items) { create_list(:menu_item, 20, seller_id: seller.id) }
   let(:seller_id) { seller.seller_id }
+  let!(:menu_items) { create_list(:menu_item, 20, seller_id: seller.id) }
   let(:id) { menu_items.first.id }
 
   # Test suite for GET /sellers/:seller_id/menu_items
@@ -40,13 +42,26 @@ RSpec.describe 'MenuItems API' do
       {
         name: 'Food',
         description: 'Awesome Food',
-        amount: 15,
+        amount: 15.5,
         image_url: 'image.com'
       }
     end
 
     context 'when request attributes are valid' do
       before { post "/sellers/#{seller_id}/menu_items", params: valid_attributes, as: :json }
+
+      it 'creates a menu_item' do
+        actual_json = json.except('id')
+        expected_json = valid_attributes.except('id')
+        expected_json['created_at'] = current_time
+        expected_json['updated_at'] = current_time
+        expected_json['name'] = 'Food'
+        expected_json['description'] = 'Awesome Food'
+        expected_json['amount'] = "15.5"
+        expected_json['image_url'] = 'image.com'
+        expected_json['seller_id'] = seller.id
+        expect(actual_json).to eq(expected_json.with_indifferent_access)
+      end
 
       it 'returns status code 201' do
         expect(response).to have_http_status(201)

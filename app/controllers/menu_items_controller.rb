@@ -9,23 +9,32 @@ class MenuItemsController < ApplicationController
 
   # POST /sellers/:seller_id/menu_items
   def create
-    json_response(@seller.menu_items.create!(menu_item_params), :created)
+    json_response(@seller.menu_items.create!(create_menu_item_params), :created)
   end
 
   # PUT /sellers/:seller_id/menu_items/:id
   def update
-    @menu_item.update(menu_item_params)
+    @menu_item.update(update_menu_item_params)
     json_response(@menu_item)
   end
 
   # DELETE /sellers/:seller_id/menu_items/:id
   def destroy
-    json_response(@menu_item.destroy)
+    @menu_item.destroy
+
+    head :no_content
   end
 
   private
 
-  def menu_item_params
+  def create_menu_item_params
+    params.require(:seller_id)
+    update_params
+  end
+
+  def update_menu_item_params
+    params.require(:seller_id)
+    params.require(:id)
     update_params
   end
 
