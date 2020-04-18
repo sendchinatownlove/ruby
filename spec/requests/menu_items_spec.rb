@@ -47,6 +47,12 @@ RSpec.describe 'MenuItems API' do
       }
     end
 
+    let(:invalid_attributes) do
+      {
+        invalid: 'Food',
+      }
+    end
+
     context 'when request attributes are valid' do
       before { post "/sellers/#{seller_id}/menu_items", params: valid_attributes, as: :json }
 
@@ -59,6 +65,27 @@ RSpec.describe 'MenuItems API' do
         expected_json['description'] = 'Awesome Food'
         expected_json['amount'] = "15.5"
         expected_json['image_url'] = 'image.com'
+        expected_json['seller_id'] = seller.id
+        expect(actual_json).to eq(expected_json.with_indifferent_access)
+      end
+
+      it 'returns status code 201' do
+        expect(response).to have_http_status(201)
+      end
+    end
+
+    context 'when request attributes are invalid' do
+      before { post "/sellers/#{seller_id}/menu_items", params: invalid_attributes, as: :json }
+
+      it 'creates a menu_item' do
+        actual_json = json.except('id')
+        expected_json = valid_attributes.except('id')
+        expected_json['created_at'] = current_time
+        expected_json['updated_at'] = current_time
+        expected_json['name'] = nil
+        expected_json['description'] = nil
+        expected_json['amount'] = nil
+        expected_json['image_url'] = nil
         expected_json['seller_id'] = seller.id
         expect(actual_json).to eq(expected_json.with_indifferent_access)
       end
