@@ -10,6 +10,15 @@
 For ubuntu try using ...
 https://gorails.com/setup/ubuntu/19.10
 
+1. Download rails, gem install rails — brew install gem
+2. brew install postgresql
+3. Install heroku cli
+4. bundle install
+5. rails create:db
+6. rails migrate:db
+7. heroku local web -> localhost:5000
+8. test: heroku local:run bundle exec rspec
+
 ## on machine
 
 ### Installation
@@ -83,6 +92,7 @@ git remote add heroku https://git.heroku.com/sendchinatownlove.git`
 
 or if pipelines already setup, push naturally to branches
 
+
 ### DNS & SSL
 Follow instructions to enable DNS. `https://devcenter.heroku.com/articles/custom-domains`
 
@@ -91,5 +101,3 @@ heroku comes with auto-ssl for all hobby and up dynos
 
 run
 `heroku certs:auto:enable`
-
-
