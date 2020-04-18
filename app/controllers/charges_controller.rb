@@ -48,9 +48,8 @@ class ChargesController < ApplicationController
 
       # Creates a pending PaymentIntent. See webhooks_controller to see what happens
       # when the PaymentIntent is successful.
-      # TODO: update stripe_id col to something payment agnostic
       PaymentIntent.create!(
-          stripe_id: payment['id'],
+          square_payment_id: payment['id'],
           email: charge_params[:email],
           line_items: line_items.to_json
       )
