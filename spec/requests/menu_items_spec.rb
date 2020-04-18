@@ -125,4 +125,21 @@ RSpec.describe 'MenuItems API' do
       end
     end
   end
+
+  # Test suite for DELETE /sellers/:seller_id/menu_items/:id
+  describe 'DELETE /sellers/:seller_id/menu_items/:id' do
+    let(:valid_attributes) { { name: 'AwesomeFood' } }
+
+    before { delete "/sellers/#{seller_id}/menu_items/#{id}", params: valid_attributes, as: :json }
+
+    context 'when menu_item exists' do
+      it 'returns status code 200' do
+        expect(response).to have_http_status(204)
+      end
+
+      it 'updates the menu_item' do
+        expect{updated_menu_item = MenuItem.find(id)}.to raise_exception(ActiveRecord::RecordNotFound)
+      end
+    end
+  end
 end
