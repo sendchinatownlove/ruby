@@ -11,5 +11,10 @@ FactoryBot.define do
     progress_bar_color { Faker::Alphanumeric.alphanumeric(number: 64) }
     accept_donations { Faker::Boolean.boolean }
     sell_gift_cards { Faker::Boolean.boolean }
+    business_type { Faker::Company.type }
+    num_employees { Faker::Number.digit }
+    founded_year { Faker::Number.within(range: 1800..2020) }
+    website_url { Faker::Lorem.word }
+    menu_url { Faker::Lorem.word }
   end
 end

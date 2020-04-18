@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_18_163401) do
+ActiveRecord::Schema.define(version: 2020_04_18_170619) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -90,7 +90,7 @@ ActiveRecord::Schema.define(version: 2020_04_18_163401) do
     t.text "summary"
     t.string "hero_image_url"
     t.string "progress_bar_color"
-    t.string "type"
+    t.string "business_type"
     t.integer "num_employees"
     t.integer "founded_year"
     t.string "website_url"
