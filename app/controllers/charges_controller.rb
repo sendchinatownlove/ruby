@@ -44,8 +44,18 @@ class ChargesController < ApplicationController
         note: description,
       }
 
-      result = api_client.payments.create_payment(body: request_body)
-      json_response(result)
+      payment = api_client.payments.create_payment(body: request_body)
+
+      # Creates a pending PaymentIntent. See webhooks_controller to see what happens
+      # when the PaymentIntent is successful.
+      # TODO: update stripe_id col to something payment agnostic
+      PaymentIntent.create!(
+          stripe_id: payment['id'],
+          email: charge_params[:email],
+          line_items: line_items.to_json
+      )
+
+      json_response(payment)
     else
       Stripe.api_key = ENV['STRIPE_API_KEY']
 
@@ -74,8 +84,7 @@ class ChargesController < ApplicationController
   def charge_params
     params.require(:line_items)
     params.require(:email)
-    params.rquire(:nonce)
-    params.permit(:email, , :nonce, line_items: [[:amount, :currency, :item_type, :quantity, :seller_id]])
+    params.permit(:email , :nonce, line_items: [[:amount, :currency, :item_type, :quantity, :seller_id]])
   end
 
   def validate(line_item:)

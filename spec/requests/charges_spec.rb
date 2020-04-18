@@ -4,7 +4,7 @@ RSpec.describe 'Charges API', type: :request do
   # Test suite for POST /charges
   describe 'POST /charges' do
     let(:email) { 'mrkrabs@thekrustykrab.com' }
-    let(:params) { { email: email, line_items: line_items } }
+    let(:params) { { email: email, nonce: nonce, line_items: line_items } }
     let(:seller_id) { 'shunfa-bakery' }
     let!(:seller) { create(:seller, seller_id: seller_id, name: 'Shunfa Bakery') }
 
