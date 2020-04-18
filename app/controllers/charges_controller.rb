@@ -6,7 +6,27 @@ class ChargesController < ApplicationController
 
   # POST /charges
   def create
-    if ENV['square']
+    line_items = charge_params[:line_items].map(&:to_h)
+
+    # Validate each Item and get all ItemTypes
+    item_types = Set.new
+    seller_names = Set.new
+    line_items.each do |item|
+      validate(line_item: item)
+      item_types.add item['item_type']
+      seller = Seller.find_by(seller_id: item['seller_id'])
+      seller_names.add seller.name
+    end
+
+    # Total all Items
+    amount = line_items.inject(0) { |sum, item| sum + item['amount'] * item['quantity'] }
+
+    description = generate_description(
+      seller_names: seller_names.to_a,
+      item_types: item_types
+    )
+
+    if ENV['use_square']
       api_client = Square::Client.new(
         # TODO: put in ENV
         access_token: 'EAAAEAQN-8I264d9ntPRq8iqR2I9jY94VEmdngHcGAghHSdAXjdFVcp7-DfECWXI',
@@ -21,33 +41,14 @@ class ChargesController < ApplicationController
           currency: 'USD',
         },
         buyer_email_address: charge_params[:email],
-        # note: 'seller: ' + seller_names.to_a + ', item_types: ' + item_types,
+        note: description,
       }
 
-      result = payments_api.create_payment(body: request_body)
+      result = api_client.payments.create_payment(body: request_body)
       json_response(result)
     else
       Stripe.api_key = ENV['STRIPE_API_KEY']
 
-      line_items = charge_params[:line_items].map(&:to_h)
-
-      # Validate each Item and get all ItemTypes
-      item_types = Set.new
-      seller_names = Set.new
-      line_items.each do |item|
-        validate(line_item: item)
-        item_types.add item['item_type']
-        seller = Seller.find_by(seller_id: item['seller_id'])
-        seller_names.add seller.name
-      end
-
-      # Total all Items
-      amount = line_items.inject(0) { |sum, item| sum + item['amount'] * item['quantity'] }
-
-      description = generate_description(
-        seller_names: seller_names.to_a,
-        item_types: item_types
-      )
       intent = Stripe::PaymentIntent.create(
         amount: amount,
         currency: 'usd',
