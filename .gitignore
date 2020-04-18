@@ -28,3 +28,7 @@
 
 # Ignore local environment variables
 .env
+
+# Ignore intellij stuff
+.idea/
+ruby.iml
