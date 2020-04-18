@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_18_153329) do
+ActiveRecord::Schema.define(version: 2020_04_18_161839) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -83,8 +83,6 @@ ActiveRecord::Schema.define(version: 2020_04_18_153329) do
     t.string "menu_url"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.bigint "seller_id", null: false
-    t.index ["seller_id"], name: "index_seller_extra_infos_on_seller_id"
   end
 
   create_table "sellers", force: :cascade do |t|
@@ -102,6 +100,11 @@ ActiveRecord::Schema.define(version: 2020_04_18_153329) do
     t.text "summary"
     t.string "hero_image_url"
     t.string "progress_bar_color"
+    t.string "type"
+    t.integer "num_employees"
+    t.integer "founded_year"
+    t.string "website_url"
+    t.string "menu_url"
     t.index ["seller_id"], name: "index_sellers_on_seller_id"
   end
 
@@ -111,5 +114,4 @@ ActiveRecord::Schema.define(version: 2020_04_18_153329) do
   add_foreign_key "items", "payment_intents"
   add_foreign_key "items", "sellers"
   add_foreign_key "locations", "sellers"
-  add_foreign_key "seller_extra_infos", "sellers"
 end
