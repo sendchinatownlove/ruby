@@ -114,6 +114,7 @@ class ChargesController < ApplicationController
     # Creates a pending PaymentIntent. See webhooks_controller to see what happens
     # when the PaymentIntent is successful.
     PaymentIntent.create!(
+        # TODO: add square location id when available
         square_payment_id: payment['id'],
         email: email,
         line_items: line_items.to_json
