@@ -26,9 +26,6 @@
 # Ignore master key for decrypting credentials and more.
 /config/master.key
 
-# Ignore local environment variables
-.env
-
 # Ignore intellij stuff
 .idea/
 ruby.iml
