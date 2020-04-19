@@ -20,25 +20,25 @@ class ChargesController < ApplicationController
     amount = line_items.inject(0) { |sum, item| sum + item['amount'] * item['quantity'] }
 
     description = generate_description(
-        seller_names: seller_names.to_a,
-        item_types: item_types
+      seller_names: seller_names.to_a,
+      item_types: item_types
     )
 
     email = charge_params[:email]
-    if ENV['USE_SQUARE'] == "true"
+    if charge_params[:is_square]
       payment = create_square_payment_request(
-          source_id: charge_params[:nonce],
-          amount: amount,
-          # TODO: email note to buyer
-          note: description,
-          email: email,
-          line_items: line_items)
+        source_id: charge_params[:nonce],
+        amount: amount,
+        # TODO: email note to buyer
+        note: description,
+        email: email,
+        line_items: line_items)
     else
       payment = create_stripe_payment_request(
-          amount: amount,
-          email: email,
-          description: description,
-          line_items: line_items)
+        amount: amount,
+        email: email,
+        description: description,
+        line_items: line_items)
     end
 
     json_response(payment)
@@ -49,7 +49,9 @@ class ChargesController < ApplicationController
   def charge_params
     params.require(:line_items)
     params.require(:email)
-    params.permit(:email, :nonce, line_items: [[:amount, :currency, :item_type, :quantity, :seller_id]])
+    params.require(:is_square)
+    params.require(:nonce) if params[:is_square]
+    params.permit(:email, :nonce, :is_square, line_items: [[:amount, :currency, :item_type, :quantity, :seller_id]])
   end
 
   def validate(line_item:)
@@ -95,51 +97,63 @@ class ChargesController < ApplicationController
 
   def create_square_payment_request(source_id:, amount:, note:, email:, line_items:)
     api_client = Square::Client.new(
-        access_token: ENV['SQUARE_ACCESS_TOKEN'],
+      access_token: ENV['SQUARE_ACCESS_TOKEN'],
+      environment: if Rails.env.production? then 'production' else 'sandbox' end
     )
 
+    # Default location in prod:
+    # https://squareup.com/dashboard/locations/3D0QAW4CSZJWZ
+    # In the future we might associate a Square location with each seller that we onboard
+    # This will give us access into reporting for each merchant.
+    # The reason why I'm not doing this work right now is because you can only associate
+    # one location per charge, but we might want to allow for people to add multiple gift
+    # cards into their card for diffrent Sellers, and then check out all at once.
+    square_location_id = ENV['SQUARE_LOCATION_ID']
+
     request_body = {
-        source_id: source_id,
-        idempotency_key: SecureRandom.uuid,
-        amount_money: {
-            amount: amount,
-            currency: 'USD',
-        },
-        buyer_email_address: email,
-        note: note,
+      source_id: source_id,
+      idempotency_key: SecureRandom.uuid,
+      amount_money: {
+        amount: amount,
+        currency: 'USD',
+      },
+      buyer_email_address: email,
+      note: note,
+      location_id: square_location_id
     }
 
-    payment = api_client.payments.create_payment(body: request_body)
+    api_response = api_client.payments.create_payment(body: request_body)
+    payment = api_response.data.payment
 
     # Creates a pending PaymentIntent. See webhooks_controller to see what happens
     # when the PaymentIntent is successful.
     PaymentIntent.create!(
-        # TODO: add square location id when available
-        square_payment_id: payment['id'],
-        email: email,
-        line_items: line_items.to_json
+      square_location_id: square_location_id,
+      square_payment_id: payment[:id],
+      email: email,
+      line_items: line_items.to_json
     )
 
-    payment
+    api_response
   end
 
   def create_stripe_payment_request(amount:, email:, description:, line_items:)
     Stripe.api_key = ENV['STRIPE_API_KEY']
 
     intent = Stripe::PaymentIntent.create(
-        amount: amount,
-        currency: 'usd',
-        receipt_email: email,
-        payment_method_types: ['card'],
-        description: description
+      amount: amount,
+      currency: 'usd',
+      receipt_email: email,
+      payment_method_types: ['card'],
+      description: description
     )
 
     # Creates a pending PaymentIntent. See webhooks_controller to see what happens
     # when the PaymentIntent is successful.
     PaymentIntent.create!(
-        stripe_id: intent['id'],
-        email: email,
-        line_items: line_items.to_json
+      stripe_id: intent['id'],
+      email: email,
+      line_items: line_items.to_json
     )
 
     intent
