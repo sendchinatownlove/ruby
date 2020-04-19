@@ -42,7 +42,7 @@ RSpec.describe 'Webhooks API', type: :request do
       create :seller
       allow(Stripe::Webhook).to receive(:construct_event)
         .and_return(payload.with_indifferent_access)
-      post '/webhooks'
+      post '/webhooks', headers: { 'HTTP_STRIPE_SIGNATURE' => 'www.stripe.com' }
     end
 
     context 'with donation' do
@@ -74,7 +74,7 @@ RSpec.describe 'Webhooks API', type: :request do
       before do
         allow(Digest::MD5).to receive(:hexdigest)
           .and_return('abcdef123')
-        post '/webhooks'
+        post '/webhooks', headers: { 'HTTP_STRIPE_SIGNATURE' => 'www.stripe.com' }
       end
 
       it 'creates a gift card' do

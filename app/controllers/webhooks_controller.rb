@@ -1,6 +1,16 @@
 class WebhooksController < ApplicationController
   # POST /webhooks
   def create
+    if request.env['HTTP_STRIPE_SIGNATURE'].present?
+      handle_stripe_event
+    elsif request.env['HTTP_X_SQUARE_SIGNATURE'].present?
+      handle_square_event
+    end
+
+    json_response({})
+  end
+
+  def handle_stripe_event
     Stripe.api_key = ENV['STRIPE_API_KEY']
 
     # Verify webhook signature and extract the event
@@ -18,14 +28,77 @@ class WebhooksController < ApplicationController
       payment_intent = event['data']['object']
 
       # Fulfill the purchase
-      handle_payment_intent_succeeded(payment_intent_id: payment_intent['id'])
+      handle_payment_intent_succeeded(stripe_payment_id: payment_intent['id'])
     end
-
-    json_response({})
   end
 
-  def handle_payment_intent_succeeded(payment_intent_id:)
-    payment_intent = PaymentIntent.find_by(stripe_id: payment_intent_id)
+  def handle_square_event
+    # Get the JSON body and HMAC-SHA1 signature of the incoming POST request
+    callback_signature = request.env['HTTP_X_SQUARE_SIGNATURE']
+    callback_body = request.body.string
+
+    # Validate the signature
+    if !is_valid_callback(callback_body, callback_signature)
+      # Fail if the signature is invalid
+      raise InvalidSquareSignature.new 'Invalid Signature Header from Square'
+    end
+
+    # Load the JSON body into a hash
+    callback_body_json = JSON.parse(callback_body)
+
+    # If the notification indicates a PAYMENT_UPDATED event...
+    if callback_body_json['type'] == 'payment.updated'
+      # Get the ID of the updated payment
+      payment_id = callback_body_json['entity_id']
+
+      # Get the ID of the payment's associated location
+      location_id = callback_body_json['object']['payment']['location_id']
+      payment_id = callback_body_json['data']['id']
+
+      # Send a request to the Retrieve Payment endpoint to get the updated payment's full details
+      response = Unirest.get CONNECT_HOST + '/v1/' + location_id + '/payments/' + payment_id,
+                    headers: REQUEST_HEADERS
+      # Perform an action based on the returned payment (in this case, simply log it)
+      puts JSON.pretty_generate(response.body)
+
+      # Fulfill the purchase
+      handle_payment_intent_succeeded(
+        square_payment_id: payment_id,
+        square_location_id: location_id
+      )
+    end
+  end
+
+  # Validates HMAC-SHA1 signatures included in webhook notifications to ensure notifications came from Square
+  def is_valid_square_callback(callback_body, callback_signature)
+
+    # Combine your webhook notification URL and the JSON body of the incoming request into a single string
+    string_to_sign = 'https://api.sendchinatownlove.com/webhooks' + callback_body
+
+    # Generate the HMAC-SHA1 signature of the string, signed with your webhook signature key
+    string_signature = Base64.strict_encode64(OpenSSL::HMAC.digest('sha1', WEBHOOK_SIGNATURE_KEY, string_to_sign))
+
+    # Hash the signatures a second time (to protect against timing attacks)
+    # and compare them
+    return Digest::SHA1.base64digest(string_signature) == Digest::SHA1.base64digest(callback_signature)
+  end
+
+  def handle_payment_intent_succeeded(
+    square_payment_id: nil,
+    square_location_id: nil,
+    stripe_payment_id: nil
+  )
+    if square_payment_id.present?
+      payment_intent_id = square_payment_id
+      payment_intent = PaymentIntent.find_by(
+        square_payment_id: square_payment_id,
+        square_location_id: square_location_id
+      )
+    else
+      payment_intent_id = stripe_payment_id
+      payment_intent = PaymentIntent.find_by(stripe_id: payment_intent_id)
+    end
+
     # Mark the payment as successful first so that we know that we received the money
     payment_intent.successful = true
     payment_intent.save
