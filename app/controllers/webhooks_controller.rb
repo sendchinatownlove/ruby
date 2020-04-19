@@ -76,7 +76,7 @@ class WebhooksController < ApplicationController
     string_to_sign = 'https://api.sendchinatownlove.com/webhooks' + callback_body
 
     # Generate the HMAC-SHA1 signature of the string, signed with your webhook signature key
-    string_signature = Base64.strict_encode64(OpenSSL::HMAC.digest('sha1', WEBHOOK_SIGNATURE_KEY, string_to_sign))
+    string_signature = Base64.strict_encode64(OpenSSL::HMAC.digest('sha1', ENV['SQUARE_WEBHOOK_SIGNATURE_KEY'] string_to_sign))
 
     # Hash the signatures a second time (to protect against timing attacks)
     # and compare them
