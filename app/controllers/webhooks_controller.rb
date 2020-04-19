@@ -38,7 +38,7 @@ class WebhooksController < ApplicationController
     callback_body = request.body.string
 
     # Validate the signature
-    if !is_valid_callback(callback_body, callback_signature)
+    if !is_valid_square_callback(callback_body, callback_signature)
       # Fail if the signature is invalid
       raise InvalidSquareSignature.new 'Invalid Signature Header from Square'
     end
