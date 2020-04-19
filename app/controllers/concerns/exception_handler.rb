@@ -3,6 +3,7 @@ module ExceptionHandler
   class InvalidLineItem < StandardError; end
   class InvalidGiftCardUpdate < StandardError; end
   class CannotGenerateUniqueHash < StandardError; end
+  class InvalidSquareSignature < StandardError; end
 
   # provides the more graceful `included` method
   extend ActiveSupport::Concern
@@ -30,9 +31,8 @@ module ExceptionHandler
     end
 
     # Invalid signature
-    rescue_from Stripe::SignatureVerificationError do |e|
+    rescue_from InvalidSquareSignature do |e|
       json_response({ message: e.message }, e.http_status)
     end
-
   end
 end
