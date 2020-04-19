@@ -48,24 +48,21 @@ class WebhooksController < ApplicationController
 
     # If the notification indicates a PAYMENT_UPDATED event...
     if callback_body_json['type'] == 'payment.updated'
-      # Get the ID of the updated payment
-      payment_id = callback_body_json['entity_id']
+      payment = callback_body_json['data']['object']['payment']
+      if payment['status'] == 'COMPLETED'
+        # Get the ID of the updated payment
+        payment_id = callback_body_json['entity_id']
 
-      # Get the ID of the payment's associated location
-      location_id = callback_body_json['data']['object']['payment']['location_id']
-      payment_id = callback_body_json['data']['id']
+        # Get the ID of the payment's associated location
+        location_id = payment['location_id']
+        payment_id = callback_body_json['data']['id']
 
-      # Send a request to the Retrieve Payment endpoint to get the updated payment's full details
-      response = Unirest.get CONNECT_HOST + '/v1/' + location_id + '/payments/' + payment_id,
-                    headers: REQUEST_HEADERS
-      # Perform an action based on the returned payment (in this case, simply log it)
-      puts JSON.pretty_generate(response.body)
-
-      # Fulfill the purchase
-      handle_payment_intent_succeeded(
-        square_payment_id: payment_id,
-        square_location_id: location_id
-      )
+        # Fulfill the purchase
+        handle_payment_intent_succeeded(
+          square_payment_id: payment_id,
+          square_location_id: location_id
+        )
+      end
     end
   end
 
