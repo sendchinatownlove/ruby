@@ -52,7 +52,7 @@ class WebhooksController < ApplicationController
       payment_id = callback_body_json['entity_id']
 
       # Get the ID of the payment's associated location
-      location_id = callback_body_json['object']['payment']['location_id']
+      location_id = callback_body_json['data']['object']['payment']['location_id']
       payment_id = callback_body_json['data']['id']
 
       # Send a request to the Retrieve Payment endpoint to get the updated payment's full details
