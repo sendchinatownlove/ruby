@@ -6,17 +6,15 @@ RSpec.describe Seller, type: :model do
   it { should have_many(:menu_items).dependent(:destroy) }
   # Validation tests
 
-  before { create :seller}
+  let!(:seller) do
+    create(:seller)
+  end
   it { should validate_uniqueness_of(:seller_id) }
   it do
     should allow_value(%w[true false]).for(:sell_gift_cards)
   end
   it do
     should allow_value(%w[true false]).for(:accept_donations)
-  end
-
-  let(:seller) do
-    create(:seller)
   end
   it { expect(seller.target_amount).to eq 1_000_000 }
 
@@ -29,7 +27,7 @@ RSpec.describe Seller, type: :model do
   end
 
   context "test pre-1800 founding year" do
-    let(:founded_year) { '1' }
+    let(:founded_year) { 1 }
 
     it 'raises an error' do
       expect do
@@ -43,7 +41,7 @@ RSpec.describe Seller, type: :model do
   end
 
   context "test future founding year" do
-    let(:founded_year) { '3000' } # not much has changed but they live underwater
+    let(:founded_year) { 3000 } # not much has changed but they live underwater
 
     it 'raises an error' do
       expect do
