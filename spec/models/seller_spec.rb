@@ -5,7 +5,6 @@ RSpec.describe Seller, type: :model do
   # ensure Seller model has a 1:m relationship with the MenuItem model
   it { should have_many(:menu_items).dependent(:destroy) }
   # Validation tests
-  # let!(:seller) { create :seller }
 
   before { create :seller}
   it { should validate_uniqueness_of(:seller_id) }
