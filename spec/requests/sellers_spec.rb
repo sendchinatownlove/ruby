@@ -54,7 +54,6 @@ RSpec.describe 'Sellers API', type: :request do
       sell_gift_cards: true,
       hero_image_url: 'superman-url',
       progress_bar_color: '#1234',
-      sell_gift_cards: true,
       business_type: "tiny-biz",
       num_employees: 2,
       founded_year: 2017,
