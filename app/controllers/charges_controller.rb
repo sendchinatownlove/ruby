@@ -123,6 +123,13 @@ class ChargesController < ApplicationController
     }
 
     api_response = api_client.payments.create_payment(body: request_body)
+
+    errors = api_response.errors
+    raise SquarePaymentsError.new(
+      errors: errors,
+      status_code: api_response.status_code
+    ) if errors.present?
+
     payment = api_response.data.payment
 
     # Creates a pending PaymentIntent. See webhooks_controller to see what happens

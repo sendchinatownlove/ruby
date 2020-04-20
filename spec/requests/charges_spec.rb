@@ -60,6 +60,78 @@ RSpec.describe 'Charges API', type: :request do
           ]
         end
 
+        describe 'with error codes' do
+          context 'with bad CVV' do
+            # Test value taken from https://developer.squareup.com/docs/testing/test-values
+            let(:nonce) { 'cnon:card-nonce-rejected-cvv' }
+
+            it 'returns status code 400' do
+              expect(response).to have_http_status(400)
+            end
+
+            it 'returns a validation failure message' do
+              expect(response.body)
+                .to match(/CVV_FAILURE/)
+            end
+          end
+
+          context 'with bad postal code' do
+            # Test value taken from https://developer.squareup.com/docs/testing/test-values
+            let(:nonce) { 'cnon:card-nonce-rejected-postalcode' }
+
+            it 'returns status code 400' do
+              expect(response).to have_http_status(400)
+            end
+
+            it 'returns a validation failure message' do
+              expect(response.body)
+                .to match(/ADDRESS_VERIFICATION_FAILURE/)
+            end
+          end
+
+          context 'with bad expiration date' do
+            # Test value taken from https://developer.squareup.com/docs/testing/test-values
+            let(:nonce) { 'cnon:card-nonce-rejected-expiration' }
+
+            it 'returns status code 400' do
+              expect(response).to have_http_status(400)
+            end
+
+            it 'returns a validation failure message' do
+              expect(response.body)
+                .to match(/INVALID_EXPIRATION/)
+            end
+          end
+
+          context 'with card declined' do
+            # Test value taken from https://developer.squareup.com/docs/testing/test-values
+            let(:nonce) { 'cnon:card-nonce-declined' }
+
+            it 'returns status code 400' do
+              expect(response).to have_http_status(400)
+            end
+
+            it 'returns a validation failure message' do
+              expect(response.body)
+                .to match(/GENERIC_DECLINE/)
+            end
+          end
+
+          context 'with card nonce already used' do
+            # Test value taken from https://developer.squareup.com/docs/testing/test-values
+            let(:nonce) { 'cnon:card-nonce-rejected-cvv' }
+
+            it 'returns status code 400' do
+              expect(response).to have_http_status(400)
+            end
+
+            it 'returns a validation failure message' do
+              expect(response.body)
+                .to match(/CVV_FAILURE/)
+            end
+          end
+        end
+
         before { post '/charges', params: params, as: :json }
 
         it 'returns Square Payment' do
