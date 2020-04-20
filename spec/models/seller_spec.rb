@@ -16,4 +16,6 @@ RSpec.describe Seller, type: :model do
   it { expect(seller.target_amount).to eq 1_000_000 }
   it { expect(seller.accept_donations).to eq true }
   it { expect(seller.sell_gift_cards).to eq false }
+  it { expect(seller.founded_year).to be <= 2020 }
+  it { expect(seller.founded_year).to be > 1800 }
 end
