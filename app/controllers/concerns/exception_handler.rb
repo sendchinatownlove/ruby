@@ -3,6 +3,18 @@ module ExceptionHandler
   class InvalidLineItem < StandardError; end
   class InvalidGiftCardUpdate < StandardError; end
   class CannotGenerateUniqueHash < StandardError; end
+  class InvalidSquareSignature < StandardError; end
+  class SquarePaymentsError < StandardError
+    attr_reader :status_code
+    attr_reader :errors
+
+    def initialize(errors:, status_code:)
+      @status_code = status_code
+      @errors = errors
+      # Get the first error and give the detail of it as a message
+      super("#{errors.first[:detail]}")
+    end
+  end
 
   # provides the more graceful `included` method
   extend ActiveSupport::Concern
@@ -30,9 +42,17 @@ module ExceptionHandler
     end
 
     # Invalid signature
-    rescue_from Stripe::SignatureVerificationError do |e|
+    rescue_from InvalidSquareSignature do |e|
       json_response({ message: e.message }, e.http_status)
     end
 
+    rescue_from SquarePaymentsError do |e|
+      json_response({
+        # Give the detail of the first error
+        message: e.message,
+        type: 'SQUARE_PAYMENTS_ERROR',
+        errors: e.errors
+        }, e.status_code)
+    end
   end
 end

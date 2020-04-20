@@ -1,6 +1,7 @@
 class Seller < ApplicationRecord
   # model association
   has_many :locations, dependent: :destroy
+  has_many :menu_items, dependent: :destroy
 
   validates_inclusion_of :founded_year, :in => 1800..2020
   validates_uniqueness_of :seller_id

@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Seller, type: :model do
   # Association test
   # ensure Seller model has a 1:m relationship with the MenuItem model
-  # it { should have_many(:menu_items).dependent(:destroy) }
+  it { should have_many(:menu_items).dependent(:destroy) }
   # Validation tests
   # let!(:seller) { create :seller }
 

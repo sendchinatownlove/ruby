@@ -4,7 +4,9 @@ RSpec.describe 'Charges API', type: :request do
   # Test suite for POST /charges
   describe 'POST /charges' do
     let(:email) { 'mrkrabs@thekrustykrab.com' }
-    let(:params) { { email: email, line_items: line_items } }
+    let(:nonce) { nil }
+    let(:is_square) { false }
+    let(:params) { { email: email, is_square: is_square, nonce: nonce, line_items: line_items } }
     let(:seller_id) { 'shunfa-bakery' }
     let!(:seller) { create(:seller, seller_id: seller_id, name: 'Shunfa Bakery') }
 
@@ -37,6 +39,157 @@ RSpec.describe 'Charges API', type: :request do
 
       it 'returns status code 200' do
         expect(response).to have_http_status(200)
+      end
+    end
+
+    context 'using Square' do
+      # Test value taken from https://developer.squareup.com/docs/testing/test-values
+      let(:nonce) { 'cnon:card-nonce-ok' }
+      let(:is_square) { true }
+
+      context 'with a gift card' do
+        let(:line_items) do
+          [
+            {
+              amount: 50,
+              currency: 'usd',
+              item_type: 'gift_card',
+              quantity: 1,
+              seller_id: seller_id
+            }
+          ]
+        end
+
+        describe 'with error codes' do
+          context 'with bad CVV' do
+            # Test value taken from https://developer.squareup.com/docs/testing/test-values
+            let(:nonce) { 'cnon:card-nonce-rejected-cvv' }
+
+            it 'returns status code 400' do
+              expect(response).to have_http_status(400)
+            end
+
+            it 'returns a validation failure message' do
+              expect(response.body)
+                .to match(/CVV_FAILURE/)
+            end
+          end
+
+          context 'with bad postal code' do
+            # Test value taken from https://developer.squareup.com/docs/testing/test-values
+            let(:nonce) { 'cnon:card-nonce-rejected-postalcode' }
+
+            it 'returns status code 400' do
+              expect(response).to have_http_status(400)
+            end
+
+            it 'returns a validation failure message' do
+              expect(response.body)
+                .to match(/ADDRESS_VERIFICATION_FAILURE/)
+            end
+          end
+
+          context 'with bad expiration date' do
+            # Test value taken from https://developer.squareup.com/docs/testing/test-values
+            let(:nonce) { 'cnon:card-nonce-rejected-expiration' }
+
+            it 'returns status code 400' do
+              expect(response).to have_http_status(400)
+            end
+
+            it 'returns a validation failure message' do
+              expect(response.body)
+                .to match(/INVALID_EXPIRATION/)
+            end
+          end
+
+          context 'with card declined' do
+            # Test value taken from https://developer.squareup.com/docs/testing/test-values
+            let(:nonce) { 'cnon:card-nonce-declined' }
+
+            it 'returns status code 400' do
+              expect(response).to have_http_status(400)
+            end
+
+            it 'returns a validation failure message' do
+              expect(response.body)
+                .to match(/GENERIC_DECLINE/)
+            end
+          end
+
+          context 'with card nonce already used' do
+            # Test value taken from https://developer.squareup.com/docs/testing/test-values
+            let(:nonce) { 'cnon:card-nonce-rejected-cvv' }
+
+            it 'returns status code 400' do
+              expect(response).to have_http_status(400)
+            end
+
+            it 'returns a validation failure message' do
+              expect(response.body)
+                .to match(/CVV_FAILURE/)
+            end
+          end
+        end
+
+        before { post '/charges', params: params, as: :json }
+
+        it 'returns Square Payment' do
+          payment = json['data']['payment']
+          expect(payment['id']).not_to be_empty
+          expect(payment['amount_money']['amount']).to eq(50)
+          expect(payment['amount_money']['currency']).to eq('USD')
+          expect(payment['buyer_email_address']).to eq(email)
+
+          expect(PaymentIntent.find_by(
+                   email: email,
+                   line_items: line_items.to_json
+          )).not_to be_nil
+        end
+
+        it 'returns status code 200' do
+          expect(response).to have_http_status(200)
+        end
+      end
+
+      context 'with a gift card and donation' do
+        let(:line_items) do
+          [
+            {
+              amount: 5000,
+              currency: 'usd',
+              item_type: 'gift_card',
+              quantity: 1,
+              seller_id: seller_id
+            },
+            {
+              amount: 3000,
+              currency: 'usd',
+              item_type: 'donation',
+              quantity: 1,
+              seller_id: seller_id
+            }
+          ]
+        end
+
+        before { post '/charges', params: params, as: :json }
+
+        it 'returns Square Payment' do
+          payment = json['data']['payment']
+          expect(payment['id']).not_to be_empty
+          expect(payment['amount_money']['amount']).to eq(8000)
+          expect(payment['amount_money']['currency']).to eq('USD')
+          expect(payment['buyer_email_address']).to eq(email)
+
+          expect(PaymentIntent.find_by(
+                   email: email,
+                   line_items: line_items.to_json
+          )).not_to be_nil
+        end
+
+        it 'returns status code 200' do
+          expect(response).to have_http_status(200)
+        end
       end
     end
 
