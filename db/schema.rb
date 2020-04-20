@@ -103,6 +103,11 @@ ActiveRecord::Schema.define(version: 2020_04_18_203010) do
     t.text "summary"
     t.string "hero_image_url"
     t.string "progress_bar_color"
+    t.string "business_type"
+    t.integer "num_employees"
+    t.integer "founded_year"
+    t.string "website_url"
+    t.string "menu_url"
     t.index ["seller_id"], name: "index_sellers_on_seller_id"
   end
 

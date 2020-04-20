@@ -47,7 +47,12 @@ class SellersController < ApplicationController
       :accept_donations,
       :sell_gift_cards,
       :hero_image_url,
-      :progress_bar_color
+      :progress_bar_color,
+      :business_type,
+      :num_employees,
+      :founded_year,
+      :website_url,
+      :menu_url
     )
   end
 

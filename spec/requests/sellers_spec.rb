@@ -15,7 +15,12 @@ RSpec.describe 'Sellers API', type: :request do
       owner_name: 'Ben Jerry',
       owner_image_url: 'https://www.aws.com/98nuw9e8unf9awnuefaiwenfoaijfosdf',
       accept_donations: true,
-      sell_gift_cards: true
+      sell_gift_cards: true,
+      business_type: "small-biz",
+      num_employees: 5,
+      founded_year: 1850,
+      website_url: 'https://www.youtube.com/watch?v=jIIuzB11dsA',
+      menu_url: 'https://www.youtube.com/watch?v=jIIuzB11dsA',
     )
   end
   let!(:seller2) do
@@ -27,7 +32,12 @@ RSpec.describe 'Sellers API', type: :request do
       owner_name: 'Tom Hanks',
       owner_image_url: 'https://www.aws.com/oawjeoiajwef9wuef09wuef09waeuf',
       accept_donations: false,
-      sell_gift_cards: true
+      sell_gift_cards: true,
+      business_type: "medium-biz",
+      num_employees: 10,
+      founded_year: 1950,
+      website_url: 'https://www.youtube.com/watch?v=C_oACPWGvM4',
+      menu_url: 'https://www.youtube.com/watch?v=C_oACPWGvM4',
     )
   end
 
@@ -43,7 +53,13 @@ RSpec.describe 'Sellers API', type: :request do
       accept_donations: true,
       sell_gift_cards: true,
       hero_image_url: 'superman-url',
-      progress_bar_color: '#1234'
+      progress_bar_color: '#1234',
+      sell_gift_cards: true,
+      business_type: "tiny-biz",
+      num_employees: 2,
+      founded_year: 2017,
+      website_url: 'https://www.youtube.com/watch?v=CIjXUg1s5gc',
+      menu_url: 'https://www.youtube.com/watch?v=CIjXUg1s5gc',
     }
   end
 

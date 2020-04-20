@@ -21,7 +21,12 @@ RSpec.describe SellersHelper, type: :helper do
         'summary': seller.summary,
         'progress_bar_color': seller.progress_bar_color,
         'hero_image_url': seller.hero_image_url,
-        'locations': []
+        'locations': [],
+        'business_type': seller.business_type,
+        'num_employees': seller.num_employees,
+        'founded_year': seller.founded_year,
+        'website_url': seller.website_url,
+        'menu_url': seller.menu_url
       }.as_json
     end
 
