@@ -40,8 +40,11 @@ https://drive.google.com/drive/u/2/folders/1vDEWSwn2UFaGXBNCyt0qe60vOa5j6wfH
 ### Useful commands
 - Run the server: `heroku local web`
   If you see an error that looks like `No such file or directory @ rb_sysopen - tmp/pids/puma.pid`, run:
+  
   `mkdir tmp`
+  
   `mkdir tmp/pids`
+  
   [source](https://stackoverflow.com/questions/52862529/no-such-file-or-directory-rb-sysopen-tmp-pids-puma-pid)
   
 - Run the server on port 3001: `heroku local web -p 3001`
