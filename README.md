@@ -43,6 +43,10 @@ PG::ConnectionBad: could not connect to server: No such file or directory`
 
 Try running `brew services restart postgresql` [source](https://stackoverflow.com/questions/19828385/pgconnectionbad-could-not-connect-to-server-connection-refused)
 
+If you see an error like `PG::UndefinedTable: ERROR:  relation "seller_extra_infos" does not exist`
+
+Try running `rails db:environment:set RAILS_ENV=development`, `rails db:reset`, `rails db:migrate`
+
 ### Useful commands
 - Run the server: `heroku local web`
   If you see an error that looks like `No such file or directory @ rb_sysopen - tmp/pids/puma.pid`, run:
