@@ -52,7 +52,8 @@ class SellersController < ApplicationController
       :num_employees,
       :founded_year,
       :website_url,
-      :menu_url
+      :menu_url,
+      :target_amount
     )
   end
 
