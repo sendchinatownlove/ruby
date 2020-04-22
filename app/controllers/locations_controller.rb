@@ -20,6 +20,7 @@ class LocationsController < ApplicationController
   # PUT /sellers/:seller_id/locations/:id
   def update
     @location.update(update_location_params)
+    @location.save
     json_response(@location)
   end
 
