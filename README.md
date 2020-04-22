@@ -39,13 +39,9 @@ https://drive.google.com/drive/u/2/folders/1vDEWSwn2UFaGXBNCyt0qe60vOa5j6wfH
 If you see an error like 
 `Couldn't create 'myapp_development' database. Please check your configuration.
 rails aborted!
-PG::ConnectionBad: could not connect to server: No such file or directory`
+PG::ConnectionBad: could not connect to server: No such file or directory`, try running `brew services restart postgresql` [source](https://stackoverflow.com/questions/19828385/pgconnectionbad-could-not-connect-to-server-connection-refused)
 
-Try running `brew services restart postgresql` [source](https://stackoverflow.com/questions/19828385/pgconnectionbad-could-not-connect-to-server-connection-refused)
-
-If you see an error like `PG::UndefinedTable: ERROR:  relation "seller_extra_infos" does not exist`
-
-Try running `rails db:environment:set RAILS_ENV=development`, `rails db:reset`, `rails db:migrate`
+If you see an error like `PG::UndefinedTable: ERROR:  relation "seller_extra_infos" does not exist`, try running `rails db:environment:set RAILS_ENV=development`, `rails db:reset`, `rails db:migrate`
 
 ### Useful commands
 - Run the server: `heroku local web`
