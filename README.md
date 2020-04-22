@@ -14,8 +14,8 @@ https://gorails.com/setup/ubuntu/19.10
 2. brew install postgresql
 3. Install heroku cli
 4. bundle install
-5. rails create:db
-6. rails migrate:db
+5. rails db:create
+6. rails db:migrate
 7. heroku local web -> localhost:5000
 8. test: heroku local:run bundle exec rspec
 
@@ -36,6 +36,12 @@ https://drive.google.com/drive/u/2/folders/1vDEWSwn2UFaGXBNCyt0qe60vOa5j6wfH
 ### Create and migrate database
 - Run the server (see below) and create and migrate your DB:
 `rails db:create && rails db:migrate`
+If you see an error like 
+`Couldn't create 'myapp_development' database. Please check your configuration.
+rails aborted!
+PG::ConnectionBad: could not connect to server: No such file or directory`
+
+Try running `brew services restart postgresql` [source](https://stackoverflow.com/questions/19828385/pgconnectionbad-could-not-connect-to-server-connection-refused)
 
 ### Useful commands
 - Run the server: `heroku local web`
