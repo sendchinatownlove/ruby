@@ -127,7 +127,6 @@ class WebhooksController < ApplicationController
         create_gift_card(
           item: item,
           amount: amount,
-          payment_intent_id: payment_intent_id,
           seller_id: seller_id
         )
       else
@@ -148,18 +147,12 @@ class WebhooksController < ApplicationController
     )
   end
 
-  def create_gift_card(item:, amount:, payment_intent_id:, seller_id:)
-    gift_card_id = generate_gift_card_id(payment_intent_id: payment_intent_id)
-    seller_gift_card_id = generate_seller_gift_card_id(
-      payment_intent_id: payment_intent_id,
-      seller_id: seller_id
-    )
-
+  def create_gift_card(item:, amount:, seller_id:)
     gift_card_detail = GiftCardDetail.create!(
-      expiration: Date.today + 100.days,
+      expiration: Date.today + 1.year,
       item: item,
-      gift_card_id: gift_card_id,
-      seller_gift_card_id: seller_gift_card_id
+      gift_card_id: generate_gift_card_id,
+      seller_gift_card_id: generate_seller_gift_card_id(seller_id: seller_id)
     )
     GiftCardAmount.create!(value: amount, gift_card_detail: gift_card_detail)
   end
@@ -174,22 +167,18 @@ class WebhooksController < ApplicationController
     )
   end
 
-  def generate_gift_card_id(payment_intent_id:)
+  def generate_gift_card_id()
     for i in 1..50 do
-      seed = "#{Time.current}#{ENV['HASH_KEY_CONSTANT']}#{payment_intent_id}#{i}"
-
-      potential_id = Digest::MD5.hexdigest(seed)
+      potential_id = SecureRandom.uuid
       # Use this ID if it's not already taken
       return potential_id if !GiftCardDetail.where(gift_card_id: potential_id).present?
     end
     raise CannotGenerateUniqueHash.new 'Error generating unique gift_card_id'
   end
 
-  def generate_seller_gift_card_id(payment_intent_id:, seller_id:)
+  def generate_seller_gift_card_id(seller_id:)
     for i in 1..50 do
-      seed = "#{Time.current}#{ENV['HASH_KEY_CONSTANT']}#{payment_intent_id}#{i}#{seller_id}"
-
-      hash = Digest::MD5.hexdigest(seed).upcase
+      hash = SecureRandom.hex.upcase
       potential_id_prefix = hash[0...3]
       potential_id_suffix = hash[3...5]
       potential_id = "##{potential_id_prefix}-#{potential_id_suffix}"
