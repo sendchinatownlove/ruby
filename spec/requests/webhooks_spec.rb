@@ -17,7 +17,7 @@ RSpec.describe 'Webhooks API', type: :request do
     let(:payment_intent) do
       create(
         :payment_intent,
-        stripe_id: 'pi_oiwjefoiawefoijwaef',
+        stripe_id: SecureRandom.uuid,
         line_items: line_items
       )
     end
@@ -40,6 +40,10 @@ RSpec.describe 'Webhooks API', type: :request do
 
     before do
       create :seller
+      allow(SecureRandom).to receive(:hex)
+        .and_return('abcdef123')
+      allow(SecureRandom).to receive(:uuid)
+        .and_return('aweofijn-3n3400-oawjiefwef-0iawef-0i')
       allow(Stripe::Webhook).to receive(:construct_event)
         .and_return(payload.with_indifferent_access)
       post '/webhooks', headers: { 'HTTP_STRIPE_SIGNATURE' => 'www.stripe.com' }
@@ -66,23 +70,29 @@ RSpec.describe 'Webhooks API', type: :request do
       it 'returns status code 200' do
         expect(response).to have_http_status(200)
       end
+
+      context 'with duplicate call' do
+        before do
+          post '/webhooks', headers: { 'HTTP_STRIPE_SIGNATURE' => 'www.stripe.com' }
+        end
+
+        it 'returns status code 400' do
+          expect(response.body)
+                .to match(/This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}/)
+          expect(response).to have_http_status(400)
+        end
+      end
     end
 
     context 'with gift card' do
       let(:item_type) { 'gift_card' }
 
-      before do
-        allow(Digest::MD5).to receive(:hexdigest)
-          .and_return('abcdef123')
-        post '/webhooks', headers: { 'HTTP_STRIPE_SIGNATURE' => 'www.stripe.com' }
-      end
-
       it 'creates a gift card' do
         gift_card_detail = GiftCardDetail.last
         expect(gift_card_detail).not_to be_nil
-        expect(gift_card_detail.gift_card_id).to eq('abcdef123')
+        expect(gift_card_detail.gift_card_id).to eq('aweofijn-3n3400-oawjiefwef-0iawef-0i')
         expect(gift_card_detail.seller_gift_card_id).to eq('#ABC-DE')
-        expect(gift_card_detail.expiration).to eq(Date.today + 100.days)
+        expect(gift_card_detail.expiration).to eq(Date.today + 1.year)
 
         gift_card_amount = GiftCardAmount.find_by(
           gift_card_detail_id: gift_card_detail['id']
@@ -101,6 +111,18 @@ RSpec.describe 'Webhooks API', type: :request do
 
       it 'returns status code 200' do
         expect(response).to have_http_status(200)
+      end
+
+      context 'with duplicate call' do
+        before do
+          post '/webhooks', headers: { 'HTTP_STRIPE_SIGNATURE' => 'www.stripe.com' }
+        end
+
+        it 'returns status code 400' do
+          expect(response.body)
+                .to match(/This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}/)
+          expect(response).to have_http_status(400)
+        end
       end
     end
   end
