@@ -3,6 +3,9 @@ Rails.application.routes.draw do
   end
   resources :gift_cards do
   end
-  resources :merchants do
+  resources :sellers do
+    resources :locations, :menu_items
+  end
+  resources :webhooks do
   end
 end
