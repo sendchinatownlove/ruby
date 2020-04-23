@@ -4,6 +4,7 @@ module ExceptionHandler
   class InvalidGiftCardUpdate < StandardError; end
   class CannotGenerateUniqueHash < StandardError; end
   class InvalidSquareSignature < StandardError; end
+  class DuplicatePaymentCompletedError < StandardError; end
   class SquarePaymentsError < StandardError
     attr_reader :status_code
     attr_reader :errors
@@ -15,6 +16,7 @@ module ExceptionHandler
       super("#{errors.first[:detail]}")
     end
   end
+
 
   # provides the more graceful `included` method
   extend ActiveSupport::Concern
@@ -41,9 +43,13 @@ module ExceptionHandler
       json_response({ message: e.error.message }, e.http_status)
     end
 
+    rescue_from DuplicatePaymentCompletedError do |e|
+      json_response({ message: e.message }, :bad_request)
+    end
+
     # Invalid signature
     rescue_from InvalidSquareSignature do |e|
-      json_response({ message: e.message }, e.http_status)
+      json_response({ message: e.message }, :bad_request)
     end
 
     rescue_from SquarePaymentsError do |e|

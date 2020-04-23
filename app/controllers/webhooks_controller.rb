@@ -96,12 +96,15 @@ class WebhooksController < ApplicationController
       payment_intent = PaymentIntent.find_by(stripe_id: payment_intent_id)
     end
 
-    # Mark the payment as successful first so that we know that we received the money
-    payment_intent.successful = true
-    payment_intent.save
+    # If the payment has already been processed
+    if payment_intent.successful
+      raise DuplicatePaymentCompletedError.new "This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}"
+    end
 
     items = JSON.parse(payment_intent.line_items)
     items.each do |item|
+      # TODO(jmckibben): Add some tracking that tracks if it breaks somewhere here
+
       amount = item['amount']
       seller_id = item['seller_id']
       case item['item_type']
@@ -131,6 +134,11 @@ class WebhooksController < ApplicationController
         raise InvalidLineItem.new 'Unsupported ItemType. Please verify the line_item.name.'
       end
     end
+
+    # Mark the payment as successful once we've recorded each object purchased in our DB
+    # eg) Donation, Gift Card, etc.
+    payment_intent.successful = true
+    payment_intent.save
   end
 
   def create_donation(item:, amount:)
