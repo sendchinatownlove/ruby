@@ -96,12 +96,15 @@ class WebhooksController < ApplicationController
       payment_intent = PaymentIntent.find_by(stripe_id: payment_intent_id)
     end
 
-    # Mark the payment as successful first so that we know that we received the money
-    payment_intent.successful = true
-    payment_intent.save
+    # If the payment has already been processed
+    if payment_intent.successful
+      raise DuplicatePaymentCompletedError.new "This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}"
+    end
 
     items = JSON.parse(payment_intent.line_items)
     items.each do |item|
+      # TODO(jmckibben): Add some tracking that tracks if it breaks somewhere here
+
       amount = item['amount']
       seller_id = item['seller_id']
       case item['item_type']
@@ -124,13 +127,17 @@ class WebhooksController < ApplicationController
         create_gift_card(
           item: item,
           amount: amount,
-          payment_intent_id: payment_intent_id,
           seller_id: seller_id
         )
       else
         raise InvalidLineItem.new 'Unsupported ItemType. Please verify the line_item.name.'
       end
     end
+
+    # Mark the payment as successful once we've recorded each object purchased in our DB
+    # eg) Donation, Gift Card, etc.
+    payment_intent.successful = true
+    payment_intent.save
   end
 
   def create_donation(item:, amount:)
@@ -140,18 +147,12 @@ class WebhooksController < ApplicationController
     )
   end
 
-  def create_gift_card(item:, amount:, payment_intent_id:, seller_id:)
-    gift_card_id = generate_gift_card_id(payment_intent_id: payment_intent_id)
-    seller_gift_card_id = generate_seller_gift_card_id(
-      payment_intent_id: payment_intent_id,
-      seller_id: seller_id
-    )
-
+  def create_gift_card(item:, amount:, seller_id:)
     gift_card_detail = GiftCardDetail.create!(
-      expiration: Date.today + 100.days,
+      expiration: Date.today + 1.year,
       item: item,
-      gift_card_id: gift_card_id,
-      seller_gift_card_id: seller_gift_card_id
+      gift_card_id: generate_gift_card_id,
+      seller_gift_card_id: generate_seller_gift_card_id(seller_id: seller_id)
     )
     GiftCardAmount.create!(value: amount, gift_card_detail: gift_card_detail)
   end
@@ -166,22 +167,18 @@ class WebhooksController < ApplicationController
     )
   end
 
-  def generate_gift_card_id(payment_intent_id:)
+  def generate_gift_card_id()
     for i in 1..50 do
-      seed = "#{Time.current}#{ENV['HASH_KEY_CONSTANT']}#{payment_intent_id}#{i}"
-
-      potential_id = Digest::MD5.hexdigest(seed)
+      potential_id = SecureRandom.uuid
       # Use this ID if it's not already taken
       return potential_id if !GiftCardDetail.where(gift_card_id: potential_id).present?
     end
     raise CannotGenerateUniqueHash.new 'Error generating unique gift_card_id'
   end
 
-  def generate_seller_gift_card_id(payment_intent_id:, seller_id:)
+  def generate_seller_gift_card_id(seller_id:)
     for i in 1..50 do
-      seed = "#{Time.current}#{ENV['HASH_KEY_CONSTANT']}#{payment_intent_id}#{i}#{seller_id}"
-
-      hash = Digest::MD5.hexdigest(seed).upcase
+      hash = SecureRandom.hex.upcase
       potential_id_prefix = hash[0...3]
       potential_id_suffix = hash[3...5]
       potential_id = "##{potential_id_prefix}-#{potential_id_suffix}"

@@ -13,7 +13,7 @@ Rails.application.configure do
   # Configure CORS
   config.middleware.insert_before 0, Rack::Cors do
     allow do
-      origins 'https://sendchinatownlove.com', 'https://www.sendchinatownlove.com'
+      origins 'https://merchant.sendchinatownlove.com', 'https://www.merchant.sendchinatownlove.com', 'https://sendchinatownlove.github.io', 'https://www.sendchinatownlove.github.io'
       resource '*', headers: :any, methods: :any
     end
   end

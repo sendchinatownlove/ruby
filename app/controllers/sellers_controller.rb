@@ -24,6 +24,7 @@ class SellersController < ApplicationController
   # PUT /sellers/:seller_id
   def update
     @seller.update(update_params)
+    @seller.save
     seller = SellersHelper.generate_seller_json(seller: @seller)
     json_response(seller)
   end
@@ -52,7 +53,8 @@ class SellersController < ApplicationController
       :num_employees,
       :founded_year,
       :website_url,
-      :menu_url
+      :menu_url,
+      :target_amount
     )
   end
 

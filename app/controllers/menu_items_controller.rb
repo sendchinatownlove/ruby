@@ -15,6 +15,7 @@ class MenuItemsController < ApplicationController
   # PUT /sellers/:seller_id/menu_items/:id
   def update
     @menu_item.update(update_menu_item_params)
+    @menu_item.save
     json_response(@menu_item)
   end
 
