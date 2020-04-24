@@ -91,14 +91,27 @@ class WebhooksController < ApplicationController
         square_payment_id: square_payment_id,
         square_location_id: square_location_id
       )
-
-      CustomerMailer.with(payment_intent: payment_intent).send_receipt.deliver_now
-
     else
       payment_intent_id = stripe_payment_id
       payment_intent = PaymentIntent.find_by(stripe_id: payment_intent_id)
     end
 
+    # TODO(jtmckibb): Fix emails
+    # CustomerMailer.with(payment_intent: payment_intent).send_receipt.deliver_now
+
+    # TODO(jtmckibb): Mark in the payment intent that the card has been successfully processed by Square
+    #                 The other "success" means that the completed payment has been processed by us
+    #                 I'm thinking that we're going to need to convert this "success" boolean into a FSM
+    #                 SquareTransactionSucceeded -> EmailsSent -> ItemsCreated
+    #                 Or since one doesn't depend on another we can make it an array of events. We could
+    #                 even start multiple threads
+
+    # TODO(jtmckibb): Instead of just checking for successful, we'd need to check that there are no other
+    #                 unfinished actions to complete in the checklist. So far our checklist is:
+    #                  - processItems (if any one Item fails, be sure not to create any)
+    #                  - sendEmail
+    #                 The new check would be like, if all of the required actions are complete, then raise
+    #                 the DuplicatePaymentCompletedError, else finish the unfinished actions.
     # If the payment has already been processed
     if payment_intent.successful
       raise DuplicatePaymentCompletedError.new "This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}"
@@ -106,7 +119,7 @@ class WebhooksController < ApplicationController
 
     items = JSON.parse(payment_intent.line_items)
     items.each do |item|
-      # TODO(jmckibben): Add some tracking that tracks if it breaks somewhere here
+      # TODO(jtmckibb): Add some tracking that tracks if it breaks somewhere here
 
       amount = item['amount']
       seller_id = item['seller_id']
