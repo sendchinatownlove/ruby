@@ -32,6 +32,7 @@ gem 'square.rb'
 # Generates hashes
 # gem 'digest'
 
+gem 'actionmailer'
 
 # rails admin
 # gem 'rails_admin', '~> 2.0'
