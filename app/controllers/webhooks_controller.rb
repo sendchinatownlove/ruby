@@ -92,7 +92,8 @@ class WebhooksController < ApplicationController
         square_location_id: square_location_id
       )
 
-      CustomerMailer.with(payment_intent: payment_intent)
+      CustomerMailer.with(payment_intent: payment_intent).send_receipt.deliver_now
+
     else
       payment_intent_id = stripe_payment_id
       payment_intent = PaymentIntent.find_by(stripe_id: payment_intent_id)

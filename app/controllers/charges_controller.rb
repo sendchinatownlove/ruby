@@ -156,7 +156,7 @@ class ChargesController < ApplicationController
       amount: amount,
       currency: 'usd',
       receipt_email: email,
-      payment_method_types: ['card'],git
+      payment_method_types: ['card'],
       description: description
     )
 
