@@ -52,7 +52,7 @@ class ChargesController < ApplicationController
     params.require(:is_square)
     params.require(:nonce) if params[:is_square]
     params.require(:name)
-    params.permit(:email, :nonce, :is_square, line_items: [[:amount, :currency, :item_type, :quantity, :seller_id]], :name)
+    params.permit(:email, :nonce, :is_square, :name, line_items: [[:amount, :currency, :item_type, :quantity, :seller_id]])
   end
 
   def validate(line_item:)
