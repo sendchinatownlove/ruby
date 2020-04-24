@@ -31,7 +31,9 @@ class ChargesController < ApplicationController
         amount: amount,
         note: description,
         email: email,
-        line_items: line_items)
+        name: charge_params[:name],
+        line_items: line_items,
+        )
     else
       payment = create_stripe_payment_request(
         amount: amount,
@@ -50,7 +52,8 @@ class ChargesController < ApplicationController
     params.require(:email)
     params.require(:is_square)
     params.require(:nonce) if params[:is_square]
-    params.permit(:email, :nonce, :is_square, line_items: [[:amount, :currency, :item_type, :quantity, :seller_id]])
+    params.require(:name)
+    params.permit(:email, :nonce, :is_square, :name, line_items: [[:amount, :currency, :item_type, :quantity, :seller_id]])
   end
 
   def validate(line_item:)
@@ -94,7 +97,7 @@ class ChargesController < ApplicationController
     description
   end
 
-  def create_square_payment_request(source_id:, amount:, note:, email:, line_items:)
+  def create_square_payment_request(source_id:, amount:, note:, email:, line_items:, name:)
     api_client = Square::Client.new(
       access_token: ENV['SQUARE_ACCESS_TOKEN'],
       environment: if Rails.env.production? then 'production' else 'sandbox' end
@@ -139,7 +142,8 @@ class ChargesController < ApplicationController
       square_payment_id: payment[:id],
       email: email,
       line_items: line_items.to_json,
-      receipt_url: receipt_url
+      receipt_url: receipt_url,
+      name: name,
     )
 
     api_response
@@ -152,7 +156,7 @@ class ChargesController < ApplicationController
       amount: amount,
       currency: 'usd',
       receipt_email: email,
-      payment_method_types: ['card'],
+      payment_method_types: ['card'],git
       description: description
     )
 
