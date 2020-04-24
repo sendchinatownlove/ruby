@@ -131,6 +131,7 @@ class ChargesController < ApplicationController
     ) if errors.present?
 
     payment = api_response.data.payment
+    receipt_url = payment.receipt_url
 
     # Creates a pending PaymentIntent. See webhooks_controller to see what happens
     # when the PaymentIntent is successful.
@@ -138,7 +139,8 @@ class ChargesController < ApplicationController
       square_location_id: square_location_id,
       square_payment_id: payment[:id],
       email: email,
-      line_items: line_items.to_json
+      line_items: line_items.to_json,
+      receipt_url: receipt_url
     )
 
     api_response
