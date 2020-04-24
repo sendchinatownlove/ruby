@@ -32,7 +32,9 @@ class ChargesController < ApplicationController
         # TODO: email note to buyer
         note: description,
         email: email,
-        line_items: line_items)
+        name: charge_params[:name],
+        line_items: line_items,
+        )
     else
       payment = create_stripe_payment_request(
         amount: amount,
@@ -96,7 +98,7 @@ class ChargesController < ApplicationController
     description
   end
 
-  def create_square_payment_request(source_id:, amount:, note:, email:, line_items:)
+  def create_square_payment_request(source_id:, amount:, note:, email:, line_items:, name:)
     api_client = Square::Client.new(
       access_token: ENV['SQUARE_ACCESS_TOKEN'],
       environment: if Rails.env.production? then 'production' else 'sandbox' end
@@ -139,7 +141,8 @@ class ChargesController < ApplicationController
       square_location_id: square_location_id,
       square_payment_id: payment[:id],
       email: email,
-      line_items: line_items.to_json
+      line_items: line_items.to_json,
+      name: name,
     )
 
     api_response
