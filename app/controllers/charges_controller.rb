@@ -29,7 +29,6 @@ class ChargesController < ApplicationController
       payment = create_square_payment_request(
         source_id: charge_params[:nonce],
         amount: amount,
-        # TODO: email note to buyer
         note: description,
         email: email,
         name: charge_params[:name],
@@ -134,6 +133,7 @@ class ChargesController < ApplicationController
     ) if errors.present?
 
     payment = api_response.data.payment
+    receipt_url = payment.receipt_url
 
     # Creates a pending PaymentIntent. See webhooks_controller to see what happens
     # when the PaymentIntent is successful.
@@ -142,6 +142,7 @@ class ChargesController < ApplicationController
       square_payment_id: payment[:id],
       email: email,
       line_items: line_items.to_json,
+      receipt_url: receipt_url,
       name: name,
     )
 

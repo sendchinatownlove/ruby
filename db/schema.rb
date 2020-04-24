@@ -88,6 +88,7 @@ ActiveRecord::Schema.define(version: 2020_04_24_024902) do
     t.string "square_payment_id"
     t.string "square_location_id"
     t.string "email_text"
+    t.string "receipt_url"
     t.string "name"
   end
 
