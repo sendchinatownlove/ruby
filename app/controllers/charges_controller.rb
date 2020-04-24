@@ -133,7 +133,7 @@ class ChargesController < ApplicationController
     ) if errors.present?
 
     payment = api_response.data.payment
-    receipt_url = payment.receipt_url
+    receipt_url = payment[:receipt_url]
 
     # Creates a pending PaymentIntent. See webhooks_controller to see what happens
     # when the PaymentIntent is successful.
