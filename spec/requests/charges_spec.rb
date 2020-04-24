@@ -6,7 +6,8 @@ RSpec.describe 'Charges API', type: :request do
     let(:email) { 'mrkrabs@thekrustykrab.com' }
     let(:nonce) { nil }
     let(:is_square) { false }
-    let(:params) { { email: email, is_square: is_square, nonce: nonce, line_items: line_items } }
+    let(:name) { 'Squarepants, Spongebob'}
+    let(:params) { { email: email, is_square: is_square, nonce: nonce, line_items: line_items, name: name } }
     let(:seller_id) { 'shunfa-bakery' }
     let!(:seller) { create(:seller, seller_id: seller_id, name: 'Shunfa Bakery') }
 
@@ -488,7 +489,8 @@ RSpec.describe 'Charges API', type: :request do
                 quantity: 1,
                 seller_id: seller_id
               }
-            ]
+            ],
+            name: "Jane Doe"
           },
           as: :json
         )
