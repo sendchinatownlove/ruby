@@ -1,3 +1,4 @@
+<!--https://mjml.io/try-it-live/HyrF2vgFU-->
 <mjml>
   <mj-body background-color="#ccd3e0">
     <mj-section background-color="#fff" padding-bottom="20px" padding-top="20px">
@@ -9,7 +10,9 @@
     <mj-section background-color="#fff" padding-bottom="0px" padding-top="0">
       <mj-column width="100%">
         <mj-text align="center" font-size="13px" color="#000" font-family="Ubuntu, Helvetica, Arial, sans-serif" padding-left="25px" padding-right="25px" padding-bottom="0" padding-top="28px">Hello
-          <p style="font-size:16px; color:#000"><strong>[[FirstName]]</strong></p>
+          <p style="font-size:16px; color:#000"><strong>
+            [[FirstName]]
+            </strong></p>
         </mj-text>
       </mj-column>
       <mj-column width="100%">
@@ -37,7 +40,7 @@
       <!--End Section-->
     </mj-section>
 
-    <mj-section background-color="#FFFCFA" padding-bottom="15px">
+    <mj-section background-color="#fff" padding-bottom="15px">
       <mj-column>
         <mj-text align="center" color="#000" font-size="15px" font-family="Ubuntu, Helvetica, Arial, sans-serif" padding-left="25px" padding-right="25px" padding-bottom="0px"><strong>Order Date</strong></mj-text>
         <mj-text align="center" color="#000" font-size="13px" font-family="Helvetica" padding-left="25px" padding-right="25px" padding-bottom="20px" padding-top="10px">[[OrderDate]]</mj-text>
