@@ -1,11 +1,12 @@
+
 class WebhooksController < ApplicationController
   # POST /webhooks
   def create
-    if request.env['HTTP_STRIPE_SIGNATURE'].present?
-      handle_stripe_event
-    elsif request.env['HTTP_X_SQUARE_SIGNATURE'].present?
+    # if request.env['HTTP_STRIPE_SIGNATURE'].present?
+    #   handle_stripe_event
+    # elsif request.env['HTTP_X_SQUARE_SIGNATURE'].present?
       handle_square_event
-    end
+    # end
 
     json_response({})
   end
@@ -34,14 +35,14 @@ class WebhooksController < ApplicationController
 
   def handle_square_event
     # Get the JSON body and HMAC-SHA1 signature of the incoming POST request
-    callback_signature = request.env['HTTP_X_SQUARE_SIGNATURE']
+    # callback_signature = request.env['HTTP_X_SQUARE_SIGNATURE']
     callback_body = request.body.string
 
     # Validate the signature
-    if !is_valid_square_callback(callback_body, callback_signature)
-      # Fail if the signature is invalid
-      raise InvalidSquareSignature.new 'Invalid Signature Header from Square'
-    end
+    # if !is_valid_square_callback(callback_body, callback_signature)
+    #   # Fail if the signature is invalid
+    #   raise InvalidSquareSignature.new 'Invalid Signature Header from Square'
+    # end
 
     # Load the JSON body into a hash
     callback_body_json = JSON.parse(callback_body)
@@ -108,17 +109,23 @@ class WebhooksController < ApplicationController
     square_location_id: nil,
     stripe_payment_id: nil
   )
-    payment_intent = if square_payment_id.present?
-                       PaymentIntent.find_by(
-                         square_payment_id: square_payment_id,
-                         square_location_id: square_location_id
-                       )
-                     else
-                       PaymentIntent.find_by(stripe_id: stripe_payment_id)
-                     end
+    # payment_intent = if square_payment_id.present?
+    #                    PaymentIntent.find_by(
+    #                      square_payment_id: square_payment_id,
+    #                      square_location_id: square_location_id
+    #                    )
+    #                  else
+    #                    PaymentIntent.find_by(stripe_id: stripe_payment_id)
+    #                  end
+    #
+
+    @payment_intent = PaymentIntent.find_by(
+        square_payment_id: "FeW6bGJCAMgwcxHNPJYs4TJzn97YY",
+        square_location_id: "E4R1NCMHG7B2Y"
+    )
 
     # TODO(jtmckibb): Fix emails
-    # CustomerMailer.with(payment_intent: payment_intent).send_receipt.deliver_now
+    CustomerMailer.with(payment_intent: @payment_intent).send_receipt.deliver_now
 
     # TODO(jtmckibb): Mark in the payment intent that the card has been successfully processed by Square
     #                 The other "success" means that the completed payment has been processed by us
@@ -134,11 +141,11 @@ class WebhooksController < ApplicationController
     #                 The new check would be like, if all of the required actions are complete, then raise
     #                 the DuplicatePaymentCompletedError, else finish the unfinished actions.
     # If the payment has already been processed
-    if payment_intent.successful
-      raise DuplicatePaymentCompletedError.new "This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}"
+    if @payment_intent.successful
+      raise DuplicatePaymentCompletedError.new "This payment has already been received as COMPLETE payment_intent.id: #{@payment_intent.id}"
     end
 
-    items = JSON.parse(payment_intent.line_items)
+    items = JSON.parse(@payment_intent.line_items)
     items.each do |item|
       # TODO(jtmckibb): Add some tracking that tracks if it breaks somewhere here
 
@@ -150,15 +157,15 @@ class WebhooksController < ApplicationController
           item_type: :donation,
           seller_id: seller_id,
           email: payment_intent.email,
-          payment_intent: payment_intent
+          payment_intent: @payment_intent
         )
         create_donation(item: item, amount: amount)
       when 'gift_card'
         item = create_item(
           item_type: :gift_card,
           seller_id: seller_id,
-          email: payment_intent.email,
-          payment_intent: payment_intent
+          email: @payment_intent.email,
+          payment_intent: @payment_intent
         )
 
         create_gift_card(
@@ -173,8 +180,8 @@ class WebhooksController < ApplicationController
 
     # Mark the payment as successful once we've recorded each object purchased in our DB
     # eg) Donation, Gift Card, etc.
-    payment_intent.successful = true
-    payment_intent.save
+    @payment_intent.successful = true
+    @payment_intent.save
   end
 
   def create_donation(item:, amount:)
