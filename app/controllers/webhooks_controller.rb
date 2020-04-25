@@ -10,6 +10,8 @@ class WebhooksController < ApplicationController
     json_response({})
   end
 
+  private
+
   def handle_stripe_event
     Stripe.api_key = ENV['STRIPE_API_KEY']
 

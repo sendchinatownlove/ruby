@@ -6,21 +6,22 @@ class ChargesController < ApplicationController
   def create
     line_items = charge_params[:line_items].map(&:to_h)
 
+    seller_id = charge_params[:seller_id]
+
     # Validate each Item and get all ItemTypes
     item_types = Set.new
-    seller_names = Set.new
     line_items.each do |item|
-      validate(line_item: item)
+      validate(seller_id: seller_id, line_item: item)
       item_types.add item['item_type']
-      seller = Seller.find_by(seller_id: item['seller_id'])
-      seller_names.add seller.name
     end
+
+    seller = Seller.find_by(seller_id: seller_id)
 
     # Total all Items
     amount = line_items.inject(0) { |sum, item| sum + item['amount'] * item['quantity'] }
 
     description = generate_description(
-      seller_names: seller_names.to_a,
+      seller_name: seller.name,
       item_types: item_types
     )
 
@@ -32,6 +33,7 @@ class ChargesController < ApplicationController
         note: description,
         email: email,
         name: charge_params[:name],
+        seller: seller,
         line_items: line_items,
         )
     else
@@ -48,16 +50,17 @@ class ChargesController < ApplicationController
   private
 
   def charge_params
+    params.require(:seller_id)
     params.require(:line_items)
     params.require(:email)
     params.require(:is_square)
     params.require(:nonce) if params[:is_square]
     params.require(:name)
-    params.permit(:email, :nonce, :is_square, :name, line_items: [[:amount, :currency, :item_type, :quantity, :seller_id]])
+    params.permit(:email, :nonce, :is_square, :name, :seller_id, line_items: [[:amount, :currency, :item_type, :quantity]])
   end
 
-  def validate(line_item:)
-    [:amount, :currency, :item_type, :quantity, :seller_id].each do |attribute|
+  def validate(seller_id:, line_item:)
+    [:amount, :currency, :item_type, :quantity].each do |attribute|
       unless line_item.key?(attribute)
         raise ActionController::ParameterMissing.new "param is missing or the value is empty: #{attribute}"
       end
@@ -67,7 +70,6 @@ class ChargesController < ApplicationController
       raise InvalidLineItem.new 'line_item must be named `gift_card` or `donation`'
     end
 
-    seller_id = line_item['seller_id']
     unless Seller.find_by(seller_id: seller_id).present?
       raise InvalidLineItem.new "Seller does not exist: #{seller_id}"
     end
@@ -84,12 +86,8 @@ class ChargesController < ApplicationController
     raise InvalidLineItem.new 'Amount must be at least $0.50 usd' unless amount >= 50
   end
 
-  def generate_description(seller_names:, item_types:)
-    description = 'Thank you for supporting '
-    description += EmailHelper.format_sellers_as_list(
-        seller_names: seller_names
-    )
-    description += '.'
+  def generate_description(seller_name:, item_types:)
+    description = 'Thank you for supporting ' + seller_name + '.'
     if item_types.include? 'gift_card'
       description += ' Your gift card(s) will be emailed to you when the seller opens back up.'
     end
@@ -97,7 +95,7 @@ class ChargesController < ApplicationController
     description
   end
 
-  def create_square_payment_request(source_id:, amount:, note:, email:, line_items:, name:)
+  def create_square_payment_request(source_id:, amount:, note:, email:, name:, seller:, line_items:)
     api_client = Square::Client.new(
       access_token: ENV['SQUARE_ACCESS_TOKEN'],
       environment: if Rails.env.production? then 'production' else 'sandbox' end
@@ -110,7 +108,7 @@ class ChargesController < ApplicationController
     # The reason why I'm not doing this work right now is because you can only associate
     # one location per charge, but we might want to allow for people to add multiple gift
     # cards into their card for diffrent Sellers, and then check out all at once.
-    square_location_id = ENV['SQUARE_LOCATION_ID']
+    square_location_id = seller.square_location_id
 
     request_body = {
       source_id: source_id,
