@@ -61,7 +61,7 @@ RSpec.describe 'Sellers API', type: :request do
       founded_year: 2017,
       website_url: 'https://www.youtube.com/watch?v=CIjXUg1s5gc',
       menu_url: 'https://www.youtube.com/watch?v=CIjXUg1s5gc',
-      square_location_id: '4567-efgh'
+      square_location_id: 'new_square_location_id'
     }
   end
 
