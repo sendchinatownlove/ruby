@@ -1,4 +1,3 @@
-
 FactoryBot.define do
   factory :seller do
     seller_id { Faker::Alphanumeric.alphanumeric(number: 64) }
@@ -16,5 +15,6 @@ FactoryBot.define do
     founded_year { Faker::Number.within(range: 1800..2020) }
     website_url { Faker::Lorem.word }
     menu_url { Faker::Lorem.word }
+    square_location_id { Faker::Alphanumeric.alphanumeric(number: 64) }
   end
 end

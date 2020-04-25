@@ -21,6 +21,7 @@ RSpec.describe 'Sellers API', type: :request do
       founded_year: 1850,
       website_url: 'https://www.youtube.com/watch?v=jIIuzB11dsA',
       menu_url: 'https://www.youtube.com/watch?v=jIIuzB11dsA',
+      square_location_id: '1234-abcd'
     )
   end
   let!(:seller2) do
@@ -38,6 +39,7 @@ RSpec.describe 'Sellers API', type: :request do
       founded_year: 1950,
       website_url: 'https://www.youtube.com/watch?v=C_oACPWGvM4',
       menu_url: 'https://www.youtube.com/watch?v=C_oACPWGvM4',
+      square_location_id: '4567-efgh'
     )
   end
 
@@ -59,6 +61,7 @@ RSpec.describe 'Sellers API', type: :request do
       founded_year: 2017,
       website_url: 'https://www.youtube.com/watch?v=CIjXUg1s5gc',
       menu_url: 'https://www.youtube.com/watch?v=CIjXUg1s5gc',
+      square_location_id: 'new_square_location_id'
     }
   end
 
