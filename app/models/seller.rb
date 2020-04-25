@@ -5,6 +5,7 @@ class Seller < ApplicationRecord
 
   validates_inclusion_of :founded_year, :in => 1800..2020
   validates_uniqueness_of :seller_id
+  validates_uniqueness_of :square_location_id
   validates_inclusion_of :sell_gift_cards, in: [true, false]
   validates_inclusion_of :accept_donations, in: [true, false]
 end

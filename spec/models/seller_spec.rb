@@ -10,6 +10,7 @@ RSpec.describe Seller, type: :model do
     create(:seller)
   end
   it { should validate_uniqueness_of(:seller_id) }
+  it { should validate_uniqueness_of(:square_location_id) }
   it do
     should allow_value(%w[true false]).for(:sell_gift_cards)
   end
