@@ -33,6 +33,7 @@ class SellersController < ApplicationController
 
   def seller_params
     params.required(:seller_id)
+    params.required(:square_location_id)
     update_params
   end
 
