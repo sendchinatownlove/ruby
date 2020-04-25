@@ -6,6 +6,7 @@ class ChargesController < ApplicationController
   def create
     line_items = charge_params[:line_items].map(&:to_h)
 
+    
     # Validate each Item and get all ItemTypes
     item_types = Set.new
     seller_names = Set.new
