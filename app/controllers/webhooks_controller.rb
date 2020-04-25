@@ -77,7 +77,7 @@ class WebhooksController < ApplicationController
       refund.update(status: status)
 
       case status
-      when 'APPROVED'
+      when 'COMPLETED'
         # Wrapped in a transaction so that if any one of them fail, none of the
         # Items are updated
         ActiveRecord::Base.transaction do

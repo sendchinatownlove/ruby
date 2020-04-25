@@ -143,8 +143,8 @@ RSpec.describe 'Webhooks API', type: :request do
                 )
               end
 
-              context 'APPROVED' do
-                let(:updated_status) { 'APPROVED' }
+              context 'COMPLETED' do
+                let(:updated_status) { 'COMPLETED' }
 
                 it 'updates the status' do
                   refund = Refund.last

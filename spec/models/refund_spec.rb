@@ -5,6 +5,6 @@ RSpec.describe Refund, type: :model do
   it { should belong_to(:payment_intent) }
   it { should validate_uniqueness_of(:square_refund_id) }
   it do
-    should allow_values('PENDING', 'APPROVED', 'REJECTED', 'FAILED').for(:status)
+    should allow_values('PENDING', 'COMPLETED', 'REJECTED', 'FAILED').for(:status)
   end
 end
