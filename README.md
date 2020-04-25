@@ -13,7 +13,7 @@ https://gorails.com/setup/ubuntu/19.10
 1. Download rails, gem install rails — brew install gem
 2. brew install postgresql
 3. Install heroku cli
-4. bundle install
+4. bundle install --path vendor/bundle
 5. rails db:create
 6. rails db:migrate
 7. heroku local web -> localhost:5000

@@ -29,3 +29,6 @@
 # Ignore intellij stuff
 .idea/
 ruby.iml
+
+# Ignore install to vendor folder
+vendor/bundle
