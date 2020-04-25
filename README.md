@@ -13,7 +13,7 @@ https://gorails.com/setup/ubuntu/19.10
 1. Download rails, gem install rails — brew install gem
 2. brew install postgresql
 3. Install heroku cli
-4. bundle install
+4. bundle install --path vendor/bundle
 5. rails db:create
 6. rails db:migrate
 7. heroku local web -> localhost:5000
@@ -58,6 +58,7 @@ You'll need to do this if you're getting cors errors from the frontend. Stop you
 - Run all tests: `heroku local:run bundle exec rspec`
 - Run specific tests: `heroku local:run bundle exec rspec -e "<insert string from test description>"`
 - Run console: `heroku local:run rails console`
+- Run local migrations in prod `heroku run rake db:migrate` (do this after submitting a change with a local migration)
 
 #### Development
 - `rails generate model <ModelName>`

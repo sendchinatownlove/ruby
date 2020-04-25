@@ -214,6 +214,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  actionmailer
   bootsnap (>= 1.4.2)
   byebug
   database_cleaner

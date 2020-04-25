@@ -7,3 +7,8 @@ ActionMailer::Base.smtp_settings = {
   :authentication => :plain,
 }
 ActionMailer::Base.delivery_method = :smtp
+
+class ApplicationMailer < ActionMailer::Base
+  default from: "receipts@sendchinatownlove.com"
+  layout 'mailer'
+end

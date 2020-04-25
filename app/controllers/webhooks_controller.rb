@@ -47,21 +47,44 @@ class WebhooksController < ApplicationController
     callback_body_json = JSON.parse(callback_body)
 
     # If the notification indicates a PAYMENT_UPDATED event...
-    if callback_body_json['type'] == 'payment.updated'
+    case callback_body_json['type']
+    when 'payment.updated'
       payment = callback_body_json['data']['object']['payment']
       if payment['status'] == 'COMPLETED'
-        # Get the ID of the updated payment
-        payment_id = callback_body_json['entity_id']
-
-        # Get the ID of the payment's associated location
-        location_id = payment['location_id']
-        payment_id = callback_body_json['data']['id']
-
         # Fulfill the purchase
         handle_payment_intent_succeeded(
-          square_payment_id: payment_id,
-          square_location_id: location_id
+          square_payment_id: payment['id'],
+          square_location_id: payment['location_id']
         )
+      end
+    when 'refund.created'
+      refund = callback_body_json['data']['object']['refund']
+
+      payment_intent = PaymentIntent.find_by(
+        square_payment_id: refund['payment_id']
+      )
+
+      Refund.create!(
+        square_refund_id: refund['id'],
+        status: refund['status'],
+        payment_intent: payment_intent
+      )
+    when 'refund.updated'
+      square_refund = callback_body_json['data']['object']['refund']
+      status = square_refund['status']
+
+      refund = Refund.find_by(square_refund_id: square_refund['id'])
+      refund.update(status: status)
+
+      case status
+      when 'COMPLETED'
+        # Wrapped in a transaction so that if any one of them fail, none of the
+        # Items are updated
+        ActiveRecord::Base.transaction do
+          refund.payment_intent.items.each do |item|
+            item.update!(refunded: true)
+          end
+        end
       end
     end
   end
@@ -85,17 +108,31 @@ class WebhooksController < ApplicationController
     square_location_id: nil,
     stripe_payment_id: nil
   )
-    if square_payment_id.present?
-      payment_intent_id = square_payment_id
-      payment_intent = PaymentIntent.find_by(
-        square_payment_id: square_payment_id,
-        square_location_id: square_location_id
-      )
-    else
-      payment_intent_id = stripe_payment_id
-      payment_intent = PaymentIntent.find_by(stripe_id: payment_intent_id)
-    end
+    payment_intent = if square_payment_id.present?
+                       PaymentIntent.find_by(
+                         square_payment_id: square_payment_id,
+                         square_location_id: square_location_id
+                       )
+                     else
+                       PaymentIntent.find_by(stripe_id: stripe_payment_id)
+                     end
 
+    # TODO(jtmckibb): Fix emails
+    # CustomerMailer.with(payment_intent: payment_intent).send_receipt.deliver_now
+
+    # TODO(jtmckibb): Mark in the payment intent that the card has been successfully processed by Square
+    #                 The other "success" means that the completed payment has been processed by us
+    #                 I'm thinking that we're going to need to convert this "success" boolean into a FSM
+    #                 SquareTransactionSucceeded -> EmailsSent -> ItemsCreated
+    #                 Or since one doesn't depend on another we can make it an array of events. We could
+    #                 even start multiple threads
+
+    # TODO(jtmckibb): Instead of just checking for successful, we'd need to check that there are no other
+    #                 unfinished actions to complete in the checklist. So far our checklist is:
+    #                  - processItems (if any one Item fails, be sure not to create any)
+    #                  - sendEmail
+    #                 The new check would be like, if all of the required actions are complete, then raise
+    #                 the DuplicatePaymentCompletedError, else finish the unfinished actions.
     # If the payment has already been processed
     if payment_intent.successful
       raise DuplicatePaymentCompletedError.new "This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}"
@@ -103,7 +140,7 @@ class WebhooksController < ApplicationController
 
     items = JSON.parse(payment_intent.line_items)
     items.each do |item|
-      # TODO(jmckibben): Add some tracking that tracks if it breaks somewhere here
+      # TODO(jtmckibb): Add some tracking that tracks if it breaks somewhere here
 
       amount = item['amount']
       seller_id = item['seller_id']
