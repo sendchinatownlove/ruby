@@ -1,13 +1,15 @@
 require 'rails_helper'
 
 RSpec.describe PaymentIntent, type: :model do
+  it { should validate_uniqueness_of(:stripe_id) }
+  it { should validate_uniqueness_of(:square_payment_id) }
+  it { should have_many(:items) }
 
   context 'with square payment intent' do
     let(:payment_intent) do
       create(
-        :payment_intent,
+        :square_payment_intent,
         square_payment_id: 'square-id',
-        stripe_id: nil,
         square_location_id: square_location_id
       )
     end
@@ -35,9 +37,8 @@ RSpec.describe PaymentIntent, type: :model do
   context 'with stripe payment intent' do
     let(:payment_intent) do
       create(
-        :payment_intent,
-        stripe_id: 'stripe-id',
-        square_payment_id: nil
+        :stripe_payment_intent,
+        stripe_id: 'stripe-id'
       )
     end
 

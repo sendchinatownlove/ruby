@@ -47,21 +47,44 @@ class WebhooksController < ApplicationController
     callback_body_json = JSON.parse(callback_body)
 
     # If the notification indicates a PAYMENT_UPDATED event...
-    if callback_body_json['type'] == 'payment.updated'
+    case callback_body_json['type']
+    when 'payment.updated'
       payment = callback_body_json['data']['object']['payment']
       if payment['status'] == 'COMPLETED'
-        # Get the ID of the updated payment
-        payment_id = callback_body_json['entity_id']
-
-        # Get the ID of the payment's associated location
-        location_id = payment['location_id']
-        payment_id = callback_body_json['data']['id']
-
         # Fulfill the purchase
         handle_payment_intent_succeeded(
-          square_payment_id: payment_id,
-          square_location_id: location_id
+          square_payment_id: payment['id'],
+          square_location_id: payment['location_id']
         )
+      end
+    when 'refund.created'
+      refund = callback_body_json['data']['object']['refund']
+
+      payment_intent = PaymentIntent.find_by(
+        square_payment_id: refund['payment_id']
+      )
+
+      Refund.create!(
+        square_refund_id: refund['id'],
+        status: refund['status'],
+        payment_intent: payment_intent
+      )
+    when 'refund.updated'
+      square_refund = callback_body_json['data']['object']['refund']
+      status = square_refund['status']
+
+      refund = Refund.find_by(square_refund_id: square_refund['id'])
+      refund.update(status: status)
+
+      case status
+      when 'APPROVED'
+        # Wrapped in a transaction so that if any one of them fail, none of the
+        # Items are updated
+        ActiveRecord::Base.transaction do
+          refund.payment_intent.items.each do |item|
+            item.update!(refunded: true)
+          end
+        end
       end
     end
   end
@@ -85,16 +108,14 @@ class WebhooksController < ApplicationController
     square_location_id: nil,
     stripe_payment_id: nil
   )
-    if square_payment_id.present?
-      payment_intent_id = square_payment_id
-      payment_intent = PaymentIntent.find_by(
-        square_payment_id: square_payment_id,
-        square_location_id: square_location_id
-      )
-    else
-      payment_intent_id = stripe_payment_id
-      payment_intent = PaymentIntent.find_by(stripe_id: payment_intent_id)
-    end
+    payment_intent = if square_payment_id.present?
+                       PaymentIntent.find_by(
+                         square_payment_id: square_payment_id,
+                         square_location_id: square_location_id
+                       )
+                     else
+                       PaymentIntent.find_by(stripe_id: stripe_payment_id)
+                     end
 
     # TODO(jtmckibb): Fix emails
     # CustomerMailer.with(payment_intent: payment_intent).send_receipt.deliver_now
