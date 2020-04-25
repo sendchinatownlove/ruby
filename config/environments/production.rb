@@ -75,7 +75,7 @@ Rails.application.configure do
       :address        => "smtp.mailgun.org",
       :user_name      => "postmaster@sandbox6657e75f5d664a16921d418cd676ac5c.mailgun.org",
       :password       => "69cac0b97a813a000fd8d198c596bfab-f135b0f1-ce7a2435",
-      :domain         => 'sandbox74151aabc4114674a95154526cf10e4f.mailgun.org',
+      :domain         => 'sendchinatownlove.herokuapp.com,
       :authentication => :plain,
   }
 
