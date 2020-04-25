@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_25_034235) do
+ActiveRecord::Schema.define(version: 2020_04_25_163638) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -21,6 +21,11 @@ ActiveRecord::Schema.define(version: 2020_04_25_034235) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["item_id"], name: "index_donation_details_on_item_id"
+  end
+
+  create_table "existing_events", force: :cascade do |t|
+    t.string "idempotency_key"
+    t.integer "type"
   end
 
   create_table "gift_card_amounts", force: :cascade do |t|
