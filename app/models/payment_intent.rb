@@ -1,6 +1,9 @@
 class PaymentIntent < ApplicationRecord
   validate :square_xor_stripe_id_exists
   validate :square_location_id_exists
+  validates_uniqueness_of :square_payment_id, allow_nil: true
+  validates_uniqueness_of :stripe_id, allow_nil: true
+  has_many :items
 
   def square_xor_stripe_id_exists
     unless stripe_id.present? ^ square_payment_id.present?

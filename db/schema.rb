@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_24_024902) do
+ActiveRecord::Schema.define(version: 2020_04_25_034235) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -92,6 +92,15 @@ ActiveRecord::Schema.define(version: 2020_04_24_024902) do
     t.string "name"
   end
 
+  create_table "refunds", force: :cascade do |t|
+    t.string "square_refund_id"
+    t.string "status"
+    t.bigint "payment_intent_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["payment_intent_id"], name: "index_refunds_on_payment_intent_id"
+  end
+
   create_table "sellers", force: :cascade do |t|
     t.string "seller_id", null: false
     t.string "cuisine_name"
@@ -122,4 +131,5 @@ ActiveRecord::Schema.define(version: 2020_04_24_024902) do
   add_foreign_key "items", "sellers"
   add_foreign_key "locations", "sellers"
   add_foreign_key "menu_items", "sellers"
+  add_foreign_key "refunds", "payment_intents"
 end
