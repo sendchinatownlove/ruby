@@ -54,7 +54,8 @@ class SellersController < ApplicationController
       :founded_year,
       :website_url,
       :menu_url,
-      :target_amount
+      :target_amount,
+      :square_location_id
     )
   end
 
