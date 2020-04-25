@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'Gift Cards API', type: :request do
-
   # initialize test data
   let!(:gift_card) { create(:gift_card_detail) }
   let!(:gift_card) { create(:item) }
@@ -9,14 +10,14 @@ RSpec.describe 'Gift Cards API', type: :request do
 
   skip 'POST /gift_cards' do
     let(:attributes) { { charge_id: 'charge-1' } }
-    let(:charge) {
+    let(:charge) do
       {
-          id: 'charge-1',
-          display_items: [{ amount: 5000 }],
-          customer: 'customer-1',
-          metadata: { merchant_id: 'shunfa-bakery' }
+        id: 'charge-1',
+        display_items: [{ amount: 5000 }],
+        customer: 'customer-1',
+        metadata: { merchant_id: 'shunfa-bakery' }
       }
-    }
+    end
 
     before do
       allow(Stripe::Checkout::Session).to receive(:retrieve).and_return(charge)

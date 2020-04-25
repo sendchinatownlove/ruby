@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe PaymentIntent, type: :model do
@@ -20,7 +22,6 @@ RSpec.describe PaymentIntent, type: :model do
     end
 
     context 'without square_location_id' do
-
       let(:square_location_id) { nil }
 
       it 'does not let you create a square payment intent without a location' do

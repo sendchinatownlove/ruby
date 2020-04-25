@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'MenuItems API' do
@@ -49,7 +51,7 @@ RSpec.describe 'MenuItems API' do
 
     let(:invalid_attributes) do
       {
-        invalid: 'Food',
+        invalid: 'Food'
       }
     end
 
@@ -63,7 +65,7 @@ RSpec.describe 'MenuItems API' do
         expected_json['updated_at'] = current_time
         expected_json['name'] = 'Food'
         expected_json['description'] = 'Awesome Food'
-        expected_json['amount'] = "15.5"
+        expected_json['amount'] = '15.5'
         expected_json['image_url'] = 'image.com'
         expected_json['seller_id'] = seller.id
         expect(actual_json).to eq(expected_json.with_indifferent_access)
@@ -138,7 +140,7 @@ RSpec.describe 'MenuItems API' do
       end
 
       it 'confirms deletion of the menu_item' do
-        expect{updated_menu_item = MenuItem.find(id)}.to raise_exception(ActiveRecord::RecordNotFound)
+        expect { updated_menu_item = MenuItem.find(id) }.to raise_exception(ActiveRecord::RecordNotFound)
       end
     end
   end

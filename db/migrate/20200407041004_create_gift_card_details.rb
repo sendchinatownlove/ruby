@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateGiftCardDetails < ActiveRecord::Migration[6.0]
   def change
     create_table :gift_card_details do |t|

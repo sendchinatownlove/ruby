@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 require 'rails_helper'
 
@@ -16,7 +17,7 @@ RSpec.describe 'Sellers API', type: :request do
       owner_image_url: 'https://www.aws.com/98nuw9e8unf9awnuefaiwenfoaijfosdf',
       accept_donations: true,
       sell_gift_cards: true,
-      business_type: "small-biz",
+      business_type: 'small-biz',
       num_employees: 5,
       founded_year: 1850,
       website_url: 'https://www.youtube.com/watch?v=jIIuzB11dsA',
@@ -34,7 +35,7 @@ RSpec.describe 'Sellers API', type: :request do
       owner_image_url: 'https://www.aws.com/oawjeoiajwef9wuef09wuef09waeuf',
       accept_donations: false,
       sell_gift_cards: true,
-      business_type: "medium-biz",
+      business_type: 'medium-biz',
       num_employees: 10,
       founded_year: 1950,
       website_url: 'https://www.youtube.com/watch?v=C_oACPWGvM4',
@@ -56,7 +57,7 @@ RSpec.describe 'Sellers API', type: :request do
       sell_gift_cards: true,
       hero_image_url: 'superman-url',
       progress_bar_color: '#1234',
-      business_type: "tiny-biz",
+      business_type: 'tiny-biz',
       num_employees: 2,
       founded_year: 2017,
       website_url: 'https://www.youtube.com/watch?v=CIjXUg1s5gc',
@@ -191,7 +192,6 @@ RSpec.describe 'Sellers API', type: :request do
 
   # Test suite for PUT /sellers/seller_id
   describe 'PUT /sellers/seller_id' do
-
     before { put "/sellers/#{seller_id1}", params: valid_attributes, as: :json }
 
     it 'updates the record' do

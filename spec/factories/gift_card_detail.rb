@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :gift_card_detail do
     gift_card_id { Faker::Alphanumeric.alphanumeric(number: 64) }

@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class SellersController < ApplicationController
-  before_action :set_seller, only: [:show, :update]
+  before_action :set_seller, only: %i[show update]
 
   # GET /sellers
   def index

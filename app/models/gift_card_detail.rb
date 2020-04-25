@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GiftCardDetail < ApplicationRecord
   belongs_to :item
   validates_uniqueness_of :gift_card_id

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 module ExceptionHandler
   class InvalidLineItem < StandardError; end
@@ -13,10 +14,9 @@ module ExceptionHandler
       @status_code = status_code
       @errors = errors
       # Get the first error and give the detail of it as a message
-      super("#{errors.first[:detail]}")
+      super(errors.first[:detail].to_s)
     end
   end
-
 
   # provides the more graceful `included` method
   extend ActiveSupport::Concern
@@ -24,10 +24,9 @@ module ExceptionHandler
   # Note that these are evaluated from bottom to top
   included do
     rescue_from ActiveRecord::RecordInvalid,
-      ActionController::ParameterMissing,
-      InvalidLineItem,
-      InvalidGiftCardUpdate do |e|
-
+                ActionController::ParameterMissing,
+                InvalidLineItem,
+                InvalidGiftCardUpdate do |e|
       json_response({ message: e.message }, :unprocessable_entity)
     end
 
@@ -54,11 +53,11 @@ module ExceptionHandler
 
     rescue_from SquarePaymentsError do |e|
       json_response({
-        # Give the detail of the first error
-        message: e.message,
-        type: 'SQUARE_PAYMENTS_ERROR',
-        errors: e.errors
-        }, e.status_code)
+                      # Give the detail of the first error
+                      message: e.message,
+                      type: 'SQUARE_PAYMENTS_ERROR',
+                      errors: e.errors
+                    }, e.status_code)
     end
   end
 end

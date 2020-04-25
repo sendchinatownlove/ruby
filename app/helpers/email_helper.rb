@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EmailHelper
   def self.format_sellers_as_list(seller_names:)
     # Sort to make it deterministic

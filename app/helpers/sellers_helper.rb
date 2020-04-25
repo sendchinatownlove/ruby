@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SellersHelper
   def self.generate_seller_json(seller:)
     locations = seller.locations

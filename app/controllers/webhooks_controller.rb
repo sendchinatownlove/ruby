@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class WebhooksController < ApplicationController
   # POST /webhooks
   def create
@@ -40,9 +42,9 @@ class WebhooksController < ApplicationController
     callback_body = request.body.string
 
     # Validate the signature
-    if !is_valid_square_callback(callback_body, callback_signature)
+    unless is_valid_square_callback(callback_body, callback_signature)
       # Fail if the signature is invalid
-      raise InvalidSquareSignature.new 'Invalid Signature Header from Square'
+      raise InvalidSquareSignature, 'Invalid Signature Header from Square'
     end
 
     # Load the JSON body into a hash
@@ -93,7 +95,6 @@ class WebhooksController < ApplicationController
 
   # Validates HMAC-SHA1 signatures included in webhook notifications to ensure notifications came from Square
   def is_valid_square_callback(callback_body, callback_signature)
-
     # Combine your webhook notification URL and the JSON body of the incoming request into a single string
     string_to_sign = 'https://api.sendchinatownlove.com/webhooks' + callback_body
 
@@ -102,7 +103,7 @@ class WebhooksController < ApplicationController
 
     # Hash the signatures a second time (to protect against timing attacks)
     # and compare them
-    return Digest::SHA1.base64digest(string_signature) == Digest::SHA1.base64digest(callback_signature)
+    Digest::SHA1.base64digest(string_signature) == Digest::SHA1.base64digest(callback_signature)
   end
 
   def handle_payment_intent_succeeded(
@@ -137,7 +138,7 @@ class WebhooksController < ApplicationController
     #                 the DuplicatePaymentCompletedError, else finish the unfinished actions.
     # If the payment has already been processed
     if payment_intent.successful
-      raise DuplicatePaymentCompletedError.new "This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}"
+      raise DuplicatePaymentCompletedError, "This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}"
     end
 
     items = JSON.parse(payment_intent.line_items)
@@ -169,7 +170,7 @@ class WebhooksController < ApplicationController
           seller_id: seller_id
         )
       else
-        raise InvalidLineItem.new 'Unsupported ItemType. Please verify the line_item.name.'
+        raise InvalidLineItem, 'Unsupported ItemType. Please verify the line_item.name.'
       end
     end
 
@@ -206,28 +207,30 @@ class WebhooksController < ApplicationController
     )
   end
 
-  def generate_gift_card_id()
-    for i in 1..50 do
+  def generate_gift_card_id
+    (1..50).each do |_i|
       potential_id = SecureRandom.uuid
       # Use this ID if it's not already taken
-      return potential_id if !GiftCardDetail.where(gift_card_id: potential_id).present?
+      unless GiftCardDetail.where(gift_card_id: potential_id).present?
+        return potential_id
+      end
     end
-    raise CannotGenerateUniqueHash.new 'Error generating unique gift_card_id'
+    raise CannotGenerateUniqueHash, 'Error generating unique gift_card_id'
   end
 
   def generate_seller_gift_card_id(seller_id:)
-    for i in 1..50 do
+    (1..50).each do |_i|
       hash = SecureRandom.hex.upcase
       potential_id_prefix = hash[0...3]
       potential_id_suffix = hash[3...5]
       potential_id = "##{potential_id_prefix}-#{potential_id_suffix}"
       # Use this ID if it's not already taken
-      return potential_id if !GiftCardDetail.where(seller_gift_card_id: potential_id)
-                                            .joins(:item)
-                                            .where(
-                                              items: { seller_id: seller_id }
-                                            ).present?
+      return potential_id unless GiftCardDetail.where(seller_gift_card_id: potential_id)
+                                               .joins(:item)
+                                               .where(
+                                                 items: { seller_id: seller_id }
+                                               ).present?
     end
-    raise CannotGenerateUniqueHash.new 'Error generating unique gift_card_id'
+    raise CannotGenerateUniqueHash, 'Error generating unique gift_card_id'
   end
 end

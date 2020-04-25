@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PaymentIntent < ApplicationRecord
   validate :square_xor_stripe_id_exists
   validate :square_location_id_exists
@@ -19,7 +21,9 @@ class PaymentIntent < ApplicationRecord
 
   def square_location_id_exists
     if square_payment_id.present?
-      errors.add(:square_location_id, 'must exist if square_payment_id exists') unless square_location_id.present?
+      unless square_location_id.present?
+        errors.add(:square_location_id, 'must exist if square_payment_id exists')
+      end
     end
   end
 end

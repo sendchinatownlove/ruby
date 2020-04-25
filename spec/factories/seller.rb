@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :seller do
     seller_id { Faker::Alphanumeric.alphanumeric(number: 64) }

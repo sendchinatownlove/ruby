@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'Webhooks API', type: :request do
@@ -191,7 +193,7 @@ RSpec.describe 'Webhooks API', type: :request do
 
           it 'returns status code 400' do
             expect(response.body)
-                  .to match(/This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}/)
+              .to match(/This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}/)
             expect(response).to have_http_status(400)
           end
         end
@@ -237,7 +239,7 @@ RSpec.describe 'Webhooks API', type: :request do
 
           it 'returns status code 400' do
             expect(response.body)
-                  .to match(/This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}/)
+              .to match(/This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}/)
             expect(response).to have_http_status(400)
           end
         end
@@ -267,7 +269,7 @@ RSpec.describe 'Webhooks API', type: :request do
       let(:payment_intent_response) do
         {
           'id': payment_intent.stripe_id,
-          'receipt_email': payment_intent.email,
+          'receipt_email': payment_intent.email
         }
       end
 
@@ -320,7 +322,7 @@ RSpec.describe 'Webhooks API', type: :request do
 
           it 'returns status code 400' do
             expect(response.body)
-                  .to match(/This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}/)
+              .to match(/This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}/)
             expect(response).to have_http_status(400)
           end
         end
@@ -362,7 +364,7 @@ RSpec.describe 'Webhooks API', type: :request do
 
           it 'returns status code 400' do
             expect(response.body)
-                  .to match(/This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}/)
+              .to match(/This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}/)
             expect(response).to have_http_status(400)
           end
         end
