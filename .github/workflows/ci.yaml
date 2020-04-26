@@ -24,6 +24,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Set up Ruby 2.6
+      uses: actions/setup-ruby@v1
+      with:
+        ruby-version: 2.6.6
     - name: Build and test with Rake
       env:
         PGHOST: 127.0.0.1
@@ -31,10 +35,6 @@ jobs:
         RAILS_ENV: test
       run: |
         sudo apt-get -yqq install libpq-dev
-        sudo apt install git curl libssl-dev libreadline-dev zlib1g-dev autoconf bison build-essential libyaml-dev libreadline-dev libncurses5-dev libffi-dev libgdbm-dev
-        curl -sL https://github.com/rbenv/rbenv-installer/raw/master/bin/rbenv-installer | bash -
-        ## RBENV 
-        /home/runner/.rbenv/bin/rbenv global 2.6.3
         gem install bundler
         bundle install --jobs 4 --retry 3
         bundle exec rails db:create
