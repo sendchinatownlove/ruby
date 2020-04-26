@@ -22,7 +22,7 @@ https://gorails.com/setup/ubuntu/19.10
 ## on machine
 
 ### Installation
-- Download Ruby 2.6.3
+- Download Ruby 2.6.6
 - rvm install ruby-X.X.X
 If you don't have rvm, gem install rvm:
 `\curl -sSL https://get.rvm.io | bash -s stable --ruby`
