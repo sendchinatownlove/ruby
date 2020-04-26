@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require 'stripe'
 
 class GiftCardsController < ApplicationController
-  before_action :set_gift_card, only: [:show, :update, :destroy]
+  before_action :set_gift_card, only: %i[show update destroy]
 
   # GET /gift_cards/:id
   def show
@@ -16,7 +18,7 @@ class GiftCardsController < ApplicationController
     new_amount = update_params[:amount].to_i
 
     if original_amount < new_amount
-      raise InvalidGiftCardUpdate.new 'Cannot increase gift card amount'
+      raise InvalidGiftCardUpdate, 'Cannot increase gift card amount'
     end
 
     @gift_card.update!(update_params)

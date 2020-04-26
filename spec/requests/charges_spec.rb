@@ -540,9 +540,11 @@ RSpec.describe 'Charges API', type: :request do
             payment_method_types: %w[card],
             receipt_email: email,
             description:
+              # rubocop:disable Layout/LineLength
               thank_you +
                 ' Your gift card(s) will be emailed to you when the seller opens back up.'
           ).and_call_original
+          # rubocop:enable Layout/LineLength
 
           post '/charges', params: params, as: :json
         end

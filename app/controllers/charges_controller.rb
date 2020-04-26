@@ -146,8 +146,8 @@ class ChargesController < ApplicationController
     payment = api_response.data.payment
     receipt_url = payment[:receipt_url]
 
-    # Creates a pending PaymentIntent. See webhooks_controller to see what happens
-    # when the PaymentIntent is successful.
+    # Creates a pending PaymentIntent. See webhooks_controller to see what
+    # happens when the PaymentIntent is successful.
     PaymentIntent.create!(
       square_location_id: square_location_id,
       square_payment_id: payment[:id],
@@ -172,8 +172,8 @@ class ChargesController < ApplicationController
         description: description
       )
 
-    # Creates a pending PaymentIntent. See webhooks_controller to see what happens
-    # when the PaymentIntent is successful.
+    # Creates a pending PaymentIntent. See webhooks_controller to see what
+    # happens when the PaymentIntent is successful.
     PaymentIntent.create!(
       stripe_id: intent['id'], email: email, line_items: line_items.to_json
     )

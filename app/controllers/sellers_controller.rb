@@ -1,10 +1,16 @@
+# frozen_string_literal: true
+
 class SellersController < ApplicationController
-  before_action :set_seller, only: [:show, :update]
+  before_action :set_seller, only: %i[show update]
 
   # GET /sellers
   def index
     @sellers = Seller.all
-    sellers = @sellers.map { |seller| SellersHelper.generate_seller_json(seller: seller) }
+    sellers = @sellers.map do |seller|
+      SellersHelper.generate_seller_json(
+        seller: seller
+      )
+    end
     json_response(sellers)
   end
 

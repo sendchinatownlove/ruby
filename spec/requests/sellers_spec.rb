@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 require 'rails_helper'
 
@@ -16,7 +17,7 @@ RSpec.describe 'Sellers API', type: :request do
       owner_image_url: 'https://www.aws.com/98nuw9e8unf9awnuefaiwenfoaijfosdf',
       accept_donations: true,
       sell_gift_cards: true,
-      business_type: "small-biz",
+      business_type: 'small-biz',
       num_employees: 5,
       founded_year: 1850,
       website_url: 'https://www.youtube.com/watch?v=jIIuzB11dsA',
@@ -34,7 +35,7 @@ RSpec.describe 'Sellers API', type: :request do
       owner_image_url: 'https://www.aws.com/oawjeoiajwef9wuef09wuef09waeuf',
       accept_donations: false,
       sell_gift_cards: true,
-      business_type: "medium-biz",
+      business_type: 'medium-biz',
       num_employees: 10,
       founded_year: 1950,
       website_url: 'https://www.youtube.com/watch?v=C_oACPWGvM4',
@@ -49,14 +50,16 @@ RSpec.describe 'Sellers API', type: :request do
       cuisine_name: 'New Age Cuisine',
       name: 'New Shunfa Bakery',
       story: "I'm on a new level I'm on a new level",
-      summary: "Darold Durard Brown Ferguson Jr. (born October 20, 1988), known by his stage name ASAP Ferg (stylized A$AP Ferg), is an American rapper and songwriter from New York City's Harlem neighborhood.",
+      summary: "Darold Durard Brown Ferguson Jr. (born October 20, 1988), known
+        by his stage name ASAP Ferg (stylized A$AP Ferg), is an American rapper
+        and songwriter from New York City's Harlem neighborhood.",
       owner_name: 'A$AP Ferg',
       owner_image_url: 'https://www.youtube.com/watch?v=Srns7NiO278',
       accept_donations: true,
       sell_gift_cards: true,
       hero_image_url: 'superman-url',
       progress_bar_color: '#1234',
-      business_type: "tiny-biz",
+      business_type: 'tiny-biz',
       num_employees: 2,
       founded_year: 2017,
       website_url: 'https://www.youtube.com/watch?v=CIjXUg1s5gc',
@@ -132,7 +135,13 @@ RSpec.describe 'Sellers API', type: :request do
     end
 
     context 'without accept_donation' do
-      before { post '/sellers', params: valid_attributes.except(:accept_donations), as: :json }
+      before do
+        post(
+          '/sellers',
+          params: valid_attributes.except(:accept_donations),
+          as: :json
+        )
+      end
 
       it 'creates a seller with default accept_donations' do
         # Ignore id field since it's auto-incremented
@@ -153,7 +162,13 @@ RSpec.describe 'Sellers API', type: :request do
     end
 
     context 'without accept_donation' do
-      before { post '/sellers', params: valid_attributes.except(:sell_gift_cards), as: :json }
+      before do
+        post(
+          '/sellers',
+          params: valid_attributes.except(:sell_gift_cards),
+          as: :json
+        )
+      end
 
       it 'creates a seller with default accept_donations' do
         # Ignore id field since it's auto-incremented
@@ -191,7 +206,6 @@ RSpec.describe 'Sellers API', type: :request do
 
   # Test suite for PUT /sellers/seller_id
   describe 'PUT /sellers/seller_id' do
-
     before { put "/sellers/#{seller_id1}", params: valid_attributes, as: :json }
 
     it 'updates the record' do
