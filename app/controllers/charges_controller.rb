@@ -13,15 +13,17 @@ class ChargesController < ApplicationController
 
     # Validate each Item and get all ItemTypes
     item_types = Set.new
-    line_items.each { |item| item_types.add item['item_type'] }
+    line_items.each do |item|
+      item_types.add item['item_type']
+      item[:seller_id] = seller_id
+    end
 
     seller = Seller.find_by(seller_id: seller_id)
 
     # Total all Items
-    amount =
-      line_items.inject(0) do |sum, item|
-        sum + item['amount'] * item['quantity']
-      end
+    amount = line_items.inject(0) do |sum, item|
+      sum + item['amount'] * item['quantity']
+    end
 
     description =
       generate_description(seller_name: seller.name, item_types: item_types)

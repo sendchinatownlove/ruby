@@ -31,7 +31,15 @@ RSpec.describe 'Charges API', type: :request do
 
     context 'with a gift card' do
       let(:line_items) do
-        [{ amount: 50, currency: 'usd', item_type: 'gift_card', quantity: 1 }]
+        [
+          {
+            amount: 50,
+            currency: 'usd',
+            item_type: 'gift_card',
+            quantity: 1,
+            seller_id: seller_id
+          }
+        ]
       end
 
       before { post '/charges', params: params, as: :json }
@@ -59,7 +67,15 @@ RSpec.describe 'Charges API', type: :request do
 
       context 'with a gift card' do
         let(:line_items) do
-          [{ amount: 50, currency: 'usd', item_type: 'gift_card', quantity: 1 }]
+          [
+            {
+              amount: 50,
+              currency: 'usd',
+              item_type: 'gift_card',
+              quantity: 1,
+              seller_id: seller_id
+            }
+          ]
         end
 
         describe 'with error codes' do
@@ -152,10 +168,18 @@ RSpec.describe 'Charges API', type: :request do
         let(:line_items) do
           [
             {
-              amount: 5000, currency: 'usd', item_type: 'gift_card', quantity: 1
+              amount: 5000,
+              currency: 'usd',
+              item_type: 'gift_card',
+              quantity: 1,
+              seller_id: seller_id
             },
             {
-              amount: 3000, currency: 'usd', item_type: 'donation', quantity: 1
+              amount: 3000,
+              currency: 'usd',
+              item_type: 'donation',
+              quantity: 1,
+              seller_id: seller_id
             }
           ]
         end
@@ -409,9 +433,19 @@ RSpec.describe 'Charges API', type: :request do
       let(:line_items) do
         [
           {
-            amount: 5000, currency: 'usd', item_type: 'gift_card', quantity: 1
+            amount: 5000,
+            currency: 'usd',
+            item_type: 'gift_card',
+            quantity: 1,
+            seller_id: seller_id
           },
-          { amount: 3000, currency: 'usd', item_type: 'donation', quantity: 1 }
+          {
+            amount: 3000,
+            currency: 'usd',
+            item_type: 'donation',
+            quantity: 1,
+            seller_id: seller_id
+          }
         ]
       end
 
