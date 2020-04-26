@@ -5,15 +5,6 @@ ActionMailer::Base.smtp_settings = {
     :password       => ENV['MAILGUN_SMTP_PASSWORD'],
     :domain         => 'sendchinatownlove.herokuapp.com',
     :authentication => :plain,
+    enable_starttls_auto: true,
 }
 ActionMailer::Base.delivery_method = :smtp
-
-class CustomerMailer < ApplicationMailer
-  default from: "receipts@sendchinatownlove.com"
-
-  def send_receipt
-    @payment_intent = params[:payment_intent]
-    mail(to: @payment_intent.email, subject: 'Receipt from Send Chinatown Love')
-  end
-
-end
