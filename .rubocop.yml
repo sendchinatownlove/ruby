@@ -15,6 +15,7 @@ AllCops:
     - 'Gemfile.lock'
     - 'Rakefile'
     - 'db/schema.rb'
+    - 'bin/**/*'
   TargetRubyVersion: 2.4
 
 Documentation:
@@ -33,6 +34,9 @@ Style/FormatStringToken:
   # look like unannotated format string tokens to this cop.
   Exclude:
     - spec/**/*
+
+Style/GuardClause:
+  Enabled: false
 
 Style/IpAddresses:
   # The test for this cop includes strings that would cause offenses
@@ -86,17 +90,31 @@ Lint/UselessAccessModifier:
 Lint/BooleanSymbol:
   Enabled: false
 
+# TODO(jtmckibb): Consider turning these back on
+Metrics/AbcSize:
+  Enabled: false
+
 Metrics/BlockLength:
+  Enabled: false
   Exclude:
+    - 'config/environments/*'
     - 'Rakefile'
     - '**/*.rake'
     - 'spec/**/*.rb'
     - '**/*.gemspec'
 
 Metrics/ClassLength:
-  Exclude:
-    - lib/rubocop/config_obsoletion.rb
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
 
 Metrics/ModuleLength:
   Exclude:
     - 'spec/**/*.rb'
+
+Metrics/ParameterLists:
+  Enabled: false

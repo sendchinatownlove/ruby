@@ -6,7 +6,11 @@ class SellersController < ApplicationController
   # GET /sellers
   def index
     @sellers = Seller.all
-    sellers = @sellers.map { |seller| SellersHelper.generate_seller_json(seller: seller) }
+    sellers = @sellers.map do |seller|
+      SellersHelper.generate_seller_json(
+        seller: seller
+      )
+    end
     json_response(sellers)
   end
 

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# TODO(jmckibben): This class needs a lot of refactoring
 class WebhooksController < ApplicationController
   # POST /webhooks
   def create
@@ -26,7 +27,6 @@ class WebhooksController < ApplicationController
     event = Stripe::Webhook.construct_event(
       payload, sig_header, endpoint_secret
     )
-
     # Handle the payment_intent.succeeded event
     if event['type'] == 'payment_intent.succeeded'
       payment_intent = event['data']['object']
@@ -42,7 +42,7 @@ class WebhooksController < ApplicationController
     callback_body = request.body.string
 
     # Validate the signature
-    unless is_valid_square_callback(callback_body, callback_signature)
+    unless valid_square_callback?(callback_body, callback_signature)
       # Fail if the signature is invalid
       raise InvalidSquareSignature, 'Invalid Signature Header from Square'
     end
@@ -93,17 +93,29 @@ class WebhooksController < ApplicationController
     end
   end
 
-  # Validates HMAC-SHA1 signatures included in webhook notifications to ensure notifications came from Square
-  def is_valid_square_callback(callback_body, callback_signature)
-    # Combine your webhook notification URL and the JSON body of the incoming request into a single string
-    string_to_sign = 'https://api.sendchinatownlove.com/webhooks' + callback_body
+  # Validates HMAC-SHA1 signatures included in webhook notifications to ensure
+  # notifications came from Square
+  def valid_square_callback?(callback_body, callback_signature)
+    # Combine your webhook notification URL and the JSON body of the incoming
+    # request into a single string
+    string_to_sign = 'https://api.sendchinatownlove.com/webhooks' +
+                     callback_body
 
-    # Generate the HMAC-SHA1 signature of the string, signed with your webhook signature key
-    string_signature = Base64.strict_encode64(OpenSSL::HMAC.digest('sha1', ENV['SQUARE_WEBHOOK_SIGNATURE_KEY'], string_to_sign))
+    # Generate the HMAC-SHA1 signature of the string, signed with your webhook
+    # signature key
+    string_signature = Base64.strict_encode64(
+      OpenSSL::HMAC.digest(
+        'sha1',
+        ENV['SQUARE_WEBHOOK_SIGNATURE_KEY'],
+        string_to_sign
+      )
+    )
 
     # Hash the signatures a second time (to protect against timing attacks)
     # and compare them
-    Digest::SHA1.base64digest(string_signature) == Digest::SHA1.base64digest(callback_signature)
+    Digest::SHA1.base64digest(string_signature) == Digest::SHA1.base64digest(
+      callback_signature
+    )
   end
 
   def handle_payment_intent_succeeded(
@@ -121,29 +133,34 @@ class WebhooksController < ApplicationController
                      end
 
     # TODO(jtmckibb): Fix emails
-    # CustomerMailer.with(payment_intent: payment_intent).send_receipt.deliver_now
+    # CustomerMailer.with(payment_intent: payment_intent)
+    #   .send_receipt.deliver_now
 
-    # TODO(jtmckibb): Mark in the payment intent that the card has been successfully processed by Square
-    #                 The other "success" means that the completed payment has been processed by us
-    #                 I'm thinking that we're going to need to convert this "success" boolean into a FSM
-    #                 SquareTransactionSucceeded -> EmailsSent -> ItemsCreated
-    #                 Or since one doesn't depend on another we can make it an array of events. We could
-    #                 even start multiple threads
+    # TODO(jtmckibb): Each payment has an associated FSM. If we see the start
+    #                 of a payment, we should expect for it to be completed.
+    #                 If it isn't, then we should record it. Similarly with
+    #                 refunds.
 
-    # TODO(jtmckibb): Instead of just checking for successful, we'd need to check that there are no other
-    #                 unfinished actions to complete in the checklist. So far our checklist is:
-    #                  - processItems (if any one Item fails, be sure not to create any)
-    #                  - sendEmail
-    #                 The new check would be like, if all of the required actions are complete, then raise
-    #                 the DuplicatePaymentCompletedError, else finish the unfinished actions.
+    # TODO(jtmckibb): If Square notifies us of a payment completion, or refund
+    #                 and for some reason we fail in the middle of reacting to
+    #                 that event, we want to be able to save the place that we
+    #                 failed at and whenever Square tries to notify us again,
+    #                 finish where we left off.
+
     # If the payment has already been processed
     if payment_intent.successful
-      raise DuplicatePaymentCompletedError, "This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}"
+      # rubocop:disable Layout/LineLength
+      raise(
+        DuplicatePaymentCompletedError,
+        "This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}"
+      )
+      # rubocop:enable Layout/LineLength
     end
 
     items = JSON.parse(payment_intent.line_items)
     items.each do |item|
-      # TODO(jtmckibb): Add some tracking that tracks if it breaks somewhere here
+      # TODO(jtmckibb): Add some tracking that tracks if it breaks somewhere
+      # here
 
       amount = item['amount']
       seller_id = item['seller_id']
@@ -170,12 +187,15 @@ class WebhooksController < ApplicationController
           seller_id: seller_id
         )
       else
-        raise InvalidLineItem, 'Unsupported ItemType. Please verify the line_item.name.'
+        raise(
+          InvalidLineItem,
+          'Unsupported ItemType. Please verify the line_item.name.'
+        )
       end
     end
 
-    # Mark the payment as successful once we've recorded each object purchased in our DB
-    # eg) Donation, Gift Card, etc.
+    # Mark the payment as successful once we've recorded each object purchased
+    # in our DB eg) Donation, Gift Card, etc.
     payment_intent.successful = true
     payment_intent.save
   end
@@ -225,11 +245,9 @@ class WebhooksController < ApplicationController
       potential_id_suffix = hash[3...5]
       potential_id = "##{potential_id_prefix}-#{potential_id_suffix}"
       # Use this ID if it's not already taken
-      return potential_id unless GiftCardDetail.where(seller_gift_card_id: potential_id)
-                                               .joins(:item)
-                                               .where(
-                                                 items: { seller_id: seller_id }
-                                               ).present?
+      return potential_id unless GiftCardDetail.where(
+        seller_gift_card_id: potential_id
+      ).joins(:item).where(items: { seller_id: seller_id }).present?
     end
     raise CannotGenerateUniqueHash, 'Error generating unique gift_card_id'
   end

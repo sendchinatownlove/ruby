@@ -88,7 +88,8 @@ RSpec.describe SellersHelper, type: :helper do
   describe '#calculate_amount_raised' do
     context 'with no money raised' do
       it 'returns the list of sellers with `and`' do
-        expect(SellersHelper.calculate_amount_raised(seller_id: seller.id)).to eq(0)
+        expect(SellersHelper.calculate_amount_raised(seller_id: seller.id))
+          .to eq(0)
       end
     end
 

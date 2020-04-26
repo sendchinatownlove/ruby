@@ -121,7 +121,9 @@ RSpec.describe 'Webhooks API', type: :request do
 
               expect(refund).not_to be_nil
               expect(refund.status).to eq(status)
-              expect(refund.square_refund_id).to eq(refund_response[:refund][:id])
+              expect(refund.square_refund_id).to eq(
+                refund_response[:refund][:id]
+              )
               expect(refund.payment_intent_id).to eq(payment_intent.id)
             end
 
@@ -192,8 +194,13 @@ RSpec.describe 'Webhooks API', type: :request do
           end
 
           it 'returns status code 400' do
+            # rubocop:disable Layout/LineLength
             expect(response.body)
-              .to match(/This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}/)
+              .to match(
+                /This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}/
+              )
+
+            # rubocop:enable Layout/LineLength
             expect(response).to have_http_status(400)
           end
         end
@@ -205,7 +212,9 @@ RSpec.describe 'Webhooks API', type: :request do
         it 'creates a gift card' do
           gift_card_detail = GiftCardDetail.last
           expect(gift_card_detail).not_to be_nil
-          expect(gift_card_detail.gift_card_id).to eq('aweofijn-3n3400-oawjiefwef-0iawef-0i')
+          expect(gift_card_detail.gift_card_id).to eq(
+            'aweofijn-3n3400-oawjiefwef-0iawef-0i'
+          )
           expect(gift_card_detail.seller_gift_card_id).to eq('#ABC-DE')
           expect(gift_card_detail.expiration).to eq(Date.today + 1.year)
 
@@ -238,8 +247,12 @@ RSpec.describe 'Webhooks API', type: :request do
           end
 
           it 'returns status code 400' do
+            # rubocop:disable Layout/LineLength
             expect(response.body)
-              .to match(/This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}/)
+              .to match(
+                /This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}/
+              )
+            # rubocop:enable Layout/LineLength
             expect(response).to have_http_status(400)
           end
         end
@@ -290,7 +303,10 @@ RSpec.describe 'Webhooks API', type: :request do
           .and_return('aweofijn-3n3400-oawjiefwef-0iawef-0i')
         allow(Stripe::Webhook).to receive(:construct_event)
           .and_return(payload.with_indifferent_access)
-        post '/webhooks', headers: { 'HTTP_STRIPE_SIGNATURE' => 'www.stripe.com' }
+        post(
+          '/webhooks',
+          headers: { 'HTTP_STRIPE_SIGNATURE' => 'www.stripe.com' }
+        )
       end
 
       context 'with donation' do
@@ -317,12 +333,19 @@ RSpec.describe 'Webhooks API', type: :request do
 
         context 'with duplicate call' do
           before do
-            post '/webhooks', headers: { 'HTTP_STRIPE_SIGNATURE' => 'www.stripe.com' }
+            post(
+              '/webhooks',
+              headers: { 'HTTP_STRIPE_SIGNATURE' => 'www.stripe.com' }
+            )
           end
 
           it 'returns status code 400' do
+            # rubocop:disable Layout/LineLength
             expect(response.body)
-              .to match(/This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}/)
+              .to match(
+                /This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}/
+              )
+            # rubocop:enable Layout/LineLength
             expect(response).to have_http_status(400)
           end
         end
@@ -334,7 +357,9 @@ RSpec.describe 'Webhooks API', type: :request do
         it 'creates a gift card' do
           gift_card_detail = GiftCardDetail.last
           expect(gift_card_detail).not_to be_nil
-          expect(gift_card_detail.gift_card_id).to eq('aweofijn-3n3400-oawjiefwef-0iawef-0i')
+          expect(gift_card_detail.gift_card_id).to eq(
+            'aweofijn-3n3400-oawjiefwef-0iawef-0i'
+          )
           expect(gift_card_detail.seller_gift_card_id).to eq('#ABC-DE')
           expect(gift_card_detail.expiration).to eq(Date.today + 1.year)
 
@@ -359,12 +384,19 @@ RSpec.describe 'Webhooks API', type: :request do
 
         context 'with duplicate call' do
           before do
-            post '/webhooks', headers: { 'HTTP_STRIPE_SIGNATURE' => 'www.stripe.com' }
+            post(
+              '/webhooks',
+              headers: { 'HTTP_STRIPE_SIGNATURE' => 'www.stripe.com' }
+            )
           end
 
           it 'returns status code 400' do
+            # rubocop:disable Layout/LineLength
             expect(response.body)
-              .to match(/This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}/)
+              .to match(
+                /This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}/
+              )
+            # rubocop:enable Layout/LineLength
             expect(response).to have_http_status(400)
           end
         end

@@ -50,7 +50,9 @@ RSpec.describe 'Sellers API', type: :request do
       cuisine_name: 'New Age Cuisine',
       name: 'New Shunfa Bakery',
       story: "I'm on a new level I'm on a new level",
-      summary: "Darold Durard Brown Ferguson Jr. (born October 20, 1988), known by his stage name ASAP Ferg (stylized A$AP Ferg), is an American rapper and songwriter from New York City's Harlem neighborhood.",
+      summary: "Darold Durard Brown Ferguson Jr. (born October 20, 1988), known
+        by his stage name ASAP Ferg (stylized A$AP Ferg), is an American rapper
+        and songwriter from New York City's Harlem neighborhood.",
       owner_name: 'A$AP Ferg',
       owner_image_url: 'https://www.youtube.com/watch?v=Srns7NiO278',
       accept_donations: true,
@@ -133,7 +135,13 @@ RSpec.describe 'Sellers API', type: :request do
     end
 
     context 'without accept_donation' do
-      before { post '/sellers', params: valid_attributes.except(:accept_donations), as: :json }
+      before do
+        post(
+          '/sellers',
+          params: valid_attributes.except(:accept_donations),
+          as: :json
+        )
+      end
 
       it 'creates a seller with default accept_donations' do
         # Ignore id field since it's auto-incremented
@@ -154,7 +162,13 @@ RSpec.describe 'Sellers API', type: :request do
     end
 
     context 'without accept_donation' do
-      before { post '/sellers', params: valid_attributes.except(:sell_gift_cards), as: :json }
+      before do
+        post(
+          '/sellers',
+          params: valid_attributes.except(:sell_gift_cards),
+          as: :json
+        )
+      end
 
       it 'creates a seller with default accept_donations' do
         # Ignore id field since it's auto-incremented

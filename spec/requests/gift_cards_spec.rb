@@ -83,7 +83,9 @@ RSpec.describe 'Gift Cards API', type: :request do
       let(:attributes) { { amount: -100 } }
 
       it 'updates the record' do
-        expect(response.body).to match(/Amount must be greater than or equal to 0/)
+        expect(response.body).to match(
+          /Amount must be greater than or equal to 0/
+        )
       end
 
       it 'returns status code 204' do

@@ -76,7 +76,13 @@ RSpec.describe 'Locations API' do
     end
 
     context 'when request attributes are valid' do
-      before { post "/sellers/#{seller_id}/locations", params: valid_attributes, as: :json }
+      before do
+        post(
+          "/sellers/#{seller_id}/locations",
+          params: valid_attributes,
+          as: :json
+        )
+      end
 
       it 'returns status code 201' do
         expect(response).to have_http_status(201)
@@ -91,7 +97,9 @@ RSpec.describe 'Locations API' do
       end
 
       it 'returns a failure message' do
-        expect(response.body).to match(/param is missing or the value is empty: address1/)
+        expect(response.body).to match(
+          /param is missing or the value is empty: address1/
+        )
       end
     end
   end
@@ -100,7 +108,13 @@ RSpec.describe 'Locations API' do
   describe 'PUT /sellers/:seller_id/locations/:id' do
     let(:valid_attributes) { { address1: '123 Mozart' } }
 
-    before { put "/sellers/#{seller_id}/locations/#{id}", params: valid_attributes, as: :json }
+    before do
+      put(
+        "/sellers/#{seller_id}/locations/#{id}",
+        params: valid_attributes,
+        as: :json
+      )
+    end
 
     context 'when location exists' do
       it 'returns status code 200' do
