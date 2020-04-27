@@ -47,7 +47,7 @@ group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'rspec-rails', '~> 4.0.0'
   gem 'faker'
-  gem 'pry', '~> 0.12.2'
+  gem 'pry-byebug'
 end
 
 group :development do
