@@ -132,9 +132,7 @@ class WebhooksController < ApplicationController
                        PaymentIntent.find_by(stripe_id: stripe_payment_id)
                      end
 
-    # TODO(jtmckibb): Fix emails
-    # CustomerMailer.with(payment_intent: payment_intent)
-    #   .send_receipt.deliver_now
+    CustomerMailer.with(payment_intent: payment_intent).send_receipt.deliver_now
 
     # TODO(jtmckibb): Each payment has an associated FSM. If we see the start
     #                 of a payment, we should expect for it to be completed.
