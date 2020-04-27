@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 class MenuItemsController < ApplicationController
   before_action :set_seller
-  before_action :set_seller_menu_item, only: [:update, :destroy]
+  before_action :set_seller_menu_item, only: %i[update destroy]
 
   # GET /sellers/:seller_id/menu_items
   def index

@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 class LocationsController < ApplicationController
   before_action :set_seller
-  before_action :set_seller_location, only: [:show, :update]
+  before_action :set_seller_location, only: %i[show update]
 
   # GET /sellers/:seller_id/locations
   def index

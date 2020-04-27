@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :existing_event do
     idempotent_key { Faker::Alphanumeric.alphanumeric(number: 64) }

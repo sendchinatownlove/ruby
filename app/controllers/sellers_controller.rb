@@ -1,10 +1,16 @@
+# frozen_string_literal: true
+
 class SellersController < ApplicationController
-  before_action :set_seller, only: [:show, :update]
+  before_action :set_seller, only: %i[show update]
 
   # GET /sellers
   def index
     @sellers = Seller.all
-    sellers = @sellers.map { |seller| SellersHelper.generate_seller_json(seller: seller) }
+    sellers = @sellers.map do |seller|
+      SellersHelper.generate_seller_json(
+        seller: seller
+      )
+    end
     json_response(sellers)
   end
 
@@ -33,6 +39,7 @@ class SellersController < ApplicationController
 
   def seller_params
     params.required(:seller_id)
+    params.required(:square_location_id)
     update_params
   end
 
@@ -54,7 +61,8 @@ class SellersController < ApplicationController
       :founded_year,
       :website_url,
       :menu_url,
-      :target_amount
+      :target_amount,
+      :square_location_id
     )
   end
 

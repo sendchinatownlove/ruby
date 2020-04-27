@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddColumnsToSeller < ActiveRecord::Migration[6.0]
   def change
     add_column :sellers, :type, :string # e.g. "Family-owned and operated"

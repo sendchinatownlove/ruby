@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe GiftCardDetail, type: :model do
@@ -109,7 +111,9 @@ RSpec.describe GiftCardDetail, type: :model do
         gift_card_detail2
       end.to raise_error(
         ActiveRecord::RecordInvalid,
+        # rubocop:disable Layout/LineLength
         'Validation failed: Seller gift card seller_gift_card_id must be unique per Seller'
+        # rubocop:enable Layout/LineLength
       )
     end
   end

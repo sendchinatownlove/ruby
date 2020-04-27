@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe SellersHelper, type: :helper do
@@ -26,7 +28,8 @@ RSpec.describe SellersHelper, type: :helper do
         'num_employees': seller.num_employees,
         'founded_year': seller.founded_year,
         'website_url': seller.website_url,
-        'menu_url': seller.menu_url
+        'menu_url': seller.menu_url,
+        'square_location_id': seller.square_location_id
       }.as_json
     end
 
@@ -84,9 +87,9 @@ RSpec.describe SellersHelper, type: :helper do
 
   describe '#calculate_amount_raised' do
     context 'with no money raised' do
-
       it 'returns the list of sellers with `and`' do
-        expect(SellersHelper.calculate_amount_raised(seller_id: seller.id)).to eq(0)
+        expect(SellersHelper.calculate_amount_raised(seller_id: seller.id))
+          .to eq(0)
       end
     end
 

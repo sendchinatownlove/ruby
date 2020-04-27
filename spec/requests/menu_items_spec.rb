@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'MenuItems API' do
@@ -49,12 +51,18 @@ RSpec.describe 'MenuItems API' do
 
     let(:invalid_attributes) do
       {
-        invalid: 'Food',
+        invalid: 'Food'
       }
     end
 
     context 'when request attributes are valid' do
-      before { post "/sellers/#{seller_id}/menu_items", params: valid_attributes, as: :json }
+      before do
+        post(
+          "/sellers/#{seller_id}/menu_items",
+          params: valid_attributes,
+          as: :json
+        )
+      end
 
       it 'creates a menu_item' do
         actual_json = json.except('id')
@@ -63,7 +71,7 @@ RSpec.describe 'MenuItems API' do
         expected_json['updated_at'] = current_time
         expected_json['name'] = 'Food'
         expected_json['description'] = 'Awesome Food'
-        expected_json['amount'] = "15.5"
+        expected_json['amount'] = '15.5'
         expected_json['image_url'] = 'image.com'
         expected_json['seller_id'] = seller.id
         expect(actual_json).to eq(expected_json.with_indifferent_access)
@@ -75,7 +83,13 @@ RSpec.describe 'MenuItems API' do
     end
 
     context 'when request attributes are invalid' do
-      before { post "/sellers/#{seller_id}/menu_items", params: invalid_attributes, as: :json }
+      before do
+        post(
+          "/sellers/#{seller_id}/menu_items",
+          params: invalid_attributes,
+          as: :json
+        )
+      end
 
       it 'creates a menu_item' do
         actual_json = json.except('id')
@@ -100,7 +114,13 @@ RSpec.describe 'MenuItems API' do
   describe 'PUT /sellers/:seller_id/menu_items/:id' do
     let(:valid_attributes) { { name: 'AwesomeFood' } }
 
-    before { put "/sellers/#{seller_id}/menu_items/#{id}", params: valid_attributes, as: :json }
+    before do
+      put(
+        "/sellers/#{seller_id}/menu_items/#{id}",
+        params: valid_attributes,
+        as: :json
+      )
+    end
 
     context 'when menu_item exists' do
       it 'returns status code 200' do
@@ -130,7 +150,13 @@ RSpec.describe 'MenuItems API' do
   describe 'DELETE /sellers/:seller_id/menu_items/:id' do
     let(:valid_attributes) { { name: 'AwesomeFood' } }
 
-    before { delete "/sellers/#{seller_id}/menu_items/#{id}", params: valid_attributes, as: :json }
+    before do
+      delete(
+        "/sellers/#{seller_id}/menu_items/#{id}",
+        params: valid_attributes,
+        as: :json
+      )
+    end
 
     context 'when menu_item exists' do
       it 'returns status code 204' do
@@ -138,7 +164,9 @@ RSpec.describe 'MenuItems API' do
       end
 
       it 'confirms deletion of the menu_item' do
-        expect{updated_menu_item = MenuItem.find(id)}.to raise_exception(ActiveRecord::RecordNotFound)
+        expect { MenuItem.find(id) }.to raise_exception(
+          ActiveRecord::RecordNotFound
+        )
       end
     end
   end
