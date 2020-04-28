@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require 'rest-client'
 
 # TODO(jmckibben): This class needs a lot of refactoring
 class WebhooksController < ApplicationController
@@ -163,22 +164,29 @@ class WebhooksController < ApplicationController
       merchant_name = Seller.find_by(seller_id: seller_id).merchant_name
       case item['item_type']
       when 'donation'
+        email = payment_intent.email
         item = create_item(
           item_type: :donation,
           seller_id: seller_id,
-          email: payment_intent.email,
+          email: email,
           payment_intent: payment_intent
         )
         create_donation(item: item, amount: amount)
-        CustomerMailer.with(
-            payment_intent: payment_intent,
-            amount: amount,
-            merchant: merchant_name).send_donation_receipt.deliver_now
+        begin
+          if isInEmailWhitelist(email: email)
+            send_donation_receipt(
+              payment_intent: payment_intent,
+              amount: amount,
+              merchant: merchant_name)
+          end
+        rescue
+        end
       when 'gift_card'
+        email = payment_intent.email
         item = create_item(
           item_type: :gift_card,
           seller_id: seller_id,
-          email: payment_intent.email,
+          email: email,
           payment_intent: payment_intent
         )
 
@@ -187,11 +195,16 @@ class WebhooksController < ApplicationController
           amount: amount,
           seller_id: seller_id
         )
-        CustomerMailer.with(
-            payment_intent: payment_intent,
-            amount: amount,
-            merchant: merchant_name,
-            receipt_id: gift_card_detail.receipt_id).send_giftcard_receipt.deliver_now
+        begin
+          if isInEmailWhitelist(email: email)
+            send_gift_card_receipt(
+              payment_intent: payment_intent,
+              amount: amount,
+              merchant: merchant_name,
+              receipt_id: gift_card_detail.seller_gift_card_id)
+          end
+        rescue
+        end
       else
         raise(
           InvalidLineItem,
@@ -257,5 +270,62 @@ class WebhooksController < ApplicationController
       ).joins(:item).where(items: { seller_id: seller_id }).present?
     end
     raise CannotGenerateUniqueHash, 'Error generating unique gift_card_id'
+  end
+
+  def send_donation_receipt(payment_intent:, amount:, merchant:)
+    html = "<!DOCTYPE html>" +
+        "<html>" +
+        "<head>" +
+        "  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />" +
+        "</head>" +
+        "<body>" +
+        "<h1>Thanks for your donation to " + merchant + ", " + payment_intent.name = "!</h1>" +
+        "<p> Donation amount: <b>" + amount.to_s + "</b></p>" +
+        "<p> Square receipt: " + payment_intent.receipt_url + "</p>" +
+        "<p> We'll be in touch when " + merchant + " opens back up. Sending " +
+        "  thanks from us and from Chinatown for your support! </p>" +
+        "<p> Love,<p>" +
+        "<p> the Send Chinatown Love team</p>" +
+        "</body>" +
+        "</html>"
+    send_receipt(to: payment_intent.email, html: html)
+  end
+
+  def send_gift_card_receipt(payment_intent:, amount:, merchant:, receipt_id:)
+    html = "<!DOCTYPE html>" +
+        "<html>" +
+        "<head>" +
+        "  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />" +
+        "</head>" +
+        "<body>" +
+        "<h1>Thanks for your purchase from " + merchant + ", " + payment_intent.name = "!</h1>" +
+        "<p> Gift card code: <b>" + receipt_id + "</b></p>" +
+        "<p> Gift card balance: <b>" + amount.to_s + "</b></p>" +
+        "<p> Square receipt: " + payment_intent.receipt_url + "</p>" +
+        "<p> We'll be in touch when " + merchant + " opens back up with details" +
+        "  on how to use your gift card. Sending thanks from us and from Chinatown for" +
+        "  your support! </p>" +
+        "<p> Love,<p>" +
+        "<p> the Send Chinatown Love team</p>" +
+        "</body>" +
+        "</html>"
+    send_receipt(to: payment_intent.email, html: html)
+
+  end
+
+  def send_receipt(to:, html:)
+    api_key = ENV["MAILGUN_API_KEY"]
+    api_url = "https://api:#{api_key}@api.mailgun.net/v2/m.sendchinatownlove.com/messages"
+
+    RestClient.post api_url,
+                    :from => "receipts@sendchinatownlove.com",
+                    :to => to,
+                    :subject => "Receipt from Send Chinatown Love",
+                    # :text => "ehllo"
+                    :html => html
+  end
+
+  def isInEmailWhitelist(email:)
+    email.eql?("jxiarizard@gmail.com")
   end
 end
