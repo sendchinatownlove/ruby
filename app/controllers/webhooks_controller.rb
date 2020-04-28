@@ -132,8 +132,6 @@ class WebhooksController < ApplicationController
                        PaymentIntent.find_by(stripe_id: stripe_payment_id)
                      end
 
-    CustomerMailer.with(payment_intent: payment_intent).send_receipt.deliver_now
-
     # TODO(jtmckibb): Each payment has an associated FSM. If we see the start
     #                 of a payment, we should expect for it to be completed.
     #                 If it isn't, then we should record it. Similarly with
@@ -162,6 +160,7 @@ class WebhooksController < ApplicationController
 
       amount = item['amount']
       seller_id = item['seller_id']
+      merchant_name = Seller.find_by(seller_id: seller_id).merchant_name
       case item['item_type']
       when 'donation'
         item = create_item(
@@ -171,6 +170,10 @@ class WebhooksController < ApplicationController
           payment_intent: payment_intent
         )
         create_donation(item: item, amount: amount)
+        CustomerMailer.with(
+            payment_intent: payment_intent,
+            amount: amount,
+            merchant: merchant_name).send_donation_receipt.deliver_now
       when 'gift_card'
         item = create_item(
           item_type: :gift_card,
@@ -179,11 +182,16 @@ class WebhooksController < ApplicationController
           payment_intent: payment_intent
         )
 
-        create_gift_card(
+        gift_card_detail = create_gift_card(
           item: item,
           amount: amount,
           seller_id: seller_id
         )
+        CustomerMailer.with(
+            payment_intent: payment_intent,
+            amount: amount,
+            merchant: merchant_name,
+            receipt_id: gift_card_detail.receipt_id).send_giftcard_receipt.deliver_now
       else
         raise(
           InvalidLineItem,
@@ -213,6 +221,7 @@ class WebhooksController < ApplicationController
       seller_gift_card_id: generate_seller_gift_card_id(seller_id: seller_id)
     )
     GiftCardAmount.create!(value: amount, gift_card_detail: gift_card_detail)
+    gift_card_detail
   end
 
   def create_item(item_type:, seller_id:, email:, payment_intent:)
