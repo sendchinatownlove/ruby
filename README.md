@@ -40,7 +40,7 @@ If you see an error like
 rails aborted!
 PG::ConnectionBad: could not connect to server: No such file or directory`, try running `brew services restart postgresql` [source](https://stackoverflow.com/questions/19828385/pgconnectionbad-could-not-connect-to-server-connection-refused)
 
-If you get a migration error like `PG::UndefinedTable: ERROR:` or `PG::NotNullViolation`, try running `rails db:environment:set RAILS_ENV=development`, `rails db:reset`, `rails db:migrate`
+If you get a migration error like `PG::UndefinedTable: ERROR:` or `PG::NotNullViolation`, try running `rails db:environment:set RAILS_ENV=development` --> `rails db:reset` --> `rails db:migrate`
 
 ### Useful commands
 - Run the server: `heroku local web`
