@@ -292,8 +292,6 @@ class WebhooksController < ApplicationController
     send_receipt(to: payment_intent.email, html: html)
   end
 
-  '%.2f' % (0.02 * 270187)
-
   def send_gift_card_receipt(payment_intent:, amount:, merchant:, receipt_id:)
     amount_string = '%.2f' % ((amount.to_f)/100)
     html = "<!DOCTYPE html>" +
