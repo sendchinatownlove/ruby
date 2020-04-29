@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+</head>
+<body>
+<h1>Thanks for your donation to <%= @merchant %>, <%= @payment_intent.name %>!</h1>
+<p> Donation amount: <b> <%= @amount %></b></p>
+<p> Square receipt: <%= @payment_intent.receipt_url %>.</p>
+<p> We'll be in touch when <%= @merchant %> opens back up. Sending thanks from
+  us and from Chinatown for your support! </p>
+<p> Love, the Send Chinatown Love team</p>
+</body>
+</html>
