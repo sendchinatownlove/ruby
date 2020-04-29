@@ -317,7 +317,6 @@ class WebhooksController < ApplicationController
                     :from => "receipts@sendchinatownlove.com",
                     :to => to,
                     :subject => "Receipt from Send Chinatown Love",
-                    # :text => "ehllo"
                     :html => html
   end
 end
