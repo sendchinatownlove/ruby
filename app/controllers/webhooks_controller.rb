@@ -161,7 +161,7 @@ class WebhooksController < ApplicationController
 
       amount = item['amount']
       seller_id = item['seller_id']
-      merchant_name = Seller.find_by(seller_id: seller_id).merchant_name
+      merchant_name = Seller.find_by(seller_id: seller_id).name
       case item['item_type']
       when 'donation'
         email = payment_intent.email
