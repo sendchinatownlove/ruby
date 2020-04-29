@@ -173,12 +173,10 @@ class WebhooksController < ApplicationController
         )
         create_donation(item: item, amount: amount)
         begin
-          if isInEmailWhitelist(email: email)
             send_donation_receipt(
               payment_intent: payment_intent,
               amount: amount,
               merchant: merchant_name)
-          end
         rescue
         end
       when 'gift_card'
@@ -196,13 +194,11 @@ class WebhooksController < ApplicationController
           seller_id: seller_id
         )
         begin
-          if isInEmailWhitelist(email: email)
             send_gift_card_receipt(
               payment_intent: payment_intent,
               amount: amount,
               merchant: merchant_name,
               receipt_id: gift_card_detail.seller_gift_card_id)
-          end
         rescue
         end
       else
@@ -323,11 +319,6 @@ class WebhooksController < ApplicationController
                     :from => "receipts@sendchinatownlove.com",
                     :to => to,
                     :subject => "Receipt from Send Chinatown Love",
-                    # :text => "ehllo"
                     :html => html
-  end
-
-  def isInEmailWhitelist(email:)
-    email.eql?("jxiarizard@gmail.com")
   end
 end
