@@ -279,8 +279,8 @@ class WebhooksController < ApplicationController
         "  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />" +
         "</head>" +
         "<body>" +
-        "<h1>Thanks for your donation to " + merchant + ", " + payment_intent.name = "!</h1>" +
-        "<p> Donation amount: <b>" + amount.to_s + "</b></p>" +
+        "<h1>Thank you for your donation to " + merchant + "!</h1>" +
+        "<p> Donation amount: <b>$" + (amount.to_f/100).to_s + "</b></p>" +
         "<p> Square receipt: " + payment_intent.receipt_url + "</p>" +
         "<p> We'll be in touch when " + merchant + " opens back up. Sending " +
         "  thanks from us and from Chinatown for your support! </p>" +
@@ -298,9 +298,9 @@ class WebhooksController < ApplicationController
         "  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />" +
         "</head>" +
         "<body>" +
-        "<h1>Thanks for your purchase from " + merchant + ", " + payment_intent.name = "!</h1>" +
+        "<h1>Thank you for your purchase from " + merchant + "!</h1>" +
         "<p> Gift card code: <b>" + receipt_id + "</b></p>" +
-        "<p> Gift card balance: <b>" + amount.to_s + "</b></p>" +
+        "<p> Gift card balance: <b>$" + (amount.to_f/100).to_s + "</b></p>" +
         "<p> Square receipt: " + payment_intent.receipt_url + "</p>" +
         "<p> We'll be in touch when " + merchant + " opens back up with details" +
         "  on how to use your gift card. Sending thanks from us and from Chinatown for" +
