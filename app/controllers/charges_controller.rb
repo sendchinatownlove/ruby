@@ -32,7 +32,7 @@ class ChargesController < ApplicationController
     payment =
       if charge_params[:is_square]
         create_square_payment_request(
-          source_id: charge_params[:nonce],
+          nonce: charge_params[:nonce],
           amount: amount,
           note: description,
           email: email,
@@ -107,34 +107,27 @@ class ChargesController < ApplicationController
   def generate_description(seller_name:, item_types:)
     description = 'Thank you for supporting ' + seller_name + '.'
     if item_types.include? 'gift_card'
-      description +=
-        ' Your gift card(s) will be emailed to you when the seller opens back up.'
+      description += ' Your gift card(s) will be emailed to you when the seller opens back up.'
     end
 
     description
   end
 
   def create_square_payment_request(
-    source_id:, amount:, note:, email:, name:, seller:, line_items:
+    nonce:, amount:, note:, email:, name:, seller:, line_items:
   )
-    api_client =
-      Square::Client.new(
-        access_token: ENV['SQUARE_ACCESS_TOKEN'],
-        environment: Rails.env.production? ? 'production' : 'sandbox'
-      )
 
     square_location_id = seller.square_location_id
 
-    request_body = {
-      source_id: source_id,
-      idempotency_key: SecureRandom.uuid,
-      amount_money: { amount: amount, currency: 'USD' },
-      buyer_email_address: email,
-      note: note,
-      location_id: square_location_id
-    }
-
-    api_response = api_client.payments.create_payment(body: request_body)
+    api_response = SquareManager::PaymentCreator.call(
+      {
+        nonce: nonce,
+        amount: amount,
+        email: email,
+        note: note,
+        location_id: square_location_id
+      }
+    )
 
     errors = api_response.errors
     if errors.present?
