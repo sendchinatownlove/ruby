@@ -5,16 +5,78 @@ require 'rest-client'
 class WebhooksController < ApplicationController
   # POST /webhooks
   def create
-    if request.env['HTTP_STRIPE_SIGNATURE'].present?
-      handle_stripe_event
-    elsif request.env['HTTP_X_SQUARE_SIGNATURE'].present?
-      handle_square_event
-    end
 
-    json_response({})
+    api_key = "" # Insert API key here
+    api_url = "https://api:#{api_key}@api.mailgun.net/v2/m.sendchinatownlove.com/messages"
+
+    amount = 500
+    merchant = "Joolie's Bakery"
+    # receipt_id = "blerghllejs"
+    # receipt_url = "coolmath.com"
+
+    amount_string = '%.2f' % ((amount.to_f)/100)
+
+    html = "<!DOCTYPE html>" +
+        "<!DOCTYPE html>" +
+        "<html>" +
+        " <head>" +
+        "   <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />" +
+        " </head>" +
+        " <body style=\"font-family: Roboto, Tahoma, 'Gill Sans', 'Segoe UI', Geneva, Verdana, sans-serif; text-align: center; color: #A8192E; background-color: #A8192E; margin: 0px;\">" +
+        "   <img src='cid:mailer_header.png' style=\"width: 100%; overflow: hidden;\"/>" +
+        "   <div style=\"height: 100%; padding: 8vw;\">" +
+        "     <div style=\"background-color: #FFFFFF; height: 100%; width: 100%; border-radius: 35px; padding: 2.5vw 8.5vw; box-sizing: border-box;\">" +
+        "       <h2 style=\"font-size: 7.5vw;\">Thank you for supporting " + merchant + "!</h2>" +
+        "       <div id='giftCardContainer' style=\"z-index: 5; position: relative;\">" +
+        "         <img src='cid:gift_card_template.png' style=\"height: 35vw; width: 100%; object-fit: cover; border-radius: 15px; margin-bottom: 25px;\"/>" +
+        "         <div style=\"position: absolute; top: 8.5vw; right: 0; left: 0; bottom: 0;\">" +
+        "             <div style=\"color: #FFFFFF; font-size: 4vw; font-weight: bold;\" >You made a donation of</div>" +
+        "             <div style=\"color: #F6B917; font-weight: bold; font-size: 10vw; margin-top: 1vw;\">$" + amount_string + "</div>" +
+        "         </div>" +
+        "       </div>" +
+        "       <p style=\"font-size: 3vw;\">We'll let you know when " + merchant + " receives your donation.</p>" +
+        "       <p style= \"font-size: 3vw;\">Thank you for sending Chinatown love!</p>" +
+        "       <div style=\"width: 100%; padding: 5vw 0; display: flex; align-items: flex-end; justify-content: space-between;\">" +
+        "         <img src='cid:logo.png' style=\"width: 15vw;\"/>" +
+        "         <div>" +
+        "           <a href=\"hello@sendchinatownlove.com\" target=\"_blank\" style=\"text-decoration: none; padding: 0 1vw; vertical-align: text-bottom;\">" +
+        "             <img src='cid:email-logo.png' style=\"width: 3vw;\"/>" +
+        "           </a>" +
+        "           <a href=\"https://www.instagram.com/sendchinatownlove/\" target=\"_blank\" style=\"text-decoration: none; padding: 0 1vw; vertical-align: text-bottom;\">" +
+        "             <img src='cid:instagram-logo.png' style=\"width: 3vw;\"/>" +
+        "           </a>" +
+        "           <a href=\"https://www.facebook.com/sendchinatownlove/\" target=\"_blank\" style=\"text-decoration: none; padding: 0 1vw; vertical-align: text-bottom;\">" +
+        "             <img src='cid:facebook-logo_360.png' style=\"width: 3vw;\"/>" +
+        "           </a>" +
+        "         </div>" +
+        "       </div>" +
+        "     </div>" +
+        "   </div>" +
+        " </body>" +
+        "</html>";
+
+        RestClient.post api_url,
+                        :from => "receipts@sendchinatownlove.com",
+                        :to => "jxiarizard@gmail.com",
+                        :subject => "test demail from Send Chinatown Love",
+                        :html => html,
+                        :inline => [get_file("facebook-logo_360.png"), get_file("gift_card_template.png"), get_file("instagram-logo.png"),
+                                    get_file("logo.png"), get_file("mailer_header.png"), get_file("email-logo.png")]
+    #
+    # if request.env['HTTP_STRIPE_SIGNATURE'].present?
+    #   handle_stripe_event
+    # elsif request.env['HTTP_X_SQUARE_SIGNATURE'].present?
+    #   handle_square_event
+    # end
+    #
+    # json_response({})
   end
 
   private
+
+  def get_file(file)
+      File.new(File.join("app", "assets", "images", file))
+  end
 
   def handle_stripe_event
     Stripe.api_key = ENV['STRIPE_API_KEY']
@@ -297,6 +359,7 @@ class WebhooksController < ApplicationController
         "</head>" +
         "<body>" +
         "<h1>Thank you for your purchase from " + merchant + "!</h1>" +
+        "<img src='cid:gift_card_template.png' style='height: 35vw; width: 100%; object-fit: cover; border-radius: 15px; margin-bottom: 25px;'/>"
         "<p> Gift card code: <b>" + receipt_id + "</b></p>" +
         "<p> Gift card balance: <b>$" + amount_string + "</b></p>" +
         "<p> Square receipt: " + payment_intent.receipt_url + "</p>" +
@@ -308,17 +371,8 @@ class WebhooksController < ApplicationController
         "</body>" +
         "</html>"
     send_receipt(to: payment_intent.email, html: html)
-
   end
 
   def send_receipt(to:, html:)
-    api_key = ENV["MAILGUN_API_KEY"]
-    api_url = "https://api:#{api_key}@api.mailgun.net/v2/m.sendchinatownlove.com/messages"
-
-    RestClient.post api_url,
-                    :from => "receipts@sendchinatownlove.com",
-                    :to => to,
-                    :subject => "Receipt from Send Chinatown Love",
-                    :html => html
   end
 end
