@@ -21,9 +21,10 @@ class ChargesController < ApplicationController
     seller = Seller.find_by(seller_id: seller_id)
 
     # Total all Items
-    amount = line_items.inject(0) do |sum, item|
-      sum + item['amount'] * item['quantity']
-    end
+    amount =
+      line_items.inject(0) do |sum, item|
+        sum + item['amount'] * item['quantity']
+      end
 
     description =
       generate_description(seller_name: seller.name, item_types: item_types)
@@ -107,7 +108,8 @@ class ChargesController < ApplicationController
   def generate_description(seller_name:, item_types:)
     description = 'Thank you for supporting ' + seller_name + '.'
     if item_types.include? 'gift_card'
-      description += ' Your gift card(s) will be emailed to you when the seller opens back up.'
+      description += ' Your gift card(s) will be emailed'\
+                     ' to you when the seller opens back up.'
     end
 
     description
@@ -116,18 +118,18 @@ class ChargesController < ApplicationController
   def create_square_payment_request(
     nonce:, amount:, note:, email:, name:, seller:, line_items:
   )
-
     square_location_id = seller.square_location_id
 
-    api_response = SquareManager::PaymentCreator.call(
-      {
-        nonce: nonce,
-        amount: amount,
-        email: email,
-        note: note,
-        location_id: square_location_id
-      }
-    )
+    api_response =
+      SquareManager::PaymentCreator.call(
+        {
+          nonce: nonce,
+          amount: amount,
+          email: email,
+          note: note,
+          location_id: square_location_id
+        }
+      )
 
     errors = api_response.errors
     if errors.present?
