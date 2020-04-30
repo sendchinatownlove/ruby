@@ -22,43 +22,74 @@ class WebhooksController < ApplicationController
         " <head>" +
         "   <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />" +
         " </head>" +
-        " <body style=\"font-family: Roboto, Tahoma, 'Gill Sans', 'Segoe UI', Geneva, Verdana, sans-serif; text-align: center; color: #A8192E; background-color: #A8192E; margin: 0px;\">" +
+        " <body style=\"margin: auto; text-align: center;\">" +
+        " <div style=\"font-family: 'open sans', Roboto, Tahoma, 'Segoe UI', 'Gill Sans', Geneva, Verdana, sans-serif; text-align: center; margin: auto; color: #A8192E; background-color: #A8192E; margin: 0px; max-width: 600px;\">" +
         "   <img src='cid:mailer_header.png' style=\"width: 100%; overflow: hidden;\"/>" +
-        "   <div style=\"height: 100%; padding: 8vw;\">" +
-        "     <div style=\"background-color: #FFFFFF; height: 100%; width: 100%; border-radius: 35px; padding: 2.5vw 8.5vw; box-sizing: border-box;\">" +
-        "       <h2 style=\"font-size: 7.5vw;\">Thank you for supporting " + merchant + "!</h2>" +
+        "   <div style=\"height: 100%; padding: 8%;\">" +
+        "     <div style=\"background-color: #FFFFFF; height: 100%; width: 100%; border-radius: 35px; padding: 5% 10%; box-sizing: border-box;\">" +
+        "       <h2 style=\"font-size: 2rem; color: #A8192E;\" >Thank you for supporting " + merchant + "!</h2>" +
         "       <div id='giftCardContainer' style=\"z-index: 5; position: relative;\">" +
-        "         <img src='cid:gift_card_template.png' style=\"height: 35vw; width: 100%; object-fit: cover; border-radius: 15px; margin-bottom: 25px;\"/>" +
-        "         <div style=\"position: absolute; top: 8.5vw; right: 0; left: 0; bottom: 0;\">" +
-        "             <div style=\"color: #FFFFFF; font-size: 4vw; font-weight: bold;\" >You made a donation of</div>" +
-        "             <div style=\"color: #F6B917; font-weight: bold; font-size: 10vw; margin-top: 1vw;\">$" + amount_string + "</div>" +
-        "         </div>" +
-        "       </div>" +
-        "       <p style=\"font-size: 3vw;\">We'll let you know when " + merchant + " receives your donation.</p>" +
-        "       <p style= \"font-size: 3vw;\">Thank you for sending Chinatown love!</p>" +
-        "       <div style=\"width: 100%; padding: 5vw 0; display: flex; align-items: flex-end; justify-content: space-between;\">" +
-        "         <img src='cid:logo.png' style=\"width: 15vw;\"/>" +
-        "         <div>" +
-        "           <a href=\"hello@sendchinatownlove.com\" target=\"_blank\" style=\"text-decoration: none; padding: 0 1vw; vertical-align: text-bottom;\">" +
-        "             <img src='cid:email-logo.png' style=\"width: 3vw;\"/>" +
-        "           </a>" +
-        "           <a href=\"https://www.instagram.com/sendchinatownlove/\" target=\"_blank\" style=\"text-decoration: none; padding: 0 1vw; vertical-align: text-bottom;\">" +
-        "             <img src='cid:instagram-logo.png' style=\"width: 3vw;\"/>" +
-        "           </a>" +
-        "           <a href=\"https://www.facebook.com/sendchinatownlove/\" target=\"_blank\" style=\"text-decoration: none; padding: 0 1vw; vertical-align: text-bottom;\">" +
-        "             <img src='cid:facebook-logo_360.png' style=\"width: 3vw;\"/>" +
-        "           </a>" +
-        "         </div>" +
-        "       </div>" +
-        "     </div>" +
+        
+        "        <table align=\"center\" style=\"width:100%; border-collapse: collapse; margin: 0; padding: 0; border: none;\">" +
+        "          <tr align=\"center\" style=\"height: 175px; background-color: #A8192E\">" +
+        "            <td background='cid:gift_card_template.png' style=\"z-index: 5; height: 175px;  object-fit: cover; border-radius: 15px; margin-bottom: 25px;\">" +
+        "              <table>" + 
+        "                 <tr align=\"center\">" +
+        "                   <td style=\"color: #FFFFFF; font-size: 1.5rem; font-weight: bold;\">You made a donation of</td>" +
+        "                 </tr>" +
+        "                 <tr align=\"center\">" +
+        "                   <td style=\"color: #F6B917; font-weight: bold; font-size: 3rem; margin-top: 1%;\">$" + amount_string + "</td>" +
+        "                 </tr>" +
+        "              </table>" +
+        "            </td>" +
+        "          </tr>" +
+
+        "         <tr align=\"center\">" + 
+        "           <td style=\"font-size: 1rem; padding-top: 35px;\">We'll let you know when " + merchant + " receives your donation.</td>" +
+        "         </tr>" +
+        "         <tr align=\"center\">" + 
+        "           <td style= \"font-size: 1rem; padding-top: 10px; padding-bottom: 45px;\">Thank you for sending Chinatown love!</td>" +
+        "         </tr>" +
+        
+        "         <tr align=\"center\">" +
+        "           <table>" +
+        "             <tr style=\"position: relative;\">" +
+        "               <td><img src='cid:logo.png' style=\"width: 35%;\"/></td>" +
+        "               <td style=\"float: right; width: 50%;\">" +
+        "                 <table>" +
+        "                   <tr>" +
+        "                     <td>" +
+        "                       <a href=\"hello@sendchinatownlove.com\" target=\"_blank\" style=\"text-decoration: none; padding: 0 2%;\">" +
+        "                         <img src='cid:email-logo.png' style=\"width: 100%; height: auto;\"/>" +
+        "                       </a>" +
+        "                     </td>" +
+        "                     <td>" +
+        "                       <a href=\"https://www.instagram.com/sendchinatownlove/\" target=\"_blank\" style=\"text-decoration: none; padding: 0 2%;\">" +
+        "                         <img src='cid:instagram-logo.png' style=\"width: 100%; height: auto;\"/>" +
+        "                       </a>" +
+        "                     </td>" +
+        "                     <td>" +
+        "                       <a href=\"https://www.facebook.com/sendchinatownlove/\" target=\"_blank\" style=\"text-decoration: none; padding: 0 2%;\">" +
+        "                         <img src='cid:facebook-logo_360.png' style=\"width: 100%; height: auto;\"/>" +
+        "                       </a>" +
+        "                     </td>" +
+        "                   </tr>" +
+        "                 </table>" +
+        "               </td>" +
+
+        "              </tr>" +
+        "           </table>" +
+        "         </tr>" +
+        "        </table>" +
         "   </div>" +
+        "  </div>" +
         " </body>" +
         "</html>";
 
         RestClient.post api_url,
                         :from => "receipts@sendchinatownlove.com",
                         :to => "jxiarizard@gmail.com",
-                        :subject => "test demail from Send Chinatown Love",
+                        :subject => "testd email from Send Chinatown Love",
                         :html => html,
                         :inline => [get_file("facebook-logo_360.png"), get_file("gift_card_template.png"), get_file("instagram-logo.png"),
                                     get_file("logo.png"), get_file("mailer_header.png"), get_file("email-logo.png")]
