@@ -5,37 +5,12 @@ require 'rest-client'
 class WebhooksController < ApplicationController
   # POST /webhooks
   def create
-    if request.env['HTTP_STRIPE_SIGNATURE'].present?
-      handle_stripe_event
-    elsif request.env['HTTP_X_SQUARE_SIGNATURE'].present?
-      handle_square_event
-    end
+    handle_square_event
 
     json_response({})
   end
 
   private
-
-  def handle_stripe_event
-    Stripe.api_key = ENV['STRIPE_API_KEY']
-
-    # Verify webhook signature and extract the event
-    # See https://stripe.com/docs/webhooks/signatures for more information.
-    sig_header = request.env['HTTP_STRIPE_SIGNATURE']
-    endpoint_secret = ENV['STRIPE_WEBHOOK_KEY']
-    payload = request.body.read
-
-    event = Stripe::Webhook.construct_event(
-      payload, sig_header, endpoint_secret
-    )
-    # Handle the payment_intent.succeeded event
-    if event['type'] == 'payment_intent.succeeded'
-      payment_intent = event['data']['object']
-
-      # Fulfill the purchase
-      handle_payment_intent_succeeded(stripe_payment_id: payment_intent['id'])
-    end
-  end
 
   def handle_square_event
     # Get the JSON body and HMAC-SHA1 signature of the incoming POST request
@@ -121,17 +96,12 @@ class WebhooksController < ApplicationController
 
   def handle_payment_intent_succeeded(
     square_payment_id: nil,
-    square_location_id: nil,
-    stripe_payment_id: nil
+    square_location_id: nil
   )
-    payment_intent = if square_payment_id.present?
-                       PaymentIntent.find_by(
+    payment_intent = PaymentIntent.find_by(
                          square_payment_id: square_payment_id,
                          square_location_id: square_location_id
                        )
-                     else
-                       PaymentIntent.find_by(stripe_id: stripe_payment_id)
-                     end
 
     # TODO(jtmckibb): Each payment has an associated FSM. If we see the start
     #                 of a payment, we should expect for it to be completed.

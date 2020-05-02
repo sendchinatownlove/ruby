@@ -38,10 +38,6 @@ module ExceptionHandler
       json_response({ message: e.error.message }, :bad_request)
     end
 
-    rescue_from Stripe::StripeError do |e|
-      json_response({ message: e.error.message }, e.http_status)
-    end
-
     rescue_from DuplicatePaymentCompletedError do |e|
       json_response({ message: e.message }, :bad_request)
     end
