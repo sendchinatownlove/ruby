@@ -70,6 +70,9 @@ you can forward your localhost port using something like [ngrok](https://ngrok.c
 This also enables you to share your local environment in pull requests for additional validations.
 
 1. Setup localhost.run or ngrok or any derivatives to forward your localhost port to the web.
+1. Make port forwarder to point to local port. localhost.run cmd: `ssh -R 80:localhost:5000 ssh.localhost.run`
+1. Copy domain name in `config/developments/development.rb`. i.e.: `config.hosts << "your-domain.example.com"`
+1. Spin up rails environment by `heroku local web`
 1. Go to: https://developer.squareup.com/apps
 1. Go to the webhooks pane and create a sandbox api to point to domain created above.
 1. Enable the following events:
