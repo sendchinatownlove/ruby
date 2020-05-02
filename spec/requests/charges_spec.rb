@@ -10,6 +10,7 @@ RSpec.describe 'Charges API', type: :request do
     let(:is_square) { true }
     let(:name) { 'Squarepants, Spongebob' }
     let(:seller_id) { 'shunfa-bakery' }
+    let(:idempotency_key) { '123' }
     let(:params) do
       {
         email: email,
@@ -17,7 +18,8 @@ RSpec.describe 'Charges API', type: :request do
         nonce: nonce,
         line_items: line_items,
         seller_id: seller_id,
-        name: name
+        name: name,
+        idempotency_key: idempotency_key
       }
     end
     let!(:seller) do
@@ -169,6 +171,21 @@ RSpec.describe 'Charges API', type: :request do
         it 'returns status code 200' do
           expect(response).to have_http_status(200)
         end
+      end
+    end
+
+    context 'with a duplicate payment request' do
+      let(:line_items) do
+        [{ currency: 'usd', item_type: 'gift_card', quantity: 1 }]
+      end
+
+      before do
+        post '/charges', params: params, as: :json
+        allow_any_instance_of(ExistingEvent).to receive(:save).and_return(false)
+      end
+
+      it 'returns status code 422' do
+        expect(response).to have_http_status(422)
       end
     end
 
@@ -438,6 +455,5 @@ RSpec.describe 'Charges API', type: :request do
         )
       end
     end
-
   end
 end

@@ -5,6 +5,17 @@ require 'securerandom'
 class ChargesController < ApplicationController
   # POST /charges
   def create
+    # Validate this not a duplicate charge
+    idempotency_key = charge_params[:idempotency_key]
+    existing_event =
+      ExistingEvent.new(
+        idempotency_key: idempotency_key,
+        event_type: 'charges_create'
+      )
+    unless existing_event.save
+      raise DuplicateChargeError, 'This charge has already been processed'
+    end
+
     line_items = charge_params[:line_items].map(&:to_h)
 
     seller_id = charge_params[:seller_id]
@@ -51,12 +62,14 @@ class ChargesController < ApplicationController
     params.require(:is_square)
     params.require(:nonce) if params[:is_square]
     params.require(:name)
+    params.require(:idempotency_key)
     params.permit(
       :email,
       :nonce,
       :is_square,
       :name,
       :seller_id,
+      :idempotency_key,
       line_items: [%i[amount currency item_type quantity]]
     )
   end
