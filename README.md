@@ -5,18 +5,17 @@
 - Rails 6x
 - [Docker-Compose](https://docs.docker.com/compose/install/)
 
-
 For ubuntu try using ...
 https://gorails.com/setup/ubuntu/19.10
 
 1. Download rails, gem install rails — brew install gem
-2. brew install postgresql
-3. Install heroku cli
-4. bundle install --path vendor/bundle
-5. rails db:create
-6. rails db:migrate
-7. heroku local web -> localhost:5000
-8. test: heroku local:run bundle exec rspec
+1. brew install postgresql
+1. Install heroku cli
+1. bundle install --path vendor/bundle
+1. rails db:create
+1. rails db:migrate
+1. heroku local web -> localhost:5000
+1. test: heroku local:run bundle exec rspec
 
 ## on machine
 
@@ -63,6 +62,27 @@ You'll need to do this if you're getting cors errors from the frontend. Stop you
 - `rails generate model <ModelName>`
 - `rails generate controller <ControllerName>`
 - `rails generate migration <MigrationName>`
+
+### Enabling Webhooks locally
+
+For you to work with webhooks, you need a domain for square to send events to. To do this without a hosted service,
+you can forward your localhost port using something like [ngrok](https://ngrok.com/) or [localhost.run](https://localhost.run/).
+This also enables you to share your local environment in pull requests for additional validations.
+
+1. Setup localhost.run or ngrok or any derivatives to forward your localhost port to the web.
+1. Make port forwarder to point to local port. localhost.run cmd: `ssh -R 80:localhost:5000 ssh.localhost.run`
+1. Copy domain name in `config/developments/development.rb`. i.e.: `config.hosts << "your-domain.example.com"`
+1. Spin up rails environment by `heroku local web`
+1. Go to: https://developer.squareup.com/apps
+1. Go to the webhooks pane and create a sandbox api to point to domain created above.
+1. Enable the following events:
+    * refund.created
+    * refund.updated
+    * payment.updated
+
+#### Reference Links
+
+* https://dev.to/giorgosk/expose-your-local-web-server-to-the-world-using-localhost-run-or-serveo-net-l83
 
 ### Troubleshooting
 
