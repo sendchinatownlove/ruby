@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_25_192700) do
+ActiveRecord::Schema.define(version: 2020_05_02_141425) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -55,6 +55,8 @@ ActiveRecord::Schema.define(version: 2020_04_25_192700) do
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "payment_intent_id", null: false
     t.boolean "refunded", default: false
+    t.bigint "merchant_payout_id"
+    t.index ["merchant_payout_id"], name: "index_items_on_merchant_payout_id"
     t.index ["payment_intent_id"], name: "index_items_on_payment_intent_id"
     t.index ["seller_id"], name: "index_items_on_seller_id"
   end
@@ -81,6 +83,20 @@ ActiveRecord::Schema.define(version: 2020_04_25_192700) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["seller_id"], name: "index_menu_items_on_seller_id"
+  end
+
+  create_table "merchant_payouts", force: :cascade do |t|
+    t.integer "payout_type", default: 0, null: false
+    t.integer "total_amount", null: false
+    t.integer "account_number", null: false
+    t.date "payment_delivered"
+    t.integer "check_number"
+    t.date "payment_cashed"
+    t.date "cash_withdrawn"
+    t.bigint "seller_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["seller_id"], name: "index_merchant_payouts_on_seller_id"
   end
 
   create_table "payment_intents", force: :cascade do |t|
@@ -133,9 +149,11 @@ ActiveRecord::Schema.define(version: 2020_04_25_192700) do
   add_foreign_key "donation_details", "items"
   add_foreign_key "gift_card_amounts", "gift_card_details"
   add_foreign_key "gift_card_details", "items"
+  add_foreign_key "items", "merchant_payouts"
   add_foreign_key "items", "payment_intents"
   add_foreign_key "items", "sellers"
   add_foreign_key "locations", "sellers"
   add_foreign_key "menu_items", "sellers"
+  add_foreign_key "merchant_payouts", "sellers"
   add_foreign_key "refunds", "payment_intents"
 end
