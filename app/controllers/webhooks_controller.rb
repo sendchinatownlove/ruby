@@ -32,7 +32,7 @@ class WebhooksController < ApplicationController
         
         "        <table align=\"center\" style=\"width:100%; border-collapse: collapse; margin: 0; padding: 0; border: none;\">" +
         "          <tr align=\"center\" style=\"height: 175px; background-color: #A8192E;\">" +
-        "            <td background='cid:gift_card_template.png' style=\"z-index: 5; height: 175px; padding: 1.75%; object-fit: cover; border-radius: 15px; margin-bottom: 25px;\">" +
+        "            <td background='cid:gift_card_template.png' style=\"z-index: 5; height: 175px; padding: 1.25%; object-fit: cover; border-radius: 15px; margin-bottom: 25px;\">" +
         "              <table>" + 
         "                 <tr align=\"center\">" +
         "                   <td style=\"color: #FFFFFF; font-size: 1.5rem; font-weight: bold;\">You made a donation of</td>" +
@@ -88,7 +88,7 @@ class WebhooksController < ApplicationController
 
         RestClient.post api_url,
                         :from => "receipts@sendchinatownlove.com",
-                        :to => "athena.chen@baruchmail.cuny.edu",
+                        :to => "test@email.com",
                         :subject => "testd email from Send Chinatown Love",
                         :html => html,
                         :inline => [get_file("facebook-logo_360.png"), get_file("gift_card_template.png"), get_file("instagram-logo.png"),
