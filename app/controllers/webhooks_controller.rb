@@ -31,14 +31,14 @@ class WebhooksController < ApplicationController
         "       <div id='giftCardContainer' style=\"z-index: 5; position: relative;\">" +
         
         "        <table align=\"center\" style=\"width:100%; border-collapse: collapse; margin: 0; padding: 0; border: none;\">" +
-        "          <tr align=\"center\" style=\"height: 175px; background-color: #A8192E\">" +
-        "            <td background='cid:gift_card_template.png' style=\"z-index: 5; height: 175px;  object-fit: cover; border-radius: 15px; margin-bottom: 25px;\">" +
+        "          <tr align=\"center\" style=\"height: 175px; background-color: #A8192E;\">" +
+        "            <td background='cid:gift_card_template.png' style=\"z-index: 5; height: 175px; padding: 1.75%; object-fit: cover; border-radius: 15px; margin-bottom: 25px;\">" +
         "              <table>" + 
         "                 <tr align=\"center\">" +
         "                   <td style=\"color: #FFFFFF; font-size: 1.5rem; font-weight: bold;\">You made a donation of</td>" +
         "                 </tr>" +
         "                 <tr align=\"center\">" +
-        "                   <td style=\"color: #F6B917; font-weight: bold; font-size: 3rem; margin-top: 1%;\">$" + amount_string + "</td>" +
+        "                   <td style=\"color: #F6B917; font-weight: bold; font-size: 1.85rem; margin-top: 1%;\">$" + amount_string + "</td>" +
         "                 </tr>" +
         "              </table>" +
         "            </td>" +
@@ -54,24 +54,24 @@ class WebhooksController < ApplicationController
         "         <tr align=\"center\">" +
         "           <table>" +
         "             <tr style=\"position: relative;\">" +
-        "               <td><img src='cid:logo.png' style=\"width: 35%;\"/></td>" +
-        "               <td style=\"float: right; width: 50%;\">" +
+        "               <td><img src='cid:logo.png' style=\"width: 35%; float: left;\"/></td>" +
+        "               <td style=\"float: right; max-width: 100px; v-align: bottom;\">" +
         "                 <table>" +
         "                   <tr>" +
         "                     <td>" +
-        "                       <a href=\"hello@sendchinatownlove.com\" target=\"_blank\" style=\"text-decoration: none; padding: 0 2%;\">" +
+        "                       <base href=\"hello@sendchinatownlove.com\" target=\"_blank\" style=\"v-align: bottom; text-decoration: none; padding: 95% 5% 0%;\">" +
         "                         <img src='cid:email-logo.png' style=\"width: 100%; height: auto;\"/>" +
-        "                       </a>" +
+        "                       </base>" +
         "                     </td>" +
         "                     <td>" +
-        "                       <a href=\"https://www.instagram.com/sendchinatownlove/\" target=\"_blank\" style=\"text-decoration: none; padding: 0 2%;\">" +
+        "                       <base href=\"https://www.instagram.com/sendchinatownlove/\" target=\"_blank\" style=\"text-decoration: none; padding: 90% 5% 0%;\">" +
         "                         <img src='cid:instagram-logo.png' style=\"width: 100%; height: auto;\"/>" +
-        "                       </a>" +
+        "                       </base>" +
         "                     </td>" +
         "                     <td>" +
-        "                       <a href=\"https://www.facebook.com/sendchinatownlove/\" target=\"_blank\" style=\"text-decoration: none; padding: 0 2%;\">" +
+        "                       <base href=\"https://www.facebook.com/sendchinatownlove/\" target=\"_blank\" style=\"text-decoration: none; padding: 90% 5% 0%;\">" +
         "                         <img src='cid:facebook-logo_360.png' style=\"width: 100%; height: auto;\"/>" +
-        "                       </a>" +
+        "                       </base>" +
         "                     </td>" +
         "                   </tr>" +
         "                 </table>" +
@@ -88,7 +88,7 @@ class WebhooksController < ApplicationController
 
         RestClient.post api_url,
                         :from => "receipts@sendchinatownlove.com",
-                        :to => "jxiarizard@gmail.com",
+                        :to => "athena.chen@baruchmail.cuny.edu",
                         :subject => "testd email from Send Chinatown Love",
                         :html => html,
                         :inline => [get_file("facebook-logo_360.png"), get_file("gift_card_template.png"), get_file("instagram-logo.png"),
