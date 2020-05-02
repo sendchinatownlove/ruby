@@ -30,25 +30,14 @@ class ChargesController < ApplicationController
       generate_description(seller_name: seller.name, item_types: item_types)
 
     email = charge_params[:email]
-    payment =
-      if charge_params[:is_square]
-        create_square_payment_request(
-          nonce: charge_params[:nonce],
-          amount: amount,
-          note: description,
-          email: email,
-          name: charge_params[:name],
-          seller: seller,
-          line_items: line_items
-        )
-      else
-        create_stripe_payment_request(
-          amount: amount,
-          email: email,
-          description: description,
-          line_items: line_items
-        )
-      end
+    payment = create_square_payment_request(nonce: charge_params[:nonce],
+                                            amount: amount,
+                                            note: description,
+                                            email: email,
+                                            name: charge_params[:name],
+                                            seller: seller,
+                                            line_items: line_items
+                                           )
 
     json_response(payment)
   end
@@ -153,26 +142,5 @@ class ChargesController < ApplicationController
     )
 
     api_response
-  end
-
-  def create_stripe_payment_request(amount:, email:, description:, line_items:)
-    Stripe.api_key = ENV['STRIPE_API_KEY']
-
-    intent =
-      Stripe::PaymentIntent.create(
-        amount: amount,
-        currency: 'usd',
-        receipt_email: email,
-        payment_method_types: %w[card],
-        description: description
-      )
-
-    # Creates a pending PaymentIntent. See webhooks_controller to see what
-    # happens when the PaymentIntent is successful.
-    PaymentIntent.create!(
-      stripe_id: intent['id'], email: email, line_items: line_items.to_json
-    )
-
-    intent
   end
 end
