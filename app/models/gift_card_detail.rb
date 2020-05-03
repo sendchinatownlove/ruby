@@ -1,5 +1,18 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: gift_card_details
+#
+#  id                  :bigint           not null, primary key
+#  gift_card_id        :string
+#  receipt_id          :string
+#  expiration          :date
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#  item_id             :bigint           not null
+#  seller_gift_card_id :string
+#
 class GiftCardDetail < ApplicationRecord
   belongs_to :item
   validates_uniqueness_of :gift_card_id
