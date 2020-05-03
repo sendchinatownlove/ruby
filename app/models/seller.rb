@@ -27,6 +27,10 @@
 #  square_location_id :string           not null
 #
 class Seller < ApplicationRecord
+  translates :name, :story, :owner_name, :summary
+  globalize_accessors locales: [:en, 'zh-CN'],
+                      attributes: %i[name story owner_name summary]
+
   # model association
   has_many :locations, dependent: :destroy
   has_many :menu_items, dependent: :destroy
