@@ -30,9 +30,7 @@ RSpec.describe PaymentIntent, type: :model do
           payment_intent
         end.to raise_error(
           ActiveRecord::RecordInvalid,
-          # rubocop:disable Layout/LineLength
           'Validation failed: Square location can\'t be blank'
-          # rubocop:enable Layout/LineLength
         )
       end
     end

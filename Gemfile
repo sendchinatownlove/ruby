@@ -29,8 +29,9 @@ gem 'sinatra'
 # Square
 gem 'square.rb'
 
-# Generates hashes
-# gem 'digest'
+# Translations
+gem 'globalize', '~> 5.3.0'
+gem 'globalize-accessors'
 
 gem 'actionmailer'
 

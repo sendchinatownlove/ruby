@@ -44,6 +44,47 @@ RSpec.describe Seller, type: :model do
     expect(seller).to_not be_valid
   end
 
+  describe 'globalization' do
+    context 'with Chinese locale' do
+      before do
+        I18n.locale = 'zh-CN'
+      end
+
+      it 'uses Chinese' do
+        expect(seller.story[0..4]).to eq 'zh-CN'
+        expect(seller.summary[0..4]).to eq 'zh-CN'
+        expect(seller.name[0..4]).to eq 'zh-CN'
+        expect(seller.owner_name[0..4]).to eq 'zh-CN'
+      end
+    end
+
+    context 'with default locale' do
+      before do
+        I18n.locale = I18n.default_locale
+      end
+
+      it 'uses English' do
+        expect(seller.story[0..1]).to eq 'en'
+        expect(seller.summary[0..1]).to eq 'en'
+        expect(seller.name[0..1]).to eq 'en'
+        expect(seller.owner_name[0..1]).to eq 'en'
+      end
+    end
+
+    context 'with English locale' do
+      before do
+        I18n.locale = 'en'
+      end
+
+      it 'uses English' do
+        expect(seller.story[0..1]).to eq 'en'
+        expect(seller.summary[0..1]).to eq 'en'
+        expect(seller.name[0..1]).to eq 'en'
+        expect(seller.owner_name[0..1]).to eq 'en'
+      end
+    end
+  end
+
   # test founding year constraints
   let(:time_travelling_seller) do
     create(
