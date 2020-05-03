@@ -19,7 +19,7 @@ RSpec.describe 'Webhooks API', type: :request do
       end
       let(:payment_intent) do
         create(
-          :square_payment_intent,
+          :payment_intent,
           square_payment_id: SecureRandom.uuid,
           square_location_id: SecureRandom.uuid,
           line_items: line_items
