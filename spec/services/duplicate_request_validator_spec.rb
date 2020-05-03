@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe DuplicateResourceValidator, '#call' do
+describe DuplicateRequestValidator, '#call' do
 
   let(:existing_event) {
     create(:existing_event, :webhook)
@@ -10,15 +10,15 @@ describe DuplicateResourceValidator, '#call' do
 
   it 'is duplicate' do
     expect {
-      DuplicateResourceValidator.call({
+      DuplicateRequestValidator.call({
         idempotency_key: existing_event.idempotency_key,
         event_type: existing_event.event_type
       })
-    }.to raise_error(ExceptionHandler::DuplicateResourceError)
+    }.to raise_error(ExceptionHandler::DuplicateRequestError)
   end
 
   it 'is not duplicate' do
-    DuplicateResourceValidator.call({
+    DuplicateRequestValidator.call({
       idempotency_key: 1,
       event_type: 'payment_updated'
     })

@@ -29,7 +29,7 @@ class WebhooksController < ApplicationController
     callback_body_json = JSON.parse(callback_body)
     square_event_type = sanitize_square_type(callback_body_json['type'])
 
-    DuplicateResourceValidator.call({
+    DuplicateRequestValidator.call({
       idempotency_key: callback_body_json['event_id'],
       event_type: square_event_type
     })

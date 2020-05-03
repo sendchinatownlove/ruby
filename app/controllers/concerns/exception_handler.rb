@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ExceptionHandler
-  class DuplicateResourceError < StandardError; end
+  class DuplicateRequestError < StandardError; end
   class InvalidLineItem < StandardError; end
   class InvalidGiftCardUpdate < StandardError; end
   class CannotGenerateUniqueHash < StandardError; end
@@ -43,7 +43,7 @@ module ExceptionHandler
       json_response({ message: e.error.message }, e.http_status)
     end
 
-    rescue_from DuplicateResourceError,
+    rescue_from DuplicateRequestError,
                 DuplicatePaymentCompletedError do |e|
       json_response({ message: e.message }, :conflict)
     end

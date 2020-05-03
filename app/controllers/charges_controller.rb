@@ -6,7 +6,7 @@ class ChargesController < ApplicationController
   # POST /charges
   def create
     # Validate this not a duplicate charge
-    DuplicateResourceValidator.call({
+    DuplicateRequestValidator.call({
       idempotency_key: charge_params[:idempotency_key],
       event_type: 'charges_create'
     })

@@ -5,26 +5,30 @@
 # Table name: sellers
 #
 #  id                 :bigint           not null, primary key
-#  seller_id          :string           not null
-#  cuisine_name       :string
-#  name               :string
-#  story              :text
 #  accept_donations   :boolean          default(TRUE), not null
-#  sell_gift_cards    :boolean          default(FALSE), not null
-#  owner_name         :string
+#  business_type      :string
+#  cuisine_name       :string
+#  founded_year       :integer
+#  hero_image_url     :string
+#  menu_url           :string
+#  name               :string
+#  num_employees      :integer
 #  owner_image_url    :string
+#  owner_name         :string
+#  progress_bar_color :string
+#  sell_gift_cards    :boolean          default(FALSE), not null
+#  story              :text
+#  summary            :text
+#  target_amount      :integer          default(1000000)
+#  website_url        :string
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
-#  target_amount      :integer          default(1000000)
-#  summary            :text
-#  hero_image_url     :string
-#  progress_bar_color :string
-#  business_type      :string
-#  num_employees      :integer
-#  founded_year       :integer
-#  website_url        :string
-#  menu_url           :string
+#  seller_id          :string           not null
 #  square_location_id :string           not null
+#
+# Indexes
+#
+#  index_sellers_on_seller_id  (seller_id)
 #
 class Seller < ApplicationRecord
   translates :name, :story, :owner_name, :summary

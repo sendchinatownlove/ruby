@@ -5,8 +5,8 @@
 # Table name: existing_events
 #
 #  id              :bigint           not null, primary key
+#  event_type      :integer
 #  idempotency_key :string
-#  type            :integer
 #
 require 'rails_helper'
 

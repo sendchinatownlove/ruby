@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Validates idempotency using the ExistingEvent Model
-class DuplicateResourceValidator < BaseService
+class DuplicateRequestValidator < BaseService
   attr_reader :idempotency_key, :event_type
 
   def initialize(params)
@@ -18,7 +18,8 @@ class DuplicateResourceValidator < BaseService
     unless existing_event.save
       Rails.logger.info "Not idempotent idempotency_key: #{idempotency_key};"\
                         " event_type: #{event_type}"
-      raise ExceptionHandler::DuplicateResourceError
+      raise ExceptionHandler::DuplicateRequestError,
+        'Request was already received'
     end
   end
 end

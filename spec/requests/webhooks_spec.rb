@@ -34,7 +34,7 @@ RSpec.describe 'Webhooks API', type: :request do
           'status': 'COMPLETED'
         }
       }
-}
+    end
 
     let(:payload) do
       {
@@ -97,7 +97,7 @@ RSpec.describe 'Webhooks API', type: :request do
 
         let(:refund_payload) do
           {
-            'event_id': 'abcd-1234',
+            'event_id': 'dfgh-4567',
             'type': payload_type,
             'data': {
               'object': refund_response
@@ -134,7 +134,7 @@ RSpec.describe 'Webhooks API', type: :request do
                 '/webhooks',
                 headers: { 'HTTP_X_SQUARE_SIGNATURE' => 'www.squareup.com' },
                 params: {
-                  event_id: 'hjkl-1234',
+                  'event_id': 'hjkl-1234',
                   'type': 'refund.updated',
                   'data': {
                     'object': {
@@ -195,7 +195,13 @@ RSpec.describe 'Webhooks API', type: :request do
           )
         end
 
-        it 'returns status code 409' do
+        it 'returns status code 400' do
+          # rubocop:disable Layout/LineLength
+          expect(response.body)
+            .to match(
+              /Request was already received/
+          )
+
           # rubocop:enable Layout/LineLength
           expect(response).to have_http_status(409)
         end
@@ -242,7 +248,13 @@ RSpec.describe 'Webhooks API', type: :request do
           )
         end
 
-        it 'returns status code 409' do
+        it 'returns status code 400' do
+          # rubocop:disable Layout/LineLength
+          expect(response.body)
+            .to match(
+              /Request was already received/
+          )
+          # rubocop:enable Layout/LineLength
           expect(response).to have_http_status(409)
         end
       end
