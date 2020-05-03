@@ -29,11 +29,11 @@ class WebhooksController < ApplicationController
         "     <div style=\"background-color: #FFFFFF; height: 100%; width: 100%; border-radius: 35px; padding: 5% 10%; box-sizing: border-box;\">" +
         "       <h2 style=\"font-size: 2rem; color: #A8192E;\" >Thank you for supporting " + merchant + "!</h2>" +
         "       <div id='giftCardContainer' style=\"z-index: 5; position: relative;\">" +
-        
+
         "        <table align=\"center\" style=\"width:100%; border-collapse: collapse; margin: 0; padding: 0; border: none;\">" +
         "          <tr align=\"center\" style=\"height: 175px; background-color: #A8192E;\">" +
         "            <td background='cid:gift_card_template.png' style=\"z-index: 5; height: 175px; padding: 1.25%; object-fit: cover; border-radius: 15px; margin-bottom: 25px;\">" +
-        "              <table>" + 
+        "              <table>" +
         "                 <tr align=\"center\">" +
         "                   <td style=\"color: #FFFFFF; font-size: 1.5rem; font-weight: bold;\">You made a donation of</td>" +
         "                 </tr>" +
@@ -44,13 +44,13 @@ class WebhooksController < ApplicationController
         "            </td>" +
         "          </tr>" +
 
-        "         <tr align=\"center\">" + 
+        "         <tr align=\"center\">" +
         "           <td style=\"font-size: 1rem; padding-top: 35px;\">We'll let you know when " + merchant + " receives your donation.</td>" +
         "         </tr>" +
-        "         <tr align=\"center\">" + 
+        "         <tr align=\"center\">" +
         "           <td style= \"font-size: 1rem; padding-top: 10px; padding-bottom: 45px;\">Thank you for sending Chinatown love!</td>" +
         "         </tr>" +
-        
+
         "         <tr align=\"center\">" +
         "           <table>" +
         "             <tr style=\"position: relative;\">" +
@@ -214,17 +214,12 @@ class WebhooksController < ApplicationController
 
   def handle_payment_intent_succeeded(
     square_payment_id: nil,
-    square_location_id: nil,
-    stripe_payment_id: nil
+    square_location_id: nil
   )
-    payment_intent = if square_payment_id.present?
-                       PaymentIntent.find_by(
+    payment_intent = PaymentIntent.find_by(
                          square_payment_id: square_payment_id,
                          square_location_id: square_location_id
                        )
-                     else
-                       PaymentIntent.find_by(stripe_id: stripe_payment_id)
-                     end
 
     # TODO(jtmckibb): Each payment has an associated FSM. If we see the start
     #                 of a payment, we should expect for it to be completed.

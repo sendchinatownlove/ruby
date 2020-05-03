@@ -5,6 +5,7 @@ module ExceptionHandler
   class InvalidGiftCardUpdate < StandardError; end
   class CannotGenerateUniqueHash < StandardError; end
   class InvalidSquareSignature < StandardError; end
+  class DuplicateChargeError < StandardError; end
   class DuplicatePaymentCompletedError < StandardError; end
   class SquarePaymentsError < StandardError
     attr_reader :status_code
@@ -42,7 +43,8 @@ module ExceptionHandler
       json_response({ message: e.error.message }, e.http_status)
     end
 
-    rescue_from DuplicatePaymentCompletedError do |e|
+    rescue_from DuplicateChargeError,
+                DuplicatePaymentCompletedError do |e|
       json_response({ message: e.message }, :bad_request)
     end
 
