@@ -25,7 +25,7 @@ ActiveRecord::Schema.define(version: 2020_05_02_062150) do
 
   create_table "existing_events", force: :cascade do |t|
     t.string "idempotency_key"
-    t.integer "type"
+    t.integer "event_type"
   end
 
   create_table "gift_card_amounts", force: :cascade do |t|
