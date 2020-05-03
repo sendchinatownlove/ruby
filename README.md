@@ -57,6 +57,9 @@ You'll need to do this if you're getting cors errors from the frontend. Stop you
 - Run specific tests: `heroku local:run bundle exec rspec -e "<insert string from test description>"`
 - Run console: `heroku local:run rails console`
 - Run local migrations in prod `heroku run rake db:migrate` (do this after submitting a change with a local migration)
+- Install annotate [`gem install annotate`](https://github.com/ctran/annotate_models)
+- Annotate models `annotate --models`
+- Annotate everything `annotate`
 
 #### Development
 - `rails generate model <ModelName>`

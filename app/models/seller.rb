@@ -1,6 +1,36 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: sellers
+#
+#  id                 :bigint           not null, primary key
+#  seller_id          :string           not null
+#  cuisine_name       :string
+#  name               :string
+#  story              :text
+#  accept_donations   :boolean          default(TRUE), not null
+#  sell_gift_cards    :boolean          default(FALSE), not null
+#  owner_name         :string
+#  owner_image_url    :string
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  target_amount      :integer          default(1000000)
+#  summary            :text
+#  hero_image_url     :string
+#  progress_bar_color :string
+#  business_type      :string
+#  num_employees      :integer
+#  founded_year       :integer
+#  website_url        :string
+#  menu_url           :string
+#  square_location_id :string           not null
+#
 class Seller < ApplicationRecord
+  translates :name, :story, :owner_name, :summary
+  globalize_accessors locales: [:en, 'zh-CN'],
+                      attributes: %i[name story owner_name summary]
+
   # model association
   has_many :locations, dependent: :destroy
   has_many :menu_items, dependent: :destroy

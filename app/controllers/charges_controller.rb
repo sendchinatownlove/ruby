@@ -42,8 +42,7 @@ class ChargesController < ApplicationController
                                             email: email,
                                             name: charge_params[:name],
                                             seller: seller,
-                                            line_items: line_items
-                                           )
+                                            line_items: line_items)
 
     json_response(payment)
   end
