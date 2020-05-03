@@ -1,5 +1,22 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: payment_intents
+#
+#  id                 :bigint           not null, primary key
+#  stripe_id          :string
+#  email              :string
+#  line_items         :text
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  successful         :boolean          default(FALSE)
+#  square_payment_id  :string
+#  square_location_id :string
+#  email_text         :string
+#  receipt_url        :string
+#  name               :string
+#
 require 'rails_helper'
 
 RSpec.describe PaymentIntent, type: :model do
