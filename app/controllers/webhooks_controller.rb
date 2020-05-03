@@ -20,7 +20,7 @@ class WebhooksController < ApplicationController
 
     # Validate the signature
     SquareManager::WebhookValidator.call({
-      url: 'https://api.sendchinatownlove.com/webhooks',
+      url: ENV['RAILS_WEBHOOK_URL'],
       callback_body: callback_body,
       callback_signature: callback_signature
     })
