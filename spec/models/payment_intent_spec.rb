@@ -3,7 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe PaymentIntent, type: :model do
-  it { should validate_uniqueness_of(:square_payment_id) }
+  it do
+    create(:square_payment_intent)
+    should validate_uniqueness_of(:square_payment_id)
+  end
   it { should validate_presence_of(:square_payment_id) }
   it { should validate_presence_of(:square_location_id) }
   it { should have_many(:items) }
