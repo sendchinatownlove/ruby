@@ -8,6 +8,10 @@
 #  event_type      :integer
 #  idempotency_key :string
 #
+# Indexes
+#
+#  index_existing_events_on_idempotency_key_and_event_type  (idempotency_key,event_type) UNIQUE
+#
 class ExistingEvent < ApplicationRecord
   validates_presence_of :idempotency_key, :event_type
   validates_uniqueness_of :idempotency_key, scope: :event_type

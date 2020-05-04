@@ -8,6 +8,10 @@
 #  event_type      :integer
 #  idempotency_key :string
 #
+# Indexes
+#
+#  index_existing_events_on_idempotency_key_and_event_type  (idempotency_key,event_type) UNIQUE
+#
 require 'rails_helper'
 
 RSpec.describe ExistingEvent, type: :model do
