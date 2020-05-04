@@ -5,6 +5,8 @@ require 'rails_helper'
 RSpec.describe SellersHelper, type: :helper do
   let(:seller) { create :seller }
 
+  # TODO(jxue) add some tests including returned giftcards/donations
+
   describe 'generate_seller_json' do
     let(:expected_seller) do
       {
@@ -36,6 +38,11 @@ RSpec.describe SellersHelper, type: :helper do
     context 'with no money raised' do
       it 'returns the list of sellers with `and`' do
         expected_seller['amount_raised'] = 0
+        expected_seller['donation_amount'] = 0
+        expected_seller['gift_card_amount'] = 0
+        expected_seller['num_contributions'] = 0
+        expected_seller['num_gift_cards'] = 0
+        expected_seller['num_donations'] = 0
         expect(SellersHelper.generate_seller_json(seller: seller))
           .to eq(expected_seller)
       end
@@ -75,6 +82,11 @@ RSpec.describe SellersHelper, type: :helper do
         # Create a donation of $10
         item_donation2 = create(:item, seller: seller)
         create(:donation_detail, item: item_donation2, amount: 10_00)
+        expected_seller['donation_amount'] = 21000
+        expected_seller['gift_card_amount'] = 8000
+        expected_seller['num_contributions'] = 4
+        expected_seller['num_gift_cards'] = 2
+        expected_seller['num_donations'] = 2
       end
 
       it 'returns the list of sellers with `and`' do
@@ -88,7 +100,7 @@ RSpec.describe SellersHelper, type: :helper do
   describe '#calculate_amount_raised' do
     context 'with no money raised' do
       it 'returns the list of sellers with `and`' do
-        expect(SellersHelper.calculate_amount_raised(seller_id: seller.id))
+        expect(SellersHelper.calculate_gift_card_amount(seller_id: seller.id) + SellersHelper.calculate_donation_amount(seller_id: seller.id))
           .to eq(0)
       end
     end
@@ -130,7 +142,7 @@ RSpec.describe SellersHelper, type: :helper do
       end
 
       it 'returns the list of sellers with `and`' do
-        expect(SellersHelper.calculate_amount_raised(seller_id: seller.id))
+        expect(SellersHelper.calculate_gift_card_amount(seller_id: seller.id) + SellersHelper.calculate_donation_amount(seller_id: seller.id))
           .to eq(290_00)
       end
     end
