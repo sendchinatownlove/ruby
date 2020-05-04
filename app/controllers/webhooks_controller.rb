@@ -1,41 +1,17 @@
 # frozen_string_literal: true
+
 require 'rest-client'
 
 # TODO(jmckibben): This class needs a lot of refactoring
 class WebhooksController < ApplicationController
   # POST /webhooks
   def create
-    if request.env['HTTP_STRIPE_SIGNATURE'].present?
-      handle_stripe_event
-    elsif request.env['HTTP_X_SQUARE_SIGNATURE'].present?
-      handle_square_event
-    end
+    handle_square_event
 
     json_response({})
   end
 
   private
-
-  def handle_stripe_event
-    Stripe.api_key = ENV['STRIPE_API_KEY']
-
-    # Verify webhook signature and extract the event
-    # See https://stripe.com/docs/webhooks/signatures for more information.
-    sig_header = request.env['HTTP_STRIPE_SIGNATURE']
-    endpoint_secret = ENV['STRIPE_WEBHOOK_KEY']
-    payload = request.body.read
-
-    event = Stripe::Webhook.construct_event(
-      payload, sig_header, endpoint_secret
-    )
-    # Handle the payment_intent.succeeded event
-    if event['type'] == 'payment_intent.succeeded'
-      payment_intent = event['data']['object']
-
-      # Fulfill the purchase
-      handle_payment_intent_succeeded(stripe_payment_id: payment_intent['id'])
-    end
-  end
 
   def handle_square_event
     # Get the JSON body and HMAC-SHA1 signature of the incoming POST request
@@ -43,17 +19,24 @@ class WebhooksController < ApplicationController
     callback_body = request.body.string
 
     # Validate the signature
-    unless valid_square_callback?(callback_body, callback_signature)
-      # Fail if the signature is invalid
-      raise InvalidSquareSignature, 'Invalid Signature Header from Square'
-    end
+    SquareManager::WebhookValidator.call({
+      url: ENV['RAILS_WEBHOOK_URL'],
+      callback_body: callback_body,
+      callback_signature: callback_signature
+    })
 
     # Load the JSON body into a hash
     callback_body_json = JSON.parse(callback_body)
+    square_event_type = sanitize_square_type(callback_body_json['type'])
+
+    DuplicateRequestValidator.call({
+      idempotency_key: callback_body_json['event_id'],
+      event_type: square_event_type
+    })
 
     # If the notification indicates a PAYMENT_UPDATED event...
-    case callback_body_json['type']
-    when 'payment.updated'
+    case square_event_type
+    when 'payment_updated'
       payment = callback_body_json['data']['object']['payment']
       if payment['status'] == 'COMPLETED'
         # Fulfill the purchase
@@ -62,7 +45,7 @@ class WebhooksController < ApplicationController
           square_location_id: payment['location_id']
         )
       end
-    when 'refund.created'
+    when 'refund_created'
       refund = callback_body_json['data']['object']['refund']
 
       payment_intent = PaymentIntent.find_by(
@@ -74,7 +57,7 @@ class WebhooksController < ApplicationController
         status: refund['status'],
         payment_intent: payment_intent
       )
-    when 'refund.updated'
+    when 'refund_updated'
       square_refund = callback_body_json['data']['object']['refund']
       status = square_refund['status']
 
@@ -94,44 +77,18 @@ class WebhooksController < ApplicationController
     end
   end
 
-  # Validates HMAC-SHA1 signatures included in webhook notifications to ensure
-  # notifications came from Square
-  def valid_square_callback?(callback_body, callback_signature)
-    # Combine your webhook notification URL and the JSON body of the incoming
-    # request into a single string
-    string_to_sign = 'https://api.sendchinatownlove.com/webhooks' +
-                     callback_body
-
-    # Generate the HMAC-SHA1 signature of the string, signed with your webhook
-    # signature key
-    string_signature = Base64.strict_encode64(
-      OpenSSL::HMAC.digest(
-        'sha1',
-        ENV['SQUARE_WEBHOOK_SIGNATURE_KEY'],
-        string_to_sign
-      )
-    )
-
-    # Hash the signatures a second time (to protect against timing attacks)
-    # and compare them
-    Digest::SHA1.base64digest(string_signature) == Digest::SHA1.base64digest(
-      callback_signature
-    )
+  def sanitize_square_type(square_event_type)
+    square_event_type.gsub('.', '_')
   end
 
   def handle_payment_intent_succeeded(
     square_payment_id: nil,
-    square_location_id: nil,
-    stripe_payment_id: nil
+    square_location_id: nil
   )
-    payment_intent = if square_payment_id.present?
-                       PaymentIntent.find_by(
-                         square_payment_id: square_payment_id,
-                         square_location_id: square_location_id
-                       )
-                     else
-                       PaymentIntent.find_by(stripe_id: stripe_payment_id)
-                     end
+    payment_intent = PaymentIntent.find_by(
+      square_payment_id: square_payment_id,
+      square_location_id: square_location_id
+    )
 
     # TODO(jtmckibb): Each payment has an associated FSM. If we see the start
     #                 of a payment, we should expect for it to be completed.
@@ -173,11 +130,12 @@ class WebhooksController < ApplicationController
         )
         create_donation(item: item, amount: amount)
         begin
-            send_donation_receipt(
-              payment_intent: payment_intent,
-              amount: amount,
-              merchant: merchant_name)
-        rescue
+          send_donation_receipt(
+            payment_intent: payment_intent,
+            amount: amount,
+            merchant: merchant_name
+          )
+        rescue StandardError
         end
       when 'gift_card'
         email = payment_intent.email
@@ -194,12 +152,13 @@ class WebhooksController < ApplicationController
           seller_id: seller_id
         )
         begin
-            send_gift_card_receipt(
-              payment_intent: payment_intent,
-              amount: amount,
-              merchant: merchant_name,
-              receipt_id: gift_card_detail.seller_gift_card_id)
-        rescue
+          send_gift_card_receipt(
+            payment_intent: payment_intent,
+            amount: amount,
+            merchant: merchant_name,
+            receipt_id: gift_card_detail.seller_gift_card_id
+          )
+        rescue StandardError
         end
       else
         raise(
@@ -268,57 +227,58 @@ class WebhooksController < ApplicationController
     raise CannotGenerateUniqueHash, 'Error generating unique gift_card_id'
   end
 
+  # rubocop:disable Layout/LineLength
   def send_donation_receipt(payment_intent:, amount:, merchant:)
-    amount_string = '%.2f' % ((amount.to_f)/100)
-    html = "<!DOCTYPE html>" +
-        "<html>" +
-        "<head>" +
-        "  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />" +
-        "</head>" +
-        "<body>" +
-        "<h1>Thank you for your donation to " + merchant + "!</h1>" +
-        "<p> Donation amount: <b>$" + amount_string + "</b></p>" +
-        "<p> Square receipt: " + payment_intent.receipt_url + "</p>" +
-        "<p> We'll be in touch when " + merchant + " opens back up. Sending " +
-        "  thanks from us and from Chinatown for your support! </p>" +
-        "<p> Love,<p>" +
-        "<p> the Send Chinatown Love team</p>" +
-        "</body>" +
-        "</html>"
+    amount_string = format('%.2f', (amount.to_f / 100))
+    html = '<!DOCTYPE html>' \
+           '<html>' \
+           '<head>' \
+           "  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />" \
+           '</head>' \
+           '<body>' \
+           '<h1>Thank you for your donation to ' + merchant + '!</h1>' \
+           '<p> Donation amount: <b>$' + amount_string + '</b></p>' \
+           '<p> Square receipt: ' + payment_intent.receipt_url + '</p>' \
+           "<p> We'll be in touch when " + merchant + ' opens back up. Sending ' \
+           '  thanks from us and from Chinatown for your support! </p>' \
+           '<p> Love,<p>' \
+           '<p> the Send Chinatown Love team</p>' \
+           '</body>' \
+           '</html>'
     send_receipt(to: payment_intent.email, html: html)
   end
 
   def send_gift_card_receipt(payment_intent:, amount:, merchant:, receipt_id:)
-    amount_string = '%.2f' % ((amount.to_f)/100)
-    html = "<!DOCTYPE html>" +
-        "<html>" +
-        "<head>" +
-        "  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />" +
-        "</head>" +
-        "<body>" +
-        "<h1>Thank you for your purchase from " + merchant + "!</h1>" +
-        "<p> Gift card code: <b>" + receipt_id + "</b></p>" +
-        "<p> Gift card balance: <b>$" + amount_string + "</b></p>" +
-        "<p> Square receipt: " + payment_intent.receipt_url + "</p>" +
-        "<p> We'll be in touch when " + merchant + " opens back up with details" +
-        "  on how to use your gift card. Sending thanks from us and from Chinatown for" +
-        "  your support! </p>" +
-        "<p> Love,<p>" +
-        "<p> the Send Chinatown Love team</p>" +
-        "</body>" +
-        "</html>"
+    amount_string = format('%.2f', (amount.to_f / 100))
+    html = '<!DOCTYPE html>' \
+           '<html>' \
+           '<head>' \
+           "  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />" \
+           '</head>' \
+           '<body>' \
+           '<h1>Thank you for your purchase from ' + merchant + '!</h1>' \
+           '<p> Gift card code: <b>' + receipt_id + '</b></p>' \
+           '<p> Gift card balance: <b>$' + amount_string + '</b></p>' \
+           '<p> Square receipt: ' + payment_intent.receipt_url + '</p>' \
+           "<p> We'll be in touch when " + merchant + ' opens back up with details' \
+           '  on how to use your gift card. Sending thanks from us and from Chinatown for' \
+           '  your support! </p>' \
+           '<p> Love,<p>' \
+           '<p> the Send Chinatown Love team</p>' \
+           '</body>' \
+           '</html>'
     send_receipt(to: payment_intent.email, html: html)
-
   end
 
   def send_receipt(to:, html:)
-    api_key = ENV["MAILGUN_API_KEY"]
+    api_key = ENV['MAILGUN_API_KEY']
     api_url = "https://api:#{api_key}@api.mailgun.net/v2/m.sendchinatownlove.com/messages"
 
     RestClient.post api_url,
-                    :from => "receipts@sendchinatownlove.com",
-                    :to => to,
-                    :subject => "Receipt from Send Chinatown Love",
-                    :html => html
+                    from: 'receipts@sendchinatownlove.com',
+                    to: to,
+                    subject: 'Receipt from Send Chinatown Love',
+                    html: html
   end
+  # rubocop:enable Layout/LineLength
 end

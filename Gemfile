@@ -29,8 +29,9 @@ gem 'sinatra'
 # Square
 gem 'square.rb'
 
-# Generates hashes
-# gem 'digest'
+# Translations
+gem 'globalize', '~> 5.3.0'
+gem 'globalize-accessors'
 
 gem 'actionmailer'
 
@@ -67,3 +68,5 @@ end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+
+gem "annotate", "~> 3.1"

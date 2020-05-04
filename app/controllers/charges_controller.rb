@@ -5,6 +5,12 @@ require 'securerandom'
 class ChargesController < ApplicationController
   # POST /charges
   def create
+    # Validate this not a duplicate charge
+    DuplicateRequestValidator.call({
+      idempotency_key: charge_params[:idempotency_key],
+      event_type: 'charges_create'
+    })
+
     line_items = charge_params[:line_items].map(&:to_h)
 
     seller_id = charge_params[:seller_id]
@@ -21,33 +27,22 @@ class ChargesController < ApplicationController
     seller = Seller.find_by(seller_id: seller_id)
 
     # Total all Items
-    amount = line_items.inject(0) do |sum, item|
-      sum + item['amount'] * item['quantity']
-    end
+    amount =
+      line_items.inject(0) do |sum, item|
+        sum + item['amount'] * item['quantity']
+      end
 
     description =
       generate_description(seller_name: seller.name, item_types: item_types)
 
     email = charge_params[:email]
-    payment =
-      if charge_params[:is_square]
-        create_square_payment_request(
-          source_id: charge_params[:nonce],
-          amount: amount,
-          note: description,
-          email: email,
-          name: charge_params[:name],
-          seller: seller,
-          line_items: line_items
-        )
-      else
-        create_stripe_payment_request(
-          amount: amount,
-          email: email,
-          description: description,
-          line_items: line_items
-        )
-      end
+    payment = create_square_payment_request(nonce: charge_params[:nonce],
+                                            amount: amount,
+                                            note: description,
+                                            email: email,
+                                            name: charge_params[:name],
+                                            seller: seller,
+                                            line_items: line_items)
 
     json_response(payment)
   end
@@ -61,12 +56,14 @@ class ChargesController < ApplicationController
     params.require(:is_square)
     params.require(:nonce) if params[:is_square]
     params.require(:name)
+    params.require(:idempotency_key)
     params.permit(
       :email,
       :nonce,
       :is_square,
       :name,
       :seller_id,
+      :idempotency_key,
       line_items: [%i[amount currency item_type quantity]]
     )
   end
@@ -107,34 +104,28 @@ class ChargesController < ApplicationController
   def generate_description(seller_name:, item_types:)
     description = 'Thank you for supporting ' + seller_name + '.'
     if item_types.include? 'gift_card'
-      description +=
-        ' Your gift card(s) will be emailed to you when the seller opens back up.'
+      description += ' Your gift card(s) will be emailed'\
+                     ' to you when the seller opens back up.'
     end
 
     description
   end
 
   def create_square_payment_request(
-    source_id:, amount:, note:, email:, name:, seller:, line_items:
+    nonce:, amount:, note:, email:, name:, seller:, line_items:
   )
-    api_client =
-      Square::Client.new(
-        access_token: ENV['SQUARE_ACCESS_TOKEN'],
-        environment: Rails.env.production? ? 'production' : 'sandbox'
-      )
-
     square_location_id = seller.square_location_id
 
-    request_body = {
-      source_id: source_id,
-      idempotency_key: SecureRandom.uuid,
-      amount_money: { amount: amount, currency: 'USD' },
-      buyer_email_address: email,
-      note: note,
-      location_id: square_location_id
-    }
-
-    api_response = api_client.payments.create_payment(body: request_body)
+    api_response =
+      SquareManager::PaymentCreator.call(
+        {
+          nonce: nonce,
+          amount: amount,
+          email: email,
+          note: note,
+          location_id: square_location_id
+        }
+      )
 
     errors = api_response.errors
     if errors.present?
@@ -158,26 +149,5 @@ class ChargesController < ApplicationController
     )
 
     api_response
-  end
-
-  def create_stripe_payment_request(amount:, email:, description:, line_items:)
-    Stripe.api_key = ENV['STRIPE_API_KEY']
-
-    intent =
-      Stripe::PaymentIntent.create(
-        amount: amount,
-        currency: 'usd',
-        receipt_email: email,
-        payment_method_types: %w[card],
-        description: description
-      )
-
-    # Creates a pending PaymentIntent. See webhooks_controller to see what
-    # happens when the PaymentIntent is successful.
-    PaymentIntent.create!(
-      stripe_id: intent['id'], email: email, line_items: line_items.to_json
-    )
-
-    intent
   end
 end
