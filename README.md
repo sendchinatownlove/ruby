@@ -75,7 +75,6 @@ This also enables you to share your local environment in pull requests for addit
 1. Setup localhost.run or ngrok or any derivatives to forward your localhost port to the web.
 1. Make port forwarder to point to local port. localhost.run cmd: `ssh -R 80:localhost:5000 ssh.localhost.run`
 1. Copy domain name in `config/developments/development.rb`. i.e.: `config.hosts << "your-domain.example.com"`
-1. Edit `.env` file with your domain + the webhooks url. For instance `https://example.com/webhooks`. This is used for validating requests.
 1. Spin up rails environment by `heroku local web`
 1. Go to: https://developer.squareup.com/apps
 1. Go to the webhooks pane and create a sandbox api to point to domain created above.
@@ -83,6 +82,9 @@ This also enables you to share your local environment in pull requests for addit
     * refund.created
     * refund.updated
     * payment.updated
+1. Edit `.env` file.
+    1. Edit `SQUARE_WEBHOOK_SIGNATURE_KEY` to the signature key from when you created the webhooks.
+    1. Edit `RAILS_WEBHOOK_URL` to your domain + webhooks url. For instance `https://example.com/webhooks`. This is used for validating requests.
 
 #### Reference Links
 
