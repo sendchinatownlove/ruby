@@ -8,12 +8,20 @@
 #  address1     :string           not null
 #  address2     :string
 #  city         :string           not null
+#  phone_number :string
 #  state        :string           not null
 #  zip_code     :string           not null
-#  seller_id    :bigint           not null
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
-#  phone_number :string
+#  seller_id    :bigint           not null
+#
+# Indexes
+#
+#  index_locations_on_seller_id  (seller_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (seller_id => sellers.id)
 #
 require 'rails_helper'
 

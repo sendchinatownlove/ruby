@@ -2,14 +2,14 @@
 
 FactoryBot.define do
   factory :existing_event do
-    idempotent_key { Faker::Alphanumeric.alphanumeric(number: 64) }
+    idempotency_key { Faker::Alphanumeric.alphanumeric(number: 64) }
 
     trait :charge do
-      type { :charges_create }
+      event_type { :charges_create }
     end
 
     trait :webhook do
-      type { :webhooks_create_refund_updated }
+      event_type { :payment_updated }
     end
   end
 end
