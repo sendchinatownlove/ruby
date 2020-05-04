@@ -82,9 +82,6 @@ This also enables you to share your local environment in pull requests for addit
     * refund.created
     * refund.updated
     * payment.updated
-1. Edit `.env` file.
-    1. Edit `SQUARE_WEBHOOK_SIGNATURE_KEY` to the signature key from when you created the webhooks.
-    1. Edit `RAILS_WEBHOOK_URL` to your domain + webhooks url. For instance `https://example.com/webhooks`. This is used for validating requests.
 
 #### Reference Links
 

@@ -5,16 +5,17 @@
 # Table name: payment_intents
 #
 #  id                 :bigint           not null, primary key
+#  stripe_id          :string
 #  email              :string
-#  email_text         :string
 #  line_items         :text
-#  name               :string
-#  receipt_url        :string
-#  successful         :boolean          default(FALSE)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
-#  square_location_id :string           not null
-#  square_payment_id  :string           not null
+#  successful         :boolean          default(FALSE)
+#  square_payment_id  :string
+#  square_location_id :string
+#  email_text         :string
+#  receipt_url        :string
+#  name               :string
 #
 require 'rails_helper'
 

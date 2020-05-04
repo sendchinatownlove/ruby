@@ -19,24 +19,17 @@ class WebhooksController < ApplicationController
     callback_body = request.body.string
 
     # Validate the signature
-    SquareManager::WebhookValidator.call({
-      url: ENV['RAILS_WEBHOOK_URL'],
-      callback_body: callback_body,
-      callback_signature: callback_signature
-    })
+    unless valid_square_callback?(callback_body, callback_signature)
+      # Fail if the signature is invalid
+      raise InvalidSquareSignature, 'Invalid Signature Header from Square'
+    end
 
     # Load the JSON body into a hash
     callback_body_json = JSON.parse(callback_body)
-    square_event_type = sanitize_square_type(callback_body_json['type'])
-
-    DuplicateRequestValidator.call({
-      idempotency_key: callback_body_json['event_id'],
-      event_type: square_event_type
-    })
 
     # If the notification indicates a PAYMENT_UPDATED event...
-    case square_event_type
-    when 'payment_updated'
+    case callback_body_json['type']
+    when 'payment.updated'
       payment = callback_body_json['data']['object']['payment']
       if payment['status'] == 'COMPLETED'
         # Fulfill the purchase
@@ -45,7 +38,7 @@ class WebhooksController < ApplicationController
           square_location_id: payment['location_id']
         )
       end
-    when 'refund_created'
+    when 'refund.created'
       refund = callback_body_json['data']['object']['refund']
 
       payment_intent = PaymentIntent.find_by(
@@ -57,7 +50,7 @@ class WebhooksController < ApplicationController
         status: refund['status'],
         payment_intent: payment_intent
       )
-    when 'refund_updated'
+    when 'refund.updated'
       square_refund = callback_body_json['data']['object']['refund']
       status = square_refund['status']
 
@@ -77,8 +70,29 @@ class WebhooksController < ApplicationController
     end
   end
 
-  def sanitize_square_type(square_event_type)
-    square_event_type.gsub('.', '_')
+  # Validates HMAC-SHA1 signatures included in webhook notifications to ensure
+  # notifications came from Square
+  def valid_square_callback?(callback_body, callback_signature)
+    # Combine your webhook notification URL and the JSON body of the incoming
+    # request into a single string
+    string_to_sign = 'https://api.sendchinatownlove.com/webhooks' +
+                     callback_body
+
+    # Generate the HMAC-SHA1 signature of the string, signed with your webhook
+    # signature key
+    string_signature = Base64.strict_encode64(
+      OpenSSL::HMAC.digest(
+        'sha1',
+        ENV['SQUARE_WEBHOOK_SIGNATURE_KEY'],
+        string_to_sign
+      )
+    )
+
+    # Hash the signatures a second time (to protect against timing attacks)
+    # and compare them
+    Digest::SHA1.base64digest(string_signature) == Digest::SHA1.base64digest(
+      callback_signature
+    )
   end
 
   def handle_payment_intent_succeeded(

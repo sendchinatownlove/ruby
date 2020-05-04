@@ -5,19 +5,11 @@
 # Table name: refunds
 #
 #  id                :bigint           not null, primary key
+#  square_refund_id  :string
 #  status            :string
+#  payment_intent_id :bigint           not null
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
-#  payment_intent_id :bigint           not null
-#  square_refund_id  :string
-#
-# Indexes
-#
-#  index_refunds_on_payment_intent_id  (payment_intent_id)
-#
-# Foreign Keys
-#
-#  fk_rails_...  (payment_intent_id => payment_intents.id)
 #
 require 'rails_helper'
 

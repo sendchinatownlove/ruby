@@ -6,10 +6,15 @@ class ChargesController < ApplicationController
   # POST /charges
   def create
     # Validate this not a duplicate charge
-    DuplicateRequestValidator.call({
-      idempotency_key: charge_params[:idempotency_key],
-      event_type: 'charges_create'
-    })
+    idempotency_key = charge_params[:idempotency_key]
+    existing_event =
+      ExistingEvent.new(
+        idempotency_key: idempotency_key,
+        event_type: 'charges_create'
+      )
+    unless existing_event.save
+      raise DuplicateChargeError, 'This charge has already been processed'
+    end
 
     line_items = charge_params[:line_items].map(&:to_h)
 

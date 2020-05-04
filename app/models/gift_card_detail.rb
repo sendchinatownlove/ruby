@@ -5,21 +5,13 @@
 # Table name: gift_card_details
 #
 #  id                  :bigint           not null, primary key
+#  gift_card_id        :string
+#  receipt_id          :string
 #  expiration          :date
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
-#  gift_card_id        :string
 #  item_id             :bigint           not null
-#  receipt_id          :string
 #  seller_gift_card_id :string
-#
-# Indexes
-#
-#  index_gift_card_details_on_item_id  (item_id)
-#
-# Foreign Keys
-#
-#  fk_rails_...  (item_id => items.id)
 #
 class GiftCardDetail < ApplicationRecord
   belongs_to :item

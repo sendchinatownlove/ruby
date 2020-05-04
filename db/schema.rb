@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_04_001746) do
+ActiveRecord::Schema.define(version: 2020_05_03_012713) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -26,7 +26,6 @@ ActiveRecord::Schema.define(version: 2020_05_04_001746) do
   create_table "existing_events", force: :cascade do |t|
     t.string "idempotency_key"
     t.integer "event_type"
-    t.index ["idempotency_key", "event_type"], name: "index_existing_events_on_idempotency_key_and_event_type", unique: true
   end
 
   create_table "gift_card_amounts", force: :cascade do |t|
