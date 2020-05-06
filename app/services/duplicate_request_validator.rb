@@ -19,7 +19,7 @@ class DuplicateRequestValidator < BaseService
       Rails.logger.info "Not idempotent idempotency_key: #{idempotency_key};"\
                         " event_type: #{event_type}"
       raise ExceptionHandler::DuplicateRequestError,
-        'Request was already received'
+            'Request was already received'
     end
   end
 end
