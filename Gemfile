@@ -51,6 +51,7 @@ group :development, :test do
   gem 'rspec-rails', '~> 4.0.0'
   gem 'faker'
   gem 'pry-byebug'
+  gem 'dotenv-rails'
 end
 
 group :development, :staging do
