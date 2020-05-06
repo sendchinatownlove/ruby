@@ -20,19 +20,19 @@ class WebhooksController < ApplicationController
 
     # Validate the signature
     SquareManager::WebhookValidator.call({
-                                           url: ENV['RAILS_WEBHOOK_URL'],
-                                           callback_body: callback_body,
-                                           callback_signature: callback_signature
-                                         })
+      url: ENV['RAILS_WEBHOOK_URL'],
+      callback_body: callback_body,
+      callback_signature: callback_signature
+    })
 
     # Load the JSON body into a hash
     callback_body_json = JSON.parse(callback_body)
     square_event_type = sanitize_square_type(callback_body_json['type'])
 
     DuplicateRequestValidator.call({
-                                     idempotency_key: callback_body_json['event_id'],
-                                     event_type: square_event_type
-                                   })
+      idempotency_key: callback_body_json['event_id'],
+      event_type: square_event_type
+    })
 
     # If the notification indicates a PAYMENT_UPDATED event...
     case square_event_type

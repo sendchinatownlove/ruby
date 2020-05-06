@@ -18,19 +18,19 @@ describe SquareManager::WebhookValidator, '#call' do
     ).and_return(true)
 
     SquareManager::WebhookValidator.call({
-                                           url: 'example.com/webhooks',
-                                           callback_body: '{}',
-                                           callback_signature: callback_signature
-                                         })
+      url: 'example.com/webhooks',
+      callback_body: '{}',
+      callback_signature: callback_signature
+    })
   end
 
   it 'is not valid webhook' do
-    expect do
+    expect {
       SquareManager::WebhookValidator.call({
-                                             url: 'example.com/webhooks',
-                                             callback_body: '{}',
-                                             callback_signature: 'abc'
-                                           })
-    end.to raise_error(ExceptionHandler::InvalidSquareSignature)
+        url: 'example.com/webhooks',
+        callback_body: '{}',
+        callback_signature: 'abc'
+      })
+    }.to raise_error(ExceptionHandler::InvalidSquareSignature)
   end
 end

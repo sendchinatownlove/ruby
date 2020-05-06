@@ -7,9 +7,9 @@ class ChargesController < ApplicationController
   def create
     # Validate this not a duplicate charge
     DuplicateRequestValidator.call({
-                                     idempotency_key: charge_params[:idempotency_key],
-                                     event_type: 'charges_create'
-                                   })
+      idempotency_key: charge_params[:idempotency_key],
+      event_type: 'charges_create'
+    })
 
     line_items = charge_params[:line_items].map(&:to_h)
 
