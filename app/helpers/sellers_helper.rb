@@ -82,5 +82,3 @@ module SellersHelper
                   .size
   end
 end
-
-

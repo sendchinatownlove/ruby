@@ -82,7 +82,7 @@ RSpec.describe SellersHelper, type: :helper do
         # Create a donation of $10
         item_donation2 = create(:item, seller: seller)
         create(:donation_detail, item: item_donation2, amount: 10_00)
-        expected_seller['donation_amount'] = 21000
+        expected_seller['donation_amount'] = 21_000
         expected_seller['gift_card_amount'] = 8000
         expected_seller['num_contributions'] = 4
         expected_seller['num_gift_cards'] = 2

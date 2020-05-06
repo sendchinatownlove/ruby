@@ -196,13 +196,11 @@ RSpec.describe 'Webhooks API', type: :request do
         end
 
         it 'returns status code 400' do
-          # rubocop:disable Layout/LineLength
           expect(response.body)
             .to match(
               /Request was already received/
-          )
+            )
 
-          # rubocop:enable Layout/LineLength
           expect(response).to have_http_status(409)
         end
       end
@@ -249,12 +247,11 @@ RSpec.describe 'Webhooks API', type: :request do
         end
 
         it 'returns status code 400' do
-          # rubocop:disable Layout/LineLength
           expect(response.body)
             .to match(
               /Request was already received/
-          )
-          # rubocop:enable Layout/LineLength
+            )
+
           expect(response).to have_http_status(409)
         end
       end
