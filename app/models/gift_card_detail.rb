@@ -5,6 +5,7 @@ class GiftCardDetail < ApplicationRecord
   validates_uniqueness_of :gift_card_id
   validate :seller_gift_card_id_is_unique_per_seller
   has_many :gift_card_amount
+  has_one :item
 
   # TODO(jmckibben): Being used in sellers_helper N times. Ideally we'd combine
   # into a single query

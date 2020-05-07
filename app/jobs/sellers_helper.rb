@@ -11,8 +11,22 @@ module SellersHelper
     seller
   end
 
+
+  def self.retrieve_amount_in_card(gift_card_id:)
+    gift_card_recent = GiftCardDetail.joins(:item)
+                                     .where(items: {
+                                              gift_card_id: gift_card_id,
+                                              refunded: false
+                                            })
+                                     .inject(0) do |sum, gift_card|
+    #will return the most recent giftcard amount
+    gift_card.amount
+    end
+  end
+
   # Calculates the amount of money raised by the Seller so far.
   # seller_id: the actual id of the Seller. Seller.id
+  #should i add gift_card_id: here?
   def self.calculate_amount_raised(seller_id:)
     return 0 if Item.where(seller_id: seller_id).empty?
 

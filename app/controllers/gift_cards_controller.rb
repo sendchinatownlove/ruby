@@ -8,21 +8,15 @@ class GiftCardsController < ApplicationController
   # GET /gift_cards/:id
   def show
     item = Item.find_by(gift_card_detail_id: @gift_card_detail[:id])
-    json_response(item)
-  end
+    #need to get the gift_card_detail of item and feed its ID into gift card recent
+    SellersHelper.gift_card_recent()
 
-  # PUT /gift_cards/:id
-  def update
-    # only allows updating amounts of gift cards
-    original_amount = @gift_card.amount
-    new_amount = update_params[:amount].to_i
+    current_amount = json_response(item)
 
-    if original_amount < new_amount
-      raise InvalidGiftCardUpdate, 'Cannot increase gift card amount'
-    end
+    #look at the models
+    #schema file
+    #items, giftcard_detail, giftcard -> schema.rb
 
-    @gift_card.update!(update_params)
-    head :no_content
   end
 
   private
