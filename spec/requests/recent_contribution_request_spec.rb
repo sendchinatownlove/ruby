@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-RSpec.describe "RecentContributions", type: :request do
-
+RSpec.describe 'RecentContributions', type: :request do
   before(:all) do
     @seller = create :seller
     @donation_item = create(:item, :donation_item, seller_id: @seller.id)
@@ -24,5 +25,4 @@ RSpec.describe "RecentContributions", type: :request do
     expect(response).to have_http_status(200)
     expect(response.body).to eq(gift_card_detail.to_json)
   end
-
 end
