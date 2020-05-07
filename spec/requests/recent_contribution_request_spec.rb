@@ -3,7 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe 'RecentContributions', type: :request do
-  before(:all) do
+
+  before do
     @seller = create :seller
     @donation_item = create(:item, :donation_item, seller_id: @seller.id)
     @donation_detail = create(:donation_detail, item_id: @donation_item.id)
