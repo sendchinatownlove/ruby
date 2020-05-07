@@ -11,7 +11,7 @@ class RecentContributionController < ApplicationController
   private
 
   def get_recent_contribution
-    item = @seller.items.order(:created_at).last
+    item = @seller.items.last
     item.item_type == 'donation' ? item.donation_detail : item.gift_card_detail
   end
 
