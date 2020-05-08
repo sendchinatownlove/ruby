@@ -228,7 +228,7 @@ class WebhooksController < ApplicationController
   end
 
   def generate_seller_gift_card_id_hash
-    ('a'..'z').to_a.sample(5)
+    ('a'..'z').to_a.sample(5).join
   end
 
   # rubocop:disable Layout/LineLength
