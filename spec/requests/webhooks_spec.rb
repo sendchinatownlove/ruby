@@ -48,8 +48,9 @@ RSpec.describe 'Webhooks API', type: :request do
 
     before do
       create :seller
-      allow(SecureRandom).to receive(:hex)
-        .and_return('abcdef123')
+      allow_any_instance_of(WebhooksController)
+        .to receive(:generate_seller_gift_card_id_hash)
+        .and_return('abcde')
       allow(SecureRandom).to receive(:uuid)
         .and_return('aweofijn-3n3400-oawjiefwef-0iawef-0i')
       allow(Digest::SHA1).to receive(:base64digest)
