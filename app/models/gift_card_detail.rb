@@ -1,5 +1,26 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: gift_card_details
+#
+#  id                  :bigint           not null, primary key
+#  expiration          :date
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#  gift_card_id        :string
+#  item_id             :bigint           not null
+#  receipt_id          :string
+#  seller_gift_card_id :string
+#
+# Indexes
+#
+#  index_gift_card_details_on_item_id  (item_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (item_id => items.id)
+#
 class GiftCardDetail < ApplicationRecord
   belongs_to :item
   validates_uniqueness_of :gift_card_id
@@ -8,6 +29,7 @@ class GiftCardDetail < ApplicationRecord
 
   # TODO(jmckibben): Being used in sellers_helper N times. Ideally we'd combine
   # into a single query
+  # TODO change to created_at
   def amount
     GiftCardAmount.where(gift_card_detail_id: id)
                   .order(updated_at: :desc)

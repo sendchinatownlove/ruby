@@ -126,6 +126,11 @@ RSpec.describe 'Sellers API', type: :request do
         expected_json['target_amount'] = 1_000_000
         expected_json['amount_raised'] = 0
         expected_json['locations'] = []
+        expected_json['donation_amount'] = 0
+        expected_json['gift_card_amount'] = 0
+        expected_json['num_contributions'] = 0
+        expected_json['num_donations'] = 0
+        expected_json['num_gift_cards'] = 0
         expect(actual_json).to eq(expected_json.with_indifferent_access)
       end
 
@@ -153,6 +158,11 @@ RSpec.describe 'Sellers API', type: :request do
         expected_json['target_amount'] = 1_000_000
         expected_json['amount_raised'] = 0
         expected_json['locations'] = []
+        expected_json['donation_amount'] = 0
+        expected_json['gift_card_amount'] = 0
+        expected_json['num_contributions'] = 0
+        expected_json['num_donations'] = 0
+        expected_json['num_gift_cards'] = 0
         expect(actual_json).to eq(expected_json.with_indifferent_access)
       end
 
@@ -180,6 +190,11 @@ RSpec.describe 'Sellers API', type: :request do
         expected_json['target_amount'] = 1_000_000
         expected_json['amount_raised'] = 0
         expected_json['locations'] = []
+        expected_json['donation_amount'] = 0
+        expected_json['gift_card_amount'] = 0
+        expected_json['num_contributions'] = 0
+        expected_json['num_donations'] = 0
+        expected_json['num_gift_cards'] = 0
         expect(actual_json).to eq(expected_json.with_indifferent_access)
       end
 
@@ -217,6 +232,11 @@ RSpec.describe 'Sellers API', type: :request do
       expected_json['target_amount'] = 1_000_000
       expected_json['amount_raised'] = 0
       expected_json['locations'] = []
+      expected_json['donation_amount'] = 0
+      expected_json['gift_card_amount'] = 0
+      expected_json['num_contributions'] = 0
+      expected_json['num_donations'] = 0
+      expected_json['num_gift_cards'] = 0
       expect(actual_json).to eq(expected_json.with_indifferent_access)
     end
 

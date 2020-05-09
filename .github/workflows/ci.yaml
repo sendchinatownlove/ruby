@@ -1,0 +1,48 @@
+name: Rails Unit Tests
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    services:
+      db:
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: myapp_test
+        image: postgres:11
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Ruby 2.6
+      uses: actions/setup-ruby@v1
+      with:
+        ruby-version: 2.6.6
+    - name: Build and test with Rake
+      env:
+        PGHOST: 127.0.0.1
+        PGUSER: postgres
+        RAILS_ENV: test
+        SQUARE_APPLICATION_ID:  ${{ secrets.TEST_SQUARE_APPLICATION_ID }}
+        SQUARE_ACCESS_TOKEN: ${{ secrets.TEST_SQUARE_ACCESS_TOKEN }}
+        SQUARE_WEBHOOK_SIGNATURE_KEY: ${{ secrets.TEST_SQUARE_WEBHOOK_SIGNATURE_KEY }}
+        SQUARE_LOCATION_ID: ${{ secrets.TEST_SQUARE_LOCATION_ID }}
+        RAILS_WEBHOOK_URL: http://localhost:3000/webhooks
+      run: |
+        sudo apt-get -yqq install libpq-dev
+        gem install bundler
+        bundle install --jobs 4 --retry 3
+        bundle exec rails db:create
+        bundle exec rails db:migrate
+        bundle exec rails test
+        bundle exec rspec

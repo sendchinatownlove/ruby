@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.6.3'
+ruby '2.6.6'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 6.0.2', '>= 6.0.2.2'
@@ -29,8 +29,9 @@ gem 'sinatra'
 # Square
 gem 'square.rb'
 
-# Generates hashes
-# gem 'digest'
+# Translations
+gem 'globalize', '~> 5.3.0'
+gem 'globalize-accessors'
 
 gem 'actionmailer'
 
@@ -50,9 +51,10 @@ group :development, :test do
   gem 'rspec-rails', '~> 4.0.0'
   gem 'faker'
   gem 'pry-byebug'
+  gem 'dotenv-rails'
 end
 
-group :development do
+group :development, :staging do
   gem 'listen', '>= 3.0.5', '< 3.2'
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
@@ -67,3 +69,5 @@ end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+
+gem "annotate", "~> 3.1"

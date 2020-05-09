@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class CustomerMailer < ApplicationMailer
   def send_donation_receipt
     @payment_intent = params[:payment_intent]

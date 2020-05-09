@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_25_192700) do
+ActiveRecord::Schema.define(version: 2020_05_04_001746) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -25,7 +25,8 @@ ActiveRecord::Schema.define(version: 2020_04_25_192700) do
 
   create_table "existing_events", force: :cascade do |t|
     t.string "idempotency_key"
-    t.integer "type"
+    t.integer "event_type"
+    t.index ["idempotency_key", "event_type"], name: "index_existing_events_on_idempotency_key_and_event_type", unique: true
   end
 
   create_table "gift_card_amounts", force: :cascade do |t|
@@ -84,14 +85,13 @@ ActiveRecord::Schema.define(version: 2020_04_25_192700) do
   end
 
   create_table "payment_intents", force: :cascade do |t|
-    t.string "stripe_id"
     t.string "email"
     t.text "line_items"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "successful", default: false
-    t.string "square_payment_id"
-    t.string "square_location_id"
+    t.string "square_payment_id", null: false
+    t.string "square_location_id", null: false
     t.string "email_text"
     t.string "receipt_url"
     t.string "name"
@@ -106,19 +106,28 @@ ActiveRecord::Schema.define(version: 2020_04_25_192700) do
     t.index ["payment_intent_id"], name: "index_refunds_on_payment_intent_id"
   end
 
+  create_table "seller_translations", force: :cascade do |t|
+    t.bigint "seller_id", null: false
+    t.string "locale", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.string "name"
+    t.text "story"
+    t.string "owner_name"
+    t.text "summary"
+    t.index ["locale"], name: "index_seller_translations_on_locale"
+    t.index ["seller_id"], name: "index_seller_translations_on_seller_id"
+  end
+
   create_table "sellers", force: :cascade do |t|
     t.string "seller_id", null: false
     t.string "cuisine_name"
-    t.string "name"
-    t.text "story"
     t.boolean "accept_donations", default: true, null: false
     t.boolean "sell_gift_cards", default: false, null: false
-    t.string "owner_name"
     t.string "owner_image_url"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "target_amount", default: 1000000
-    t.text "summary"
     t.string "hero_image_url"
     t.string "progress_bar_color"
     t.string "business_type"
