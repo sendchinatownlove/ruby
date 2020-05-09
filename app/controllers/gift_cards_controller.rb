@@ -1,37 +1,20 @@
 # frozen_string_literal: true
 
 class GiftCardsController < ApplicationController
-  before_action :set_gift_card, only: %i[show update destroy]
+  before_action :set_gift_card, only: %i[show]
 
   # GET /gift_cards/:id
   def show
-    item = Item.find_by(gift_card_detail_id: @gift_card_detail[:id])
+    item = Item.find_by(id: @gift_card_detail.item_id).as_json
+    item['gift_card_detail'] = @gift_card_detail.as_json
+    item['gift_card_detail']['amount'] = @gift_card_detail.amount
     json_response(item)
-  end
-
-  # PUT /gift_cards/:id
-  def update
-    # only allows updating amounts of gift cards
-    original_amount = @gift_card.amount
-    new_amount = update_params[:amount].to_i
-
-    if original_amount < new_amount
-      raise InvalidGiftCardUpdate, 'Cannot increase gift card amount'
-    end
-
-    @gift_card.update!(update_params)
-    head :no_content
   end
 
   private
 
-  def update_params
-    params.require(:amount)
-    params.permit(:amount)
-  end
-
   def set_gift_card
     params.require(:id)
-    @gift_card_detail = GiftCardDetail.find_by(gift_card_id: params[:id])
+    @gift_card_detail = GiftCardDetail.find_by!(gift_card_id: params[:id])
   end
 end
