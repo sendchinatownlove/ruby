@@ -33,6 +33,10 @@ jobs:
         PGHOST: 127.0.0.1
         PGUSER: postgres
         RAILS_ENV: test
+        SQUARE_APPLICATION_ID:  ${{ secrets.TEST_SQUARE_APPLICATION_ID }}
+        SQUARE_ACCESS_TOKEN: ${{ secrets.TEST_SQUARE_ACCESS_TOKEN }}
+        SQUARE_WEBHOOK_SIGNATURE_KEY: ${{ secrets.TEST_SQUARE_WEBHOOK_SIGNATURE_KEY }}
+        SQUARE_LOCATION_ID: ${{ secrets.TEST_SQUARE_LOCATION_ID }}
       run: |
         sudo apt-get -yqq install libpq-dev
         gem install bundler
@@ -40,3 +44,4 @@ jobs:
         bundle exec rails db:create
         bundle exec rails db:migrate
         bundle exec rails test
+        bundle exec rspec
