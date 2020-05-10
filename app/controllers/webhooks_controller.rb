@@ -126,8 +126,7 @@ class WebhooksController < ApplicationController
           item_type: :donation,
           seller_id: seller_id,
           email: email,
-          payment_intent: payment_intent,
-          amount: amount
+          payment_intent: payment_intent
         )
         create_donation(item: item, amount: amount)
         begin
@@ -144,8 +143,7 @@ class WebhooksController < ApplicationController
           item_type: :gift_card,
           seller_id: seller_id,
           email: email,
-          payment_intent: payment_intent,
-          amount: amount
+          payment_intent: payment_intent
         )
 
         gift_card_detail = create_gift_card(
@@ -194,14 +192,13 @@ class WebhooksController < ApplicationController
     gift_card_detail
   end
 
-  def create_item(item_type:, seller_id:, email:, payment_intent:, amount:)
+  def create_item(item_type:, seller_id:, email:, payment_intent:)
     seller = Seller.find_by(seller_id: seller_id)
     Item.create!(
       seller: seller,
       email: email,
       item_type: item_type,
-      payment_intent: payment_intent,
-      amount: amount
+      payment_intent: payment_intent
     )
   end
 
