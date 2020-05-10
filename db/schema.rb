@@ -56,7 +56,6 @@ ActiveRecord::Schema.define(version: 2020_05_04_001746) do
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "payment_intent_id", null: false
     t.boolean "refunded", default: false
-    t.decimal "amount", null: false
     t.index ["payment_intent_id"], name: "index_items_on_payment_intent_id"
     t.index ["seller_id"], name: "index_items_on_seller_id"
   end
