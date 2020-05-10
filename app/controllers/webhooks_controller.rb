@@ -215,7 +215,7 @@ class WebhooksController < ApplicationController
 
   def generate_seller_gift_card_id(seller_id:)
     (1..50).each do |_i|
-      hash = generate_seller_gift_card_id_hash.upcase
+      hash = SecureRandom.hex.upcase
       potential_id_prefix = hash[0...3]
       potential_id_suffix = hash[3...5]
       potential_id = "##{potential_id_prefix}-#{potential_id_suffix}"
@@ -225,10 +225,6 @@ class WebhooksController < ApplicationController
       ).joins(:item).where(items: { seller_id: seller_id }).present?
     end
     raise CannotGenerateUniqueHash, 'Error generating unique gift_card_id'
-  end
-
-  def generate_seller_gift_card_id_hash
-    ('a'..'z').to_a.sample(5).join
   end
 
   # rubocop:disable Layout/LineLength
