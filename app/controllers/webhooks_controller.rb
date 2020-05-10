@@ -126,7 +126,8 @@ class WebhooksController < ApplicationController
           item_type: :donation,
           seller_id: seller_id,
           email: email,
-          payment_intent: payment_intent
+          payment_intent: payment_intent,
+          amount: amount
         )
         create_donation(item: item, amount: amount)
         begin
@@ -143,7 +144,8 @@ class WebhooksController < ApplicationController
           item_type: :gift_card,
           seller_id: seller_id,
           email: email,
-          payment_intent: payment_intent
+          payment_intent: payment_intent,
+          amount: amount
         )
 
         gift_card_detail = create_gift_card(
@@ -192,13 +194,14 @@ class WebhooksController < ApplicationController
     gift_card_detail
   end
 
-  def create_item(item_type:, seller_id:, email:, payment_intent:)
+  def create_item(item_type:, seller_id:, email:, payment_intent:, amount:)
     seller = Seller.find_by(seller_id: seller_id)
     Item.create!(
       seller: seller,
       email: email,
       item_type: item_type,
-      payment_intent: payment_intent
+      payment_intent: payment_intent,
+      amount: amount
     )
   end
 
@@ -215,7 +218,7 @@ class WebhooksController < ApplicationController
 
   def generate_seller_gift_card_id(seller_id:)
     (1..50).each do |_i|
-      hash = SecureRandom.hex.upcase
+      hash = generate_seller_gift_card_id_hash.upcase
       potential_id_prefix = hash[0...3]
       potential_id_suffix = hash[3...5]
       potential_id = "##{potential_id_prefix}-#{potential_id_suffix}"
@@ -225,6 +228,10 @@ class WebhooksController < ApplicationController
       ).joins(:item).where(items: { seller_id: seller_id }).present?
     end
     raise CannotGenerateUniqueHash, 'Error generating unique gift_card_id'
+  end
+
+  def generate_seller_gift_card_id_hash
+    ('a'..'z').to_a.sample(5).join
   end
 
   # rubocop:disable Layout/LineLength

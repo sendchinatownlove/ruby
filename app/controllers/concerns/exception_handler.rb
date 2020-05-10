@@ -2,6 +2,7 @@
 
 module ExceptionHandler
   class DuplicateRequestError < StandardError; end
+  class InvalidParameterError < StandardError; end
   class InvalidLineItem < StandardError; end
   class InvalidGiftCardUpdate < StandardError; end
   class CannotGenerateUniqueHash < StandardError; end
@@ -26,6 +27,7 @@ module ExceptionHandler
   included do
     rescue_from ActiveRecord::RecordInvalid,
                 ActionController::ParameterMissing,
+                InvalidParameterError,
                 InvalidLineItem,
                 InvalidGiftCardUpdate do |e|
       json_response({ message: e.message }, :unprocessable_entity)

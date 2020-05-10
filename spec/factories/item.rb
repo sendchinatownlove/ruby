@@ -6,6 +6,7 @@ FactoryBot.define do
     association :seller
     association :payment_intent
     item_type { Faker::Number.within(range: 0..1) }
+    amount { Faker::Number.decimal }
 
     trait :donation_item do
       item_type { :donation }
