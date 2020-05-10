@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_04_001746) do
+ActiveRecord::Schema.define(version: 2020_05_10_012452) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -137,6 +137,11 @@ ActiveRecord::Schema.define(version: 2020_05_04_001746) do
     t.string "menu_url"
     t.string "square_location_id", null: false
     t.index ["seller_id"], name: "index_sellers_on_seller_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "email"
+    t.boolean "is_subscribed"
   end
 
   add_foreign_key "donation_details", "items"
