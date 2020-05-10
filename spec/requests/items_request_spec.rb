@@ -5,8 +5,8 @@ require 'rails_helper'
 RSpec.describe 'Items', type: :request do
   before do
     @seller = create :seller
-    @first_item = create(:item, :donation_item, seller_id: @seller.id)
-    @second_item = create(:item, :gift_card_item, seller_id: @seller.id)
+    @first_item = create(:item, seller_id: @seller.id)
+    @second_item = create(:item, seller_id: @seller.id)
   end
 
   it 'should validate invalid order' do
