@@ -8,5 +8,5 @@
 #
 class User < ApplicationRecord
   validates_uniqueness_of :email, :allow_blank => true, :allow_nil => true
-  validates_presence_of :is_subscribed
+  validates :is_subscribed, inclusion: { in: [ true, false ] }
 end
