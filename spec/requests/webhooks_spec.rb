@@ -73,7 +73,7 @@ RSpec.describe 'Webhooks API', type: :request do
 
         item = Item.find(donation_detail['item_id'])
         expect(item).not_to be_nil
-        expect(item['email']).to eq(payment_intent.email)
+        expect(item.purchaser).to eq(payment_intent.purchaser)
         expect(item.donation?).to be true
         expect(item.seller).to eq(seller)
 
@@ -228,7 +228,7 @@ RSpec.describe 'Webhooks API', type: :request do
         expect(item).not_to be_nil
         expect(item.gift_card?).to be true
         expect(item.seller).to eq(seller)
-        expect(item['email']).to eq(payment_intent.email)
+        expect(item.purchaser).to eq(payment_intent.purchaser)
 
         payment_intent = PaymentIntent.find(item['payment_intent_id'])
         expect(payment_intent.successful).to be true

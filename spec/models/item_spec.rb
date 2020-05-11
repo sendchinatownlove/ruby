@@ -11,16 +11,19 @@
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  payment_intent_id :bigint           not null
+#  purchaser_id      :bigint
 #  seller_id         :bigint           not null
 #
 # Indexes
 #
 #  index_items_on_payment_intent_id  (payment_intent_id)
+#  index_items_on_purchaser_id       (purchaser_id)
 #  index_items_on_seller_id          (seller_id)
 #
 # Foreign Keys
 #
 #  fk_rails_...  (payment_intent_id => payment_intents.id)
+#  fk_rails_...  (purchaser_id => contacts.id)
 #  fk_rails_...  (seller_id => sellers.id)
 #
 require 'rails_helper'

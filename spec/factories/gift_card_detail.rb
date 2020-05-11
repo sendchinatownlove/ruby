@@ -12,5 +12,6 @@ FactoryBot.define do
       )
     end
     association :item
+    association :recipient, factory: :contact
   end
 end

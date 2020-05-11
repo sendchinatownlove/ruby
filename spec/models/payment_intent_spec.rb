@@ -13,8 +13,20 @@
 #  successful         :boolean          default(FALSE)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#  purchaser_id       :bigint
+#  recipient_id       :bigint
 #  square_location_id :string           not null
 #  square_payment_id  :string           not null
+#
+# Indexes
+#
+#  index_payment_intents_on_purchaser_id  (purchaser_id)
+#  index_payment_intents_on_recipient_id  (recipient_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (purchaser_id => contacts.id)
+#  fk_rails_...  (recipient_id => contacts.id)
 #
 require 'rails_helper'
 

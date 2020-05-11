@@ -112,6 +112,8 @@ class WebhooksController < ApplicationController
     end
 
     items = JSON.parse(payment_intent.line_items)
+    purchaser = payment_intent.purchaser
+    recipient = payment_intent.recipient
     items.each do |item|
       # TODO(jtmckibb): Add some tracking that tracks if it breaks somewhere
       # here
@@ -121,11 +123,10 @@ class WebhooksController < ApplicationController
       merchant_name = Seller.find_by(seller_id: seller_id).name
       case item['item_type']
       when 'donation'
-        email = payment_intent.email
         item = create_item(
           item_type: :donation,
           seller_id: seller_id,
-          email: email,
+          purchaser: purchaser,
           payment_intent: payment_intent
         )
         create_donation(item: item, amount: amount)
@@ -138,18 +139,20 @@ class WebhooksController < ApplicationController
         rescue StandardError
         end
       when 'gift_card'
-        email = payment_intent.email
+        purchaser = payment_intent.purchaser
         item = create_item(
           item_type: :gift_card,
           seller_id: seller_id,
-          email: email,
+          purchaser: purchaser,
           payment_intent: payment_intent
         )
 
+        recipient = payment_intent.recipient
         gift_card_detail = create_gift_card(
           item: item,
           amount: amount,
-          seller_id: seller_id
+          seller_id: seller_id,
+          recipient: recipient
         )
         begin
           send_gift_card_receipt(
@@ -181,22 +184,23 @@ class WebhooksController < ApplicationController
     )
   end
 
-  def create_gift_card(item:, amount:, seller_id:)
+  def create_gift_card(item:, amount:, seller_id:, recipient:)
     gift_card_detail = GiftCardDetail.create!(
       expiration: Date.today + 1.year,
       item: item,
       gift_card_id: generate_gift_card_id,
-      seller_gift_card_id: generate_seller_gift_card_id(seller_id: seller_id)
+      seller_gift_card_id: generate_seller_gift_card_id(seller_id: seller_id),
+      recipient: recipient
     )
     GiftCardAmount.create!(value: amount, gift_card_detail: gift_card_detail)
     gift_card_detail
   end
 
-  def create_item(item_type:, seller_id:, email:, payment_intent:)
+  def create_item(item_type:, seller_id:, purchaser:, payment_intent:)
     seller = Seller.find_by(seller_id: seller_id)
     Item.create!(
       seller: seller,
-      email: email,
+      purchaser: purchaser,
       item_type: item_type,
       payment_intent: payment_intent
     )

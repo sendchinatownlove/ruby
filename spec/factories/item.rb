@@ -5,6 +5,7 @@ FactoryBot.define do
     email { Faker::Internet.email }
     association :seller
     association :payment_intent
+    association :purchaser, factory: :contact
     item_type { Faker::Number.within(range: 0..1) }
   end
 end
