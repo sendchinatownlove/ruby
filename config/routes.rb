@@ -27,6 +27,12 @@
 #                                       PATCH  /sellers/:seller_id/menu_items/:id(.:format)                                             menu_items#update
 #                                       PUT    /sellers/:seller_id/menu_items/:id(.:format)                                             menu_items#update
 #                                       DELETE /sellers/:seller_id/menu_items/:id(.:format)                                             menu_items#destroy
+#                          seller_items GET    /sellers/:seller_id/items(.:format)                                                      items#index
+#                                       POST   /sellers/:seller_id/items(.:format)                                                      items#create
+#                           seller_item GET    /sellers/:seller_id/items/:id(.:format)                                                  items#show
+#                                       PATCH  /sellers/:seller_id/items/:id(.:format)                                                  items#update
+#                                       PUT    /sellers/:seller_id/items/:id(.:format)                                                  items#update
+#                                       DELETE /sellers/:seller_id/items/:id(.:format)                                                  items#destroy
 #                               sellers GET    /sellers(.:format)                                                                       sellers#index
 #                                       POST   /sellers(.:format)                                                                       sellers#create
 #                                seller GET    /sellers/:id(.:format)                                                                   sellers#show
