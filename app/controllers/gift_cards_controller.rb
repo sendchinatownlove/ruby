@@ -1,20 +1,50 @@
 # frozen_string_literal: true
 
 class GiftCardsController < ApplicationController
-  before_action :set_gift_card, only: %i[show]
+  before_action :set_gift_card, only: %i[show update]
 
   # GET /gift_cards/:id
   def show
-    item = Item.find_by(id: @gift_card_detail.item_id).as_json
-    item['gift_card_detail'] = @gift_card_detail.as_json
-    item['gift_card_detail']['amount'] = @gift_card_detail.amount
-    json_response(item)
+    json_response(item_gift_card_detail_json)
+  end
+
+  # PUT /gift_cards/:id
+  def update
+    validate_update_params
+    GiftCardAmount.create!(
+      value: gift_card_params[:amount],
+      gift_card_detail: @gift_card_detail
+    )
+
+    json_response(item_gift_card_detail_json)
   end
 
   private
 
+  def gift_card_params
+    params.require(:amount)
+    params.permit(:amount, :id)
+  end
+
   def set_gift_card
-    params.require(:id)
-    @gift_card_detail = GiftCardDetail.find_by!(gift_card_id: params[:id])
+    params.require(:id) # gift_card_id
+    @gift_card_detail = GiftCardDetail.find_by!(
+      gift_card_id: params[:id]
+    )
+  end
+
+  def validate_update_params
+    current_amount = @gift_card_detail.amount
+    unless gift_card_params[:amount] < current_amount
+      raise InvalidParameterError,
+            "New amount must be less than current amount of: #{current_amount}"
+    end
+  end
+
+  def item_gift_card_detail_json
+    json = Item.find_by(id: @gift_card_detail.item_id).as_json
+    json['gift_card_detail'] = @gift_card_detail.as_json
+    json['gift_card_detail']['amount'] = @gift_card_detail.amount
+    json
   end
 end
