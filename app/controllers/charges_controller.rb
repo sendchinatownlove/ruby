@@ -32,13 +32,9 @@ class ChargesController < ApplicationController
         sum + item['amount'] * item['quantity']
       end
 
-    description =
-      generate_description(seller_name: seller.name, item_types: item_types)
-
     email = charge_params[:email]
     payment = create_square_payment_request(nonce: charge_params[:nonce],
                                             amount: amount,
-                                            note: description,
                                             email: email,
                                             name: charge_params[:name],
                                             seller: seller,
@@ -101,18 +97,8 @@ class ChargesController < ApplicationController
     end
   end
 
-  def generate_description(seller_name:, item_types:)
-    description = 'Thank you for supporting ' + seller_name + '.'
-    if item_types.include? 'gift_card'
-      description += ' Your gift card(s) will be emailed'\
-                     ' to you when the seller opens back up.'
-    end
-
-    description
-  end
-
   def create_square_payment_request(
-    nonce:, amount:, note:, email:, name:, seller:, line_items:
+    nonce:, amount:, email:, name:, seller:, line_items:
   )
     square_location_id = seller.square_location_id
 
@@ -122,7 +108,6 @@ class ChargesController < ApplicationController
           nonce: nonce,
           amount: amount,
           email: email,
-          note: note,
           location_id: square_location_id
         }
       )
