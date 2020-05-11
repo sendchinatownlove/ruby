@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: users
+# Table name: contacts
 #
 #  id            :bigint           not null, primary key
 #  email         :string
@@ -11,9 +11,7 @@
 #
 #  index_users_on_email  (email)
 #
-require 'rails_helper'
-
-RSpec.describe User, type: :model do
-  it { should validate_uniqueness_of(:email) }
-  it { should validate_presence_of(:is_subscribed) }
+class Contact < ApplicationRecord
+  validates_uniqueness_of :email, :allow_blank => true, :allow_nil => true
+  validates_presence_of :is_subscribed
 end

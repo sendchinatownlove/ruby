@@ -10,10 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_11_014822) do
+ActiveRecord::Schema.define(version: 2020_05_11_195105) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "contacts", force: :cascade do |t|
+    t.string "email"
+    t.boolean "is_subscribed", default: true, null: false
+    t.string "name"
+    t.index ["email"], name: "index_contacts_on_email"
+  end
 
   create_table "donation_details", force: :cascade do |t|
     t.bigint "item_id", null: false
@@ -137,13 +144,6 @@ ActiveRecord::Schema.define(version: 2020_05_11_014822) do
     t.string "menu_url"
     t.string "square_location_id", null: false
     t.index ["seller_id"], name: "index_sellers_on_seller_id"
-  end
-
-  create_table "users", force: :cascade do |t|
-    t.string "email"
-    t.boolean "is_subscribed", default: true, null: false
-    t.string "name"
-    t.index ["email"], name: "index_users_on_email"
   end
 
   add_foreign_key "donation_details", "items"
