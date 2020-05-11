@@ -72,7 +72,7 @@ RSpec.describe SellersHelper, type: :helper do
           :gift_card_amount,
           value: 30_00,
           gift_card_detail: gift_card_detail2,
-          updated_at: Time.current + 1.day
+          created_at: Time.current + 1.day
         )
 
         # Create a donation of $200
@@ -141,7 +141,7 @@ RSpec.describe SellersHelper, type: :helper do
           :gift_card_amount,
           value: 30_00,
           gift_card_detail: gift_card_detail2,
-          updated_at: Time.current + 1.day
+          created_at: Time.current + 1.day
         )
 
         # Create $100 gift card, refunded
@@ -184,7 +184,7 @@ RSpec.describe SellersHelper, type: :helper do
           :gift_card_amount,
           value: 30_00,
           gift_card_detail: gift_card_detail2,
-          updated_at: Time.current + 1.day
+          created_at: Time.current + 1.day
         )
 
         # Create $100 gift card, refunded

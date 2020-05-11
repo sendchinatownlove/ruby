@@ -32,7 +32,7 @@ class GiftCardDetail < ApplicationRecord
   # TODO change to created_at
   def amount
     GiftCardAmount.where(gift_card_detail_id: id)
-                  .order(updated_at: :desc)
+                  .order(created_at: :desc)
                   .first
                   .value
   end

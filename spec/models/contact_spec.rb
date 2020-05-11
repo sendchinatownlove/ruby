@@ -15,5 +15,5 @@ require 'rails_helper'
 
 RSpec.describe Contact, type: :model do
   it { should validate_uniqueness_of(:email) }
-  it { should validate_presence_of(:is_subscribed) }
+  it { should allow_value(%w(true false)).for(:is_subscribed) }
 end
