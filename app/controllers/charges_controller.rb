@@ -137,15 +137,23 @@ class ChargesController < ApplicationController
     payment = api_response.data.payment
     receipt_url = payment[:receipt_url]
 
+    # TODO (yong): Also query to find out the recipient
+    contact = Contact.find_or_create_by(email: email)
+
+    if contact.name != name
+      contact.name = name
+      contact.save!
+    end
+
     # Creates a pending PaymentIntent. See webhooks_controller to see what
     # happens when the PaymentIntent is successful.
     PaymentIntent.create!(
       square_location_id: square_location_id,
       square_payment_id: payment[:id],
-      email: email,
       line_items: line_items.to_json,
       receipt_url: receipt_url,
-      name: name
+      purchaser: contact,
+      recipient: contact
     )
 
     api_response

@@ -124,8 +124,11 @@ RSpec.describe 'Charges API', type: :request do
           expect(payment['amount_money']['currency']).to eq('USD')
           expect(payment['buyer_email_address']).to eq(email)
 
+          contact = Contact.find_by(email: email, name: name)
+
+          expect(contact).not_to be_nil
           expect(
-            PaymentIntent.find_by(email: email, line_items: line_items.to_json)
+            PaymentIntent.find_by(recipient: contact, line_items: line_items.to_json)
           ).not_to be_nil
         end
 
@@ -163,8 +166,11 @@ RSpec.describe 'Charges API', type: :request do
           expect(payment['amount_money']['currency']).to eq('USD')
           expect(payment['buyer_email_address']).to eq(email)
 
+          contact = Contact.find_by(email: email, name: name)
+
+          expect(contact).not_to be_nil
           expect(
-            PaymentIntent.find_by(email: email, line_items: line_items.to_json)
+            PaymentIntent.find_by(recipient: contact, line_items: line_items.to_json)
           ).not_to be_nil
         end
 

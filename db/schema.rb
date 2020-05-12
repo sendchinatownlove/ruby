@@ -10,10 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_10_012452) do
+ActiveRecord::Schema.define(version: 2020_05_11_200219) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "contacts", force: :cascade do |t|
+    t.string "email"
+    t.boolean "is_subscribed", default: true, null: false
+    t.string "name"
+    t.index ["email"], name: "index_contacts_on_email"
+  end
 
   create_table "donation_details", force: :cascade do |t|
     t.bigint "item_id", null: false
@@ -45,7 +52,9 @@ ActiveRecord::Schema.define(version: 2020_05_10_012452) do
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "item_id", null: false
     t.string "seller_gift_card_id"
+    t.bigint "recipient_id", null: false
     t.index ["item_id"], name: "index_gift_card_details_on_item_id"
+    t.index ["recipient_id"], name: "index_gift_card_details_on_recipient_id"
   end
 
   create_table "items", force: :cascade do |t|
@@ -56,7 +65,9 @@ ActiveRecord::Schema.define(version: 2020_05_10_012452) do
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "payment_intent_id", null: false
     t.boolean "refunded", default: false
+    t.bigint "purchaser_id"
     t.index ["payment_intent_id"], name: "index_items_on_payment_intent_id"
+    t.index ["purchaser_id"], name: "index_items_on_purchaser_id"
     t.index ["seller_id"], name: "index_items_on_seller_id"
   end
 
@@ -95,6 +106,10 @@ ActiveRecord::Schema.define(version: 2020_05_10_012452) do
     t.string "email_text"
     t.string "receipt_url"
     t.string "name"
+    t.bigint "purchaser_id"
+    t.bigint "recipient_id"
+    t.index ["purchaser_id"], name: "index_payment_intents_on_purchaser_id"
+    t.index ["recipient_id"], name: "index_payment_intents_on_recipient_id"
   end
 
   create_table "refunds", force: :cascade do |t|
@@ -139,17 +154,16 @@ ActiveRecord::Schema.define(version: 2020_05_10_012452) do
     t.index ["seller_id"], name: "index_sellers_on_seller_id"
   end
 
-  create_table "users", force: :cascade do |t|
-    t.string "email"
-    t.boolean "is_subscribed"
-  end
-
   add_foreign_key "donation_details", "items"
   add_foreign_key "gift_card_amounts", "gift_card_details"
+  add_foreign_key "gift_card_details", "contacts", column: "recipient_id"
   add_foreign_key "gift_card_details", "items"
+  add_foreign_key "items", "contacts", column: "purchaser_id"
   add_foreign_key "items", "payment_intents"
   add_foreign_key "items", "sellers"
   add_foreign_key "locations", "sellers"
   add_foreign_key "menu_items", "sellers"
+  add_foreign_key "payment_intents", "contacts", column: "purchaser_id"
+  add_foreign_key "payment_intents", "contacts", column: "recipient_id"
   add_foreign_key "refunds", "payment_intents"
 end
