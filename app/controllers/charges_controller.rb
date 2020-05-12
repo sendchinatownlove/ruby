@@ -140,6 +140,11 @@ class ChargesController < ApplicationController
     # TODO (yong): Also query to find out the recipient
     contact = Contact.find_or_create_by(email: email)
 
+    if contact.name != name
+      contact.name = name
+      contact.save!
+    end
+
     # Creates a pending PaymentIntent. See webhooks_controller to see what
     # happens when the PaymentIntent is successful.
     PaymentIntent.create!(
