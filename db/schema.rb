@@ -19,13 +19,7 @@ ActiveRecord::Schema.define(version: 2020_05_11_200219) do
     t.string "email"
     t.boolean "is_subscribed", default: true, null: false
     t.string "name"
-    t.bigint "payment_intents_id"
-    t.bigint "items_id"
-    t.bigint "gift_card_details_id"
     t.index ["email"], name: "index_contacts_on_email"
-    t.index ["gift_card_details_id"], name: "index_contacts_on_gift_card_details_id"
-    t.index ["items_id"], name: "index_contacts_on_items_id"
-    t.index ["payment_intents_id"], name: "index_contacts_on_payment_intents_id"
   end
 
   create_table "donation_details", force: :cascade do |t|
@@ -58,7 +52,7 @@ ActiveRecord::Schema.define(version: 2020_05_11_200219) do
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "item_id", null: false
     t.string "seller_gift_card_id"
-    t.bigint "recipient_id"
+    t.bigint "recipient_id", null: false
     t.index ["item_id"], name: "index_gift_card_details_on_item_id"
     t.index ["recipient_id"], name: "index_gift_card_details_on_recipient_id"
   end

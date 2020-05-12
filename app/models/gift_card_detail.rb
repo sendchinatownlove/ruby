@@ -11,7 +11,7 @@
 #  gift_card_id        :string
 #  item_id             :bigint           not null
 #  receipt_id          :string
-#  recipient_id        :bigint
+#  recipient_id        :bigint           not null
 #  seller_gift_card_id :string
 #
 # Indexes
@@ -25,11 +25,13 @@
 #  fk_rails_...  (recipient_id => contacts.id)
 #
 class GiftCardDetail < ApplicationRecord
-  belongs_to :item
   validates_uniqueness_of :gift_card_id
+  validates_presence_of :recipient
   validate :seller_gift_card_id_is_unique_per_seller, on: :create
+
+  belongs_to :item
+  belongs_to :recipient, class_name: 'Contact'
   has_many :gift_card_amount
-  belongs_to :recipient, class_name: "Contact"
 
   # TODO(jmckibben): Being used in sellers_helper N times. Ideally we'd combine
   # into a single query

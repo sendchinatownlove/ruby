@@ -11,7 +11,7 @@
 #  gift_card_id        :string
 #  item_id             :bigint           not null
 #  receipt_id          :string
-#  recipient_id        :bigint
+#  recipient_id        :bigint           not null
 #  seller_gift_card_id :string
 #
 # Indexes
@@ -59,6 +59,7 @@ RSpec.describe GiftCardDetail, type: :model do
 
   before { create :gift_card_detail }
   it { should validate_uniqueness_of(:gift_card_id) }
+  it { should validate_presence_of(:recipient) }
 
   context 'with unique gift_card_id and seller_gift_card_id' do
     let(:gift_card_id1) { 'GIFTCARD1' }

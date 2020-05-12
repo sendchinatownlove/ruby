@@ -29,5 +29,7 @@
 require 'rails_helper'
 
 RSpec.describe Item, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  it { should have_one(:gift_card_detail) }
+  it { should have_one(:donation_detail) }
+  it { should belong_to(:purchaser) }
 end

@@ -7,9 +7,6 @@ class AddContactToPaymentIntentAndItem < ActiveRecord::Migration[6.0]
     add_reference :gift_card_details, :recipient, foreign_key: { to_table: :contacts }
     add_reference :payment_intents, :purchaser, foreign_key: { to_table: :contacts }
     add_reference :payment_intents, :recipient, foreign_key: { to_table: :contacts }
-    add_reference :contacts, :payment_intents
-    add_reference :contacts, :items
-    add_reference :contacts, :gift_card_details
 
     visited_contacts = Hash.new
 
@@ -38,5 +35,7 @@ class AddContactToPaymentIntentAndItem < ActiveRecord::Migration[6.0]
         end
       end
     end
+
+    change_column_null :gift_card_details, :recipient_id, false
   end
 end
