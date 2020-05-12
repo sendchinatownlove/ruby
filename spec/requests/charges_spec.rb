@@ -127,7 +127,9 @@ RSpec.describe 'Charges API', type: :request do
           contact = Contact.find_by(email: email, name: name)
 
           expect(contact).not_to be_nil
-          expect(contact.payment_intent).not_to be_nil
+          expect(
+            PaymentIntent.find_by(recipient: contact, line_items: line_items.to_json)
+          ).not_to be_nil
         end
 
         it 'returns status code 200' do
@@ -167,7 +169,9 @@ RSpec.describe 'Charges API', type: :request do
           contact = Contact.find_by(email: email, name: name)
 
           expect(contact).not_to be_nil
-          expect(contact.payment_intent).not_to be_nil
+          expect(
+            PaymentIntent.find_by(recipient: contact, line_items: line_items.to_json)
+          ).not_to be_nil
         end
 
         it 'returns status code 200' do
