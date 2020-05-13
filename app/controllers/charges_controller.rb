@@ -40,6 +40,12 @@ class ChargesController < ApplicationController
                                             seller: seller,
                                             line_items: line_items)
 
+    # Save the contact information only if the charge is succesful
+    # Use a job to avoid blocking the request
+    ContactRegistrationJob.perform_now(name: charge_params[:name],
+                                       email: charge_params[:email],
+                                       is_subscribed: charge_params[:is_subscribed])
+
     json_response(payment)
   end
 
@@ -53,6 +59,7 @@ class ChargesController < ApplicationController
     params.require(:nonce) if params[:is_square]
     params.require(:name)
     params.require(:idempotency_key)
+    params.require(:is_subscribed)
     params.permit(
       :email,
       :nonce,
@@ -60,6 +67,7 @@ class ChargesController < ApplicationController
       :name,
       :seller_id,
       :idempotency_key,
+      :is_subscribed,
       line_items: [%i[amount currency item_type quantity]]
     )
   end
@@ -122,7 +130,7 @@ class ChargesController < ApplicationController
     payment = api_response.data.payment
     receipt_url = payment[:receipt_url]
 
-    # TODO (yong): Also query to find out the recipient
+    # TODO: (yong): Also query to find out the recipient
     contact = Contact.find_or_create_by(email: email)
 
     if contact.name != name
