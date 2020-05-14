@@ -62,7 +62,7 @@ RSpec.describe 'Webhooks API', type: :request do
     end
     let!(:seller_pool) do
       Seller.create(
-          seller_id: 'send-chinatown-love',
+          seller_id: Seller::POOL_DONATION_SELLER_ID,
           accept_donations: true,
           sell_gift_cards: false,
           founded_year: 2020,

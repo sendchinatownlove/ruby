@@ -31,6 +31,9 @@
 #  index_sellers_on_seller_id  (seller_id)
 #
 class Seller < ApplicationRecord
+  # The `seller_id` of the special seller we use to collect pool donations.
+  POOL_DONATION_SELLER_ID = 'send-chinatown-love'
+
   translates :name, :story, :owner_name, :summary
   globalize_accessors locales: [:en, 'zh-CN'],
                       attributes: %i[name story owner_name summary]

@@ -2,9 +2,6 @@
 
 require 'rest-client'
 
-# TODO(juliexxia):  document
-POOL_DONATION_SELLER_ID = 'send-chinatown-love'
-
 # TODO(jmckibben): This class needs a lot of refactoring
 class WebhooksController < ApplicationController
   # POST /webhooks
@@ -123,8 +120,7 @@ class WebhooksController < ApplicationController
 
       amount = item['amount']
       seller_id = item['seller_id']
-
-      if seller_id.eql?(POOL_DONATION_SELLER_ID)
+      if seller_id.eql?(Seller::POOL_DONATION_SELLER_ID)
         unless item['item_type'].eql?('donation')
           type = item['item_type']
           raise InvalidPoolDonationError,
@@ -137,14 +133,13 @@ class WebhooksController < ApplicationController
         amount_per = (amount.to_f/(Seller.count - 1).to_f).round
 
         Seller.all.each do |seller|
-          unless seller.seller_id.eql?(POOL_DONATION_SELLER_ID)
-            new_item = create_item(
-                item_type: :donation,
+          unless seller.seller_id.eql?(Seller::POOL_DONATION_SELLER_ID)
+            create_item_and_donation(
                 seller_id: seller.seller_id,
                 purchaser: purchaser,
-                payment_intent: payment_intent
+                payment_intent: payment_intent,
+                amount: amount_per
             )
-            create_donation(item: new_item, amount: amount_per)
           end
         end
         begin
@@ -153,18 +148,18 @@ class WebhooksController < ApplicationController
               amount: amount,
           )
         rescue StandardError
+          # don't let a failed email bring down the whole POST
         end
       else
         merchant_name = Seller.find_by(seller_id: seller_id).name
         case item['item_type']
         when 'donation'
-          item = create_item(
-              item_type: :donation,
+          create_item_and_donation(
               seller_id: seller_id,
               purchaser: purchaser,
-              payment_intent: payment_intent
+              payment_intent: payment_intent,
+              amount: amount
           )
-          create_donation(item: item, amount: amount)
           begin
             send_donation_receipt(
                 payment_intent: payment_intent,
@@ -172,6 +167,7 @@ class WebhooksController < ApplicationController
                 merchant: merchant_name
             )
           rescue StandardError
+            # don't let a failed email bring down the whole POST
           end
         when 'gift_card'
           item = create_item(
@@ -195,6 +191,7 @@ class WebhooksController < ApplicationController
                 receipt_id: gift_card_detail.seller_gift_card_id
             )
           rescue StandardError
+            # don't let a failed email bring down the whole POST
           end
         else
           raise(
@@ -210,6 +207,16 @@ class WebhooksController < ApplicationController
     # in our DB eg) Donation, Gift Card, etc.
     payment_intent.successful = true
     payment_intent.save
+  end
+
+  def create_item_and_donation(seller_id:, purchaser:, payment_intent:, amount:)
+    new_item = create_item(
+        item_type: :donation,
+        seller_id: seller_id,
+        purchaser: purchaser,
+        payment_intent: payment_intent
+    )
+  create_donation(item: new_item, amount: amount)
   end
 
   def create_donation(item:, amount:)
@@ -291,7 +298,6 @@ class WebhooksController < ApplicationController
     send_receipt(to: payment_intent.email, html: html)
   end
 
-  # rubocop:disable Layout/LineLength
   def send_donation_receipt(payment_intent:, amount:, merchant:)
     amount_string = format('%.2f', (amount.to_f / 100))
     html = '<!DOCTYPE html>' \
