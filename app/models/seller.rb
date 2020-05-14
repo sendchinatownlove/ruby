@@ -40,7 +40,7 @@ class Seller < ApplicationRecord
   has_many :menu_items, dependent: :destroy
   has_many :items, dependent: :destroy
 
-  has_one :recipient, class_name: 'Contact'
+  has_one :distributor, class_name: 'Contact'
 
   validates_presence_of :seller_id
   validates_presence_of :square_location_id
