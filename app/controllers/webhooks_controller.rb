@@ -22,7 +22,8 @@ class WebhooksController < ApplicationController
     SquareManager::WebhookValidator.call({
                                            url: ENV['RAILS_WEBHOOK_URL'],
                                            callback_body: callback_body,
-                                           callback_signature: callback_signature
+                                           callback_signature:
+                                               callback_signature
                                          })
 
     # Load the JSON body into a hash
@@ -30,7 +31,8 @@ class WebhooksController < ApplicationController
     square_event_type = sanitize_square_type(callback_body_json['type'])
 
     DuplicateRequestValidator.call({
-                                     idempotency_key: callback_body_json['event_id'],
+                                     idempotency_key:
+                                         callback_body_json['event_id'],
                                      event_type: square_event_type
                                    })
 
@@ -121,31 +123,27 @@ class WebhooksController < ApplicationController
       amount = item['amount']
       seller_id = item['seller_id']
       if seller_id.eql?(Seller::POOL_DONATION_SELLER_ID)
-        unless item['item_type'].eql?('donation')
-          type = item['item_type']
-          raise InvalidPoolDonationError,
-                "pool contribution must but be of type 'donation' but found type '#{type}'."
-        end
+        PoolDonationValidator.call({ type: item['item_type'] })
 
         # calculate amount per merchant
         # This will break if we ever have zero merchants but are still
         # accepting pool donations.
-        amount_per = (amount.to_f/(Seller.count - 1).to_f).round
+        amount_per = (amount.to_f / (Seller.count - 1).to_f).round
 
         Seller.all.each do |seller|
-          unless seller.seller_id.eql?(Seller::POOL_DONATION_SELLER_ID)
-            create_item_and_donation(
-                seller_id: seller.seller_id,
-                purchaser: purchaser,
-                payment_intent: payment_intent,
-                amount: amount_per
-            )
-          end
+          next if seller.seller_id.eql?(Seller::POOL_DONATION_SELLER_ID)
+
+          create_item_and_donation(
+            seller_id: seller.seller_id,
+            purchaser: purchaser,
+            payment_intent: payment_intent,
+            amount: amount_per
+          )
         end
         begin
           send_pool_donation_receipt(
-              payment_intent: payment_intent,
-              amount: amount,
+            payment_intent: payment_intent,
+            amount: amount
           )
         rescue StandardError
           # don't let a failed email bring down the whole POST
@@ -155,52 +153,51 @@ class WebhooksController < ApplicationController
         case item['item_type']
         when 'donation'
           create_item_and_donation(
-              seller_id: seller_id,
-              purchaser: purchaser,
-              payment_intent: payment_intent,
-              amount: amount
+            seller_id: seller_id,
+            purchaser: purchaser,
+            payment_intent: payment_intent,
+            amount: amount
           )
           begin
             send_donation_receipt(
-                payment_intent: payment_intent,
-                amount: amount,
-                merchant: merchant_name
+              payment_intent: payment_intent,
+              amount: amount,
+              merchant: merchant_name
             )
           rescue StandardError
             # don't let a failed email bring down the whole POST
           end
         when 'gift_card'
           item = create_item(
-              item_type: :gift_card,
-              seller_id: seller_id,
-              purchaser: purchaser,
-              payment_intent: payment_intent
+            item_type: :gift_card,
+            seller_id: seller_id,
+            purchaser: purchaser,
+            payment_intent: payment_intent
           )
 
           gift_card_detail = create_gift_card(
-              item: item,
-              amount: amount,
-              seller_id: seller_id,
-              recipient: recipient
+            item: item,
+            amount: amount,
+            seller_id: seller_id,
+            recipient: recipient
           )
           begin
             send_gift_card_receipt(
-                payment_intent: payment_intent,
-                amount: amount,
-                merchant: merchant_name,
-                receipt_id: gift_card_detail.seller_gift_card_id
+              payment_intent: payment_intent,
+              amount: amount,
+              merchant: merchant_name,
+              receipt_id: gift_card_detail.seller_gift_card_id
             )
           rescue StandardError
             # don't let a failed email bring down the whole POST
           end
         else
           raise(
-              InvalidLineItem,
-              'Unsupported ItemType. Please verify the line_item.name.'
+            InvalidLineItem,
+            'Unsupported ItemType. Please verify the line_item.name.'
           )
         end
       end
-
     end
 
     # Mark the payment as successful once we've recorded each object purchased
@@ -211,12 +208,12 @@ class WebhooksController < ApplicationController
 
   def create_item_and_donation(seller_id:, purchaser:, payment_intent:, amount:)
     new_item = create_item(
-        item_type: :donation,
-        seller_id: seller_id,
-        purchaser: purchaser,
-        payment_intent: payment_intent
+      item_type: :donation,
+      seller_id: seller_id,
+      purchaser: purchaser,
+      payment_intent: payment_intent
     )
-  create_donation(item: new_item, amount: amount)
+    create_donation(item: new_item, amount: amount)
   end
 
   def create_donation(item:, amount:)
@@ -279,7 +276,7 @@ class WebhooksController < ApplicationController
 
   # rubocop:disable Layout/LineLength
   def send_pool_donation_receipt(payment_intent:, amount:)
-    amount_string = format('%.2f', (amount.to_f / 100))
+    amount_string = format_amount(amount: amount)
     html = '<!DOCTYPE html>' \
            '<html>' \
            '<head>' \
@@ -299,7 +296,7 @@ class WebhooksController < ApplicationController
   end
 
   def send_donation_receipt(payment_intent:, amount:, merchant:)
-    amount_string = format('%.2f', (amount.to_f / 100))
+    amount_string = format_amount(amount: amount)
     html = '<!DOCTYPE html>' \
            '<html>' \
            '<head>' \
@@ -319,7 +316,7 @@ class WebhooksController < ApplicationController
   end
 
   def send_gift_card_receipt(payment_intent:, amount:, merchant:, receipt_id:)
-    amount_string = format('%.2f', (amount.to_f / 100))
+    amount_string = format_amount(amount: amount)
     html = '<!DOCTYPE html>' \
            '<html>' \
            '<head>' \
@@ -338,6 +335,10 @@ class WebhooksController < ApplicationController
            '</body>' \
            '</html>'
     send_receipt(to: payment_intent.email, html: html)
+  end
+
+  def format_amount(amount:)
+    format('%<amount>.2f', amount: (amount.to_f / 100))
   end
 
   def send_receipt(to:, html:)
