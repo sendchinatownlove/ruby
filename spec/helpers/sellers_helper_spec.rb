@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe SellersHelper, type: :helper do
   let(:contact) { create :contact }
-  let(:seller) { create :seller, recipient: contact }
+  let(:seller) { create :seller, distributor: contact }
 
   # TODO(jxue) add some tests including returned giftcards/donations
 
@@ -33,7 +33,7 @@ RSpec.describe SellersHelper, type: :helper do
         'website_url': seller.website_url,
         'menu_url': seller.menu_url,
         'square_location_id': seller.square_location_id,
-        'recipient': contact
+        'distributor': contact
       }.as_json
     end
 
