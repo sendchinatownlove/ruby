@@ -25,13 +25,16 @@ RSpec.describe 'Webhooks API', type: :request do
       )
     end
     let!(:seller1) do
-      create :seller, seller_id: 'leaky-cauldron'
+      create :seller, seller_id: 'leaky-cauldron', accept_donations: true
     end
     let!(:seller2) do
-      create :seller, seller_id: 'honeydukes'
+      create :seller, seller_id: 'honeydukes', accept_donations: true
+    end
+    let!(:seller3) do
+      create :seller, seller_id: 'great-hall', accept_donations: false
     end
     let!(:seller_pool) do
-      create :seller, seller_id: Seller::POOL_DONATION_SELLER_ID
+      create :seller, seller_id: Seller::POOL_DONATION_SELLER_ID, accept_donations: false
     end
     let(:payment_intent_response) do
       {

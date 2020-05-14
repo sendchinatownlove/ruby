@@ -125,12 +125,14 @@ class WebhooksController < ApplicationController
       if seller_id.eql?(Seller::POOL_DONATION_SELLER_ID)
         PoolDonationValidator.call({ type: item['item_type'] })
 
+        @donation_sellers = Seller.filter_by_accepts_donations
+
         # calculate amount per merchant
         # This will break if we ever have zero merchants but are still
         # accepting pool donations.
-        amount_per = (amount.to_f / (Seller.count - 1).to_f).round
+        amount_per = (amount.to_f / (@donation_sellers.count).to_f).round
 
-        Seller.all.each do |seller|
+        @donation_sellers.each do |seller|
           next if seller.seller_id.eql?(Seller::POOL_DONATION_SELLER_ID)
 
           create_item_and_donation(
