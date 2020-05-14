@@ -8,6 +8,7 @@ module ExceptionHandler
   class CannotGenerateUniqueHash < StandardError; end
   class InvalidSquareSignature < StandardError; end
   class DuplicatePaymentCompletedError < StandardError; end
+  class InvalidPoolDonationError < StandardError; end
   class SquarePaymentsError < StandardError
     attr_reader :status_code
     attr_reader :errors
@@ -29,7 +30,8 @@ module ExceptionHandler
                 ActionController::ParameterMissing,
                 InvalidParameterError,
                 InvalidLineItem,
-                InvalidGiftCardUpdate do |e|
+                InvalidGiftCardUpdate,
+                InvalidPoolDonationError do |e|
       json_response({ message: e.message }, :unprocessable_entity)
     end
 

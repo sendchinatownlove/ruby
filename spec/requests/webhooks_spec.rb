@@ -9,11 +9,11 @@ RSpec.describe 'Webhooks API', type: :request do
   describe 'POST /webhooks' do
     let(:line_items) do
       [{
-        'amount': 5000,
+        'amount': amount,
         'currency': 'usd',
         'item_type': item_type,
         'quantity': 1,
-        'seller_id': seller.seller_id
+        'seller_id': seller_id
       }].to_json
     end
     let(:payment_intent) do
@@ -24,7 +24,18 @@ RSpec.describe 'Webhooks API', type: :request do
         line_items: line_items
       )
     end
-    let(:seller) { create :seller }
+    let!(:seller1) do
+      create :seller, seller_id: 'leaky-cauldron', accept_donations: true
+    end
+    let!(:seller2) do
+      create :seller, seller_id: 'honeydukes', accept_donations: true
+    end
+    let!(:seller3) do
+      create :seller, seller_id: 'great-hall', accept_donations: false
+    end
+    let!(:seller_pool) do
+      create :seller, seller_id: Seller::POOL_DONATION_SELLER_ID, accept_donations: false
+    end
     let(:payment_intent_response) do
       {
         'payment': {
@@ -47,7 +58,6 @@ RSpec.describe 'Webhooks API', type: :request do
     end
 
     before do
-      create :seller
       allow_any_instance_of(WebhooksController)
         .to receive(:generate_seller_gift_card_id_hash)
         .and_return('abcde')
@@ -63,8 +73,66 @@ RSpec.describe 'Webhooks API', type: :request do
       )
     end
 
+    context 'with pool donation' do
+      let(:seller_id) { seller_pool.seller_id }
+
+      context 'with nice pool donation' do
+        let(:amount) { 5000 }
+        let(:item_type) { 'donation' }
+
+        it 'creates pool donation' do
+          expect(DonationDetail.count).to eq(2)
+          expect(Item.count).to eq(2)
+          expect(PaymentIntent.count).to eq(1)
+
+          pool_donation = DonationDetail.last
+          expect(pool_donation).not_to be_nil
+          expect(pool_donation['amount']).to eq(2500)
+        end
+
+        it 'returns status code 200' do
+          expect(response).to have_http_status(200)
+        end
+      end
+
+      context 'with non-divisible number round' do
+        let(:amount) { 3 }
+        let(:item_type) { 'donation' }
+
+        it 'creates pool donation and rounds' do
+          expect(DonationDetail.count).to eq(2)
+          expect(Item.count).to eq(2)
+          expect(PaymentIntent.count).to eq(1)
+
+          pool_donation = DonationDetail.last
+          expect(pool_donation).not_to be_nil
+          expect(pool_donation['amount']).to eq(2)
+        end
+
+        it 'returns status code 200' do
+          expect(response).to have_http_status(200)
+        end
+      end
+
+      context 'with erroneous pool gift card' do
+        let(:amount) { 5000 }
+        let(:item_type) { 'gift card' }
+
+        it 'returns status code 422' do
+          expect(response.body)
+            .to match(
+              /but found type 'gift card'./
+            )
+
+          expect(response).to have_http_status(422)
+        end
+      end
+    end
+
     context 'with donation' do
+      let(:amount) { 5000 }
       let(:item_type) { 'donation' }
+      let(:seller_id) { seller1.seller_id }
 
       it 'creates a donation' do
         donation_detail = DonationDetail.last
@@ -75,7 +143,7 @@ RSpec.describe 'Webhooks API', type: :request do
         expect(item).not_to be_nil
         expect(item.purchaser).to eq(payment_intent.purchaser)
         expect(item.donation?).to be true
-        expect(item.seller).to eq(seller)
+        expect(item.seller).to eq(seller1)
 
         payment_intent = PaymentIntent.find(item['payment_intent_id'])
         expect(payment_intent.successful).to be true
@@ -208,7 +276,9 @@ RSpec.describe 'Webhooks API', type: :request do
     end
 
     context 'with gift card' do
+      let(:amount) { 5000 }
       let(:item_type) { 'gift_card' }
+      let(:seller_id) { seller1.seller_id }
 
       it 'creates a gift card' do
         gift_card_detail = GiftCardDetail.last
@@ -227,7 +297,7 @@ RSpec.describe 'Webhooks API', type: :request do
         item = Item.find(gift_card_detail['item_id'])
         expect(item).not_to be_nil
         expect(item.gift_card?).to be true
-        expect(item.seller).to eq(seller)
+        expect(item.seller).to eq(seller1)
         expect(item.purchaser).to eq(payment_intent.purchaser)
 
         payment_intent = PaymentIntent.find(item['payment_intent_id'])
