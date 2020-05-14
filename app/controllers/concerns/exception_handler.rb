@@ -30,7 +30,8 @@ module ExceptionHandler
                 ActionController::ParameterMissing,
                 InvalidParameterError,
                 InvalidLineItem,
-                InvalidGiftCardUpdate do |e|
+                InvalidGiftCardUpdate,
+                InvalidPoolDonationError do |e|
       json_response({ message: e.message }, :unprocessable_entity)
     end
 

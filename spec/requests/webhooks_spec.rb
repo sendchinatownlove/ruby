@@ -9,11 +9,11 @@ RSpec.describe 'Webhooks API', type: :request do
   describe 'POST /webhooks' do
     let(:line_items) do
       [{
-        'amount': 5000,
+        'amount': amount,
         'currency': 'usd',
         'item_type': item_type,
         'quantity': 1,
-        'seller_id': seller.seller_id
+        'seller_id': seller_id
       }].to_json
     end
     let(:payment_intent) do
@@ -24,7 +24,51 @@ RSpec.describe 'Webhooks API', type: :request do
         line_items: line_items
       )
     end
-    let(:seller) { create :seller }
+    let!(:seller_1) do
+      Seller.create(
+          seller_id: 'shunfa-bakery',
+          cuisine_name: 'Chinese',
+          name: 'Shunfa Bakery',
+          story: 'I am but a small, small boy',
+          owner_name: 'Ben Jerry',
+          owner_image_url: 'https://www.aws.com/98nuw9e8unf9awnuefaiwenfoaijfosdf',
+          accept_donations: true,
+          sell_gift_cards: true,
+          business_type: 'small-biz',
+          num_employees: 5,
+          founded_year: 1850,
+          website_url: 'https://www.youtube.com/watch?v=jIIuzB11dsA',
+          menu_url: 'https://www.youtube.com/watch?v=jIIuzB11dsA',
+          square_location_id: '1234-abcd'
+      )
+    end
+    let!(:seller_2) do
+      Seller.create(
+          seller_id: '87-lan-zhou-handpooled-noods',
+          cuisine_name: 'Noodle Soup',
+          name: '87 Lan Zhou Handpooled Noods',
+          story: 'Been pullin noods since I was 2',
+          owner_name: 'Tom Hanks',
+          owner_image_url: 'https://www.aws.com/oawjeoiajwef9wuef09wuef09waeuf',
+          accept_donations: false,
+          sell_gift_cards: true,
+          business_type: 'medium-biz',
+          num_employees: 10,
+          founded_year: 1950,
+          website_url: 'https://www.youtube.com/watch?v=C_oACPWGvM4',
+          menu_url: 'https://www.youtube.com/watch?v=C_oACPWGvM4',
+          square_location_id: '4567-efgh'
+      )
+    end
+    let!(:seller_pool) do
+      Seller.create(
+          seller_id: 'send-chinatown-love',
+          accept_donations: true,
+          sell_gift_cards: false,
+          founded_year: 2020,
+          square_location_id: '8910-ijkl'
+      )
+    end
     let(:payment_intent_response) do
       {
         'payment': {
@@ -47,7 +91,6 @@ RSpec.describe 'Webhooks API', type: :request do
     end
 
     before do
-      create :seller
       allow_any_instance_of(WebhooksController)
         .to receive(:generate_seller_gift_card_id_hash)
         .and_return('abcde')
@@ -63,8 +106,66 @@ RSpec.describe 'Webhooks API', type: :request do
       )
     end
 
+    context 'with pool donation' do
+      let(:seller_id) { seller_pool.seller_id }
+
+      context 'with nice pool donation' do
+        let(:amount) { 5000 }
+        let(:item_type) { 'donation' }
+
+        it 'creates pool donation' do
+          expect(DonationDetail.count).to eq(2)
+          expect(Item.count).to eq(2)
+          expect(PaymentIntent.count).to eq(1)
+
+          pool_donation = DonationDetail.last
+          expect(pool_donation).not_to be_nil
+          expect(pool_donation['amount']).to eq(2500)
+        end
+
+        it 'returns status code 200' do
+          expect(response).to have_http_status(200)
+        end
+      end
+
+      context 'with non-divisible number round' do
+        let(:amount) { 3 }
+        let(:item_type) { 'donation' }
+
+        it 'creates pool donation and rounds' do
+        expect(DonationDetail.count).to eq(2)
+        expect(Item.count).to eq(2)
+        expect(PaymentIntent.count).to eq(1)
+
+        pool_donation = DonationDetail.last
+        expect(pool_donation).not_to be_nil
+        expect(pool_donation['amount']).to eq(2)
+        end
+
+        it 'returns status code 200' do
+          expect(response).to have_http_status(200)
+        end
+      end
+
+      context 'with erroneous pool gift card' do
+        let(:amount) { 5000 }
+        let(:item_type) { 'gift card' }
+
+        it 'returns status code 422' do
+          expect(response.body)
+              .to match(
+                      /pool contribution must but be of type 'donation' but found type 'gift card'./
+                  )
+
+          expect(response).to have_http_status(422)
+        end
+      end
+    end
+
     context 'with donation' do
+      let(:amount) { 5000 }
       let(:item_type) { 'donation' }
+      let(:seller_id) { seller_1.seller_id }
 
       it 'creates a donation' do
         donation_detail = DonationDetail.last
@@ -75,7 +176,7 @@ RSpec.describe 'Webhooks API', type: :request do
         expect(item).not_to be_nil
         expect(item.purchaser).to eq(payment_intent.purchaser)
         expect(item.donation?).to be true
-        expect(item.seller).to eq(seller)
+        expect(item.seller).to eq(seller_1)
 
         payment_intent = PaymentIntent.find(item['payment_intent_id'])
         expect(payment_intent.successful).to be true
@@ -208,7 +309,9 @@ RSpec.describe 'Webhooks API', type: :request do
     end
 
     context 'with gift card' do
+      let(:amount) { 5000 }
       let(:item_type) { 'gift_card' }
+      let(:seller_id) { seller_1.seller_id }
 
       it 'creates a gift card' do
         gift_card_detail = GiftCardDetail.last
@@ -227,7 +330,7 @@ RSpec.describe 'Webhooks API', type: :request do
         item = Item.find(gift_card_detail['item_id'])
         expect(item).not_to be_nil
         expect(item.gift_card?).to be true
-        expect(item.seller).to eq(seller)
+        expect(item.seller).to eq(seller_1)
         expect(item.purchaser).to eq(payment_intent.purchaser)
 
         payment_intent = PaymentIntent.find(item['payment_intent_id'])

@@ -124,11 +124,11 @@ class WebhooksController < ApplicationController
       amount = item['amount']
       seller_id = item['seller_id']
 
-
       if seller_id.eql?(POOL_DONATION_SELLER_ID)
         unless item['item_type'].eql?('donation')
+          type = item['item_type']
           raise InvalidPoolDonationError,
-                "pool contribution must but be of type 'donation' but found type #{item['item_type']}."
+                "pool contribution must but be of type 'donation' but found type '#{type}'."
         end
 
         # calculate amount per merchant
