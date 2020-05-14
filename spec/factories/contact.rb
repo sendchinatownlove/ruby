@@ -4,5 +4,7 @@ FactoryBot.define do
   factory :contact do
     email { Faker::Internet.email }
     is_subscribed { Faker::Boolean }
+
+    association :seller
   end
 end

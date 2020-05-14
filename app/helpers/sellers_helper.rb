@@ -3,7 +3,9 @@
 module SellersHelper
   def self.generate_seller_json(seller:)
     locations = seller.locations
+    recipient = seller.recipient
     seller = seller.as_json
+    seller['recipient'] = recipient.as_json if recipient != nil
     seller['locations'] = locations.as_json
     seller['gift_card_amount'] = calculate_gift_card_amount(
       seller_id: seller['id']

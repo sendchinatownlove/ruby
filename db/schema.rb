@@ -153,10 +153,6 @@ ActiveRecord::Schema.define(version: 2020_05_13_163901) do
     t.string "website_url"
     t.string "menu_url"
     t.string "square_location_id", null: false
-    t.bigint "contacts_id"
-    t.bigint "contact_id"
-    t.index ["contact_id"], name: "index_sellers_on_contact_id"
-    t.index ["contacts_id"], name: "index_sellers_on_contacts_id"
     t.index ["seller_id"], name: "index_sellers_on_seller_id"
   end
 
