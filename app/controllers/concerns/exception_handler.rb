@@ -8,6 +8,7 @@ module ExceptionHandler
   class CannotGenerateUniqueHash < StandardError; end
   class InvalidSquareSignature < StandardError; end
   class DuplicatePaymentCompletedError < StandardError; end
+  class InvalidPoolDonationError < StandardError; end
   class SquarePaymentsError < StandardError
     attr_reader :status_code
     attr_reader :errors

@@ -2,6 +2,9 @@
 
 require 'rest-client'
 
+# TODO(juliexxia):  document
+POOL_DONATION_SELLER_ID = 'send-chinatown-love'
+
 # TODO(jmckibben): This class needs a lot of refactoring
 class WebhooksController < ApplicationController
   # POST /webhooks
@@ -120,55 +123,87 @@ class WebhooksController < ApplicationController
 
       amount = item['amount']
       seller_id = item['seller_id']
-      merchant_name = Seller.find_by(seller_id: seller_id).name
-      case item['item_type']
-      when 'donation'
-        item = create_item(
-          item_type: :donation,
-          seller_id: seller_id,
-          purchaser: purchaser,
-          payment_intent: payment_intent
-        )
-        create_donation(item: item, amount: amount)
-        begin
-          send_donation_receipt(
-            payment_intent: payment_intent,
-            amount: amount,
-            merchant: merchant_name
-          )
-        rescue StandardError
-        end
-      when 'gift_card'
-        purchaser = payment_intent.purchaser
-        item = create_item(
-          item_type: :gift_card,
-          seller_id: seller_id,
-          purchaser: purchaser,
-          payment_intent: payment_intent
-        )
 
-        recipient = payment_intent.recipient
-        gift_card_detail = create_gift_card(
-          item: item,
-          amount: amount,
-          seller_id: seller_id,
-          recipient: recipient
-        )
+
+      if seller_id.eql?(POOL_DONATION_SELLER_ID)
+        unless item['item_type'].eql?('donation')
+          raise InvalidPoolDonationError,
+                "pool contribution must but be of type 'donation' but found type #{item['item_type']}."
+        end
+
+        # calculate amount per merchant
+        # This will break if we ever have zero merchants but are still
+        # accepting pool donations.
+        amount_per = (amount.to_f/(Seller.count - 1).to_f).round
+
+        Seller.all.each do |seller|
+          unless seller.seller_id.eql?(POOL_DONATION_SELLER_ID)
+            new_item = create_item(
+                item_type: :donation,
+                seller_id: seller.seller_id,
+                purchaser: purchaser,
+                payment_intent: payment_intent
+            )
+            create_donation(item: new_item, amount: amount_per)
+          end
+        end
         begin
-          send_gift_card_receipt(
-            payment_intent: payment_intent,
-            amount: amount,
-            merchant: merchant_name,
-            receipt_id: gift_card_detail.seller_gift_card_id
+          send_pool_donation_receipt(
+              payment_intent: payment_intent,
+              amount: amount,
           )
         rescue StandardError
         end
       else
-        raise(
-          InvalidLineItem,
-          'Unsupported ItemType. Please verify the line_item.name.'
-        )
+        merchant_name = Seller.find_by(seller_id: seller_id).name
+        case item['item_type']
+        when 'donation'
+          item = create_item(
+              item_type: :donation,
+              seller_id: seller_id,
+              purchaser: purchaser,
+              payment_intent: payment_intent
+          )
+          create_donation(item: item, amount: amount)
+          begin
+            send_donation_receipt(
+                payment_intent: payment_intent,
+                amount: amount,
+                merchant: merchant_name
+            )
+          rescue StandardError
+          end
+        when 'gift_card'
+          item = create_item(
+              item_type: :gift_card,
+              seller_id: seller_id,
+              purchaser: purchaser,
+              payment_intent: payment_intent
+          )
+
+          gift_card_detail = create_gift_card(
+              item: item,
+              amount: amount,
+              seller_id: seller_id,
+              recipient: recipient
+          )
+          begin
+            send_gift_card_receipt(
+                payment_intent: payment_intent,
+                amount: amount,
+                merchant: merchant_name,
+                receipt_id: gift_card_detail.seller_gift_card_id
+            )
+          rescue StandardError
+          end
+        else
+          raise(
+              InvalidLineItem,
+              'Unsupported ItemType. Please verify the line_item.name.'
+          )
+        end
       end
+
     end
 
     # Mark the payment as successful once we've recorded each object purchased
@@ -233,6 +268,27 @@ class WebhooksController < ApplicationController
 
   def generate_seller_gift_card_id_hash
     ('a'..'z').to_a.sample(5).join
+  end
+
+  # rubocop:disable Layout/LineLength
+  def send_pool_donation_receipt(payment_intent:, amount:)
+    amount_string = format('%.2f', (amount.to_f / 100))
+    html = '<!DOCTYPE html>' \
+           '<html>' \
+           '<head>' \
+           "  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />" \
+           '</head>' \
+           '<body>' \
+           '<h1>Thank you for your donation to Send Chinatown Love!</h1>' \
+           '<p> Donation amount: <b>$' + amount_string + '</b></p>' \
+           '<p> Square receipt: ' + payment_intent.receipt_url + '</p>' \
+           '<p> You\'re donation will be distributed evenly between our merchants. Sending ' \
+           '  thanks from us and from Chinatown for your support! </p>' \
+           '<p> Love,<p>' \
+           '<p> the Send Chinatown Love team</p>' \
+           '</body>' \
+           '</html>'
+    send_receipt(to: payment_intent.email, html: html)
   end
 
   # rubocop:disable Layout/LineLength
