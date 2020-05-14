@@ -23,12 +23,16 @@
 #  website_url        :string
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#  contact_id         :bigint
+#  contacts_id        :bigint
 #  seller_id          :string           not null
 #  square_location_id :string           not null
 #
 # Indexes
 #
-#  index_sellers_on_seller_id  (seller_id)
+#  index_sellers_on_contact_id   (contact_id)
+#  index_sellers_on_contacts_id  (contacts_id)
+#  index_sellers_on_seller_id    (seller_id)
 #
 require 'rails_helper'
 
@@ -36,6 +40,7 @@ RSpec.describe Seller, type: :model do
   # Association test
   # ensure Seller model has a 1:m relationship with the MenuItem model
   it { should have_many(:menu_items).dependent(:destroy) }
+  it { should have_one(:recipient) }
   # Validation tests
 
   let!(:seller) do

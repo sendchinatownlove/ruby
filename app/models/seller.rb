@@ -23,12 +23,16 @@
 #  website_url        :string
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#  contact_id         :bigint
+#  contacts_id        :bigint
 #  seller_id          :string           not null
 #  square_location_id :string           not null
 #
 # Indexes
 #
-#  index_sellers_on_seller_id  (seller_id)
+#  index_sellers_on_contact_id   (contact_id)
+#  index_sellers_on_contacts_id  (contacts_id)
+#  index_sellers_on_seller_id    (seller_id)
 #
 class Seller < ApplicationRecord
   translates :name, :story, :owner_name, :summary
@@ -39,6 +43,8 @@ class Seller < ApplicationRecord
   has_many :locations, dependent: :destroy
   has_many :menu_items, dependent: :destroy
   has_many :items, dependent: :destroy
+
+  has_one :recipient, class_name: 'Contact'
 
   validates_presence_of :seller_id
   validates_presence_of :square_location_id
