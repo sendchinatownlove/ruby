@@ -12,6 +12,7 @@ RSpec.describe 'Charges API', type: :request do
     let(:seller_id) { 'shunfa-bakery' }
     let(:idempotency_key) { '123' }
     let(:is_subscribed) { 'true' }
+    let(:is_distribution) { false }
     let(:params) do
       {
         email: email,
@@ -21,15 +22,18 @@ RSpec.describe 'Charges API', type: :request do
         seller_id: seller_id,
         name: name,
         idempotency_key: idempotency_key,
-        is_subscribed: is_subscribed
+        is_subscribed: is_subscribed,
+        is_distribution: is_distribution
       }
     end
+    let(:distributor) { create :contact }
     let!(:seller) do
       create(
         :seller,
         seller_id: seller_id,
         square_location_id: ENV['SQUARE_LOCATION_ID'],
-        name: 'Shunfa Bakery'
+        name: 'Shunfa Bakery',
+        distributor: distributor
       )
     end
 
@@ -174,6 +178,47 @@ RSpec.describe 'Charges API', type: :request do
           expect(
             PaymentIntent.find_by(recipient: contact, line_items: line_items.to_json)
           ).not_to be_nil
+        end
+
+        it 'returns status code 200' do
+          expect(response).to have_http_status(200)
+        end
+      end
+
+      context 'with gift card donation for distribution' do
+        let(:line_items) do
+          [
+            {
+              amount: 3000,
+              currency: 'usd',
+              item_type: 'donation',
+              quantity: 1,
+              seller_id: seller_id
+            }
+          ]
+        end
+
+        let(:is_distribution) { true }
+
+        before { post '/charges', params: params, as: :json }
+
+        it 'returns Square Payment' do
+          payment = json['data']['payment']
+          expect(payment['id']).not_to be_empty
+          expect(payment['amount_money']['amount']).to eq(3000)
+          expect(payment['amount_money']['currency']).to eq('USD')
+          expect(payment['buyer_email_address']).to eq(email)
+
+          contact = Contact.find_by(email: email, name: name)
+          payment_intent =
+            PaymentIntent.find_by(purchaser: contact,
+                                  line_items: line_items.to_json)
+
+          expect(contact).not_to be_nil
+          expect(payment_intent).not_to be_nil
+          expect(payment_intent.recipient).not_to eq(contact)
+          expect(payment_intent.recipient).to eq(distributor)
+          expect(payment_intent.recipient).not_to eq(payment_intent.purchaser)
         end
 
         it 'returns status code 200' do
