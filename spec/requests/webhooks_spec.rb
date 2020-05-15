@@ -16,7 +16,13 @@ RSpec.describe 'Webhooks API', type: :request do
         'seller_id': seller_id
       }].to_json
     end
-    let(:contact) do
+    let(:purchaser) do
+      create(
+        :contact,
+        seller: Seller.find_by(seller_id: seller_id)
+      )
+    end
+    let(:recipient) do
       create(
         :contact,
         seller: Seller.find_by(seller_id: seller_id)
@@ -27,8 +33,8 @@ RSpec.describe 'Webhooks API', type: :request do
         :payment_intent,
         square_payment_id: SecureRandom.uuid,
         square_location_id: SecureRandom.uuid,
-        recipient: contact,
-        purchaser: contact,
+        recipient: recipient,
+        purchaser: purchaser,
         line_items: line_items
       )
     end
@@ -306,10 +312,12 @@ RSpec.describe 'Webhooks API', type: :request do
         expect(item).not_to be_nil
         expect(item.gift_card?).to be true
         expect(item.seller).to eq(seller1)
-        expect(item.purchaser).to eq(payment_intent.purchaser)
 
         payment_intent = PaymentIntent.find(item['payment_intent_id'])
         expect(payment_intent.successful).to be true
+        expect(payment_intent.recipient).not_to eq(payment_intent.purchaser)
+        expect(item.purchaser).to eq(payment_intent.purchaser)
+        expect(gift_card_detail.recipient).to eq(payment_intent.recipient)
       end
 
       it 'returns status code 200' do

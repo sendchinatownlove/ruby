@@ -72,6 +72,7 @@ class ChargesController < ApplicationController
       :name,
       :seller_id,
       :idempotency_key,
+      :is_subscribed,
       :is_distribution,
       line_items: [%i[amount currency item_type quantity]]
     )
