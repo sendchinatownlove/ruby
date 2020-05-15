@@ -24,6 +24,13 @@
     website_url: nil,
     menu_url: nil,
     square_location_id: 'E4R1NCMHG7B2Y'
+  },
+  {
+      seller_id: 'send-chinatown-love',
+      accept_donations: false,
+      sell_gift_cards: false,
+      founded_year: 2020,
+      square_location_id: ENV['POOL_SQUARE_LOCATION_ID']
   }
 ].each do |attributes|
   Seller.find_or_initialize_by(seller_id: attributes[:seller_id]).update!(attributes)
