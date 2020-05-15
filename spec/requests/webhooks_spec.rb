@@ -108,7 +108,6 @@ RSpec.describe 'Webhooks API', type: :request do
         let(:item_type) { 'donation' }
 
         it 'creates pool donation and rounds' do
-
           expect(DonationDetail.count).to eq(2)
           expect(Item.count).to eq(2)
           expect(PaymentIntent.count).to eq(1)
