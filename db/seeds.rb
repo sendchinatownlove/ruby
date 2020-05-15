@@ -30,7 +30,7 @@
       accept_donations: false,
       sell_gift_cards: false,
       founded_year: 2020,
-      square_location_id: "" # TODO
+      square_location_id: ENV['POOL_SQUARE_LOCATION_ID']
   }
 ].each do |attributes|
   Seller.find_or_initialize_by(seller_id: attributes[:seller_id]).update!(attributes)
