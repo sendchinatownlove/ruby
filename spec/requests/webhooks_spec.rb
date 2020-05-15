@@ -16,11 +16,19 @@ RSpec.describe 'Webhooks API', type: :request do
         'seller_id': seller_id
       }].to_json
     end
+    let(:contact) do
+      create(
+        :contact,
+        seller: Seller.find_by(seller_id: seller_id)
+      )
+    end
     let(:payment_intent) do
       create(
         :payment_intent,
         square_payment_id: SecureRandom.uuid,
         square_location_id: SecureRandom.uuid,
+        recipient: contact,
+        purchaser: contact,
         line_items: line_items
       )
     end
