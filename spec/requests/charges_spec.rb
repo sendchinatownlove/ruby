@@ -11,6 +11,7 @@ RSpec.describe 'Charges API', type: :request do
     let(:name) { 'Squarepants, Spongebob' }
     let(:seller_id) { 'shunfa-bakery' }
     let(:idempotency_key) { '123' }
+    let(:is_subscribed) { 'true' }
     let(:params) do
       {
         email: email,
@@ -19,7 +20,8 @@ RSpec.describe 'Charges API', type: :request do
         line_items: line_items,
         seller_id: seller_id,
         name: name,
-        idempotency_key: idempotency_key
+        idempotency_key: idempotency_key,
+        is_subscribed: is_subscribed
       }
     end
     let!(:seller) do
