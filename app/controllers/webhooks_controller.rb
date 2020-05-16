@@ -294,7 +294,7 @@ class WebhooksController < ApplicationController
            '<p> the Send Chinatown Love team</p>' \
            '</body>' \
            '</html>'
-    send_receipt(to: payment_intent.email, html: html)
+    send_receipt(to: payment_intent.recipient.email, html: html)
   end
 
   def send_donation_receipt(payment_intent:, amount:, merchant:)
@@ -314,7 +314,7 @@ class WebhooksController < ApplicationController
            '<p> the Send Chinatown Love team</p>' \
            '</body>' \
            '</html>'
-    send_receipt(to: payment_intent.email, html: html)
+    send_receipt(to: payment_intent.recipient.email, html: html)
   end
 
   def send_gift_card_receipt(payment_intent:, amount:, merchant:, receipt_id:)
