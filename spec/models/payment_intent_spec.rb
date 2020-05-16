@@ -5,10 +5,7 @@
 # Table name: payment_intents
 #
 #  id                 :bigint           not null, primary key
-#  email              :string
-#  email_text         :string
 #  line_items         :text
-#  name               :string
 #  receipt_url        :string
 #  successful         :boolean          default(FALSE)
 #  created_at         :datetime         not null
