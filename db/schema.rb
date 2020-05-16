@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_16_190635) do
+ActiveRecord::Schema.define(version: 2020_05_16_191859) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -60,7 +60,6 @@ ActiveRecord::Schema.define(version: 2020_05_16_190635) do
   end
 
   create_table "items", force: :cascade do |t|
-    t.string "email"
     t.bigint "seller_id", null: false
     t.integer "item_type"
     t.datetime "created_at", precision: 6, null: false
