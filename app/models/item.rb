@@ -5,7 +5,6 @@
 # Table name: items
 #
 #  id                :bigint           not null, primary key
-#  email             :string
 #  item_type         :integer
 #  refunded          :boolean          default(FALSE)
 #  created_at        :datetime         not null
