@@ -32,13 +32,16 @@ class ChargesController < ApplicationController
         sum + item['amount'] * item['quantity']
       end
 
+    is_distribution = charge_params[:is_distribution] || false
+
     email = charge_params[:email]
     payment = create_square_payment_request(nonce: charge_params[:nonce],
                                             amount: amount,
                                             email: email,
                                             name: charge_params[:name],
                                             seller: seller,
-                                            line_items: line_items)
+                                            line_items: line_items,
+                                            is_distribution: is_distribution)
 
     # Save the contact information only if the charge is succesful
     # Use a job to avoid blocking the request
@@ -68,6 +71,7 @@ class ChargesController < ApplicationController
       :seller_id,
       :idempotency_key,
       :is_subscribed,
+      :is_distribution,
       line_items: [%i[amount currency item_type quantity]]
     )
   end
@@ -106,7 +110,7 @@ class ChargesController < ApplicationController
   end
 
   def create_square_payment_request(
-    nonce:, amount:, email:, name:, seller:, line_items:
+    nonce:, amount:, email:, name:, seller:, line_items:, is_distribution:
   )
     square_location_id = seller.square_location_id
 
@@ -130,13 +134,14 @@ class ChargesController < ApplicationController
     payment = api_response.data.payment
     receipt_url = payment[:receipt_url]
 
-    # TODO: (yong): Also query to find out the recipient
-    contact = Contact.find_or_create_by(email: email)
+    purchaser = Contact.find_or_create_by(email: email)
 
-    if contact.name != name
-      contact.name = name
-      contact.save!
+    if purchaser.name != name
+      purchaser.name = name
+      purchaser.save!
     end
+
+    recipient = is_distribution ? seller.distributor : purchaser
 
     # Creates a pending PaymentIntent. See webhooks_controller to see what
     # happens when the PaymentIntent is successful.
@@ -145,8 +150,8 @@ class ChargesController < ApplicationController
       square_payment_id: payment[:id],
       line_items: line_items.to_json,
       receipt_url: receipt_url,
-      purchaser: contact,
-      recipient: contact
+      purchaser: purchaser,
+      recipient: recipient
     )
 
     api_response
