@@ -131,6 +131,7 @@ RSpec.describe 'Sellers API', type: :request do
         expected_json['num_contributions'] = 0
         expected_json['num_donations'] = 0
         expected_json['num_gift_cards'] = 0
+      expected_json['cost_per_meal'] = nil
         expect(actual_json).to eq(expected_json.with_indifferent_access)
       end
 
@@ -163,6 +164,7 @@ RSpec.describe 'Sellers API', type: :request do
         expected_json['num_contributions'] = 0
         expected_json['num_donations'] = 0
         expected_json['num_gift_cards'] = 0
+      expected_json['cost_per_meal'] = nil
         expect(actual_json).to eq(expected_json.with_indifferent_access)
       end
 
@@ -195,6 +197,7 @@ RSpec.describe 'Sellers API', type: :request do
         expected_json['num_contributions'] = 0
         expected_json['num_donations'] = 0
         expected_json['num_gift_cards'] = 0
+      expected_json['cost_per_meal'] = nil
         expect(actual_json).to eq(expected_json.with_indifferent_access)
       end
 
@@ -237,6 +240,7 @@ RSpec.describe 'Sellers API', type: :request do
       expected_json['num_contributions'] = 0
       expected_json['num_donations'] = 0
       expected_json['num_gift_cards'] = 0
+      expected_json['cost_per_meal'] = nil
       expect(actual_json).to eq(expected_json.with_indifferent_access)
     end
 
