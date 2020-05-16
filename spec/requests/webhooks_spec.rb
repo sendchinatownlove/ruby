@@ -55,7 +55,7 @@ RSpec.describe 'Webhooks API', type: :request do
         'payment': {
           'id': payment_intent.square_payment_id,
           'location_id': payment_intent.square_location_id,
-          'receipt_email': payment_intent.email,
+          'receipt_email': payment_intent.recipient.email,
           'status': 'COMPLETED'
         }
       }

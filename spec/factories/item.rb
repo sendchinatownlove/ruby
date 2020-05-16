@@ -2,7 +2,6 @@
 
 FactoryBot.define do
   factory :item do
-    email { Faker::Internet.email }
     association :seller
     association :payment_intent
     association :purchaser, factory: :contact
