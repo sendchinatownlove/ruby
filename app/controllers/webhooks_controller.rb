@@ -352,6 +352,14 @@ class WebhooksController < ApplicationController
                     to: to,
                     subject: 'Receipt from Send Chinatown Love',
                     html: html
+
+    # Send to Receipts Eng so that they know what their receipts in prod looks
+    # like
+    RestClient.post api_url,
+                    from: 'receipts@sendchinatownlove.com',
+                    to: 'receipts@sendchinatownlove.com',
+                    subject: 'Receipt from Send Chinatown Love',
+                    html: html
   end
   # rubocop:enable Layout/LineLength
 end
