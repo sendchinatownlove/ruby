@@ -32,9 +32,7 @@ class ChargesController < ApplicationController
         sum + item['amount'] * item['quantity']
       end
 
-    is_distribution = !charge_params[:is_distribution].nil? ?
-      charge_params[:is_distribution] :
-      false
+    is_distribution = charge_params[:is_distribution] || false
 
     email = charge_params[:email]
     payment = create_square_payment_request(nonce: charge_params[:nonce],
