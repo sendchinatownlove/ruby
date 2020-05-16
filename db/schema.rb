@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_13_163901) do
+ActiveRecord::Schema.define(version: 2020_05_16_190635) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -98,16 +98,13 @@ ActiveRecord::Schema.define(version: 2020_05_13_163901) do
   end
 
   create_table "payment_intents", force: :cascade do |t|
-    t.string "email"
     t.text "line_items"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "successful", default: false
     t.string "square_payment_id", null: false
     t.string "square_location_id", null: false
-    t.string "email_text"
     t.string "receipt_url"
-    t.string "name"
     t.bigint "purchaser_id"
     t.bigint "recipient_id"
     t.index ["purchaser_id"], name: "index_payment_intents_on_purchaser_id"
