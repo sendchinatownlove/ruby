@@ -8,7 +8,7 @@ class AddContactToPaymentIntentAndItem < ActiveRecord::Migration[6.0]
     add_reference :payment_intents, :purchaser, foreign_key: { to_table: :contacts }
     add_reference :payment_intents, :recipient, foreign_key: { to_table: :contacts }
 
-    visited_contacts = Hash.new
+    visited_contacts = {}
 
     # First backfill all contacts information
     PaymentIntent.order(created_at: 'desc').each do |payment_intent|
@@ -29,7 +29,7 @@ class AddContactToPaymentIntentAndItem < ActiveRecord::Migration[6.0]
 
         gift_card_detail = item.gift_card_detail
 
-        if gift_card_detail != nil
+        unless gift_card_detail.nil?
           gift_card_detail.recipient = contact
           gift_card_detail.save!
         end

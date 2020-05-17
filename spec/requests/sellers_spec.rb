@@ -8,40 +8,10 @@ RSpec.describe 'Sellers API', type: :request do
   let(:current_time) { Time.current.utc.iso8601(3).to_s }
   let(:seller_id1) { seller1.seller_id }
   let!(:seller1) do
-    Seller.create(
-      seller_id: 'shunfa-bakery',
-      cuisine_name: 'Chinese',
-      name: 'Shunfa Bakery',
-      story: 'I am but a small, small boy',
-      owner_name: 'Ben Jerry',
-      owner_image_url: 'https://www.aws.com/98nuw9e8unf9awnuefaiwenfoaijfosdf',
-      accept_donations: true,
-      sell_gift_cards: true,
-      business_type: 'small-biz',
-      num_employees: 5,
-      founded_year: 1850,
-      website_url: 'https://www.youtube.com/watch?v=jIIuzB11dsA',
-      menu_url: 'https://www.youtube.com/watch?v=jIIuzB11dsA',
-      square_location_id: '1234-abcd'
-    )
+    create(:seller)
   end
   let!(:seller2) do
-    Seller.create(
-      seller_id: '87-lan-zhou-handpooled-noods',
-      cuisine_name: 'Noodle Soup',
-      name: '87 Lan Zhou Handpooled Noods',
-      story: 'Been pullin noods since I was 2',
-      owner_name: 'Tom Hanks',
-      owner_image_url: 'https://www.aws.com/oawjeoiajwef9wuef09wuef09waeuf',
-      accept_donations: false,
-      sell_gift_cards: true,
-      business_type: 'medium-biz',
-      num_employees: 10,
-      founded_year: 1950,
-      website_url: 'https://www.youtube.com/watch?v=C_oACPWGvM4',
-      menu_url: 'https://www.youtube.com/watch?v=C_oACPWGvM4',
-      square_location_id: '4567-efgh'
-    )
+    create(:seller)
   end
 
   let(:valid_attributes) do
@@ -55,7 +25,7 @@ RSpec.describe 'Sellers API', type: :request do
         and songwriter from New York City's Harlem neighborhood.",
       owner_name: 'A$AP Ferg',
       owner_image_url: 'https://www.youtube.com/watch?v=Srns7NiO278',
-      accept_donations: true,
+      accept_donations: false,
       sell_gift_cards: true,
       hero_image_url: 'superman-url',
       progress_bar_color: '#1234',
@@ -118,21 +88,23 @@ RSpec.describe 'Sellers API', type: :request do
       before { post '/sellers', params: valid_attributes, as: :json }
 
       it 'creates a seller' do
-        # Ignore id field since it's auto-incremented
-        actual_json = json.except('id')
-        expected_json = valid_attributes.except('id')
-        expected_json['created_at'] = current_time
-        expected_json['updated_at'] = current_time
-        expected_json['target_amount'] = 1_000_000
-        expected_json['amount_raised'] = 0
-        expected_json['locations'] = []
-        expected_json['donation_amount'] = 0
-        expected_json['gift_card_amount'] = 0
-        expected_json['num_contributions'] = 0
-        expected_json['num_donations'] = 0
-        expected_json['num_gift_cards'] = 0
-      expected_json['cost_per_meal'] = nil
-        expect(actual_json).to eq(expected_json.with_indifferent_access)
+        new_seller = Seller.find_by(seller_id: valid_attributes[:seller_id])
+        expect(new_seller).not_to be_nil
+        expect(new_seller[:cuisine_name]).to eq(valid_attributes[:cuisine_name])
+        expect(new_seller[:name]).to eq(valid_attributes[:name])
+        expect(new_seller[:story]).to eq(valid_attributes[:story])
+        expect(new_seller[:owner_name]).to eq(valid_attributes[:owner_name])
+        expect(new_seller[:owner_image_url]).to eq(valid_attributes[:owner_image_url])
+        expect(new_seller[:accept_donations]).to eq(valid_attributes[:accept_donations])
+        expect(new_seller[:sell_gift_cards]).to eq(valid_attributes[:sell_gift_cards])
+        expect(new_seller[:hero_image_url]).to eq(valid_attributes[:hero_image_url])
+        expect(new_seller[:progress_bar_color]).to eq(valid_attributes[:progress_bar_color])
+        expect(new_seller[:business_type]).to eq(valid_attributes[:business_type])
+        expect(new_seller[:num_employees]).to eq(valid_attributes[:num_employees])
+        expect(new_seller[:founded_year]).to eq(valid_attributes[:founded_year])
+        expect(new_seller[:website_url]).to eq(valid_attributes[:website_url])
+        expect(new_seller[:menu_url]).to eq(valid_attributes[:menu_url])
+        expect(new_seller[:square_location_id]).to eq(valid_attributes[:square_location_id])
       end
 
       it 'returns status code 201' do
@@ -150,22 +122,9 @@ RSpec.describe 'Sellers API', type: :request do
       end
 
       it 'creates a seller with default accept_donations' do
-        # Ignore id field since it's auto-incremented
-        actual_json = json.except('id')
-        expected_json = valid_attributes.except('id')
-        expected_json['created_at'] = current_time
-        expected_json['updated_at'] = current_time
-        expected_json['accept_donations'] = true
-        expected_json['target_amount'] = 1_000_000
-        expected_json['amount_raised'] = 0
-        expected_json['locations'] = []
-        expected_json['donation_amount'] = 0
-        expected_json['gift_card_amount'] = 0
-        expected_json['num_contributions'] = 0
-        expected_json['num_donations'] = 0
-        expected_json['num_gift_cards'] = 0
-      expected_json['cost_per_meal'] = nil
-        expect(actual_json).to eq(expected_json.with_indifferent_access)
+        new_seller = Seller.find_by(seller_id: valid_attributes[:seller_id])
+        expect(new_seller).not_to be_nil
+        expect(new_seller[:accept_donations]).to eq(true)
       end
 
       it 'returns status code 201' do
@@ -182,23 +141,10 @@ RSpec.describe 'Sellers API', type: :request do
         )
       end
 
-      it 'creates a seller with default accept_donations' do
-        # Ignore id field since it's auto-incremented
-        actual_json = json.except('id')
-        expected_json = valid_attributes.except('id')
-        expected_json['created_at'] = current_time
-        expected_json['updated_at'] = current_time
-        expected_json['sell_gift_cards'] = false
-        expected_json['target_amount'] = 1_000_000
-        expected_json['amount_raised'] = 0
-        expected_json['locations'] = []
-        expected_json['donation_amount'] = 0
-        expected_json['gift_card_amount'] = 0
-        expected_json['num_contributions'] = 0
-        expected_json['num_donations'] = 0
-        expected_json['num_gift_cards'] = 0
-      expected_json['cost_per_meal'] = nil
-        expect(actual_json).to eq(expected_json.with_indifferent_access)
+      it 'creates a seller with default sell_gift_cards' do
+        new_seller = Seller.find_by(seller_id: valid_attributes[:seller_id])
+        expect(new_seller).not_to be_nil
+        expect(new_seller[:sell_gift_cards]).to eq(false)
       end
 
       it 'returns status code 201' do
@@ -227,21 +173,23 @@ RSpec.describe 'Sellers API', type: :request do
     before { put "/sellers/#{seller_id1}", params: valid_attributes, as: :json }
 
     it 'updates the record' do
-      # Ignore id field since it's auto-incremented
-      actual_json = json.except('id')
-      expected_json = valid_attributes.except('id')
-      expected_json['created_at'] = current_time
-      expected_json['updated_at'] = current_time
-      expected_json['target_amount'] = 1_000_000
-      expected_json['amount_raised'] = 0
-      expected_json['locations'] = []
-      expected_json['donation_amount'] = 0
-      expected_json['gift_card_amount'] = 0
-      expected_json['num_contributions'] = 0
-      expected_json['num_donations'] = 0
-      expected_json['num_gift_cards'] = 0
-      expected_json['cost_per_meal'] = nil
-      expect(actual_json).to eq(expected_json.with_indifferent_access)
+      new_seller = Seller.find_by(seller_id: valid_attributes[:seller_id])
+      expect(new_seller).not_to be_nil
+      expect(new_seller[:cuisine_name]).to eq(valid_attributes[:cuisine_name])
+      expect(new_seller[:name]).to eq(valid_attributes[:name])
+      expect(new_seller[:story]).to eq(valid_attributes[:story])
+      expect(new_seller[:owner_name]).to eq(valid_attributes[:owner_name])
+      expect(new_seller[:owner_image_url]).to eq(valid_attributes[:owner_image_url])
+      expect(new_seller[:accept_donations]).to eq(valid_attributes[:accept_donations])
+      expect(new_seller[:sell_gift_cards]).to eq(valid_attributes[:sell_gift_cards])
+      expect(new_seller[:hero_image_url]).to eq(valid_attributes[:hero_image_url])
+      expect(new_seller[:progress_bar_color]).to eq(valid_attributes[:progress_bar_color])
+      expect(new_seller[:business_type]).to eq(valid_attributes[:business_type])
+      expect(new_seller[:num_employees]).to eq(valid_attributes[:num_employees])
+      expect(new_seller[:founded_year]).to eq(valid_attributes[:founded_year])
+      expect(new_seller[:website_url]).to eq(valid_attributes[:website_url])
+      expect(new_seller[:menu_url]).to eq(valid_attributes[:menu_url])
+      expect(new_seller[:square_location_id]).to eq(valid_attributes[:square_location_id])
     end
 
     it 'returns status code 200' do

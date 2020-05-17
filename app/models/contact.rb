@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: contacts
@@ -18,6 +20,6 @@ class Contact < ApplicationRecord
   has_many :gift_card_details, class_name: 'GiftCardDetail', foreign_key: 'recipient_id'
   belongs_to :seller, optional: true
 
-  validates_uniqueness_of :email, :allow_blank => true, :allow_nil => true
-  validates :is_subscribed, inclusion: { in: [ true, false ] }
+  validates_uniqueness_of :email, allow_blank: true, allow_nil: true
+  validates :is_subscribed, inclusion: { in: [true, false] }
 end

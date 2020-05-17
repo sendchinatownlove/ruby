@@ -5,7 +5,7 @@ module SellersHelper
     locations = seller.locations
     distributor = seller.distributor
     seller = seller.as_json
-    seller['distributor'] = distributor.as_json unless distributor == nil
+    seller['distributor'] = distributor.as_json unless distributor.nil?
     seller['locations'] = locations.as_json
     seller['gift_card_amount'] = calculate_gift_card_amount(
       seller_id: seller['id']
