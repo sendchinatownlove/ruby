@@ -42,9 +42,12 @@ class GiftCardsController < ApplicationController
   end
 
   def item_gift_card_detail_json
-    json = Item.find_by(id: @gift_card_detail.item_id).as_json
+    item = Item.find_by(id: @gift_card_detail.item_id)
+    json = item.as_json
     json['gift_card_detail'] = @gift_card_detail.as_json
     json['gift_card_detail']['amount'] = @gift_card_detail.amount
+    # Replace the internal Seller.id with the external seller_id
+    json['seller_id'] = item.seller.seller_id
     json
   end
 end
