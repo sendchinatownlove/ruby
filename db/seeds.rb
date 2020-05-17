@@ -57,8 +57,9 @@ end
   }
 ].each do |attributes|
   seller = Seller.find_by(seller_id: 'shunfa-bakery')
-  payment_intent = PaymentIntent.create!(email: attributes[:email], square_location_id: seller.square_location_id, square_payment_id: Faker::Alphanumeric.alpha(number: 64))
-  item = Item.create!(email: attributes[:email], item_type: attributes[:item_type], refunded: attributes[:refunded], seller_id: seller.id, payment_intent_id: payment_intent.id)
+  contact = Contact.find_or_create_by!(email: attributes[:email])
+  payment_intent = PaymentIntent.create!(purchaser: contact, recipient: contact, square_location_id: seller.square_location_id, square_payment_id: Faker::Alphanumeric.alpha(number: 64))
+  item = Item.create!(purchaser: contact, item_type: attributes[:item_type], refunded: attributes[:refunded], seller_id: seller.id, payment_intent_id: payment_intent.id)
   DonationDetail.create!(item_id: item.id, amount: attributes[:amount])
 end
 
@@ -83,9 +84,10 @@ end
   }
 ].each do |attributes|
   seller = Seller.find_by(seller_id: 'shunfa-bakery')
-  payment_intent = PaymentIntent.create!(email: attributes[:email], square_location_id: seller.square_location_id, square_payment_id: Faker::Alphanumeric.alpha(number: 64))
-  item = Item.create!(email: attributes[:email], item_type: attributes[:item_type], refunded: attributes[:refunded], seller_id: seller.id, payment_intent_id: payment_intent.id)
-  gift_card_detail = GiftCardDetail.create!(item_id: item.id, gift_card_id: Faker::Alphanumeric.alpha(number: 64), seller_gift_card_id: Faker::Alphanumeric.alpha(number: 64))
+  contact = Contact.find_or_create_by!(email: attributes[:email])
+  payment_intent = PaymentIntent.create!(recipient: contact, purchaser: contact, square_location_id: seller.square_location_id, square_payment_id: Faker::Alphanumeric.alpha(number: 64))
+  item = Item.create!(purchaser: contact, item_type: attributes[:item_type], refunded: attributes[:refunded], seller_id: seller.id, payment_intent_id: payment_intent.id)
+  gift_card_detail = GiftCardDetail.create!(recipient: contact, item_id: item.id, gift_card_id: Faker::Alphanumeric.alpha(number: 64), seller_gift_card_id: Faker::Alphanumeric.alpha(number: 64))
   attributes[:amounts].each_with_index do |amount, i|
     GiftCardAmount.create!(gift_card_detail_id: gift_card_detail.id, value: amount, updated_at: Time.now + i.days)
   end
