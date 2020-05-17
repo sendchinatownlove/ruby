@@ -37,9 +37,15 @@ class Seller < ApplicationRecord
 
   scope :filter_by_accepts_donations, -> { where(accept_donations: true) }
 
-  translates :name, :story, :owner_name, :summary
+  translates :name, :story, :owner_name, :summary, :business_type
   globalize_accessors locales: [:en, 'zh-CN'],
-                      attributes: %i[name story owner_name summary]
+                      attributes: %i[
+                        name
+                        story
+                        owner_name
+                        summary
+                        business_type
+                      ]
 
   # model association
   has_many :locations, dependent: :destroy
