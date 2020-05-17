@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_16_212708) do
+ActiveRecord::Schema.define(version: 2020_05_17_210843) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -128,6 +128,7 @@ ActiveRecord::Schema.define(version: 2020_05_16_212708) do
     t.text "story"
     t.string "owner_name"
     t.text "summary"
+    t.string "business_type"
     t.index ["locale"], name: "index_seller_translations_on_locale"
     t.index ["seller_id"], name: "index_seller_translations_on_seller_id"
   end
