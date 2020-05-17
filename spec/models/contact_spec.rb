@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: contacts
@@ -17,7 +19,7 @@ require 'rails_helper'
 
 RSpec.describe Contact, type: :model do
   it { should validate_uniqueness_of(:email) }
-  it { should allow_value(%w(true false)).for(:is_subscribed) }
+  it { should allow_value(%w[true false]).for(:is_subscribed) }
   it { should have_many(:items) }
   it { should have_many(:gift_card_details) }
   it { should belong_to(:seller).optional }

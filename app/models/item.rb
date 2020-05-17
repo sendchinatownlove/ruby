@@ -30,6 +30,6 @@ class Item < ApplicationRecord
   belongs_to :payment_intent
   has_one :gift_card_detail
   has_one :donation_detail
-  belongs_to :purchaser, class_name: "Contact"
+  belongs_to :purchaser, class_name: 'Contact'
   enum item_type: %i[donation gift_card]
 end

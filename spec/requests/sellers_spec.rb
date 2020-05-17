@@ -142,9 +142,9 @@ RSpec.describe 'Sellers API', type: :request do
       end
 
       it 'creates a seller with default sell_gift_cards' do
-      new_seller = Seller.find_by(seller_id: valid_attributes[:seller_id])
-      expect(new_seller).not_to be_nil
-      expect(new_seller[:sell_gift_cards]).to eq(false)
+        new_seller = Seller.find_by(seller_id: valid_attributes[:seller_id])
+        expect(new_seller).not_to be_nil
+        expect(new_seller[:sell_gift_cards]).to eq(false)
       end
 
       it 'returns status code 201' do

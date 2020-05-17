@@ -11,8 +11,8 @@ class PoolDonationValidator < BaseService
   def call
     unless type.eql?('donation')
       raise ExceptionHandler::InvalidPoolDonationError,
-            "pool contribution must but be of type 'donation' " +
-                "but found type '#{type}'."
+            "pool contribution must but be of type 'donation' " \
+            "but found type '#{type}'."
     end
   end
 end

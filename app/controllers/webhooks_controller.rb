@@ -130,7 +130,7 @@ class WebhooksController < ApplicationController
         # calculate amount per merchant
         # This will break if we ever have zero merchants but are still
         # accepting pool donations.
-        amount_per = (amount.to_f / (@donation_sellers.count).to_f).ceil
+        amount_per = (amount.to_f / @donation_sellers.count.to_f).ceil
 
         @donation_sellers.each do |seller|
           next if seller.seller_id.eql?(Seller::POOL_DONATION_SELLER_ID)
