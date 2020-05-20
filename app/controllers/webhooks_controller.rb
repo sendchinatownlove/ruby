@@ -149,6 +149,10 @@ class WebhooksController < ApplicationController
           )
         rescue StandardError
           # don't let a failed email bring down the whole POST
+          logger.error 'Pool donation email errored out. ' \
+            "email: #{payment_intent.recipient.email}, " \
+            "receipt: #{payment_intent.receipt_url} " \
+            "amount: #{amount}"
         end
       else
         merchant_name = Seller.find_by(seller_id: seller_id).name
@@ -168,6 +172,10 @@ class WebhooksController < ApplicationController
             )
           rescue StandardError
             # don't let a failed email bring down the whole POST
+            logger.error 'Donation email errored out. ' \
+              "email: #{payment_intent.recipient.email}, " \
+              "receipt: #{payment_intent.receipt_url} " \
+              "amount: #{amount}, merchant: #{merchant_name}"
           end
         when 'gift_card'
           item = create_item(
@@ -191,7 +199,14 @@ class WebhooksController < ApplicationController
               receipt_id: gift_card_detail.seller_gift_card_id
             )
           rescue StandardError
-            logger.info "Gift card email errored out. payment_intent: #{payment_intent}, amount: #{amount}, merchant: #{merchant_name}, receipt_id: #{gift_card_detail.seller_gift_card_id}, gift card detail: #{gift_card_detail}"
+            # don't let a failed email bring down the whole POST
+            logger.error 'Gift card email errored out. ' \
+              "email: #{payment_intent.recipient.email}, " \
+              "receipt: #{payment_intent.receipt_url} " \
+              "amount: #{amount}, " \
+              "merchant: #{merchant_name}, " \
+              "receipt_id: #{gift_card_detail.seller_gift_card_id}, " \
+              "gift card detail: #{gift_card_detail}"
           end
         else
           raise(
@@ -319,7 +334,6 @@ class WebhooksController < ApplicationController
 
   def send_gift_card_receipt(payment_intent:, amount:, merchant:, receipt_id:)
     amount_string = format_amount(amount: amount)
-    logger.info "amount_string: #{amount_string}"
     html = '<!DOCTYPE html>' \
            '<html>' \
            '<head>' \
@@ -337,7 +351,7 @@ class WebhooksController < ApplicationController
            '<p> the Send Chinatown Love team</p>' \
            '</body>' \
            '</html>'
-    send_receipt(to: payment_intent.email, html: html)
+    send_receipt(to: payment_intent.recipient.email, html: html)
   end
 
   def format_amount(amount:)
@@ -347,9 +361,6 @@ class WebhooksController < ApplicationController
   def send_receipt(to:, html:)
     api_key = ENV['MAILGUN_API_KEY']
     api_url = "https://api:#{api_key}@api.mailgun.net/v2/m.sendchinatownlove.com/messages"
-
-    logger.info "to: #{to}"
-    logger.info "html: #{html}"
 
     RestClient.post api_url,
                     from: 'receipts@sendchinatownlove.com',
