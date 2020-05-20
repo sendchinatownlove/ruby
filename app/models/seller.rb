@@ -35,6 +35,7 @@ class Seller < ApplicationRecord
   # The `seller_id` of the special seller we use to collect pool donations.
   POOL_DONATION_SELLER_ID = 'send-chinatown-love'
 
+  # NOTE: POOL_DONATION_SELLER_ID does not accept donations
   scope :filter_by_accepts_donations, -> { where(accept_donations: true) }
 
   translates :name, :story, :owner_name, :summary, :business_type
