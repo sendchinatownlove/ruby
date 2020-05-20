@@ -191,12 +191,7 @@ class WebhooksController < ApplicationController
               receipt_id: gift_card_detail.seller_gift_card_id
             )
           rescue StandardError
-            logger.info "Gift card email errored out. Printing vars:\n"
-              + "payment_intent: #{payment_intent}\n"
-              + "amount: #{amount}\n"
-              + "merchant: #{merchant_name}\n"
-              + "receipt_id: #{gift_card_detail.seller_gift_card_id}\n"
-              + "gift card detail: #{gift_card_detail}"
+            logger.info "Gift card email errored out. payment_intent: #{payment_intent}, amount: #{amount}, merchant: #{merchant_name}, receipt_id: #{gift_card_detail.seller_gift_card_id}, gift card detail: #{gift_card_detail}"
           end
         else
           raise(
