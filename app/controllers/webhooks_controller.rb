@@ -191,7 +191,16 @@ class WebhooksController < ApplicationController
               receipt_id: gift_card_detail.seller_gift_card_id
             )
           rescue StandardError
-            # don't let a failed email bring down the whole POST
+            puts "Gift card email errored out. Printing vars:"
+            puts "payment_intent:"
+            puts payment_intent
+            puts "amount:"
+            puts amount
+            puts "merchant:"
+            puts merchant_name
+            puts "receipt_id:"
+            puts gift_card_detail
+            puts gift_card_detail.seller_gift_card_id
           end
         else
           raise(
@@ -319,6 +328,7 @@ class WebhooksController < ApplicationController
 
   def send_gift_card_receipt(payment_intent:, amount:, merchant:, receipt_id:)
     amount_string = format_amount(amount: amount)
+    puts amount_string
     html = '<!DOCTYPE html>' \
            '<html>' \
            '<head>' \
@@ -346,6 +356,9 @@ class WebhooksController < ApplicationController
   def send_receipt(to:, html:)
     api_key = ENV['MAILGUN_API_KEY']
     api_url = "https://api:#{api_key}@api.mailgun.net/v2/m.sendchinatownlove.com/messages"
+
+    puts to
+    puts html
 
     RestClient.post api_url,
                     from: 'receipts@sendchinatownlove.com',
