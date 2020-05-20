@@ -148,6 +148,7 @@ class WebhooksController < ApplicationController
             amount: amount
           )
         rescue StandardError
+          # don't let a failed email bring down the whole POST
           logger.error "Pool donation email errored out. "
           + "email: #{payment_intent.recipient.email}, "
           + "receipt: #{payment_intent.receipt_url} "
@@ -171,12 +172,11 @@ class WebhooksController < ApplicationController
             )
           rescue StandardError
             # don't let a failed email bring down the whole POST
-              logger.error "Donation email errored out. "
-              + "email: #{payment_intent.recipient.email}, "
-              + "receipt: #{payment_intent.receipt_url} "
-              + "amount: #{amount}, "
-              + "merchant: #{merchant_name}, "
-            end
+            logger.error "Donation email errored out. "
+            + "email: #{payment_intent.recipient.email}, "
+            + "receipt: #{payment_intent.receipt_url} "
+            + "amount: #{amount}, "
+            + "merchant: #{merchant_name}, "
           end
         when 'gift_card'
           item = create_item(
