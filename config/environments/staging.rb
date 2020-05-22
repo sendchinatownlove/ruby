@@ -42,6 +42,13 @@ Rails.application.configure do
     config.cache_store = :null_store
   end
 
+  # Use the lowest log level to ensure availability of diagnostic information
+  # when problems arise.
+  config.log_level = :debug
+
+  # Prepend all log lines with the following tags.
+  config.log_tags = [:request_id]
+
   # Store uploaded files on the local file system (see config/storage.yml for
   # options).
   config.active_storage.service = :local
