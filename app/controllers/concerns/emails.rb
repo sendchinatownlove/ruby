@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 module Emails
   # rubocop:disable Layout/LineLength
