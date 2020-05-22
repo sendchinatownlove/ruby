@@ -146,18 +146,10 @@ class WebhooksController < ApplicationController
           )
           remainder -= 1
         end
-        begin
-          send_pool_donation_receipt(
-            payment_intent: payment_intent,
-            amount: amount
-          )
-        rescue StandardError
-          # don't let a failed email bring down the whole POST
-          logger.error 'Pool donation email errored out. ' \
-            "email: #{payment_intent.recipient.email}, " \
-            "receipt: #{payment_intent.receipt_url} " \
-            "amount: #{amount}"
-        end
+        send_pool_donation_receipt(
+          payment_intent: payment_intent,
+          amount: amount
+        )
       else
         merchant_name = Seller.find_by(seller_id: seller_id).name
         case item['item_type']
@@ -168,19 +160,11 @@ class WebhooksController < ApplicationController
             payment_intent: payment_intent,
             amount: amount
           )
-          begin
-            send_donation_receipt(
-              payment_intent: payment_intent,
-              amount: amount,
-              merchant: merchant_name
-            )
-          rescue StandardError
-            # don't let a failed email bring down the whole POST
-            logger.error 'Donation email errored out. ' \
-              "email: #{payment_intent.recipient.email}, " \
-              "receipt: #{payment_intent.receipt_url} " \
-              "amount: #{amount}, merchant: #{merchant_name}"
-          end
+          send_donation_receipt(
+            payment_intent: payment_intent,
+            amount: amount,
+            merchant: merchant_name
+          )
         when 'gift_card'
           item = create_item(
             item_type: :gift_card,
@@ -195,23 +179,12 @@ class WebhooksController < ApplicationController
             seller_id: seller_id,
             recipient: recipient
           )
-          begin
-            send_gift_card_receipt(
-              payment_intent: payment_intent,
-              amount: amount,
-              merchant: merchant_name,
-              receipt_id: gift_card_detail.seller_gift_card_id
-            )
-          rescue StandardError
-            # don't let a failed email bring down the whole POST
-            logger.error 'Gift card email errored out. ' \
-              "email: #{payment_intent.recipient.email}, " \
-              "receipt: #{payment_intent.receipt_url} " \
-              "amount: #{amount}, " \
-              "merchant: #{merchant_name}, " \
-              "receipt_id: #{gift_card_detail.seller_gift_card_id}, " \
-              "gift card detail: #{gift_card_detail}"
-          end
+          send_gift_card_receipt(
+            payment_intent: payment_intent,
+            amount: amount,
+            merchant: merchant_name,
+            receipt_id: gift_card_detail.seller_gift_card_id
+          )
         else
           raise(
             InvalidLineItem,

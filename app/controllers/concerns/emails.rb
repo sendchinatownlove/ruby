@@ -3,8 +3,9 @@
 module Emails
   # rubocop:disable Layout/LineLength
   def send_pool_donation_receipt(payment_intent:, amount:)
-    amount_string = format_amount(amount: amount)
-    html = '<!DOCTYPE html>' \
+    begin
+      amount_string = format_amount(amount: amount)
+      html = '<!DOCTYPE html>' \
            '<html>' \
            '<head>' \
            "  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />" \
@@ -19,12 +20,20 @@ module Emails
            '<p> the Send Chinatown Love team</p>' \
            '</body>' \
            '</html>'
-    send_receipt(to: payment_intent.recipient.email, html: html)
+      send_receipt(to: payment_intent.recipient.email, html: html)
+    rescue StandardError
+      # don't let a failed email bring down the whole POST
+      logger.error 'Pool donation email errored out. ' \
+            "email: #{payment_intent.recipient.email}, " \
+            "receipt: #{payment_intent.receipt_url} " \
+            "amount: #{amount}"
+    end
   end
 
   def send_donation_receipt(payment_intent:, amount:, merchant:)
-    amount_string = format_amount(amount: amount)
-    html = '<!DOCTYPE html>' \
+    begin
+      amount_string = format_amount(amount: amount)
+      html = '<!DOCTYPE html>' \
            '<html>' \
            '<head>' \
            "  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />" \
@@ -39,12 +48,20 @@ module Emails
            '<p> the Send Chinatown Love team</p>' \
            '</body>' \
            '</html>'
-    send_receipt(to: payment_intent.recipient.email, html: html)
+      send_receipt(to: payment_intent.recipient.email, html: html)
+    rescue StandardError
+      # don't let a failed email bring down the whole POST
+      logger.error 'Donation email errored out. ' \
+              "email: #{payment_intent.recipient.email}, " \
+              "receipt: #{payment_intent.receipt_url} " \
+              "amount: #{amount}, merchant: #{merchant_name}"
+    end
   end
 
   def send_gift_card_receipt(payment_intent:, amount:, merchant:, receipt_id:)
-    amount_string = format_amount(amount: amount)
-    html = '<!DOCTYPE html>' \
+    begin
+      amount_string = format_amount(amount: amount)
+      html = '<!DOCTYPE html>' \
            '<html>' \
            '<head>' \
            "  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />" \
@@ -61,7 +78,17 @@ module Emails
            '<p> the Send Chinatown Love team</p>' \
            '</body>' \
            '</html>'
-    send_receipt(to: payment_intent.recipient.email, html: html)
+      send_receipt(to: payment_intent.recipient.email, html: html)
+    rescue StandardError
+      # don't let a failed email bring down the whole POST
+      logger.error 'Gift card email errored out. ' \
+              "email: #{payment_intent.recipient.email}, " \
+              "receipt: #{payment_intent.receipt_url} " \
+              "amount: #{amount}, " \
+              "merchant: #{merchant_name}, " \
+              "receipt_id: #{gift_card_detail.seller_gift_card_id}, " \
+              "gift card detail: #{gift_card_detail}"
+    end
   end
 
   def format_amount(amount:)
