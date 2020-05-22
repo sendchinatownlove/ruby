@@ -22,7 +22,6 @@ module Emails
            '</html>'
       send_receipt(to: payment_intent.recipient.email, html: html)
     rescue StandardError
-      # don't let a failed email bring down the whole POST
       logger.error 'Pool donation email errored out. ' \
             "email: #{payment_intent.recipient.email}, " \
             "receipt: #{payment_intent.receipt_url} " \
@@ -50,7 +49,6 @@ module Emails
            '</html>'
       send_receipt(to: payment_intent.recipient.email, html: html)
     rescue StandardError
-      # don't let a failed email bring down the whole POST
       logger.error 'Donation email errored out. ' \
               "email: #{payment_intent.recipient.email}, " \
               "receipt: #{payment_intent.receipt_url} " \
@@ -80,7 +78,6 @@ module Emails
            '</html>'
       send_receipt(to: payment_intent.recipient.email, html: html)
     rescue StandardError
-      # don't let a failed email bring down the whole POST
       logger.error 'Gift card email errored out. ' \
               "email: #{payment_intent.recipient.email}, " \
               "receipt: #{payment_intent.receipt_url} " \
