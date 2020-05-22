@@ -183,7 +183,7 @@ class WebhooksController < ApplicationController
             payment_intent: payment_intent,
             amount: amount,
             merchant: merchant_name,
-            receipt_id: gift_card_detail.seller_gift_card_id
+            gift_card_detail: gift_card_detail
           )
         else
           raise(

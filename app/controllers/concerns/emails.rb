@@ -54,11 +54,11 @@ module Emails
       logger.error 'Donation email errored out. ' \
               "email: #{payment_intent.recipient.email}, " \
               "receipt: #{payment_intent.receipt_url} " \
-              "amount: #{amount}, merchant: #{merchant_name}"
+              "amount: #{amount}, merchant: #{merchant}"
     end
   end
 
-  def send_gift_card_receipt(payment_intent:, amount:, merchant:, receipt_id:)
+  def send_gift_card_receipt(payment_intent:, amount:, merchant:, gift_card_detail:)
     begin
       amount_string = format_amount(amount: amount)
       html = '<!DOCTYPE html>' \
@@ -68,7 +68,7 @@ module Emails
            '</head>' \
            '<body>' \
            '<h1>Thank you for your purchase from ' + merchant + '!</h1>' \
-           '<p> Gift card code: <b>' + receipt_id + '</b></p>' \
+           '<p> Gift card code: <b>' + gift_card_detail.seller_gift_card_id + '</b></p>' \
            '<p> Gift card balance: <b>$' + amount_string + '</b></p>' \
            '<p> Square receipt: ' + payment_intent.receipt_url + '</p>' \
            "<p> We'll be in touch when " + merchant + ' opens back up with details' \
@@ -85,7 +85,7 @@ module Emails
               "email: #{payment_intent.recipient.email}, " \
               "receipt: #{payment_intent.receipt_url} " \
               "amount: #{amount}, " \
-              "merchant: #{merchant_name}, " \
+              "merchant: #{merchant}, " \
               "receipt_id: #{gift_card_detail.seller_gift_card_id}, " \
               "gift card detail: #{gift_card_detail}"
     end
