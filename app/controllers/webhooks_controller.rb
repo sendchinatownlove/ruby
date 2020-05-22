@@ -114,7 +114,8 @@ class WebhooksController < ApplicationController
     end
 
     items = JSON.parse(payment_intent.line_items)
-    purchaser = payment_intent.purchaser
+    purchaser = payment_intent.purchaserexit
+
     recipient = payment_intent.recipient
     items.each do |item|
       # TODO(jtmckibb): Add some tracking that tracks if it breaks somewhere
