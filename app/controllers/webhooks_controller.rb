@@ -116,7 +116,6 @@ class WebhooksController < ApplicationController
     end
 
     items = JSON.parse(payment_intent.line_items)
-    purchaser = payment_intent.purchaser
     recipient = payment_intent.recipient
     items.each do |item|
       # TODO(jtmckibb): Add some tracking that tracks if it breaks somewhere
@@ -145,10 +144,10 @@ class WebhooksController < ApplicationController
           )
           remainder -= 1
         end
-        send_pool_donation_receipt(
-          payment_intent: payment_intent,
-          amount: amount
-        )
+        EmailManager::PoolDonationReceiptEmailSender.call({
+            payment_intent: payment_intent,
+            amount: amount,
+        })
       else
         merchant_name = Seller.find_by(seller_id: seller_id).name
         case item['item_type']
@@ -158,11 +157,11 @@ class WebhooksController < ApplicationController
             payment_intent: payment_intent,
             amount: amount
           )
-          send_donation_receipt(
-            payment_intent: payment_intent,
-            amount: amount,
-            merchant: merchant_name
-          )
+          EmailManager::DonationReceiptEmailSender.call({
+              payment_intent: payment_intent,
+              amount: amount,
+              merchant: merchant_name
+          })
         when 'gift_card'
           item = create_item(
             item_type: :gift_card,
@@ -176,12 +175,12 @@ class WebhooksController < ApplicationController
             seller_id: seller_id,
             recipient: recipient
           )
-          send_gift_card_receipt(
-            payment_intent: payment_intent,
-            amount: amount,
-            merchant: merchant_name,
-            gift_card_detail: gift_card_detail
-          )
+          EmailManager::GiftCardReceiptEmailSender.call({
+              payment_intent: payment_intent,
+              amount: amount,
+              merchant: merchant_name,
+              gift_card_detail: gift_card_detail
+          })
         else
           raise(
             InvalidLineItem,
