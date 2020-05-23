@@ -140,7 +140,6 @@ class WebhooksController < ApplicationController
 
           create_item_and_donation(
             seller_id: seller.seller_id,
-            purchaser: purchaser,
             payment_intent: payment_intent,
             amount: amount_per + (remainder > 0 ? 1 : 0)
           )
@@ -156,7 +155,6 @@ class WebhooksController < ApplicationController
         when 'donation'
           create_item_and_donation(
             seller_id: seller_id,
-            purchaser: purchaser,
             payment_intent: payment_intent,
             amount: amount
           )
@@ -169,7 +167,6 @@ class WebhooksController < ApplicationController
           item = create_item(
             item_type: :gift_card,
             seller_id: seller_id,
-            purchaser: purchaser,
             payment_intent: payment_intent
           )
 
@@ -200,11 +197,10 @@ class WebhooksController < ApplicationController
     payment_intent.save
   end
 
-  def create_item_and_donation(seller_id:, purchaser:, payment_intent:, amount:)
+  def create_item_and_donation(seller_id:, payment_intent:, amount:)
     new_item = create_item(
       item_type: :donation,
       seller_id: seller_id,
-      purchaser: purchaser,
       payment_intent: payment_intent
     )
     create_donation(item: new_item, amount: amount)
@@ -229,14 +225,12 @@ class WebhooksController < ApplicationController
     gift_card_detail
   end
 
-  def create_item(item_type:, seller_id:, purchaser:, payment_intent:)
-    seller = Seller.find_by(seller_id: seller_id)
-    Item.create!(
-      seller: seller,
-      purchaser: purchaser,
+  def create_item(item_type:, seller_id:, payment_intent:)
+    WebhookManager::ItemCreator.call({
       item_type: item_type,
+      seller_id: seller_id,
       payment_intent: payment_intent
-    )
+    })
   end
 
   def generate_gift_card_id

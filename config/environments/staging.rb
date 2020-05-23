@@ -42,6 +42,13 @@ Rails.application.configure do
     config.cache_store = :null_store
   end
 
+  # Use the lowest log level to ensure availability of diagnostic information
+  # when problems arise.
+  config.log_level = :debug
+
+  # Prepend all log lines with the following tags.
+  config.log_tags = [:request_id]
+
   # Store uploaded files on the local file system (see config/storage.yml for
   # options).
   config.active_storage.service = :local
@@ -59,6 +66,12 @@ Rails.application.configure do
 
   # Highlight code that triggered database queries in logs.
   config.active_record.verbose_query_logs = true
+
+  if ENV['RAILS_LOG_TO_STDOUT'].present?
+    logger           = ActiveSupport::Logger.new(STDOUT)
+    logger.formatter = config.log_formatter
+    config.logger    = ActiveSupport::TaggedLogging.new(logger)
+  end
 
   # Raises error for missing translations.
   # config.action_view.raise_on_missing_translations = true
