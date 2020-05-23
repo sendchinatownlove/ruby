@@ -27,14 +27,15 @@ If you don't have rvm, gem install rvm:
 - Download postgres
 `brew install postgresql`
 - cd to ruby/ and run `bundle install`. You might have to `gem install bundler`
-- Download the local deveopment `.env` file (the secret sauce) and place it in your ruby/ (mac os might give you
-a warning about hiding files that begin with '.')
-https://drive.google.com/drive/u/2/folders/1vDEWSwn2UFaGXBNCyt0qe60vOa5j6wfH
+- Create a `.env` file (the secret sauce) by running this command `cp .env.example .env`
+- Follow the following guide to fill .env file in
+https://docs.google.com/document/d/1UPNCwjWS_T7XT5AXsewphu6NvNdV7TQLSJub-RBRAG0/edit?ts=5ec88e82
+
 
 ### Create and migrate database
 - Run the server (see below) and create and migrate your DB:
 `rails db:create && rails db:migrate`
-If you see an error like 
+If you see an error like
 `Couldn't create 'myapp_development' database. Please check your configuration.
 rails aborted!
 PG::ConnectionBad: could not connect to server: No such file or directory`, try running `brew services restart postgresql` [source](https://stackoverflow.com/questions/19828385/pgconnectionbad-could-not-connect-to-server-connection-refused)
@@ -44,13 +45,13 @@ If you get a migration error like `PG::UndefinedTable: ERROR:` or `PG::NotNullVi
 ### Useful commands
 - Run the server: `heroku local web`
   If you see an error that looks like `No such file or directory @ rb_sysopen - tmp/pids/puma.pid`, run:
-  
+
   `mkdir tmp`
-  
+
   `mkdir tmp/pids`
-  
+
   [source](https://stackoverflow.com/questions/52862529/no-such-file-or-directory-rb-sysopen-tmp-pids-puma-pid)
-  
+
 - Run the server on port 3001: `heroku local web -p 3001`
 You'll need to do this if you're getting cors errors from the frontend. Stop your frontend server, start the rails server on 3001, then start the local server again from port 3000 using `yarn start`
 - Run all tests: `heroku local:run bundle exec rspec`
@@ -90,8 +91,8 @@ This also enables you to share your local environment in pull requests for addit
 
 ### Troubleshooting
 
-If you're getting errors related to your local environment variables not being set, you probably need to download the new version of .env
-https://drive.google.com/drive/u/2/folders/1vDEWSwn2UFaGXBNCyt0qe60vOa5j6wfH
+If you're getting errors related to your local environment variables not being set, you probably need to create a .env file
+https://docs.google.com/document/d/1UPNCwjWS_T7XT5AXsewphu6NvNdV7TQLSJub-RBRAG0/edit?ts=5ec88e82
 
 Anytime a new migration is created, you'll have to run `rails db:migrate` for your local dev environment, and `rails db:migrate RAILS_ENV=test` for your local test environment
 
