@@ -1,6 +1,6 @@
 # SendChinatownLoveAPI
 
-## Setup
+## Setup 🔧
 - Ruby x
 - Rails 6x
 - [Docker-Compose](https://docs.docker.com/compose/install/)
@@ -28,7 +28,7 @@ If you don't have rvm, gem install rvm:
 `brew install postgresql`
 - cd to ruby/ and run `bundle install`. You might have to `gem install bundler`
 - Create a `.env` file (the secret sauce) by running this command `cp .env.example .env`
-- Follow the following guide to fill .env file in
+- Follow the following guide to fill the .env file in
 https://docs.google.com/document/d/1UPNCwjWS_T7XT5AXsewphu6NvNdV7TQLSJub-RBRAG0/edit?ts=5ec88e82
 
 
@@ -119,7 +119,7 @@ bundle exec rails g model Todo title:string created_by:string
 ```
 
 
-## deployment
+## deployment 🚀
 
 install [heroku-cli](https://devcenter.heroku.com/articles/heroku-cli)
 
