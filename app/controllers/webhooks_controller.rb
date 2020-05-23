@@ -4,8 +4,6 @@ require 'rest-client'
 
 # TODO(jmckibben): This class needs a lot of refactoring
 class WebhooksController < ApplicationController
-  include Emails
-
   # POST /webhooks
   def create
     handle_square_event
