@@ -142,7 +142,7 @@ class WebhooksController < ApplicationController
           )
           remainder -= 1
         end
-        EmailManager::PoolDonationReceiptEmailSender.call({
+        EmailManager::PoolDonationReceiptSender.call({
             payment_intent: payment_intent,
             amount: amount,
         })
@@ -155,7 +155,7 @@ class WebhooksController < ApplicationController
             payment_intent: payment_intent,
             amount: amount
           )
-          EmailManager::DonationReceiptEmailSender.call({
+          EmailManager::DonationReceiptSender.call({
               payment_intent: payment_intent,
               amount: amount,
               merchant: merchant_name
@@ -173,7 +173,7 @@ class WebhooksController < ApplicationController
             seller_id: seller_id,
             recipient: recipient
           )
-          EmailManager::GiftCardReceiptEmailSender.call({
+          EmailManager::GiftCardReceiptSender.call({
               payment_intent: payment_intent,
               amount: amount,
               merchant: merchant_name,
