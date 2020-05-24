@@ -56,6 +56,7 @@ class SellersController < ApplicationController
       :sell_gift_cards,
       :hero_image_url,
       :progress_bar_color,
+      :cost_per_meal,
       :business_type,
       :num_employees,
       :founded_year,
