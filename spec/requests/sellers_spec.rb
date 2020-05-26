@@ -55,7 +55,7 @@ RSpec.describe 'Sellers API', type: :request do
   # Test suite for GET /sellers
   describe 'GET /sellers sort by created_at asc' do
     # make HTTP get request before each example
-    before { get '/sellers?sort=created_at.asc' }
+    before { get '/sellers?sort=created_at:asc' }
 
     it 'returns sellers' do
       # Note `json` is a custom helper to parse JSON responses
@@ -73,7 +73,7 @@ RSpec.describe 'Sellers API', type: :request do
   # Test suite for GET /sellers
   describe 'GET /sellers sort by created_at desc' do
     # make HTTP get request before each example
-    before { get '/sellers?sort=created_at.desc' }
+    before { get '/sellers?sort=created_at:desc' }
 
     it 'returns sellers' do
       # Note `json` is a custom helper to parse JSON responses

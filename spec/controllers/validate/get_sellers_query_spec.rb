@@ -19,14 +19,14 @@ describe Validate::GetSellersQuery, '#valid?', type: :model do
   end
 
   it 'is valid query with both sort key and order desc' do
-    query = Validate::GetSellersQuery.new({sort: 'created_at.desc'})
+    query = Validate::GetSellersQuery.new({sort: 'created_at:desc'})
     expect(query.valid?).to eq(true)
     expect(query.sort_key).to eq('created_at')
     expect(query.sort_order).to eq('desc')
   end
 
   it 'is valid query with both sort key and order asc' do
-    query = Validate::GetSellersQuery.new({sort: 'created_at.asc'})
+    query = Validate::GetSellersQuery.new({sort: 'created_at:asc'})
     expect(query.valid?).to eq(true)
     expect(query.sort_key).to eq('created_at')
     expect(query.sort_order).to eq('asc')
