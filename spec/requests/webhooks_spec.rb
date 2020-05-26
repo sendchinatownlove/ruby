@@ -80,6 +80,10 @@ RSpec.describe 'Webhooks API', type: :request do
       allow(Digest::SHA1).to receive(:base64digest)
         .and_return(true)
 
+      # Give seller2 the most donations
+      item = create(:item, seller: seller2)
+      create(:donation_detail, item: item, amount: 10_00)
+
       post(
         '/webhooks',
         headers: { 'HTTP_X_SQUARE_SIGNATURE' => 'www.squareup.com' },
@@ -90,31 +94,13 @@ RSpec.describe 'Webhooks API', type: :request do
     context 'with pool donation' do
       let(:seller_id) { seller_pool.seller_id }
 
-      def get_donation_detail(seller_id:)
-        DonationDetail.joins(:item).where(
-          items: { seller_id: seller_id }
-        ).first
-      end
-
       context 'with nice pool donation' do
         let(:amount) { 5000 }
         let(:item_type) { 'donation' }
 
         it 'creates pool donation' do
-          donation_to_seller1 = get_donation_detail(seller_id: seller1.id)
-          donation_to_seller2 = get_donation_detail(seller_id: seller2.id)
-          donation_to_seller3 = get_donation_detail(seller_id: seller3.id)
-
-          expect(DonationDetail.count).to eq(2)
-          expect(Item.count).to eq(2)
-          expect(PaymentIntent.count).to eq(1)
-
-          expect(donation_to_seller1).not_to be_nil
-          expect(donation_to_seller2).not_to be_nil
-          expect(donation_to_seller3).to be_nil
-
-          expect(donation_to_seller1.amount).to eq(2500)
-          expect(donation_to_seller2.amount).to eq(2500)
+          expect(seller1.donation_amount).to eq(25_00)
+          expect(seller2.donation_amount).to eq(35_00)
         end
 
         it 'returns status code 200' do
@@ -127,20 +113,8 @@ RSpec.describe 'Webhooks API', type: :request do
         let(:item_type) { 'donation' }
 
         it 'creates pool donation and distrubutes the cents' do
-          donation_to_seller1 = get_donation_detail(seller_id: seller1.id)
-          donation_to_seller2 = get_donation_detail(seller_id: seller2.id)
-          donation_to_seller3 = get_donation_detail(seller_id: seller3.id)
-
-          expect(DonationDetail.count).to eq(2)
-          expect(Item.count).to eq(2)
-          expect(PaymentIntent.count).to eq(1)
-
-          expect(donation_to_seller1).not_to be_nil
-          expect(donation_to_seller2).not_to be_nil
-          expect(donation_to_seller3).to be_nil
-
-          expect(donation_to_seller1.amount).to eq(2)
-          expect(donation_to_seller2.amount).to eq(1)
+          expect(seller1.donation_amount).to eq(2)
+          expect(seller2.donation_amount).to eq(10_01)
         end
 
         it 'returns status code 200' do
@@ -158,21 +132,9 @@ RSpec.describe 'Webhooks API', type: :request do
           let(:item_type) { 'donation' }
 
           it 'creates pool donation and distrubutes the cents' do
-            donation_to_seller1 = get_donation_detail(seller_id: seller1.id)
-            donation_to_seller2 = get_donation_detail(seller_id: seller2.id)
-            donation_to_seller3 = get_donation_detail(seller_id: seller3.id)
-
-            expect(DonationDetail.count).to eq(3)
-            expect(Item.count).to eq(3)
-            expect(PaymentIntent.count).to eq(1)
-
-            expect(donation_to_seller1).not_to be_nil
-            expect(donation_to_seller2).not_to be_nil
-            expect(donation_to_seller2).not_to be_nil
-
-            expect(donation_to_seller1.amount).to eq(112)
-            expect(donation_to_seller2.amount).to eq(112)
-            expect(donation_to_seller3.amount).to eq(111)
+            expect(seller1.donation_amount).to eq(1_12)
+            expect(seller3.donation_amount).to eq(1_12)
+            expect(seller2.donation_amount).to eq(11_11)
           end
 
           it 'returns status code 200' do

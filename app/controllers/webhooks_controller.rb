@@ -125,7 +125,17 @@ class WebhooksController < ApplicationController
       if seller_id.eql?(Seller::POOL_DONATION_SELLER_ID)
         PoolDonationValidator.call({ type: item['item_type'] })
 
-        @donation_sellers = Seller.filter_by_accepts_donations
+        # TODO(jtmckibb): This is a very inefficient sort, since each time we
+        #                 call amount_raised, it has to fetch all of the
+        #                 associated Items, DonationDetails, and GiftCardDetails
+        #                 Then for each GiftCardDetail, it has to fetch every
+        #                 amount in an N+1 query, then sum everything.
+        #                 This all in an N log N sort is just a bad. Ideally,
+        #                 we would memoize amount_raised, and fix the N+1 query
+        #                 in GiftCardDetail that calculates amount.
+        @donation_sellers = Seller.filter_by_accepts_donations.sort_by do |s|
+          s.amount_raised
+        end
 
         # calculate amount per merchant
         # This will break if we ever have zero merchants but are still

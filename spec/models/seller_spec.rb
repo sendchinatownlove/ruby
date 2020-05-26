@@ -139,6 +139,84 @@ RSpec.describe Seller, type: :model do
     end
   end
 
+  describe '#amount_raised' do
+    context 'amount with no money raised' do
+      it 'returns zero gift cards' do
+        expect(seller.gift_card_amount).to eq(0)
+        expect(seller.num_gift_cards).to eq(0)
+        expect(seller.donation_amount).to eq(0)
+        expect(seller.num_donations).to eq(0)
+        expect(seller.num_contributions).to eq(0)
+        expect(seller.amount_raised).to eq(0)
+      end
+    end
+
+    context 'amount with money raised' do
+      before do
+        # Create $50 gift card
+        item_gift_card1 = create(:item, seller: seller)
+        gift_card_detail1 = create(:gift_card_detail, item: item_gift_card1)
+        create(
+          :gift_card_amount,
+          value: 50_00,
+          gift_card_detail: gift_card_detail1
+        )
+
+        # Create second gift card, which is a $50 gift card with $20 spent
+        item_gift_card2 = create(:item, seller: seller)
+        gift_card_detail2 = create(:gift_card_detail, item: item_gift_card2)
+        create(
+          :gift_card_amount,
+          value: 50_00,
+          gift_card_detail: gift_card_detail2
+        )
+        # Updated a day later
+        create(
+          :gift_card_amount,
+          value: 30_00,
+          gift_card_detail: gift_card_detail2,
+          created_at: Time.current + 1.day
+        )
+
+        # Create $100 gift card, refunded
+        item_gift_card3 = create(:item, seller: seller, refunded: true)
+        gift_card_detail3 = create(:gift_card_detail, item: item_gift_card3)
+        create(
+          :gift_card_amount,
+          value: 100_00,
+          gift_card_detail: gift_card_detail3
+        )
+
+        # Create a donation of $200
+        item_donation1 = create(:item, seller: seller)
+        create(:donation_detail, item: item_donation1, amount: 200_00)
+
+        # Create a donation of $10
+        item_donation2 = create(:item, seller: seller)
+        create(:donation_detail, item: item_donation2, amount: 10_00)
+
+        # Create a donation of $50, refunded
+        item_donation3 = create(:item, seller: seller, refunded: true)
+        create(:donation_detail, item: item_donation3, amount: 50_00)
+      end
+
+      it 'returns gift card amounts' do
+        expect(seller.gift_card_amount).to eq(80_00)
+        expect(seller.num_gift_cards).to eq(2)
+      end
+
+      it 'returns donation amounts' do
+        expect(seller.donation_amount).to eq(210_00)
+        expect(seller.num_donations).to eq(2)
+      end
+
+      it 'returns total amount' do
+        expect(seller.amount_raised).to eq(290_00)
+        expect(seller.num_contributions).to eq(4)
+      end
+    end
+  end
+
   context 'test future founding year' do
     let(:founded_year) { 3000 } # not much has changed but they live underwater
 
