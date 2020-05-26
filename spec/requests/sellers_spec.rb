@@ -4,8 +4,6 @@ require 'rails_helper'
 
 RSpec.describe 'Sellers API', type: :request do
   # initialize test data
-  before { freeze_time }
-  let(:current_time) { Time.current.utc.iso8601(3).to_s }
   let(:seller_id1) { seller1.seller_id }
   let!(:seller1) do
     create(:seller)
@@ -47,6 +45,42 @@ RSpec.describe 'Sellers API', type: :request do
       # Note `json` is a custom helper to parse JSON responses
       expect(json).not_to be_empty
       expect(json.size).to eq(2)
+    end
+
+    it 'returns status code 200' do
+      expect(response).to have_http_status(200)
+    end
+  end
+
+  # Test suite for GET /sellers
+  describe 'GET /sellers sort by created_at asc' do
+    # make HTTP get request before each example
+    before { get '/sellers?sort=created_at.asc' }
+
+    it 'returns sellers' do
+      # Note `json` is a custom helper to parse JSON responses
+      expect(json).not_to be_empty
+      expect(json.size).to eq(2)
+      expect(json[0]['id']).to eq(seller1.id)
+      expect(json[1]['id']).to eq(seller2.id)
+    end
+
+    it 'returns status code 200' do
+      expect(response).to have_http_status(200)
+    end
+  end
+
+  # Test suite for GET /sellers
+  describe 'GET /sellers sort by created_at desc' do
+    # make HTTP get request before each example
+    before { get '/sellers?sort=created_at.desc' }
+
+    it 'returns sellers' do
+      # Note `json` is a custom helper to parse JSON responses
+      expect(json).not_to be_empty
+      expect(json.size).to eq(2)
+      expect(json[0]['id']).to eq(seller2.id)
+      expect(json[1]['id']).to eq(seller1.id)
     end
 
     it 'returns status code 200' do
