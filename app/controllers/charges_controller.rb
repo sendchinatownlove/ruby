@@ -17,11 +17,14 @@ class ChargesController < ApplicationController
 
     validate(seller_id: seller_id, line_items: line_items)
 
+    is_distribution = charge_params[:is_distribution] || false
+
     # Validate each Item and get all ItemTypes
     item_types = Set.new
     line_items.each do |item|
       item_types.add item['item_type']
       item[:seller_id] = seller_id
+      item[:is_distribution] = is_distribution
     end
 
     seller = Seller.find_by(seller_id: seller_id)
@@ -32,7 +35,6 @@ class ChargesController < ApplicationController
         sum + item['amount'] * item['quantity']
       end
 
-    is_distribution = charge_params[:is_distribution] || false
 
     email = charge_params[:email]
     payment = create_square_payment_request(nonce: charge_params[:nonce],

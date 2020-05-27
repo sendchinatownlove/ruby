@@ -6,6 +6,7 @@
 #
 #  id                  :bigint           not null, primary key
 #  expiration          :date
+#  single_use          :boolean          default(FALSE), not null
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
 #  gift_card_id        :string

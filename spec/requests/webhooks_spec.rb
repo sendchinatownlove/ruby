@@ -13,9 +13,11 @@ RSpec.describe 'Webhooks API', type: :request do
         'currency': 'usd',
         'item_type': item_type,
         'quantity': 1,
-        'seller_id': seller_id
+        'seller_id': seller_id,
+        'is_distribution': is_distribution
       }].to_json
     end
+    let(:is_distribution) { false }
     let(:purchaser) do
       create(
         :contact,
@@ -309,30 +311,44 @@ RSpec.describe 'Webhooks API', type: :request do
       let(:item_type) { 'gift_card' }
       let(:seller_id) { seller1.seller_id }
 
-      it 'creates a gift card' do
-        gift_card_detail = GiftCardDetail.last
+      def verify_gift_card(single_use:)
+        item = Item.where(
+          seller_id: seller1.id,
+          item_type: 'gift_card'
+        ).first
+        expect(item).not_to be_nil
+
+        gift_card_detail = item.gift_card_detail
         expect(gift_card_detail).not_to be_nil
         expect(gift_card_detail.gift_card_id).to eq(
           'aweofijn-3n3400-oawjiefwef-0iawef-0i'
         )
+        expect(gift_card_detail.single_use).to eq(single_use)
         expect(gift_card_detail.seller_gift_card_id).to eq('#ABC-DE')
         expect(gift_card_detail.expiration).to eq(Date.today + 1.year)
+        expect(gift_card_detail.amount).to eq(5000)
 
-        gift_card_amount = GiftCardAmount.find_by(
-          gift_card_detail_id: gift_card_detail['id']
-        )
-        expect(gift_card_amount['value']).to eq(5000)
-
-        item = Item.find(gift_card_detail['item_id'])
-        expect(item).not_to be_nil
-        expect(item.gift_card?).to be true
-        expect(item.seller).to eq(seller1)
-
-        payment_intent = PaymentIntent.find(item['payment_intent_id'])
+        payment_intent = item.payment_intent
         expect(payment_intent.successful).to be true
         expect(payment_intent.recipient).not_to eq(payment_intent.purchaser)
         expect(item.purchaser).to eq(payment_intent.purchaser)
         expect(gift_card_detail.recipient).to eq(payment_intent.recipient)
+      end
+
+      context 'with is_distribution = true' do
+        let(:is_distribution) { true }
+
+        it 'creates a single use gift card' do
+          verify_gift_card(single_use: true)
+        end
+
+        it 'returns status code 200' do
+          expect(response).to have_http_status(200)
+        end
+      end
+
+      it 'creates a gift card' do
+        verify_gift_card(single_use: false)
       end
 
       it 'returns status code 200' do
