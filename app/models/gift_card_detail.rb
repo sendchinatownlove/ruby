@@ -35,7 +35,6 @@ class GiftCardDetail < ApplicationRecord
 
   # TODO(jmckibben): Being used in sellers_helper N times. Ideally we'd combine
   # into a single query
-  # TODO change to created_at
   def amount
     GiftCardAmount.where(gift_card_detail_id: id)
                   .order(created_at: :desc)

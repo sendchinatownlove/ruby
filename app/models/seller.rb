@@ -63,4 +63,59 @@ class Seller < ApplicationRecord
   validates_uniqueness_of :square_location_id
   validates_inclusion_of :sell_gift_cards, in: [true, false]
   validates_inclusion_of :accept_donations, in: [true, false]
+
+  # returns the total amount raised
+  def amount_raised
+    gift_card_amount + donation_amount
+  end
+
+  # calculates the amount raised from gift cards
+  def gift_card_amount
+    GiftCardDetail.joins(:item)
+                  .where(items: {
+                           seller_id: id,
+                           refunded: false
+                         })
+                  .inject(0) do |sum, gift_card|
+      sum + gift_card.amount
+    end
+  end
+
+  # calculates the amount raised from donations
+  def donation_amount
+    DonationDetail.joins(:item)
+                  .where(items: {
+                           seller_id: id,
+                           refunded: false
+                         })
+                  .inject(0) do |sum, donation|
+      sum + donation.amount
+    end
+  end
+
+  def num_contributions
+    num_gift_cards + num_donations
+  end
+
+  # calculates the number of gift cards sold for seller
+  # seller_id: the actual id of the Seller. Seller.id
+  def num_gift_cards
+    GiftCardDetail.joins(:item)
+                  .where(items: {
+                           seller_id: id,
+                           refunded: false
+                         })
+                  .size
+  end
+
+  # calculates the number of donations received by seller
+  # seller_id: the actual id of the Seller. Seller.id
+  def num_donations
+    DonationDetail.joins(:item)
+                  .where(items: {
+                           seller_id: id,
+                           refunded: false
+                         })
+                  .size
+  end
 end
