@@ -49,7 +49,8 @@ RSpec.describe 'Charges API', type: :request do
               currency: 'usd',
               item_type: 'gift_card',
               quantity: 1,
-              seller_id: seller_id
+              seller_id: seller_id,
+              is_distribution: is_distribution
             }
           ]
         end
@@ -151,14 +152,16 @@ RSpec.describe 'Charges API', type: :request do
               currency: 'usd',
               item_type: 'gift_card',
               quantity: 1,
-              seller_id: seller_id
+              seller_id: seller_id,
+              is_distribution: is_distribution
             },
             {
               amount: 3000,
               currency: 'usd',
               item_type: 'donation',
               quantity: 1,
-              seller_id: seller_id
+              seller_id: seller_id,
+              is_distribution: is_distribution
             }
           ]
         end
@@ -193,7 +196,8 @@ RSpec.describe 'Charges API', type: :request do
               currency: 'usd',
               item_type: 'donation',
               quantity: 1,
-              seller_id: seller_id
+              seller_id: seller_id,
+              is_distribution: is_distribution
             }
           ]
         end

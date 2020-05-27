@@ -115,21 +115,21 @@ class WebhooksController < ApplicationController
 
     items = JSON.parse(payment_intent.line_items)
     recipient = payment_intent.recipient
-    items.each do |item|
+    items.each do |item_json|
       # TODO(jtmckibb): Add some tracking that tracks if it breaks somewhere
       # here
 
-      amount = item['amount']
-      seller_id = item['seller_id']
+      amount = item_json['amount']
+      seller_id = item_json['seller_id']
       if seller_id.eql?(Seller::POOL_DONATION_SELLER_ID)
-        PoolDonationValidator.call({ type: item['item_type'] })
+        PoolDonationValidator.call({ type: item_json['item_type'] })
 
         # TODO(jtmckibb): This is a very inefficient sort, since each time we
         #                 call amount_raised, it has to fetch all of the
         #                 associated Items, DonationDetails, and GiftCardDetails
         #                 Then for each GiftCardDetail, it has to fetch every
-        #                 amount in an N+1 query, then sum everything.
-        #                 This all in an N log N sort is just a bad. Ideally,
+        #                 amount in an N+1 query, then sum everything. This is
+        #                 all in an N log N sort—which is horrible. Ideally,
         #                 we would memoize amount_raised, and fix the N+1 query
         #                 in GiftCardDetail that calculates amount.
         @donation_sellers = Seller.filter_by_accepts_donations.sort_by do |s|
@@ -158,7 +158,7 @@ class WebhooksController < ApplicationController
         })
       else
         merchant_name = Seller.find_by(seller_id: seller_id).name
-        case item['item_type']
+        case item_json['item_type']
         when 'donation'
           create_item_and_donation(
             seller_id: seller_id,
@@ -181,7 +181,8 @@ class WebhooksController < ApplicationController
             item: item,
             amount: amount,
             seller_id: seller_id,
-            recipient: recipient
+            recipient: recipient,
+            single_use: item_json['is_distribution']
           )
           EmailManager::GiftCardReceiptSender.call({
               payment_intent: payment_intent,
@@ -220,13 +221,14 @@ class WebhooksController < ApplicationController
     )
   end
 
-  def create_gift_card(item:, amount:, seller_id:, recipient:)
+  def create_gift_card(item:, amount:, seller_id:, recipient:, single_use:)
     gift_card_detail = GiftCardDetail.create!(
       expiration: Date.today + 1.year,
       item: item,
       gift_card_id: generate_gift_card_id,
       seller_gift_card_id: generate_seller_gift_card_id(seller_id: seller_id),
-      recipient: recipient
+      recipient: recipient,
+      single_use: single_use
     )
     GiftCardAmount.create!(value: amount, gift_card_detail: gift_card_detail)
     gift_card_detail

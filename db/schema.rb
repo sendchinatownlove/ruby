@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_17_210843) do
+ActiveRecord::Schema.define(version: 2020_05_27_020111) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -55,6 +55,7 @@ ActiveRecord::Schema.define(version: 2020_05_17_210843) do
     t.bigint "item_id", null: false
     t.string "seller_gift_card_id"
     t.bigint "recipient_id", null: false
+    t.boolean "single_use", default: false, null: false
     t.index ["item_id"], name: "index_gift_card_details_on_item_id"
     t.index ["recipient_id"], name: "index_gift_card_details_on_recipient_id"
   end
