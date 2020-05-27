@@ -2,7 +2,7 @@
 
 class LocationsController < ApplicationController
   before_action :set_seller
-  before_action :set_seller_location, only: %i[show update]
+  before_action :set_seller_location, only: %i[show update destroy]
 
   # GET /sellers/:seller_id/locations
   def index
@@ -24,6 +24,13 @@ class LocationsController < ApplicationController
     @location.update(update_location_params)
     @location.save
     json_response(@location)
+  end
+
+  # DELETE /sellers/:seller_id/locations/:id
+  def destroy
+    @location.destroy
+
+    head :no_content
   end
 
   private

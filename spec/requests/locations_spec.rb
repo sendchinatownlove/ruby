@@ -139,4 +139,25 @@ RSpec.describe 'Locations API' do
       end
     end
   end
+
+  # Test suite for DELETE /sellers/:seller_id/menu_items/:id
+  describe 'DELETE /sellers/:seller_id/locations/:id' do
+    before do
+      delete(
+        "/sellers/#{seller_id}/locations/#{id}",
+      )
+    end
+
+    context 'when location exists' do
+      it 'returns status code 204' do
+        expect(response).to have_http_status(204)
+      end
+
+      it 'confirms deletion of the location' do
+        expect { Location.find(id) }.to raise_exception(
+          ActiveRecord::RecordNotFound
+        )
+      end
+    end
+  end
 end
