@@ -7,7 +7,7 @@ describe WebhookManager::ItemCreator, '#call' do
   let(:payment_intent) { create :payment_intent }
   let(:payload) do
     {
-      item_type: "donation",
+      item_type: 'donation',
       seller_id: seller.seller_id,
       payment_intent: payment_intent
     }
