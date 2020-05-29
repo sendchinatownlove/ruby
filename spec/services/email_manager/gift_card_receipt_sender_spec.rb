@@ -8,6 +8,7 @@ describe EmailManager::GiftCardReceiptSender, '#call' do
       gift_card_detail: gift_card_detail,
       merchant: "Three Broomsticks",
       payment_intent: payment_intent,
+      email: 'justin@sendchinatownlove.com'
   }
   end
 

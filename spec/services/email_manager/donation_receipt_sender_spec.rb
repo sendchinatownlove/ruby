@@ -6,6 +6,7 @@ describe EmailManager::DonationReceiptSender, '#call' do
       amount: 5000,
       merchant: "Leaky Cauldron",
       payment_intent: payment_intent,
+      email: 'justin@sendchinatownlove.com'
   }
   end
 

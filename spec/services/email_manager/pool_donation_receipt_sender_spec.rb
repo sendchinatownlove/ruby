@@ -5,6 +5,7 @@ describe EmailManager::PoolDonationReceiptSender, '#call' do
   let(:receipt_params) do {
       amount: 5000,
       payment_intent: payment_intent,
+      email: 'justin@sendchinatownlove.com'
   }
   end
 
