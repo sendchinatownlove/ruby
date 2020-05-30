@@ -23,6 +23,7 @@ RSpec.describe SellersHelper, type: :helper do
         'created_at': seller.created_at,
         'updated_at': seller.updated_at,
         'target_amount': seller.target_amount,
+        'logo_image_url': seller.logo_image_url,
         'summary': seller.summary,
         'progress_bar_color': seller.progress_bar_color,
         'hero_image_url': seller.hero_image_url,
