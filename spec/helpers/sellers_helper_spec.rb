@@ -27,6 +27,7 @@ RSpec.describe SellersHelper, type: :helper do
         'progress_bar_color': seller.progress_bar_color,
         'hero_image_url': seller.hero_image_url,
         'locations': [],
+        'gallery_image_urls': [],
         'business_type': seller.business_type,
         'num_employees': seller.num_employees,
         'founded_year': seller.founded_year,

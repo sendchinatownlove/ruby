@@ -71,7 +71,8 @@ class SellersController < ApplicationController
       :website_url,
       :menu_url,
       :target_amount,
-      :square_location_id
+      :square_location_id,
+      gallery_image_urls: []
     )
   end
 
