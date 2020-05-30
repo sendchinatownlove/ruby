@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_30_191835) do
+ActiveRecord::Schema.define(version: 2020_05_30_194123) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -107,6 +107,7 @@ ActiveRecord::Schema.define(version: 2020_05_30_191835) do
     t.string "receipt_url"
     t.bigint "purchaser_id"
     t.bigint "recipient_id"
+    t.integer "lock_version"
     t.index ["purchaser_id"], name: "index_payment_intents_on_purchaser_id"
     t.index ["recipient_id"], name: "index_payment_intents_on_recipient_id"
   end
