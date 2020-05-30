@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_27_020111) do
+ActiveRecord::Schema.define(version: 2020_05_30_191835) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -152,6 +152,8 @@ ActiveRecord::Schema.define(version: 2020_05_27_020111) do
     t.string "menu_url"
     t.string "square_location_id", null: false
     t.integer "cost_per_meal"
+    t.string "gallery_image_urls", default: [], null: false, array: true
+    t.string "logo_image_url"
     t.index ["seller_id"], name: "index_sellers_on_seller_id"
   end
 

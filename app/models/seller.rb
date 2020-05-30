@@ -10,7 +10,9 @@
 #  cost_per_meal      :integer
 #  cuisine_name       :string
 #  founded_year       :integer
+#  gallery_image_urls :string           default([]), not null, is an Array
 #  hero_image_url     :string
+#  logo_image_url     :string
 #  menu_url           :string
 #  name               :string
 #  num_employees      :integer
