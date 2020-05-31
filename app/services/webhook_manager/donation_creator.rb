@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Validates idempotency using the ExistingEvent Model
+# Creates donation and item with the corresponding payload
 module WebhookManager
   class DonationCreator < BaseService
     attr_reader :seller_id, :payment_intent, :amount
