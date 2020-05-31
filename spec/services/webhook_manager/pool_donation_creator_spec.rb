@@ -7,7 +7,7 @@ describe WebhookManager::PoolDonationCreator, '#call' do
 
   it 'creates donation' do
     # Initialize more than one seller
-    create :seller
+    create :seller, accept_donations: true
 
     payment_intent = create :payment_intent
     payload = new_payload(payment_intent)
@@ -26,7 +26,7 @@ describe WebhookManager::PoolDonationCreator, '#call' do
 
   it 'does not create donation due to stale data' do
     create :payment_intent
-    create :seller
+    create :seller, accept_donations: true
 
     payment_intent_1 = PaymentIntent.last
     payment_intent_2 = PaymentIntent.last
