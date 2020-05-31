@@ -132,9 +132,7 @@ class WebhooksController < ApplicationController
         #                 all in an N log N sort—which is horrible. Ideally,
         #                 we would memoize amount_raised, and fix the N+1 query
         #                 in GiftCardDetail that calculates amount.
-        @donation_sellers = Seller.filter_by_accepts_donations.sort_by do |s|
-          s.amount_raised
-        end
+        @donation_sellers = Seller.filter_by_accepts_donations.sort_by(&:amount_raised)
 
         # calculate amount per merchant
         # This will break if we ever have zero merchants but are still
@@ -153,9 +151,10 @@ class WebhooksController < ApplicationController
           remainder -= 1
         end
         EmailManager::PoolDonationReceiptSender.call({
-            payment_intent: payment_intent,
-            amount: amount,
-        })
+                                                       payment_intent: payment_intent,
+                                                       amount: amount,
+                                                       email: payment_intent.purchaser.email
+                                                     })
       else
         merchant_name = Seller.find_by(seller_id: seller_id).name
         case item_json['item_type']
@@ -166,10 +165,11 @@ class WebhooksController < ApplicationController
             amount: amount
           )
           EmailManager::DonationReceiptSender.call({
-              payment_intent: payment_intent,
-              amount: amount,
-              merchant: merchant_name
-          })
+                                                     payment_intent: payment_intent,
+                                                     amount: amount,
+                                                     merchant: merchant_name,
+                                                     email: payment_intent.purchaser.email
+                                                   })
         when 'gift_card'
           item = create_item(
             item_type: :gift_card,
@@ -177,19 +177,33 @@ class WebhooksController < ApplicationController
             payment_intent: payment_intent
           )
 
+          is_distribution = item_json['is_distribution']
+
           gift_card_detail = create_gift_card(
             item: item,
             amount: amount,
             seller_id: seller_id,
             recipient: recipient,
-            single_use: item_json['is_distribution']
+            single_use: is_distribution
           )
-          EmailManager::GiftCardReceiptSender.call({
-              payment_intent: payment_intent,
-              amount: amount,
-              merchant: merchant_name,
-              gift_card_detail: gift_card_detail
-          })
+
+          # Gift a meal purchases are technically donations to the purchaser
+          if is_distribution
+            EmailManager::DonationReceiptSender.call({
+                                                       payment_intent: payment_intent,
+                                                       amount: amount,
+                                                       merchant: merchant_name,
+                                                       email: payment_intent.purchaser.email
+                                                     })
+          else
+            EmailManager::GiftCardReceiptSender.call({
+                                                       payment_intent: payment_intent,
+                                                       amount: amount,
+                                                       merchant: merchant_name,
+                                                       gift_card_detail: gift_card_detail,
+                                                       email: payment_intent.recipient.email
+                                                     })
+          end
         else
           raise(
             InvalidLineItem,
@@ -236,10 +250,10 @@ class WebhooksController < ApplicationController
 
   def create_item(item_type:, seller_id:, payment_intent:)
     WebhookManager::ItemCreator.call({
-      item_type: item_type,
-      seller_id: seller_id,
-      payment_intent: payment_intent
-    })
+                                       item_type: item_type,
+                                       seller_id: seller_id,
+                                       payment_intent: payment_intent
+                                     })
   end
 
   def generate_gift_card_id

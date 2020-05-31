@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EmailManager
   class Sender < BaseService
     def self.format_amount(amount:)
