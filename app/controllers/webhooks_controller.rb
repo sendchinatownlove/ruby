@@ -151,11 +151,14 @@ class WebhooksController < ApplicationController
                                                      email: payment_intent.purchaser.email
                                                    })
         when 'gift_card'
+
+          is_distribution = item_json['is_distribution']
+
           gift_card_detail = WebhookManager::GiftCardCreator.call({
                                                                     amount: amount,
                                                                     seller_id: seller_id,
                                                                     payment_intent: payment_intent,
-                                                                    single_use: item_json['is_distribution']
+                                                                    single_use: is_distribution
                                                                   })
           # Gift a meal purchases are technically donations to the purchaser
           if is_distribution
