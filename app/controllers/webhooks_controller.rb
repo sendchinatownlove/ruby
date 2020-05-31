@@ -159,11 +159,11 @@ class WebhooksController < ApplicationController
         merchant_name = Seller.find_by(seller_id: seller_id).name
         case item_json['item_type']
         when 'donation'
-          create_item_and_donation(
+          WebhookManager::DonationCreator.call({
             seller_id: seller_id,
             payment_intent: payment_intent,
             amount: amount
-          )
+          })
           EmailManager::DonationReceiptSender.call({
                                                      payment_intent: payment_intent,
                                                      amount: amount,
