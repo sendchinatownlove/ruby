@@ -35,7 +35,6 @@ class ChargesController < ApplicationController
         sum + item['amount'] * item['quantity']
       end
 
-
     email = charge_params[:email]
     payment = create_square_payment_request(nonce: charge_params[:nonce],
                                             amount: amount,
