@@ -115,6 +115,8 @@ class WebhooksController < ApplicationController
 
     items = JSON.parse(payment_intent.line_items)
     recipient = payment_intent.recipient
+    donation_event = nil
+
     items.each do |item_json|
       # TODO(jtmckibb): Add some tracking that tracks if it breaks somewhere
       # here
@@ -165,11 +167,7 @@ class WebhooksController < ApplicationController
             payment_intent: payment_intent,
             amount: amount
           )
-          EmailManager::DonationReceiptSender.call({
-              payment_intent: payment_intent,
-              amount: amount,
-              merchant: merchant_name
-          })
+          donation_event ||= true
         when 'gift_card'
           item = create_item(
             item_type: :gift_card,
@@ -196,6 +194,18 @@ class WebhooksController < ApplicationController
             'Unsupported ItemType. Please verify the line_item.name.'
           )
         end
+      end
+    end
+
+    if donation_event
+      # Send separate email for each seller.
+      grouped_items = items.group_by { |li| li["seller_id"] }
+      grouped_items.keys.each do |sid|
+        EmailManager::DonationReceiptSender.call({
+            payment_intent: payment_intent,
+            amount: grouped_items[sid].map { |li| li["amount"].to_f }.sum,
+            merchant: Seller.find_by(seller_id: sid).name
+        })
       end
     end
 
