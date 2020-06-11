@@ -74,7 +74,7 @@ RSpec.describe 'Webhooks API', type: :request do
     end
 
     before do
-      allow_any_instance_of(WebhookManager::GiftCardCreator)
+      allow(GiftCardIdGenerator)
         .to receive(:generate_seller_gift_card_id_hash)
         .and_return('abcde')
       allow(SecureRandom).to receive(:uuid)
