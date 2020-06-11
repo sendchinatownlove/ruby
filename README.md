@@ -85,6 +85,16 @@ This also enables you to share your local environment in pull requests for addit
     1. Edit `SQUARE_WEBHOOK_SIGNATURE_KEY` to the signature key from when you created the webhooks.
     1. Edit `RAILS_WEBHOOK_URL` to your domain + webhooks url. For instance `https://example.com/webhooks`. This is used for validating requests.
 
+### Seeding Gift Cards
+
+First evaluate which seller the gift cards are going to go towards, how many are needed, and who is going to distribute the gift cards.
+
+Run the command below
+
+```sh
+heroku run rake create_gift_cards -s {SELLER_ID} -m {DISTRIBUTOR_EMAIL} -q {QUANTITY} -a {AMOUNT}
+```
+
 #### Reference Links
 
 * https://dev.to/giorgosk/expose-your-local-web-server-to-the-world-using-localhost-run-or-serveo-net-l83
