@@ -92,7 +92,7 @@ First evaluate which seller the gift cards are going to go towards, how many are
 Run the command below
 
 ```sh
-heroku run rake create_gift_cards -s {SELLER_ID} -m {DISTRIBUTOR_EMAIL} -q {QUANTITY} -a {AMOUNT}
+heroku run rake gift_cards:create -s {SELLER_ID} -m {DISTRIBUTOR_EMAIL} -q {QUANTITY} -a {AMOUNT}
 ```
 
 #### Reference Links
