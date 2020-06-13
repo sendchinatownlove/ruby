@@ -91,8 +91,10 @@ First evaluate which seller the gift cards are going to go towards, how many are
 
 Run the command below
 
+_**NOTE:** A dollar is 100. If you wish to seed $5, put 500 as the amount._
+
 ```sh
-heroku run rake gift_cards:create -s {SELLER_ID} -m {DISTRIBUTOR_EMAIL} -q {QUANTITY} -a {AMOUNT}
+heroku run -a {HEROKU APP} 'rake gift_cards:create -s {SELLER_ID} -m {DISTRIBUTOR_EMAIL} -q {QUANTITY} -a {AMOUNT}'
 ```
 
 #### Reference Links
