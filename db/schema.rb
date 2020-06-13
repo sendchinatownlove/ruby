@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_30_032154) do
+ActiveRecord::Schema.define(version: 2020_05_30_194123) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -117,6 +117,7 @@ ActiveRecord::Schema.define(version: 2020_05_30_032154) do
     t.string "receipt_url"
     t.bigint "purchaser_id"
     t.bigint "recipient_id"
+    t.integer "lock_version"
     t.index ["purchaser_id"], name: "index_payment_intents_on_purchaser_id"
     t.index ["recipient_id"], name: "index_payment_intents_on_recipient_id"
   end
@@ -162,6 +163,8 @@ ActiveRecord::Schema.define(version: 2020_05_30_032154) do
     t.string "menu_url"
     t.string "square_location_id", null: false
     t.integer "cost_per_meal"
+    t.string "gallery_image_urls", default: [], null: false, array: true
+    t.string "logo_image_url"
     t.index ["seller_id"], name: "index_sellers_on_seller_id"
   end
 

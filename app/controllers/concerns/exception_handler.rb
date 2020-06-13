@@ -27,6 +27,7 @@ module ExceptionHandler
   # Note that these are evaluated from bottom to top
   included do
     rescue_from ActiveRecord::RecordInvalid,
+                ActiveRecord::StaleObjectError,
                 ActionController::ParameterMissing,
                 InvalidParameterError,
                 InvalidLineItem,

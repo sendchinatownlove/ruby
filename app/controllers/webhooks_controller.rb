@@ -124,72 +124,59 @@ class WebhooksController < ApplicationController
       if seller_id.eql?(Seller::POOL_DONATION_SELLER_ID)
         PoolDonationValidator.call({ type: item_json['item_type'] })
 
-        # TODO(jtmckibb): This is a very inefficient sort, since each time we
-        #                 call amount_raised, it has to fetch all of the
-        #                 associated Items, DonationDetails, and GiftCardDetails
-        #                 Then for each GiftCardDetail, it has to fetch every
-        #                 amount in an N+1 query, then sum everything. This is
-        #                 all in an N log N sort—which is horrible. Ideally,
-        #                 we would memoize amount_raised, and fix the N+1 query
-        #                 in GiftCardDetail that calculates amount.
-        @donation_sellers = Seller.filter_by_accepts_donations.sort_by do |s|
-          s.amount_raised
-        end
-
-        # calculate amount per merchant
-        # This will break if we ever have zero merchants but are still
-        # accepting pool donations.
-        amount_per = (amount.to_f / @donation_sellers.count.to_f).floor
-        remainder = amount % @donation_sellers.count
-
-        @donation_sellers.each do |seller|
-          next if seller.seller_id.eql?(Seller::POOL_DONATION_SELLER_ID)
-
-          create_item_and_donation(
-            seller_id: seller.seller_id,
-            payment_intent: payment_intent,
-            amount: amount_per + (remainder > 0 ? 1 : 0)
-          )
-          remainder -= 1
-        end
-        EmailManager::PoolDonationReceiptSender.call({
-            payment_intent: payment_intent,
-            amount: amount,
+        WebhookManager::PoolDonationCreator.call({
+          seller_id: seller_id,
+          payment_intent: payment_intent,
+          amount: amount
         })
+
+        EmailManager::PoolDonationReceiptSender.call({
+                                                       payment_intent: payment_intent,
+                                                       amount: amount,
+                                                       email: payment_intent.purchaser.email
+                                                     })
       else
         merchant_name = Seller.find_by(seller_id: seller_id).name
         case item_json['item_type']
         when 'donation'
-          create_item_and_donation(
-            seller_id: seller_id,
-            payment_intent: payment_intent,
-            amount: amount
-          )
+          WebhookManager::DonationCreator.call({
+                                                 seller_id: seller_id,
+                                                 payment_intent: payment_intent,
+                                                 amount: amount
+                                               })
           EmailManager::DonationReceiptSender.call({
-              payment_intent: payment_intent,
-              amount: amount,
-              merchant: merchant_name
-          })
+                                                     payment_intent: payment_intent,
+                                                     amount: amount,
+                                                     merchant: merchant_name,
+                                                     email: payment_intent.purchaser.email
+                                                   })
         when 'gift_card'
-          item = create_item(
-            item_type: :gift_card,
-            seller_id: seller_id,
-            payment_intent: payment_intent
-          )
 
-          gift_card_detail = create_gift_card(
-            item: item,
-            amount: amount,
-            seller_id: seller_id,
-            recipient: recipient,
-            single_use: item_json['is_distribution']
-          )
-          EmailManager::GiftCardReceiptSender.call({
-              payment_intent: payment_intent,
-              amount: amount,
-              merchant: merchant_name,
-              gift_card_detail: gift_card_detail
-          })
+          is_distribution = item_json['is_distribution']
+
+          gift_card_detail = WebhookManager::GiftCardCreator.call({
+                                                                    amount: amount,
+                                                                    seller_id: seller_id,
+                                                                    payment_intent: payment_intent,
+                                                                    single_use: is_distribution
+                                                                  })
+          # Gift a meal purchases are technically donations to the purchaser
+          if is_distribution
+            EmailManager::DonationReceiptSender.call({
+                                                       payment_intent: payment_intent,
+                                                       amount: amount,
+                                                       merchant: merchant_name,
+                                                       email: payment_intent.purchaser.email
+                                                     })
+          else
+            EmailManager::GiftCardReceiptSender.call({
+                                                       payment_intent: payment_intent,
+                                                       amount: amount,
+                                                       merchant: merchant_name,
+                                                       gift_card_detail: gift_card_detail,
+                                                       email: payment_intent.recipient.email
+                                                     })
+          end
         else
           raise(
             InvalidLineItem,
@@ -198,76 +185,5 @@ class WebhooksController < ApplicationController
         end
       end
     end
-
-    # Mark the payment as successful once we've recorded each object purchased
-    # in our DB eg) Donation, Gift Card, etc.
-    payment_intent.successful = true
-    payment_intent.save
-  end
-
-  def create_item_and_donation(seller_id:, payment_intent:, amount:)
-    new_item = create_item(
-      item_type: :donation,
-      seller_id: seller_id,
-      payment_intent: payment_intent
-    )
-    create_donation(item: new_item, amount: amount)
-  end
-
-  def create_donation(item:, amount:)
-    DonationDetail.create!(
-      item: item,
-      amount: amount
-    )
-  end
-
-  def create_gift_card(item:, amount:, seller_id:, recipient:, single_use:)
-    gift_card_detail = GiftCardDetail.create!(
-      expiration: Date.today + 1.year,
-      item: item,
-      gift_card_id: generate_gift_card_id,
-      seller_gift_card_id: generate_seller_gift_card_id(seller_id: seller_id),
-      recipient: recipient,
-      single_use: single_use
-    )
-    GiftCardAmount.create!(value: amount, gift_card_detail: gift_card_detail)
-    gift_card_detail
-  end
-
-  def create_item(item_type:, seller_id:, payment_intent:)
-    WebhookManager::ItemCreator.call({
-      item_type: item_type,
-      seller_id: seller_id,
-      payment_intent: payment_intent
-    })
-  end
-
-  def generate_gift_card_id
-    (1..50).each do |_i|
-      potential_id = SecureRandom.uuid
-      # Use this ID if it's not already taken
-      unless GiftCardDetail.where(gift_card_id: potential_id).present?
-        return potential_id
-      end
-    end
-    raise CannotGenerateUniqueHash, 'Error generating unique gift_card_id'
-  end
-
-  def generate_seller_gift_card_id(seller_id:)
-    (1..50).each do |_i|
-      hash = generate_seller_gift_card_id_hash.upcase
-      potential_id_prefix = hash[0...3]
-      potential_id_suffix = hash[3...5]
-      potential_id = "##{potential_id_prefix}-#{potential_id_suffix}"
-      # Use this ID if it's not already taken
-      return potential_id unless GiftCardDetail.where(
-        seller_gift_card_id: potential_id
-      ).joins(:item).where(items: { seller_id: seller_id }).present?
-    end
-    raise CannotGenerateUniqueHash, 'Error generating unique gift_card_id'
-  end
-
-  def generate_seller_gift_card_id_hash
-    ('a'..'z').to_a.sample(5).join
   end
 end
