@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_30_194123) do
+ActiveRecord::Schema.define(version: 2020_06_12_212747) do
 
   # These are extensions that must be enabled in order to support this database
+  enable_extension "hstore"
   enable_extension "plpgsql"
 
   create_table "contacts", force: :cascade do |t|
@@ -155,6 +156,9 @@ ActiveRecord::Schema.define(version: 2020_05_30_194123) do
     t.integer "cost_per_meal"
     t.string "gallery_image_urls", default: [], null: false, array: true
     t.string "logo_image_url"
+    t.boolean "delivery"
+    t.hstore "delivery_options"
+    t.index ["delivery_options"], name: "index_sellers_on_delivery_options", using: :gin
     t.index ["seller_id"], name: "index_sellers_on_seller_id"
   end
 
@@ -163,10 +167,12 @@ ActiveRecord::Schema.define(version: 2020_05_30_194123) do
   add_foreign_key "gift_card_details", "contacts", column: "recipient_id"
   add_foreign_key "gift_card_details", "items"
   add_foreign_key "items", "contacts", column: "purchaser_id"
+  add_foreign_key "items", "merchant_payouts"
   add_foreign_key "items", "payment_intents"
   add_foreign_key "items", "sellers"
   add_foreign_key "locations", "sellers"
   add_foreign_key "menu_items", "sellers"
+  add_foreign_key "merchant_payouts", "sellers"
   add_foreign_key "payment_intents", "contacts", column: "purchaser_id"
   add_foreign_key "payment_intents", "contacts", column: "recipient_id"
   add_foreign_key "refunds", "payment_intents"

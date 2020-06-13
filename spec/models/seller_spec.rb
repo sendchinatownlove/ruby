@@ -9,6 +9,8 @@
 #  business_type      :string
 #  cost_per_meal      :integer
 #  cuisine_name       :string
+#  delivery           :boolean
+#  delivery_options   :hstore
 #  founded_year       :integer
 #  gallery_image_urls :string           default([]), not null, is an Array
 #  hero_image_url     :string
@@ -31,7 +33,8 @@
 #
 # Indexes
 #
-#  index_sellers_on_seller_id  (seller_id)
+#  index_sellers_on_delivery_options  (delivery_options) USING gin
+#  index_sellers_on_seller_id         (seller_id)
 #
 require 'rails_helper'
 
