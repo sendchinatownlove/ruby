@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_17_025433) do
+ActiveRecord::Schema.define(version: 2020_06_20_045700) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -27,9 +27,9 @@ ActiveRecord::Schema.define(version: 2020_06_17_025433) do
   create_table "delivery_options", force: :cascade do |t|
     t.string "url"
     t.string "phone_number"
+    t.bigint "seller_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.bigint "seller_id", null: false
     t.index ["seller_id"], name: "index_delivery_options_on_seller_id"
   end
 
@@ -115,6 +115,17 @@ ActiveRecord::Schema.define(version: 2020_06_17_025433) do
     t.index ["seller_id"], name: "index_menu_items_on_seller_id"
   end
 
+  create_table "open_hours", force: :cascade do |t|
+    t.bigint "seller_id", null: false
+    t.time "open"
+    t.time "close"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.integer "openday"
+    t.integer "closeday"
+    t.index ["seller_id"], name: "index_open_hours_on_seller_id"
+  end
+
   create_table "payment_intents", force: :cascade do |t|
     t.text "line_items"
     t.datetime "created_at", precision: 6, null: false
@@ -187,6 +198,7 @@ ActiveRecord::Schema.define(version: 2020_06_17_025433) do
   add_foreign_key "items", "sellers"
   add_foreign_key "locations", "sellers"
   add_foreign_key "menu_items", "sellers"
+  add_foreign_key "open_hours", "sellers"
   add_foreign_key "payment_intents", "contacts", column: "purchaser_id"
   add_foreign_key "payment_intents", "contacts", column: "recipient_id"
   add_foreign_key "refunds", "payment_intents"
