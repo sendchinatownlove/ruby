@@ -11,7 +11,7 @@ namespace :gift_cards do
       opts.on('-s', '--seller_id ARG', String, 'seller_id_id to associate the purchaser') { |seller_id| options[:seller_id] = seller_id }
       opts.on('-m', '--mail ARG', String, 'Email to associate the purchaser and recipient') { |email| options[:email] = email }
       opts.on('-q', '--quantity ARG', Integer, 'Quantity of gift_cards to generate') { |quantity| options[:quantity] = quantity }
-      opts.on('-a', '--amount ARG', Integer, 'Amount on each gift card') { |amount| options[:amount] = amount }
+      opts.on('-a', '--amount ARG', Integer, 'Amount on each gift card per unit quantity. $1 = 100') { |amount| options[:amount] = amount }
     end
 
     begin
