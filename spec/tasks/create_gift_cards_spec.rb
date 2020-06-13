@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'rake'
 
 describe 'gift_cards:create' do
   include_context 'rake'
