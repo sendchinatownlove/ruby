@@ -69,7 +69,7 @@ Rails.application.routes.draw do
   resources :gift_cards do
   end
   resources :sellers do
-    resources :locations, :menu_items, :items
+    resources :locations, :menu_items, :items, :open_hour
   end
   resources :webhooks do
   end
