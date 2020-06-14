@@ -20,13 +20,14 @@
 #
 class OpenHour < ApplicationRecord
   belongs_to :seller
-  validates_presence_of :day, :closes, :opens
+  validates_presence_of :day, :close, :open
+  # 1:Monday - 7:Sunday
   validates_inclusion_of :day, :in => 1..7
   validate :opens_before_closes 
 
 
   protected
   def opens_before_closes
-    errors.add(:closes, I18n.t('errors.opens_before_closes')) if opens && closes && opens >= closes
+    errors.add(:close, I18n.t('errors.opens_before_closes')) if open && close && open >= close
   end
 end
