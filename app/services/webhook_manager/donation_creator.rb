@@ -15,10 +15,10 @@ module WebhookManager
       ActiveRecord::Base.transaction do
         seller = Seller.find_by(seller_id: seller_id)
         item = WebhookManager::ItemCreator.call({
-          item_type: :donation,
-          seller_id: seller_id,
-          payment_intent: payment_intent
-        })
+                                                  item_type: :donation,
+                                                  seller_id: seller_id,
+                                                  payment_intent: payment_intent
+                                                })
         donation = DonationDetail.create!(
           item: item,
           amount: amount

@@ -125,10 +125,10 @@ class WebhooksController < ApplicationController
         PoolDonationValidator.call({ type: item_json['item_type'] })
 
         WebhookManager::PoolDonationCreator.call({
-          seller_id: seller_id,
-          payment_intent: payment_intent,
-          amount: amount
-        })
+                                                   seller_id: seller_id,
+                                                   payment_intent: payment_intent,
+                                                   amount: amount
+                                                 })
 
         EmailManager::PoolDonationReceiptSender.call({
                                                        payment_intent: payment_intent,

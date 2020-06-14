@@ -6,8 +6,8 @@ class AddGalleryToSeller < ActiveRecord::Migration[6.0]
       :sellers,
       :gallery_image_urls,
       :string, array: true,
-      default: [],
-      null: false
+               default: [],
+               null: false
     )
   end
 end

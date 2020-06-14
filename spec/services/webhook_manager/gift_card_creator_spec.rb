@@ -45,8 +45,8 @@ describe WebhookManager::GiftCardCreator, '#call' do
 
     payload = new_payload(payment_intent_2)
 
-    expect{WebhookManager::GiftCardCreator.call(payload)}.
-      to raise_error(ActiveRecord::StaleObjectError)
+    expect { WebhookManager::GiftCardCreator.call(payload) }
+      .to raise_error(ActiveRecord::StaleObjectError)
 
     expect(count).to eq(Item.count)
   end
