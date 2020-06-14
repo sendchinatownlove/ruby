@@ -9,7 +9,7 @@
 #  refunded          :boolean          default(FALSE)
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
-#  payment_intent_id :bigint           not null
+#  payment_intent_id :bigint
 #  purchaser_id      :bigint
 #  seller_id         :bigint           not null
 #
@@ -27,7 +27,7 @@
 #
 class Item < ApplicationRecord
   belongs_to :seller
-  belongs_to :payment_intent
+  belongs_to :payment_intent, optional: true
   has_one :gift_card_detail
   has_one :donation_detail
   belongs_to :purchaser, class_name: 'Contact'
