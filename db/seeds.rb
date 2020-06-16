@@ -26,6 +26,28 @@
     square_location_id: 'E4R1NCMHG7B2Y'
   },
   {
+    seller_id: '46-mott',
+    cuisine_name: 'Bakery',
+    name: '46 Mott',
+    story: "Patrick is awesome, tbh",
+    accept_donations: true,
+    sell_gift_cards: true,
+    owner_name: 'Patrick Mock',
+    owner_image_url: 'assets/46-mott-logo.png',
+    target_amount: 1_000_000,
+    summary: nil,
+    hero_image_url: 'assets/46-mott-hero.png',
+    progress_bar_color: nil,
+    business_type: nil,
+    num_employees: 4,
+    founded_year: 2018,
+    website_url: nil,
+    menu_url: nil,
+    square_location_id: 'E4R1NCMHG7B2Z',
+    non_profit_location_id: 'SDAFADS34334',
+    cost_per_meal: 500
+  },
+  {
     seller_id: 'send-chinatown-love',
     accept_donations: false,
     sell_gift_cards: false,
