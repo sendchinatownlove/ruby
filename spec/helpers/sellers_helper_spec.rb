@@ -36,7 +36,8 @@ RSpec.describe SellersHelper, type: :helper do
         'menu_url': seller.menu_url,
         'square_location_id': seller.square_location_id,
         'distributor': contact,
-        'cost_per_meal': seller.cost_per_meal
+        'cost_per_meal': seller.cost_per_meal,
+        'non_profit_location_id': seller.non_profit_location_id
       }.as_json
     end
 
