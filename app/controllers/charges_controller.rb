@@ -113,7 +113,7 @@ class ChargesController < ApplicationController
   def create_square_payment_request(
     nonce:, amount:, email:, name:, seller:, line_items:, is_distribution:
   )
-    if is_distribution && seller.non_profit_location_id
+    if is_distribution && !seller.non_profit_location_id.blank?
       square_location_id = seller.non_profit_location_id
     else
       square_location_id = seller.square_location_id
