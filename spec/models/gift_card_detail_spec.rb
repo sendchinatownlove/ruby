@@ -1,5 +1,30 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: gift_card_details
+#
+#  id                  :bigint           not null, primary key
+#  expiration          :date
+#  single_use          :boolean          default(FALSE), not null
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#  gift_card_id        :string
+#  item_id             :bigint           not null
+#  receipt_id          :string
+#  recipient_id        :bigint           not null
+#  seller_gift_card_id :string
+#
+# Indexes
+#
+#  index_gift_card_details_on_item_id       (item_id)
+#  index_gift_card_details_on_recipient_id  (recipient_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (item_id => items.id)
+#  fk_rails_...  (recipient_id => contacts.id)
+#
 require 'rails_helper'
 
 RSpec.describe GiftCardDetail, type: :model do
@@ -35,6 +60,7 @@ RSpec.describe GiftCardDetail, type: :model do
 
   before { create :gift_card_detail }
   it { should validate_uniqueness_of(:gift_card_id) }
+  it { should validate_presence_of(:recipient) }
 
   context 'with unique gift_card_id and seller_gift_card_id' do
     let(:gift_card_id1) { 'GIFTCARD1' }

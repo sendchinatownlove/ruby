@@ -1,43 +1,35 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: payment_intents
+#
+#  id                 :bigint           not null, primary key
+#  line_items         :text
+#  lock_version       :integer
+#  receipt_url        :string
+#  successful         :boolean          default(FALSE)
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  purchaser_id       :bigint
+#  recipient_id       :bigint
+#  square_location_id :string           not null
+#  square_payment_id  :string           not null
+#
+# Indexes
+#
+#  index_payment_intents_on_purchaser_id  (purchaser_id)
+#  index_payment_intents_on_recipient_id  (recipient_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (purchaser_id => contacts.id)
+#  fk_rails_...  (recipient_id => contacts.id)
+#
 class PaymentIntent < ApplicationRecord
-  validate :square_xor_stripe_id_exists
-  validate :square_location_id_exists
-  validates_uniqueness_of :square_payment_id, allow_nil: true
-  validates_uniqueness_of :stripe_id, allow_nil: true
+  validates_presence_of :square_payment_id, :square_location_id
+  validates_uniqueness_of :square_payment_id, allow_nil: false
   has_many :items
-  def square_xor_stripe_id_exists
-    unless stripe_id.present? ^ square_payment_id.present?
-      if stripe_id.present? && square_payment_id.present?
-        errors.add(
-          :stripe_id,
-          'cannot contain both stripe_id and square_payment_id'
-        )
-        errors.add(
-          :square_payment_id,
-          'cannot contain both stripe_id and square_payment_id'
-        )
-      else
-        errors.add(
-          :stripe_id,
-          'must contain either stripe_id or square_payment_id'
-        )
-        errors.add(
-          :square_payment_id,
-          'must contain either stripe_id or square_payment_id'
-        )
-      end
-    end
-  end
-
-  def square_location_id_exists
-    if square_payment_id.present?
-      unless square_location_id.present?
-        errors.add(
-          :square_location_id,
-          'must exist if square_payment_id exists'
-        )
-      end
-    end
-  end
+  belongs_to :purchaser, class_name: 'Contact'
+  belongs_to :recipient, class_name: 'Contact'
 end

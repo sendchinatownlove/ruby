@@ -3,38 +3,19 @@
 module SellersHelper
   def self.generate_seller_json(seller:)
     locations = seller.locations
-    seller = seller.as_json
-    seller['locations'] = locations.as_json
-    seller['amount_raised'] = SellersHelper.calculate_amount_raised(
-      seller_id: seller['id']
-    )
-    seller
-  end
+    distributor = seller.distributor
+    json = seller.as_json
+    json['distributor'] = distributor.as_json unless distributor.nil?
+    json['locations'] = locations.as_json
 
-  # Calculates the amount of money raised by the Seller so far.
-  # seller_id: the actual id of the Seller. Seller.id
-  def self.calculate_amount_raised(seller_id:)
-    return 0 if Item.where(seller_id: seller_id).empty?
+    json['donation_amount'] = seller.donation_amount
+    json['gift_card_amount'] = seller.gift_card_amount
+    json['amount_raised'] = json['donation_amount'] + json['gift_card_amount']
 
-    donation_amount = DonationDetail.joins(:item)
-                                    .where(items: {
-                                             seller_id: seller_id,
-                                             refunded: false
-                                           })
-                                    .inject(0) do |sum, donation|
-      sum + donation.amount
-    end
+    json['num_gift_cards'] = seller.num_gift_cards
+    json['num_donations'] = seller.num_donations
+    json['num_contributions'] = json['num_gift_cards'] + json['num_donations']
 
-    # TODO(jmckibben): Make this a single SQL query instead of doing N queries
-    gift_card_amount = GiftCardDetail.joins(:item)
-                                     .where(items: {
-                                              seller_id: seller_id,
-                                              refunded: false
-                                            })
-                                     .inject(0) do |sum, gift_card|
-      sum + gift_card.amount
-    end
-
-    gift_card_amount + donation_amount
+    json
   end
 end

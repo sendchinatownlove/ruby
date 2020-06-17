@@ -3,42 +3,33 @@
 require 'rails_helper'
 
 RSpec.describe 'Gift Cards API', type: :request do
-  # initialize test data
-  let!(:gift_card) { create(:gift_card_detail) }
-  let!(:gift_card) { create(:item) }
-  let(:gift_card_id) { gift_card.id }
-
-  skip 'POST /gift_cards' do
-    let(:attributes) { { charge_id: 'charge-1' } }
-    let(:charge) do
-      {
-        id: 'charge-1',
-        display_items: [{ amount: 5000 }],
-        customer: 'customer-1',
-        metadata: { merchant_id: 'shunfa-bakery' }
-      }
-    end
-
-    before do
-      allow(Stripe::Checkout::Session).to receive(:retrieve).and_return(charge)
-      post '/gift_cards', params: attributes
-    end
-
-    it 'returns valid response' do
-      p json
-      expect(json).not_to be_empty
-      expect(json['merchant_id']).to eq('shunfa-bakery')
-      expect(json['charge_id']).to eq('charge-1')
-      expect(json['customer_id']).to eq('customer-1')
-      expect(json['amount']).to eq(5000)
-    end
-
-    it 'returns status code 200' do
-      expect(response).to have_http_status(201)
-    end
+  let!(:gift_card_detail) do
+    create(
+      :gift_card_detail
+    )
   end
 
-  skip 'GET /gift_cards/:id' do
+  let!(:gift_card_amount1) do
+    create(
+      :gift_card_amount,
+      gift_card_detail_id: gift_card_detail.id,
+      created_at: Time.now - 2.days,
+      value: 5000
+    )
+  end
+
+  let!(:gift_card_amount2) do
+    create(
+      :gift_card_amount,
+      gift_card_detail_id: gift_card_detail.id,
+      created_at: Time.now - 1.day,
+      value: 4000
+    )
+  end
+
+  let!(:gift_card_id) { gift_card_detail.gift_card_id }
+
+  context 'GET /gift_cards/:id' do
     before { get "/gift_cards/#{gift_card_id}" }
 
     context 'when gift card exists' do
@@ -47,12 +38,17 @@ RSpec.describe 'Gift Cards API', type: :request do
       end
 
       it 'returns the gift card' do
-        expect(json['id']).to eq(gift_card_id)
+        expect(json['id']).to eq(gift_card_detail.item_id)
+        expect(json['gift_card_detail']['id']).to eq(gift_card_detail.id)
+        expect(json['gift_card_detail']['amount'])
+          .to eq(gift_card_amount2.value)
       end
     end
 
     context 'when gift card does not exist' do
-      let(:gift_card_id) { 0 }
+      let(:gift_card_id) do
+        '398r2ujdqwd'
+      end
 
       it 'returns status code 404' do
         expect(response).to have_http_status(404)
@@ -64,44 +60,49 @@ RSpec.describe 'Gift Cards API', type: :request do
     end
   end
 
-  skip 'PUT /gift_cards/:id' do
-    before { put "/gift_cards/#{gift_card_id}", params: attributes }
+  context 'PUT /gift_cards/:id' do
+    before do
+      put "/gift_cards/#{gift_card_id}",
+          params: { amount: amount },
+          as: :json
+    end
 
-    context 'when amount is valid' do
-      let(:attributes) { { amount: gift_card.amount - 500 } }
+    let(:amount) { 3000 }
 
-      it 'updates the record' do
-        expect(response.body).to be_empty
+    context 'when gift card exists' do
+      it 'returns status code 200' do
+        expect(response).to have_http_status(200)
       end
 
-      it 'returns status code 204' do
-        expect(response).to have_http_status(204)
+      it 'returns the gift card' do
+        expect(json['gift_card_detail']['amount']).to eq(amount)
+        expect(gift_card_detail.amount).to eq amount
       end
     end
 
-    context 'when amount is negative' do
-      let(:attributes) { { amount: -100 } }
+    context 'when amount is greater' do
+      let(:amount) { 5000 }
 
-      it 'updates the record' do
+      it 'returns status code 422' do
+        expect(response).to have_http_status(422)
+      end
+
+      it 'returns a not found message' do
         expect(response.body).to match(
-          /Amount must be greater than or equal to 0/
+          /New amount must be less than current amount of: #{gift_card_amount2.value}/
         )
       end
-
-      it 'returns status code 204' do
-        expect(response).to have_http_status(422)
-      end
     end
 
-    context 'when the amount is greater than original' do
-      let(:attributes) { { amount: gift_card.amount + 500 } }
+    context 'when gift card does not exist' do
+      let(:gift_card_id) { 'invalid_id' }
 
-      it 'updates the record' do
-        expect(response.body).to match(/Cannot increase gift card amount/)
+      it 'returns status code 404' do
+        expect(response).to have_http_status(404)
       end
 
-      it 'returns status code 204' do
-        expect(response).to have_http_status(422)
+      it 'returns a not found message' do
+        expect(response.body).to match(/Couldn't find GiftCardDetail/)
       end
     end
   end

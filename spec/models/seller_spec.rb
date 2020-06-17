@@ -1,11 +1,45 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: sellers
+#
+#  id                 :bigint           not null, primary key
+#  accept_donations   :boolean          default(TRUE), not null
+#  business_type      :string
+#  cost_per_meal      :integer
+#  cuisine_name       :string
+#  founded_year       :integer
+#  gallery_image_urls :string           default([]), not null, is an Array
+#  hero_image_url     :string
+#  logo_image_url     :string
+#  menu_url           :string
+#  name               :string
+#  num_employees      :integer
+#  owner_image_url    :string
+#  owner_name         :string
+#  progress_bar_color :string
+#  sell_gift_cards    :boolean          default(FALSE), not null
+#  story              :text
+#  summary            :text
+#  target_amount      :integer          default(1000000)
+#  website_url        :string
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  seller_id          :string           not null
+#  square_location_id :string           not null
+#
+# Indexes
+#
+#  index_sellers_on_seller_id  (seller_id)
+#
 require 'rails_helper'
 
 RSpec.describe Seller, type: :model do
   # Association test
   # ensure Seller model has a 1:m relationship with the MenuItem model
   it { should have_many(:menu_items).dependent(:destroy) }
+  it { should have_one(:distributor) }
   # Validation tests
 
   let!(:seller) do
@@ -44,6 +78,47 @@ RSpec.describe Seller, type: :model do
     expect(seller).to_not be_valid
   end
 
+  describe 'globalization' do
+    context 'with Chinese locale' do
+      before do
+        I18n.locale = 'zh-CN'
+      end
+
+      it 'uses Chinese' do
+        expect(seller.story[0..4]).to eq 'zh-CN'
+        expect(seller.summary[0..4]).to eq 'zh-CN'
+        expect(seller.name[0..4]).to eq 'zh-CN'
+        expect(seller.owner_name[0..4]).to eq 'zh-CN'
+      end
+    end
+
+    context 'with default locale' do
+      before do
+        I18n.locale = I18n.default_locale
+      end
+
+      it 'uses English' do
+        expect(seller.story[0..1]).to eq 'en'
+        expect(seller.summary[0..1]).to eq 'en'
+        expect(seller.name[0..1]).to eq 'en'
+        expect(seller.owner_name[0..1]).to eq 'en'
+      end
+    end
+
+    context 'with English locale' do
+      before do
+        I18n.locale = 'en'
+      end
+
+      it 'uses English' do
+        expect(seller.story[0..1]).to eq 'en'
+        expect(seller.summary[0..1]).to eq 'en'
+        expect(seller.name[0..1]).to eq 'en'
+        expect(seller.owner_name[0..1]).to eq 'en'
+      end
+    end
+  end
+
   # test founding year constraints
   let(:time_travelling_seller) do
     create(
@@ -63,6 +138,84 @@ RSpec.describe Seller, type: :model do
         ActiveRecord::RecordInvalid,
         'Validation failed: Founded year is not included in the list'
       )
+    end
+  end
+
+  describe '#amount_raised' do
+    context 'amount with no money raised' do
+      it 'returns zero gift cards' do
+        expect(seller.gift_card_amount).to eq(0)
+        expect(seller.num_gift_cards).to eq(0)
+        expect(seller.donation_amount).to eq(0)
+        expect(seller.num_donations).to eq(0)
+        expect(seller.num_contributions).to eq(0)
+        expect(seller.amount_raised).to eq(0)
+      end
+    end
+
+    context 'amount with money raised' do
+      before do
+        # Create $50 gift card
+        item_gift_card1 = create(:item, seller: seller)
+        gift_card_detail1 = create(:gift_card_detail, item: item_gift_card1)
+        create(
+          :gift_card_amount,
+          value: 50_00,
+          gift_card_detail: gift_card_detail1
+        )
+
+        # Create second gift card, which is a $50 gift card with $20 spent
+        item_gift_card2 = create(:item, seller: seller)
+        gift_card_detail2 = create(:gift_card_detail, item: item_gift_card2)
+        create(
+          :gift_card_amount,
+          value: 50_00,
+          gift_card_detail: gift_card_detail2
+        )
+        # Updated a day later
+        create(
+          :gift_card_amount,
+          value: 30_00,
+          gift_card_detail: gift_card_detail2,
+          created_at: Time.current + 1.day
+        )
+
+        # Create $100 gift card, refunded
+        item_gift_card3 = create(:item, seller: seller, refunded: true)
+        gift_card_detail3 = create(:gift_card_detail, item: item_gift_card3)
+        create(
+          :gift_card_amount,
+          value: 100_00,
+          gift_card_detail: gift_card_detail3
+        )
+
+        # Create a donation of $200
+        item_donation1 = create(:item, seller: seller)
+        create(:donation_detail, item: item_donation1, amount: 200_00)
+
+        # Create a donation of $10
+        item_donation2 = create(:item, seller: seller)
+        create(:donation_detail, item: item_donation2, amount: 10_00)
+
+        # Create a donation of $50, refunded
+        item_donation3 = create(:item, seller: seller, refunded: true)
+        create(:donation_detail, item: item_donation3, amount: 50_00)
+      end
+
+      it 'returns gift card amounts' do
+        expect(seller.gift_card_amount).to eq(80_00)
+        expect(seller.num_gift_cards).to eq(2)
+      end
+
+      it 'returns donation amounts' do
+        expect(seller.donation_amount).to eq(210_00)
+        expect(seller.num_donations).to eq(2)
+      end
+
+      it 'returns total amount' do
+        expect(seller.amount_raised).to eq(290_00)
+        expect(seller.num_contributions).to eq(4)
+      end
     end
   end
 

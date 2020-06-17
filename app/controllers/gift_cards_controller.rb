@@ -1,44 +1,53 @@
 # frozen_string_literal: true
 
-require 'stripe'
-
 class GiftCardsController < ApplicationController
-  before_action :set_gift_card, only: %i[show update destroy]
+  before_action :set_gift_card, only: %i[show update]
 
   # GET /gift_cards/:id
   def show
-    item = Item.find_by(gift_card_detail_id: @gift_card_detail[:id])
-    json_response(item)
+    json_response(item_gift_card_detail_json)
   end
 
   # PUT /gift_cards/:id
   def update
-    # only allows updating amounts of gift cards
-    original_amount = @gift_card.amount
-    new_amount = update_params[:amount].to_i
+    validate_update_params
+    GiftCardAmount.create!(
+      value: gift_card_params[:amount],
+      gift_card_detail: @gift_card_detail
+    )
 
-    if original_amount < new_amount
-      raise InvalidGiftCardUpdate, 'Cannot increase gift card amount'
-    end
-
-    @gift_card.update!(update_params)
-    head :no_content
+    json_response(item_gift_card_detail_json)
   end
 
   private
 
-  def update_params
+  def gift_card_params
     params.require(:amount)
-    params.permit(:amount)
+    params.permit(:amount, :id)
   end
 
   def set_gift_card
-    params.require(:id)
-    @gift_card_detail = GiftCardDetail.find_by(gift_card_id: params[:id])
+    params.require(:id) # gift_card_id
+    @gift_card_detail = GiftCardDetail.find_by!(
+      gift_card_id: params[:id]
+    )
   end
 
-  def stripe_charge
-    Stripe.api_key = 'sk_test_Vux9P2VnjEDHuR4Cg8DHWmhq00y6iKGY8x'
-    Stripe::Checkout::Session.retrieve(params[:charge_id])
+  def validate_update_params
+    current_amount = @gift_card_detail.amount
+    unless gift_card_params[:amount] < current_amount
+      raise InvalidParameterError,
+            "New amount must be less than current amount of: #{current_amount}"
+    end
+  end
+
+  def item_gift_card_detail_json
+    item = Item.find_by(id: @gift_card_detail.item_id)
+    json = item.as_json
+    json['gift_card_detail'] = @gift_card_detail.as_json
+    json['gift_card_detail']['amount'] = @gift_card_detail.amount
+    # Replace the internal Seller.id with the external seller_id
+    json['seller_id'] = item.seller.seller_id
+    json
   end
 end

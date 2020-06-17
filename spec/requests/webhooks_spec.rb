@@ -7,54 +7,88 @@ RSpec.describe 'Webhooks API', type: :request do
 
   # Test suite for POST /webhooks
   describe 'POST /webhooks' do
-    context 'with Square' do
-      let(:line_items) do
-        [{
-          'amount': 5000,
-          'currency': 'usd',
-          'item_type': item_type,
-          'quantity': 1,
-          'seller_id': seller.seller_id
-        }].to_json
-      end
-      let(:payment_intent) do
-        create(
-          :square_payment_intent,
-          square_payment_id: SecureRandom.uuid,
-          square_location_id: SecureRandom.uuid,
-          line_items: line_items
-        )
-      end
-      let(:seller) { create :seller }
-      let(:payment_intent_response) do
-        {
-          'payment': {
-            'id': payment_intent.square_payment_id,
-            'location_id': payment_intent.square_location_id,
-            'receipt_email': payment_intent.email,
-            'status': 'COMPLETED'
-          }
+    let(:line_items) do
+      [{
+        'amount': amount,
+        'currency': 'usd',
+        'item_type': item_type,
+        'quantity': 1,
+        'seller_id': seller_id,
+        'is_distribution': is_distribution
+      }].to_json
+    end
+    let(:is_distribution) { false }
+    let(:purchaser) do
+      create(
+        :contact,
+        seller: Seller.find_by(seller_id: seller_id)
+      )
+    end
+    let(:recipient) do
+      create(
+        :contact,
+        seller: Seller.find_by(seller_id: seller_id)
+      )
+    end
+    let(:payment_intent) do
+      create(
+        :payment_intent,
+        square_payment_id: SecureRandom.uuid,
+        square_location_id: SecureRandom.uuid,
+        recipient: recipient,
+        purchaser: purchaser,
+        line_items: line_items
+      )
+    end
+    let!(:seller1) do
+      create :seller, seller_id: 'leaky-cauldron', accept_donations: true
+    end
+    let!(:seller2) do
+      create :seller, seller_id: 'honeydukes', accept_donations: true
+    end
+    let!(:seller3) do
+      create :seller, seller_id: 'great-hall', accept_donations: false
+    end
+    let!(:seller_pool) do
+      create :seller, seller_id: Seller::POOL_DONATION_SELLER_ID, accept_donations: false
+    end
+    let(:payment_intent_response) do
+      {
+        'payment': {
+          'id': payment_intent.square_payment_id,
+          'location_id': payment_intent.square_location_id,
+          'receipt_email': payment_intent.recipient.email,
+          'status': 'COMPLETED'
         }
-      end
+      }
+    end
 
-      let(:payload) do
-        {
-          'type': 'payment.updated',
-          'data': {
-            'object': payment_intent_response
-          }
+    let(:payload) do
+      {
+        'event_id': 'abcd-1234',
+        'type': 'payment.updated',
+        'data': {
+          'object': payment_intent_response
         }
-      end
+      }
+    end
 
+    before do
+      allow(GiftCardIdGenerator)
+        .to receive(:generate_seller_gift_card_id_hash)
+        .and_return('abcde')
+      allow(SecureRandom).to receive(:uuid)
+        .and_return('aweofijn-3n3400-oawjiefwef-0iawef-0i')
+      allow(Digest::SHA1).to receive(:base64digest)
+        .and_return(true)
+
+      # Give seller2 the most donations
+      item = create(:item, seller: seller2)
+      create(:donation_detail, item: item, amount: 10_00)
+    end
+
+    describe 'donations' do
       before do
-        create :seller
-        allow(SecureRandom).to receive(:hex)
-          .and_return('abcdef123')
-        allow(SecureRandom).to receive(:uuid)
-          .and_return('aweofijn-3n3400-oawjiefwef-0iawef-0i')
-        allow(Digest::SHA1).to receive(:base64digest)
-          .and_return(true)
-
         post(
           '/webhooks',
           headers: { 'HTTP_X_SQUARE_SIGNATURE' => 'www.squareup.com' },
@@ -62,8 +96,77 @@ RSpec.describe 'Webhooks API', type: :request do
         )
       end
 
+      context 'with pool donation' do
+        let(:seller_id) { seller_pool.seller_id }
+
+        context 'with nice pool donation' do
+          let(:amount) { 5000 }
+          let(:item_type) { 'donation' }
+
+          it 'creates pool donation' do
+            expect(seller1.donation_amount).to eq(25_00)
+            expect(seller2.donation_amount).to eq(35_00)
+          end
+
+          it 'returns status code 200' do
+            expect(response).to have_http_status(200)
+          end
+        end
+
+        context 'with non-divisible number round' do
+          let(:amount) { 3 }
+          let(:item_type) { 'donation' }
+
+          it 'creates pool donation and distrubutes the cents' do
+            expect(seller1.donation_amount).to eq(2)
+            expect(seller2.donation_amount).to eq(10_01)
+          end
+
+          it 'returns status code 200' do
+            expect(response).to have_http_status(200)
+          end
+        end
+
+        context 'with an extra seller' do
+          let!(:seller3) do
+            create :seller, seller_id: 'great-hall', accept_donations: true
+          end
+
+          context 'with non-divisible number round' do
+            let(:amount) { 335 }
+            let(:item_type) { 'donation' }
+
+            it 'creates pool donation and distrubutes the cents' do
+              expect(seller1.donation_amount).to eq(1_12)
+              expect(seller3.donation_amount).to eq(1_12)
+              expect(seller2.donation_amount).to eq(11_11)
+            end
+
+            it 'returns status code 200' do
+              expect(response).to have_http_status(200)
+            end
+          end
+        end
+
+        context 'with erroneous pool gift card' do
+          let(:amount) { 5000 }
+          let(:item_type) { 'gift card' }
+
+          it 'returns status code 422' do
+            expect(response.body)
+              .to match(
+                /but found type 'gift card'./
+              )
+
+            expect(response).to have_http_status(422)
+          end
+        end
+      end
+
       context 'with donation' do
+        let(:amount) { 5000 }
         let(:item_type) { 'donation' }
+        let(:seller_id) { seller1.seller_id }
 
         it 'creates a donation' do
           donation_detail = DonationDetail.last
@@ -72,9 +175,9 @@ RSpec.describe 'Webhooks API', type: :request do
 
           item = Item.find(donation_detail['item_id'])
           expect(item).not_to be_nil
-          expect(item['email']).to eq(payment_intent.email)
+          expect(item.purchaser).to eq(payment_intent.purchaser)
           expect(item.donation?).to be true
-          expect(item.seller).to eq(seller)
+          expect(item.seller).to eq(seller1)
 
           payment_intent = PaymentIntent.find(item['payment_intent_id'])
           expect(payment_intent.successful).to be true
@@ -97,6 +200,7 @@ RSpec.describe 'Webhooks API', type: :request do
 
           let(:refund_payload) do
             {
+              'event_id': 'dfgh-4567',
               'type': payload_type,
               'data': {
                 'object': refund_response
@@ -133,6 +237,7 @@ RSpec.describe 'Webhooks API', type: :request do
                   '/webhooks',
                   headers: { 'HTTP_X_SQUARE_SIGNATURE' => 'www.squareup.com' },
                   params: {
+                    'event_id': 'hjkl-1234',
                     'type': 'refund.updated',
                     'data': {
                       'object': {
@@ -194,43 +299,79 @@ RSpec.describe 'Webhooks API', type: :request do
           end
 
           it 'returns status code 400' do
-            # rubocop:disable Layout/LineLength
             expect(response.body)
               .to match(
-                /This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}/
+                /Request was already received/
               )
 
-            # rubocop:enable Layout/LineLength
-            expect(response).to have_http_status(400)
+            expect(response).to have_http_status(409)
           end
         end
       end
+    end
 
-      context 'with gift card' do
-        let(:item_type) { 'gift_card' }
+    describe 'gift cards' do
+      def verify_gift_card(single_use:)
+        item = Item.where(
+          seller_id: seller1.id,
+          item_type: 'gift_card'
+        ).first
+        expect(item).not_to be_nil
+
+        gift_card_detail = item.gift_card_detail
+        expect(gift_card_detail).not_to be_nil
+        expect(gift_card_detail.gift_card_id).to eq(
+          'aweofijn-3n3400-oawjiefwef-0iawef-0i'
+        )
+        expect(gift_card_detail.single_use).to eq(single_use)
+        expect(gift_card_detail.seller_gift_card_id).to eq('#ABC-DE')
+        expect(gift_card_detail.expiration).to eq(Date.today + 1.year)
+        expect(gift_card_detail.amount).to eq(5000)
+
+        payment_intent = item.payment_intent
+        expect(payment_intent.successful).to be true
+        expect(payment_intent.recipient).not_to eq(payment_intent.purchaser)
+        expect(item.purchaser).to eq(payment_intent.purchaser)
+        expect(gift_card_detail.recipient).to eq(payment_intent.recipient)
+      end
+
+      let(:amount) { 5000 }
+      let(:item_type) { 'gift_card' }
+      let(:seller_id) { seller1.seller_id }
+
+      context 'with is_distribution = true' do
+        let(:is_distribution) { true }
+
+        before do
+          expect(EmailManager::DonationReceiptSender).to receive(:call)
+          post(
+            '/webhooks',
+            headers: { 'HTTP_X_SQUARE_SIGNATURE' => 'www.squareup.com' },
+            params: payload.to_json
+          )
+        end
+
+        it 'creates a single use gift card' do
+          verify_gift_card(single_use: true)
+        end
+
+        it 'returns status code 200' do
+          expect(response).to have_http_status(200)
+        end
+      end
+
+      context 'with is_distribution = false' do
+        before do
+          expect(EmailManager::GiftCardReceiptSender).to receive(:call)
+          post(
+            '/webhooks',
+            headers: { 'HTTP_X_SQUARE_SIGNATURE' => 'www.squareup.com' },
+            params: payload.to_json
+          )
+        end
 
         it 'creates a gift card' do
-          gift_card_detail = GiftCardDetail.last
-          expect(gift_card_detail).not_to be_nil
-          expect(gift_card_detail.gift_card_id).to eq(
-            'aweofijn-3n3400-oawjiefwef-0iawef-0i'
-          )
-          expect(gift_card_detail.seller_gift_card_id).to eq('#ABC-DE')
-          expect(gift_card_detail.expiration).to eq(Date.today + 1.year)
-
-          gift_card_amount = GiftCardAmount.find_by(
-            gift_card_detail_id: gift_card_detail['id']
-          )
-          expect(gift_card_amount['value']).to eq(5000)
-
-          item = Item.find(gift_card_detail['item_id'])
-          expect(item).not_to be_nil
-          expect(item.gift_card?).to be true
-          expect(item.seller).to eq(seller)
-          expect(item['email']).to eq(payment_intent.email)
-
-          payment_intent = PaymentIntent.find(item['payment_intent_id'])
-          expect(payment_intent.successful).to be true
+          verify_gift_card(single_use: false)
         end
 
         it 'returns status code 200' do
@@ -247,157 +388,12 @@ RSpec.describe 'Webhooks API', type: :request do
           end
 
           it 'returns status code 400' do
-            # rubocop:disable Layout/LineLength
             expect(response.body)
               .to match(
-                /This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}/
+                /Request was already received/
               )
-            # rubocop:enable Layout/LineLength
-            expect(response).to have_http_status(400)
-          end
-        end
-      end
-    end
 
-    context 'with Stripe' do
-      let(:line_items) do
-        [{
-          'amount': 5000,
-          'currency': 'usd',
-          'item_type': item_type,
-          'quantity': 1,
-          'seller_id': seller.seller_id
-        }].to_json
-      end
-      let(:payment_intent) do
-        create(
-          :stripe_payment_intent,
-          stripe_id: SecureRandom.uuid,
-          square_payment_id: nil,
-          square_location_id: nil,
-          line_items: line_items
-        )
-      end
-      let(:seller) { create :seller }
-      let(:payment_intent_response) do
-        {
-          'id': payment_intent.stripe_id,
-          'receipt_email': payment_intent.email
-        }
-      end
-
-      let(:payload) do
-        {
-          'type': 'payment_intent.succeeded',
-          'data': {
-            'object': payment_intent_response
-          }
-        }
-      end
-
-      before do
-        create :seller
-        allow(SecureRandom).to receive(:hex)
-          .and_return('abcdef123')
-        allow(SecureRandom).to receive(:uuid)
-          .and_return('aweofijn-3n3400-oawjiefwef-0iawef-0i')
-        allow(Stripe::Webhook).to receive(:construct_event)
-          .and_return(payload.with_indifferent_access)
-        post(
-          '/webhooks',
-          headers: { 'HTTP_STRIPE_SIGNATURE' => 'www.stripe.com' }
-        )
-      end
-
-      context 'with donation' do
-        let(:item_type) { 'donation' }
-
-        it 'creates a donation' do
-          donation_detail = DonationDetail.last
-          expect(donation_detail).not_to be_nil
-          expect(donation_detail['amount']).to eq(5000)
-
-          item = Item.find(donation_detail['item_id'])
-          expect(item).not_to be_nil
-          expect(item['email']).to eq(payment_intent.email)
-          expect(item.donation?).to be true
-          expect(item.seller).to eq(seller)
-
-          payment_intent = PaymentIntent.find(item['payment_intent_id'])
-          expect(payment_intent.successful).to be true
-        end
-
-        it 'returns status code 200' do
-          expect(response).to have_http_status(200)
-        end
-
-        context 'with duplicate call' do
-          before do
-            post(
-              '/webhooks',
-              headers: { 'HTTP_STRIPE_SIGNATURE' => 'www.stripe.com' }
-            )
-          end
-
-          it 'returns status code 400' do
-            # rubocop:disable Layout/LineLength
-            expect(response.body)
-              .to match(
-                /This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}/
-              )
-            # rubocop:enable Layout/LineLength
-            expect(response).to have_http_status(400)
-          end
-        end
-      end
-
-      context 'with gift card' do
-        let(:item_type) { 'gift_card' }
-
-        it 'creates a gift card' do
-          gift_card_detail = GiftCardDetail.last
-          expect(gift_card_detail).not_to be_nil
-          expect(gift_card_detail.gift_card_id).to eq(
-            'aweofijn-3n3400-oawjiefwef-0iawef-0i'
-          )
-          expect(gift_card_detail.seller_gift_card_id).to eq('#ABC-DE')
-          expect(gift_card_detail.expiration).to eq(Date.today + 1.year)
-
-          gift_card_amount = GiftCardAmount.find_by(
-            gift_card_detail_id: gift_card_detail['id']
-          )
-          expect(gift_card_amount['value']).to eq(5000)
-
-          item = Item.find(gift_card_detail['item_id'])
-          expect(item).not_to be_nil
-          expect(item.gift_card?).to be true
-          expect(item.seller).to eq(seller)
-          expect(item['email']).to eq(payment_intent.email)
-
-          payment_intent = PaymentIntent.find(item['payment_intent_id'])
-          expect(payment_intent.successful).to be true
-        end
-
-        it 'returns status code 200' do
-          expect(response).to have_http_status(200)
-        end
-
-        context 'with duplicate call' do
-          before do
-            post(
-              '/webhooks',
-              headers: { 'HTTP_STRIPE_SIGNATURE' => 'www.stripe.com' }
-            )
-          end
-
-          it 'returns status code 400' do
-            # rubocop:disable Layout/LineLength
-            expect(response.body)
-              .to match(
-                /This payment has already been received as COMPLETE payment_intent.id: #{payment_intent.id}/
-              )
-            # rubocop:enable Layout/LineLength
-            expect(response).to have_http_status(400)
+            expect(response).to have_http_status(409)
           end
         end
       end

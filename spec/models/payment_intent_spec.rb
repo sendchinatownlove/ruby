@@ -1,16 +1,45 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: payment_intents
+#
+#  id                 :bigint           not null, primary key
+#  line_items         :text
+#  lock_version       :integer
+#  receipt_url        :string
+#  successful         :boolean          default(FALSE)
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  purchaser_id       :bigint
+#  recipient_id       :bigint
+#  square_location_id :string           not null
+#  square_payment_id  :string           not null
+#
+# Indexes
+#
+#  index_payment_intents_on_purchaser_id  (purchaser_id)
+#  index_payment_intents_on_recipient_id  (recipient_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (purchaser_id => contacts.id)
+#  fk_rails_...  (recipient_id => contacts.id)
+#
 require 'rails_helper'
 
 RSpec.describe PaymentIntent, type: :model do
-  it { should validate_uniqueness_of(:stripe_id) }
-  it { should validate_uniqueness_of(:square_payment_id) }
-  it { should have_many(:items) }
+  context('with square_location_id') do
+    it { should validate_uniqueness_of(:square_payment_id) }
+    it { should validate_presence_of(:square_payment_id) }
+    it { should validate_presence_of(:square_location_id) }
+    it { should have_many(:items) }
+    it { should belong_to(:purchaser) }
+    it { should belong_to(:recipient) }
 
-  context 'with square payment intent' do
-    let(:payment_intent) do
+    let!(:payment_intent) do
       create(
-        :square_payment_intent,
+        :payment_intent,
         square_payment_id: 'square-id',
         square_location_id: square_location_id
       )
@@ -20,71 +49,24 @@ RSpec.describe PaymentIntent, type: :model do
     it 'lets you create a payment intent with square_payment_id' do
       expect(PaymentIntent.where(id: payment_intent.id).empty?).to eq(false)
     end
-
-    context 'without square_location_id' do
-      let(:square_location_id) { nil }
-
-      it 'does not let you create a square payment intent without a location' do
-        expect do
-          payment_intent
-        end.to raise_error(
-          ActiveRecord::RecordInvalid,
-          # rubocop:disable Layout/LineLength
-          'Validation failed: Square location must exist if square_payment_id exists'
-          # rubocop:enable Layout/LineLength
-        )
-      end
-    end
   end
 
-  context 'with stripe payment intent' do
-    let(:payment_intent) do
-      create(
-        :stripe_payment_intent,
-        stripe_id: 'stripe-id'
-      )
-    end
-
-    it 'lets you create a payment intent with stripe_id' do
-      expect(PaymentIntent.where(id: payment_intent.id).empty?).to eq(false)
-    end
-  end
-
-  context 'with both stripe and square id' do
+  context 'without square_location_id' do
+    let(:square_location_id) { nil }
     let(:payment_intent) do
       create(
         :payment_intent,
-        stripe_id: 'stripe-id',
         square_payment_id: 'square-id',
-        square_location_id: 'OIJWEOFIJWEFE'
+        square_location_id: square_location_id
       )
     end
 
-    it 'does not let you create a payment intent' do
+    it 'does not let you create a square payment intent without a location' do
       expect do
         payment_intent
       end.to raise_error(
         ActiveRecord::RecordInvalid,
-        # rubocop:disable Layout/LineLength
-        'Validation failed: Stripe cannot contain both stripe_id and square_payment_id, Square payment cannot contain both stripe_id and square_payment_id'
-        # rubocop:enable Layout/LineLength
-      )
-    end
-  end
-
-  context 'with neither stripe nor square id' do
-    let(:payment_intent) do
-      create :payment_intent, stripe_id: nil, square_payment_id: nil
-    end
-
-    it 'does not let you create a payment intent' do
-      expect do
-        payment_intent
-      end.to raise_error(
-        ActiveRecord::RecordInvalid,
-        # rubocop:disable Layout/LineLength
-        'Validation failed: Stripe must contain either stripe_id or square_payment_id, Square payment must contain either stripe_id or square_payment_id'
-        # rubocop:enable Layout/LineLength
+        'Validation failed: Square location can\'t be blank'
       )
     end
   end

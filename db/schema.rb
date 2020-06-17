@@ -10,7 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 2020_06_17_025433) do
+=======
+ActiveRecord::Schema.define(version: 2020_06_11_014835) do
+>>>>>>> master
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -24,6 +28,7 @@ ActiveRecord::Schema.define(version: 2020_06_17_025433) do
     t.index ["seller_id"], name: "index_contacts_on_seller_id"
   end
 
+<<<<<<< HEAD
   create_table "delivery_options", force: :cascade do |t|
     t.string "url"
     t.string "phone_number"
@@ -42,6 +47,8 @@ ActiveRecord::Schema.define(version: 2020_06_17_025433) do
     t.index ["delivery_options_id"], name: "index_delivery_types_on_delivery_options_id"
   end
 
+=======
+>>>>>>> master
   create_table "donation_details", force: :cascade do |t|
     t.bigint "item_id", null: false
     t.integer "amount"

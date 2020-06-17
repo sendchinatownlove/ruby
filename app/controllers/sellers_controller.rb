@@ -5,7 +5,15 @@ class SellersController < ApplicationController
 
   # GET /sellers
   def index
-    @sellers = Seller.all
+
+    query = Validate::GetSellersQuery.new(params)
+
+    unless query.valid?
+      raise InvalidParameterError, query.errors.full_messages.to_sentence
+    end
+
+    @sellers = Seller.order("#{query.sort_key} #{query.sort_order}")
+
     sellers = @sellers.map do |seller|
       SellersHelper.generate_seller_json(
         seller: seller
@@ -56,13 +64,16 @@ class SellersController < ApplicationController
       :sell_gift_cards,
       :hero_image_url,
       :progress_bar_color,
+      :cost_per_meal,
       :business_type,
       :num_employees,
       :founded_year,
       :website_url,
       :menu_url,
       :target_amount,
-      :square_location_id
+      :square_location_id,
+      :logo_image_url,
+      gallery_image_urls: []
     )
   end
 

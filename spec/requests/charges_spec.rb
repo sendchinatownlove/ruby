@@ -6,10 +6,13 @@ RSpec.describe 'Charges API', type: :request do
   # Test suite for POST /charges
   describe 'POST /charges' do
     let(:email) { 'mrkrabs@thekrustykrab.com' }
-    let(:nonce) { nil }
-    let(:is_square) { false }
+    let(:nonce) { 'cnon:card-nonce-ok' }
+    let(:is_square) { true }
     let(:name) { 'Squarepants, Spongebob' }
     let(:seller_id) { 'shunfa-bakery' }
+    let(:idempotency_key) { '123' }
+    let(:is_subscribed) { 'true' }
+    let(:is_distribution) { false }
     let(:params) do
       {
         email: email,
@@ -17,53 +20,26 @@ RSpec.describe 'Charges API', type: :request do
         nonce: nonce,
         line_items: line_items,
         seller_id: seller_id,
-        name: name
+        name: name,
+        idempotency_key: idempotency_key,
+        is_subscribed: is_subscribed,
+        is_distribution: is_distribution
       }
     end
+    let(:distributor) { create :contact }
     let!(:seller) do
       create(
         :seller,
         seller_id: seller_id,
-        square_location_id: 'E4R1NCMHG7B2Y',
-        name: 'Shunfa Bakery'
+        square_location_id: ENV['SQUARE_LOCATION_ID'],
+        name: 'Shunfa Bakery',
+        distributor: distributor
       )
-    end
-
-    context 'with a gift card' do
-      let(:line_items) do
-        [
-          {
-            amount: 50,
-            currency: 'usd',
-            item_type: 'gift_card',
-            quantity: 1,
-            seller_id: seller_id
-          }
-        ]
-      end
-
-      before { post '/charges', params: params, as: :json }
-
-      it 'returns Stripe PaymentIntent' do
-        expect(json['id']).not_to be_empty
-        expect(json['amount']).to eq(50)
-        expect(json['currency']).to eq('usd')
-        expect(json['receipt_email']).to eq(email)
-
-        expect(
-          PaymentIntent.find_by(email: email, line_items: line_items.to_json)
-        ).not_to be_nil
-      end
-
-      it 'returns status code 200' do
-        expect(response).to have_http_status(200)
-      end
     end
 
     context 'using Square' do
       # Test value taken from https://developer.squareup.com/docs/testing/test-values
       let(:nonce) { 'cnon:card-nonce-ok' }
-      let(:is_square) { true }
 
       context 'with a gift card' do
         let(:line_items) do
@@ -73,7 +49,8 @@ RSpec.describe 'Charges API', type: :request do
               currency: 'usd',
               item_type: 'gift_card',
               quantity: 1,
-              seller_id: seller_id
+              seller_id: seller_id,
+              is_distribution: is_distribution
             }
           ]
         end
@@ -154,8 +131,11 @@ RSpec.describe 'Charges API', type: :request do
           expect(payment['amount_money']['currency']).to eq('USD')
           expect(payment['buyer_email_address']).to eq(email)
 
+          contact = Contact.find_by(email: email, name: name)
+
+          expect(contact).not_to be_nil
           expect(
-            PaymentIntent.find_by(email: email, line_items: line_items.to_json)
+            PaymentIntent.find_by(recipient: contact, line_items: line_items.to_json)
           ).not_to be_nil
         end
 
@@ -172,14 +152,16 @@ RSpec.describe 'Charges API', type: :request do
               currency: 'usd',
               item_type: 'gift_card',
               quantity: 1,
-              seller_id: seller_id
+              seller_id: seller_id,
+              is_distribution: is_distribution
             },
             {
               amount: 3000,
               currency: 'usd',
               item_type: 'donation',
               quantity: 1,
-              seller_id: seller_id
+              seller_id: seller_id,
+              is_distribution: is_distribution
             }
           ]
         end
@@ -193,14 +175,74 @@ RSpec.describe 'Charges API', type: :request do
           expect(payment['amount_money']['currency']).to eq('USD')
           expect(payment['buyer_email_address']).to eq(email)
 
+          contact = Contact.find_by(email: email, name: name)
+
+          expect(contact).not_to be_nil
           expect(
-            PaymentIntent.find_by(email: email, line_items: line_items.to_json)
+            PaymentIntent.find_by(recipient: contact, line_items: line_items.to_json)
           ).not_to be_nil
         end
 
         it 'returns status code 200' do
           expect(response).to have_http_status(200)
         end
+      end
+
+      context 'with gift card donation for distribution' do
+        let(:line_items) do
+          [
+            {
+              amount: 3000,
+              currency: 'usd',
+              item_type: 'donation',
+              quantity: 1,
+              seller_id: seller_id,
+              is_distribution: is_distribution
+            }
+          ]
+        end
+
+        let(:is_distribution) { true }
+
+        before { post '/charges', params: params, as: :json }
+
+        it 'returns Square Payment' do
+          payment = json['data']['payment']
+          expect(payment['id']).not_to be_empty
+          expect(payment['amount_money']['amount']).to eq(3000)
+          expect(payment['amount_money']['currency']).to eq('USD')
+          expect(payment['buyer_email_address']).to eq(email)
+
+          contact = Contact.find_by(email: email, name: name)
+          payment_intent =
+            PaymentIntent.find_by(purchaser: contact,
+                                  line_items: line_items.to_json)
+
+          expect(contact).not_to be_nil
+          expect(payment_intent).not_to be_nil
+          expect(payment_intent.recipient).not_to eq(contact)
+          expect(payment_intent.recipient).to eq(distributor)
+          expect(payment_intent.recipient).not_to eq(payment_intent.purchaser)
+        end
+
+        it 'returns status code 200' do
+          expect(response).to have_http_status(200)
+        end
+      end
+    end
+
+    context 'with a duplicate payment request' do
+      let(:line_items) do
+        [{ currency: 'usd', item_type: 'gift_card', quantity: 1 }]
+      end
+
+      before do
+        post '/charges', params: params, as: :json
+        allow_any_instance_of(ExistingEvent).to receive(:save).and_return(false)
+      end
+
+      it 'returns status code 422' do
+        expect(response).to have_http_status(422)
       end
     end
 
@@ -429,44 +471,6 @@ RSpec.describe 'Charges API', type: :request do
       end
     end
 
-    context 'with a gift card and donation' do
-      let(:line_items) do
-        [
-          {
-            amount: 5000,
-            currency: 'usd',
-            item_type: 'gift_card',
-            quantity: 1,
-            seller_id: seller_id
-          },
-          {
-            amount: 3000,
-            currency: 'usd',
-            item_type: 'donation',
-            quantity: 1,
-            seller_id: seller_id
-          }
-        ]
-      end
-
-      before { post '/charges', params: params, as: :json }
-
-      it 'returns Stripe PaymentIntent' do
-        expect(json['id']).not_to be_empty
-        expect(json['amount']).to eq(8000)
-        expect(json['currency']).to eq('usd')
-        expect(json['receipt_email']).to eq(email)
-
-        expect(
-          PaymentIntent.find_by(email: email, line_items: line_items.to_json)
-        ).not_to be_nil
-      end
-
-      it 'returns status code 200' do
-        expect(response).to have_http_status(200)
-      end
-    end
-
     context 'when the request is missing email' do
       before do
         post(
@@ -506,78 +510,6 @@ RSpec.describe 'Charges API', type: :request do
         expect(response.body).to match(
           /param is missing or the value is empty: seller_id/
         )
-      end
-    end
-
-    describe 'PaymentIntent' do
-      context 'includes gift cards' do
-        let!(:seller2) { create(:seller, name: 'Uncle Boons') }
-
-        let(:line_items) do
-          [
-            {
-              amount: 5050,
-              currency: 'usd',
-              item_type: 'gift_card',
-              quantity: 2,
-              seller_id: seller.seller_id
-            },
-            {
-              amount: 3000,
-              currency: 'usd',
-              item_type: 'donation',
-              quantity: 1,
-              seller_id: seller2.seller_id
-            }
-          ]
-        end
-
-        it 'should include gift card details' do
-          thank_you = "Thank you for supporting #{seller.name}."
-          expect(Stripe::PaymentIntent).to receive(:create).with(
-            amount: 13_100,
-            currency: 'usd',
-            payment_method_types: %w[card],
-            receipt_email: email,
-            description:
-              # rubocop:disable Layout/LineLength
-              thank_you +
-                ' Your gift card(s) will be emailed to you when the seller opens back up.'
-          ).and_call_original
-          # rubocop:enable Layout/LineLength
-
-          post '/charges', params: params, as: :json
-        end
-      end
-
-      context 'when donations only' do
-        let(:line_items) do
-          [
-            {
-              amount: 5050, currency: 'usd', item_type: 'donation', quantity: 2
-            },
-            {
-              amount: 3000, currency: 'usd', item_type: 'donation', quantity: 1
-            },
-            {
-              amount: 3000, currency: 'usd', item_type: 'donation', quantity: 1
-            }
-          ]
-        end
-
-        before { post '/charges', params: params, as: :json }
-        it 'should not include gift card details' do
-          thank_you = "Thank you for supporting #{seller.name}."
-          expect(Stripe::PaymentIntent).to receive(:create).with(
-            amount: 16_100,
-            currency: 'usd',
-            receipt_email: email,
-            payment_method_types: %w[card],
-            description: thank_you
-          ).and_call_original
-
-          post '/charges', params: params, as: :json
-        end
       end
     end
   end
