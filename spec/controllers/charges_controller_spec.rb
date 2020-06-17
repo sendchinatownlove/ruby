@@ -22,6 +22,9 @@ RSpec.describe ChargesController, type: :controller do
         expect(PaymentIntent.find_by square_location_id: seller_non_prof.non_profit_location_id).not_to eq nil
       end
 
+    end
+
+    context "when seller has a blank non_profit_location_id" do
       it "should create a payment_intent using the square_location_id" do
         allow(SquareManager::PaymentCreator)
                                             .to receive(:call)
