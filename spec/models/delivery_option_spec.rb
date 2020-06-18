@@ -1,5 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe DeliveryOption, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+	it { should have_one(:delivery_type) }
+	it { should belong_to(:seller) }
 end
