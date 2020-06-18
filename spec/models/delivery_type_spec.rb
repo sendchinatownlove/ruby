@@ -13,6 +13,10 @@
 #
 #  index_delivery_types_on_delivery_option_id  (delivery_option_id)
 #
+# Foreign Keys
+#
+#  fk_rails_...  (delivery_option_id => delivery_options.id)
+#
 require 'rails_helper'
 
 RSpec.describe DeliveryType, type: :model do

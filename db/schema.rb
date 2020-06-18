@@ -177,6 +177,7 @@ ActiveRecord::Schema.define(version: 2020_06_17_025433) do
   end
 
   add_foreign_key "delivery_options", "sellers"
+  add_foreign_key "delivery_types", "delivery_options"
   add_foreign_key "donation_details", "items"
   add_foreign_key "gift_card_amounts", "gift_card_details"
   add_foreign_key "gift_card_details", "contacts", column: "recipient_id"
