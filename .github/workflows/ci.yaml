@@ -38,6 +38,8 @@ jobs:
         SQUARE_WEBHOOK_SIGNATURE_KEY: ${{ secrets.TEST_SQUARE_WEBHOOK_SIGNATURE_KEY }}
         SQUARE_LOCATION_ID: ${{ secrets.TEST_SQUARE_LOCATION_ID }}
         RAILS_WEBHOOK_URL: http://localhost:3000/webhooks
+        THINK_CHINATOWN_LOCATION_ID: ${{ secrets.THINK_CHINATOWN_LOCATION_ID }}
+        THINK_CHINATOWN_WEBHOOK_SIGNATURE_KEY: ${{ secrets.THINK_CHINATOWN_WEBHOOK_SIGNATURE_KEY }}
       run: |
         sudo apt-get -yqq install libpq-dev
         gem install bundler
