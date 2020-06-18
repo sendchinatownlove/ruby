@@ -5,7 +5,6 @@ class SellersController < ApplicationController
 
   # GET /sellers
   def index
-
     query = Validate::GetSellersQuery.new(params)
 
     unless query.valid?
