@@ -38,8 +38,8 @@ ActiveRecord::Schema.define(version: 2020_06_17_025433) do
     t.string "icon_url"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.bigint "delivery_options_id"
-    t.index ["delivery_options_id"], name: "index_delivery_types_on_delivery_options_id"
+    t.bigint "delivery_option_id"
+    t.index ["delivery_option_id"], name: "index_delivery_types_on_delivery_option_id"
   end
 
   create_table "donation_details", force: :cascade do |t|
@@ -177,7 +177,6 @@ ActiveRecord::Schema.define(version: 2020_06_17_025433) do
   end
 
   add_foreign_key "delivery_options", "sellers"
-  add_foreign_key "delivery_types", "delivery_options", column: "delivery_options_id"
   add_foreign_key "donation_details", "items"
   add_foreign_key "gift_card_amounts", "gift_card_details"
   add_foreign_key "gift_card_details", "contacts", column: "recipient_id"
