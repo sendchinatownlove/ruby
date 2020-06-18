@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_11_014835) do
+ActiveRecord::Schema.define(version: 2020_06_17_025433) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -22,6 +22,24 @@ ActiveRecord::Schema.define(version: 2020_06_11_014835) do
     t.bigint "seller_id"
     t.index ["email"], name: "index_contacts_on_email"
     t.index ["seller_id"], name: "index_contacts_on_seller_id"
+  end
+
+  create_table "delivery_options", force: :cascade do |t|
+    t.string "url"
+    t.string "phone_number"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.bigint "seller_id", null: false
+    t.index ["seller_id"], name: "index_delivery_options_on_seller_id"
+  end
+
+  create_table "delivery_types", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "icon_url"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.bigint "delivery_option_id"
+    t.index ["delivery_option_id"], name: "index_delivery_types_on_delivery_option_id"
   end
 
   create_table "donation_details", force: :cascade do |t|
@@ -158,6 +176,8 @@ ActiveRecord::Schema.define(version: 2020_06_11_014835) do
     t.index ["seller_id"], name: "index_sellers_on_seller_id"
   end
 
+  add_foreign_key "delivery_options", "sellers"
+  add_foreign_key "delivery_types", "delivery_options"
   add_foreign_key "donation_details", "items"
   add_foreign_key "gift_card_amounts", "gift_card_details"
   add_foreign_key "gift_card_details", "contacts", column: "recipient_id"
