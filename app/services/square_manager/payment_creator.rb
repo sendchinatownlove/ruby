@@ -14,7 +14,7 @@ module SquareManager
 
     def call
       client = Square::Client.new(
-        access_token: ENV['SQUARE_ACCESS_TOKEN'],
+        access_token: which_access_token_from_location_id(location_id: location_id)
         environment: Rails.env.production? ? 'production' : 'sandbox'
       )
       client.payments.create_payment(body: create_payment_body)
@@ -31,6 +31,14 @@ module SquareManager
         note: note,
         location_id: location_id
       }
+    end
+
+    def which_access_token_from_location_id(location_id:)
+      case location_id
+      when ENV['THINK_CHINATOWN_LOCATION_ID']
+        return ENV['THINK_CHINATOWN_ACCESS_TOKEN']
+      else
+        return ENV['SQUARE_ACCESS_TOKEN']
     end
   end
 end

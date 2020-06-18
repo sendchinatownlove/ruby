@@ -29,7 +29,7 @@
     seller_id: '46-mott',
     cuisine_name: 'Bakery',
     name: '46 Mott',
-    story: "Patrick is awesome, tbh",
+    story: 'Patrick is awesome, tbh',
     accept_donations: true,
     sell_gift_cards: true,
     owner_name: 'Patrick Mock',
