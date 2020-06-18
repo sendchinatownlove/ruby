@@ -36,8 +36,7 @@ module SquareManager
 
       # Hash the signatures a second time (to protect against timing attacks)
       # and compare them
-      unless [Digest::SHA1.base64digest(string_signature), Digest::SHA1.base64digest(think_chinatown_signature)].include?
-        Digest::SHA1.base64digest(callback_signature)
+      unless [Digest::SHA1.base64digest(string_signature), Digest::SHA1.base64digest(think_chinatown_signature)].include?(Digest::SHA1.base64digest(callback_signature))
         raise ExceptionHandler::InvalidSquareSignature
       end
     end
