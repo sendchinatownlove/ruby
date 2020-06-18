@@ -2,6 +2,6 @@
 
 FactoryBot.define do
   factory :delivery_type do
-    name { Faker::Company.name }
+    name { Faker::Lorem.word }
   end
 end
