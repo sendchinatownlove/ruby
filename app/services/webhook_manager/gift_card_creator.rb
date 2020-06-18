@@ -16,10 +16,10 @@ module WebhookManager
       ActiveRecord::Base.transaction do
         seller = Seller.find_by(seller_id: seller_id)
         item = WebhookManager::ItemCreator.call({
-          item_type: :gift_card,
-          seller_id: seller_id,
-          payment_intent: payment_intent
-        })
+                                                  item_type: :gift_card,
+                                                  seller_id: seller_id,
+                                                  payment_intent: payment_intent
+                                                })
 
         gift_card_detail = GiftCardDetail.create!(
           expiration: Date.today + 1.year,

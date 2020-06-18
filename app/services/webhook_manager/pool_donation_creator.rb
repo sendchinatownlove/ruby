@@ -21,9 +21,7 @@ module WebhookManager
         #                 all in an N log N sort—which is horrible. Ideally,
         #                 we would memoize amount_raised, and fix the N+1 query
         #                 in GiftCardDetail that calculates amount.
-        @donation_sellers = Seller.filter_by_accepts_donations.sort_by do |s|
-          s.amount_raised
-        end
+        @donation_sellers = Seller.filter_by_accepts_donations.sort_by(&:amount_raised)
 
         # calculate amount per merchant
         # This will break if we ever have zero merchants but are still
@@ -35,10 +33,10 @@ module WebhookManager
           next if seller.seller_id.eql?(Seller::POOL_DONATION_SELLER_ID)
 
           item = WebhookManager::ItemCreator.call({
-            item_type: :donation,
-            seller_id: seller.seller_id,
-            payment_intent: payment_intent
-          })
+                                                    item_type: :donation,
+                                                    seller_id: seller.seller_id,
+                                                    payment_intent: payment_intent
+                                                  })
 
           donation = DonationDetail.create!(
             item: item,

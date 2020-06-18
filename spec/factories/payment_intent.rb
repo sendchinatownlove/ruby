@@ -11,14 +11,14 @@ FactoryBot.define do
   end
 
   trait :with_line_items do
-    line_items {
-      %{
+    line_items do
+      %(
         [
           {"amount": "100", "seller_id": "42", "item_type": "donation"},
           {"amount": "200", "seller_id": "42", "item_type": "donation"},
           {"amount": "300", "seller_id": "43", "item_type": "donation"}
         ]
-      }
-    }
+      )
+    end
   end
 end

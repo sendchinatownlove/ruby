@@ -42,8 +42,8 @@ describe WebhookManager::DonationCreator, '#call' do
 
     payload = new_payload(payment_intent_2)
 
-    expect{WebhookManager::DonationCreator.call(payload)}.
-      to raise_error(ActiveRecord::StaleObjectError)
+    expect { WebhookManager::DonationCreator.call(payload) }
+      .to raise_error(ActiveRecord::StaleObjectError)
 
     expect(count).to eq(Item.count)
   end

@@ -115,7 +115,7 @@ class WebhooksController < ApplicationController
 
     items = JSON.parse(payment_intent.line_items)
     recipient = payment_intent.recipient
-    is_donation = nil
+    is_donation = false
 
     items.each do |item_json|
       # TODO(jtmckibb): Add some tracking that tracks if it breaks somewhere
@@ -127,10 +127,10 @@ class WebhooksController < ApplicationController
         PoolDonationValidator.call({ type: item_json['item_type'] })
 
         WebhookManager::PoolDonationCreator.call({
-          seller_id: seller_id,
-          payment_intent: payment_intent,
-          amount: amount
-        })
+                                                   seller_id: seller_id,
+                                                   payment_intent: payment_intent,
+                                                   amount: amount
+                                                 })
 
         EmailManager::PoolDonationReceiptSender.call({
                                                        payment_intent: payment_intent,
@@ -185,13 +185,13 @@ class WebhooksController < ApplicationController
 
     if is_donation
       # Send separate email for each seller.
-      grouped_items = items.group_by { |li| li["seller_id"] }
-      grouped_items.keys.each do |sid|
+      grouped_items = items.group_by { |li| li['seller_id'] }
+      grouped_items.each_key do |sid|
         EmailManager::DonationReceiptSender.call({
-            payment_intent: payment_intent,
-            amount: grouped_items[sid].map { |li| li["amount"].to_f }.sum,
-            merchant: Seller.find_by(seller_id: sid).name
-        })
+                                                   payment_intent: payment_intent,
+                                                   amount: grouped_items[sid].map { |li| li['amount'].to_f }.sum,
+                                                   merchant: Seller.find_by(seller_id: sid).name
+                                                 })
       end
     end
   end
