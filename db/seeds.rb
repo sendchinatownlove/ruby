@@ -43,8 +43,8 @@
     founded_year: 2018,
     website_url: nil,
     menu_url: nil,
-    square_location_id: 'E4R1NCMHG7B2Z',
-    non_profit_location_id: 'SDAFADS34334',
+    square_location_id: 'E4R1NCMHG7B2Y',
+    non_profit_location_id: '1VHM457EG87XX',
     cost_per_meal: 500
   },
   {
