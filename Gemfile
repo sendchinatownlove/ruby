@@ -40,6 +40,10 @@ gem 'actionmailer'
 
 gem 'rubocop'
 
+# Caching
+gem 'connection_pool'
+gem 'actionpack-action_caching'
+
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 gem 'rack-cors'
 
