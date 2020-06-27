@@ -14,7 +14,6 @@ class OpenHourController < ApplicationController
 
   def update
     @open_hour.update(update_open_hour_params)
-    # @open_hour.save
     json_response(@open_hour)
   end
 
