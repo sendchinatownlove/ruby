@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: delivery_options
@@ -18,6 +20,6 @@
 #  fk_rails_...  (seller_id => sellers.id)
 #
 class DeliveryOption < ApplicationRecord
-	belongs_to :seller
-	has_one :delivery_type
+  belongs_to :seller
+  has_one :delivery_type
 end
