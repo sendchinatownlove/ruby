@@ -54,6 +54,7 @@ class Seller < ApplicationRecord
   # model association
   has_many :locations, dependent: :destroy
   has_many :menu_items, dependent: :destroy
+  has_many :delivery_options, dependent: :destroy
   has_many :items, dependent: :destroy
 
   has_one :distributor, class_name: 'Contact'

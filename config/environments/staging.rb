@@ -30,18 +30,18 @@ Rails.application.configure do
   # Show full error reports.
   config.consider_all_requests_local = false
 
-  # Enable/disable caching. By default caching is disabled.
-  # Run rails dev:cache to toggle caching.
-  if Rails.root.join('tmp', 'caching-dev.txt').exist?
-    config.cache_store = :memory_store
-    config.public_file_server.headers = {
-      'Cache-Control' => "public, max-age=#{2.days.to_i}"
-    }
-  else
-    config.action_controller.perform_caching = false
+  config.action_controller.perform_caching = true
 
-    config.cache_store = :null_store
-  end
+  config.cache_store = :mem_cache_store,
+                  (ENV["MEMCACHIER_SERVERS"] || "").split(","),
+                  {:username => ENV["MEMCACHIER_USERNAME"],
+                   :password => ENV["MEMCACHIER_PASSWORD"],
+                   :failover => true,
+                   :socket_timeout => 1.5,
+                   :socket_failure_delay => 0.2,
+                   :down_retry_delay => 60,
+                   :pool_size => 5
+                  }
 
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.

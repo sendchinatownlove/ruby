@@ -13,7 +13,7 @@ module Validate
       if params[:sort].nil?
         # Default to most recent sellers
         @sort_key = 'created_at'
-        @sort_order  = 'desc'
+        @sort_order = 'desc'
       else
         @sort_key = params[:sort].split(':')[0]
         @sort_order = params[:sort].split(':')[1] || 'desc'

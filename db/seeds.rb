@@ -23,7 +23,9 @@
     founded_year: 2013,
     website_url: nil,
     menu_url: nil,
-    square_location_id: 'E4R1NCMHG7B2Y'
+    # See instructions for setting this up at
+    # https://docs.google.com/document/d/1UPNCwjWS_T7XT5AXsewphu6NvNdV7TQLSJub-RBRAG0/edit
+    square_location_id: ENV['SQUARE_LOCATION_ID']
   },
   {
     seller_id: '46-mott',
@@ -52,6 +54,8 @@
     accept_donations: false,
     sell_gift_cards: false,
     founded_year: 2020,
+    # See instructions for setting this up at
+    # https://docs.google.com/document/d/1UPNCwjWS_T7XT5AXsewphu6NvNdV7TQLSJub-RBRAG0/edit
     square_location_id: ENV['POOL_SQUARE_LOCATION_ID']
   }
 ].each do |attributes|
