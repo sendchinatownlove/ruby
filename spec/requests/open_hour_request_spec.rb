@@ -3,4 +3,161 @@
 require 'rails_helper'
 
 RSpec.describe 'OpenHours', type: :request do
+  # Initialize the test data
+  before { freeze_time }
+  let(:current_time) { Time.current.utc.iso8601(3).to_s }
+  let!(:seller) { create(:seller) }
+  let(:seller_id) { seller.seller_id }
+  let!(:open_hours) { create_list(:open_hour, 7, seller_id: seller.id) }
+  let(:id) { open_hours.first.id }
+
+  # Test suite for GET /sellers/:seller_id/open_hours
+  describe 'GET /sellers/:seller_id/open_hour' do
+    before { get "/sellers/#{seller_id}/open_hour" }
+
+    context 'when seller exists' do
+      it 'returns status code 200' do
+        expect(response).to have_http_status(200)
+      end
+
+      it 'returns all seller open_hours' do
+        expect(json.size).to eq(7)
+      end
+    end
+
+    context 'when seller does not exist' do
+      let(:seller_id) { 0 }
+
+      it 'returns status code 404' do
+        expect(response).to have_http_status(404)
+      end
+
+      it 'returns a not found message' do
+        expect(response.body).to match(/Couldn't find Seller/)
+      end
+    end
+  end
+
+  # Test suite for POST /sellers/:seller_id/open_hour
+  describe 'POST /sellers/:seller_id/open_hour' do
+    let(:valid_attributes) do
+      {
+        openday: 'MON',
+        closeday: 'MON',
+        open: Time.find_zone('UTC').parse('6:30'),
+        close: Time.find_zone('UTC').parse('18:30')
+      }
+    end
+
+    let(:invalid_attributes) do
+      {
+        invalid: 'yellow'
+      }
+    end
+
+    context 'when request attributes are valid' do
+      before do
+        post(
+          "/sellers/#{seller_id}/open_hour",
+          params: valid_attributes,
+          as: :json
+        )
+      end
+
+      it 'creates an open_hour' do
+        actual_json = json.except('id')
+        expected_json = valid_attributes.except('id')
+        expected_json['created_at'] = current_time
+        expected_json['updated_at'] = current_time
+        expected_json['openday'] = 'MON'
+        expected_json['closeday'] = 'MON'
+        # workaround since the db modifies the date and messes up the rspec validation
+        expect(actual_json['open'].to_time.strftime('%I:%M%p')).to eq('06:30AM')
+        expect(actual_json['close'].to_time.strftime('%I:%M%p')).to eq('06:30PM')
+        expected_json['open'] = actual_json['open']
+        expected_json['close'] = actual_json['close']
+        expected_json['seller_id'] = seller.id
+        expect(actual_json).to eq(expected_json.with_indifferent_access)
+      end
+
+      it 'returns status code 201' do
+        expect(response).to have_http_status(201)
+      end
+    end
+
+    context 'when request attributes are invalid' do
+      before do
+        post(
+          "/sellers/#{seller_id}/open_hour",
+          params: invalid_attributes,
+          as: :json
+        )
+      end
+
+      it 'returns status code 422' do
+        expect(response).to have_http_status(422)
+      end
+    end
+  end
+
+  # Test suite for PUT /sellers/:seller_id/open_hour/:id
+  describe 'PUT /sellers/:seller_id/open_hour/:id' do
+    let(:valid_attributes) { { closeday: 'TUE' } }
+
+    before do
+      put(
+        "/sellers/#{seller_id}/open_hour/#{id}",
+        params: valid_attributes,
+        as: :json
+      )
+    end
+
+    context 'when open_hour exists' do
+      it 'returns status code 200' do
+        expect(response).to have_http_status(200)
+      end
+
+      it 'updates the menu_item' do
+        updated_open_hour = OpenHour.find(id)
+        expect(updated_open_hour.closeday).to match(/TUE/)
+      end
+    end
+
+    context 'when the open_hour does not exist' do
+      let(:id) { 0 }
+
+      it 'returns status code 404' do
+        expect(response).to have_http_status(404)
+      end
+
+      it 'returns a not found message' do
+        expect(response.body).to match(/Couldn't find OpenHour/)
+      end
+    end
+  end
+
+  # Test suite for DELETE /sellers/:seller_id/open_hour/:id
+  describe 'DELETE /sellers/:seller_id/open_hour/:id' do
+    let(:valid_attributes) { { openday: 'MON' } }
+
+    before do
+      delete(
+        "/sellers/#{seller_id}/open_hour/#{id}",
+        params: valid_attributes,
+        as: :json
+      )
+    end
+
+    context 'when open_hour exists' do
+      it 'returns status code 204' do
+        expect(response).to have_http_status(204)
+      end
+
+      it 'confirms deletion of the open_hour' do
+        expect { OpenHour.find(id) }.to raise_exception(
+          ActiveRecord::RecordNotFound
+        )
+      end
+    end
+  end
 end

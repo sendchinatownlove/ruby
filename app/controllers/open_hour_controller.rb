@@ -14,7 +14,7 @@ class OpenHourController < ApplicationController
 
   def update
     @open_hour.update(update_open_hour_params)
-    @open_hour.save
+    # @open_hour.save
     json_response(@open_hour)
   end
 
@@ -39,7 +39,8 @@ class OpenHourController < ApplicationController
 
   def update_params
     params.permit(
-      :day,
+      :openday,
+      :closeday,
       :open,
       :close
     )
@@ -49,7 +50,7 @@ class OpenHourController < ApplicationController
     @seller = Seller.find_by!(seller_id: params[:seller_id])
   end
 
-  def set_seller_menu_item
+  def set_seller_open_hour
     @open_hour = @seller.open_hour.find_by!(id: params[:id]) if @seller
   end
 end
