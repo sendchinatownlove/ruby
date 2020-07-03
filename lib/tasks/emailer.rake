@@ -20,9 +20,9 @@ namespace :emailer do
         gcd.expiration 
         from gift_card_details gcd 
         join ( -- latest gift card amount for a gift card id
-        select distinct on (gift_card_detail_id) *
-        from gift_card_amounts
-        ) as gca on gca.gift_card_detail_id = gcd.id 
+          select distinct on (gift_card_detail_id) *
+          from gift_card_amounts
+          ) as gca on gca.gift_card_detail_id = gcd.id 
         join items i on gcd.item_id = i.id
         join contacts c_r on gcd.recipient_id = c_r.id 
         where gcd.created_at > current_date - 30
@@ -67,7 +67,7 @@ namespace :emailer do
       puts(html)
 
       puts('sending... to ' + s['seller_contact_email'])
-      EmailManager::Sender.send_receipt(to: ENV['EMAIL_ADDRESS'], html: html)
+      # EmailManager::Sender.send_receipt(to: ENV['EMAIL_ADDRESS'], html: html)
       puts('sent?')
 
     end
