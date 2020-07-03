@@ -32,7 +32,7 @@ namespace :emailer do
 
     html = ''
     html += '<style> table, tr, td {border: 1px solid black}</style>'
-    html += <table><tr>'
+    html += '<table><tr>'
 
     r.columns.each do |col|
       html += '<th>' + col + '</th>'
