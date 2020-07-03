@@ -42,8 +42,8 @@ RSpec.describe 'OpenHours', type: :request do
   describe 'POST /sellers/:seller_id/open_hour' do
     let(:valid_attributes) do
       {
-        openday: 'MON',
-        closeday: 'MON',
+        open_day: 'MON',
+        close_day: 'MON',
         open: Time.find_zone('UTC').parse('6:30'),
         close: Time.find_zone('UTC').parse('18:30')
       }
@@ -52,6 +52,15 @@ RSpec.describe 'OpenHours', type: :request do
     let(:invalid_attributes) do
       {
         invalid: 'yellow'
+      }
+    end
+
+    let(:opens_after_closes_attributes) do
+      {
+        open_day: 'MON',
+        close_day: 'MON',
+        open: Time.find_zone('UTC').parse('18:30'),
+        close: Time.find_zone('UTC').parse('6:30')
       }
     end
 
@@ -69,8 +78,8 @@ RSpec.describe 'OpenHours', type: :request do
         expected_json = valid_attributes.except('id')
         expected_json['created_at'] = current_time
         expected_json['updated_at'] = current_time
-        expected_json['openday'] = 'MON'
-        expected_json['closeday'] = 'MON'
+        expected_json['open_day'] = 'MON'
+        expected_json['close_day'] = 'MON'
         # workaround since the db modifies the date and messes up the rspec validation
         expect(actual_json['open'].to_time.strftime('%I:%M%p')).to eq('06:30AM')
         expect(actual_json['close'].to_time.strftime('%I:%M%p')).to eq('06:30PM')
@@ -98,11 +107,25 @@ RSpec.describe 'OpenHours', type: :request do
         expect(response).to have_http_status(422)
       end
     end
+
+    context 'when attempting to create an open hour that closes before it opens' do
+      before do
+        post(
+          "/sellers/#{seller_id}/open_hour",
+          params: opens_after_closes_attributes,
+          as: :json
+        )
+      end
+
+      it 'returns status code 422' do
+        expect(response).to have_http_status(422)
+      end
+    end
   end
 
   # Test suite for PUT /sellers/:seller_id/open_hour/:id
   describe 'PUT /sellers/:seller_id/open_hour/:id' do
-    let(:valid_attributes) { { closeday: 'TUE' } }
+    let(:valid_attributes) { { close_day: 'TUE' } }
 
     before do
       put(
@@ -119,7 +142,7 @@ RSpec.describe 'OpenHours', type: :request do
 
       it 'updates the menu_item' do
         updated_open_hour = OpenHour.find(id)
-        expect(updated_open_hour.closeday).to match(/TUE/)
+        expect(updated_open_hour.close_day).to match(/TUE/)
       end
     end
 
@@ -138,7 +161,7 @@ RSpec.describe 'OpenHours', type: :request do
 
   # Test suite for DELETE /sellers/:seller_id/open_hour/:id
   describe 'DELETE /sellers/:seller_id/open_hour/:id' do
-    let(:valid_attributes) { { openday: 'MON' } }
+    let(:valid_attributes) { { open_day: 'MON' } }
 
     before do
       delete(

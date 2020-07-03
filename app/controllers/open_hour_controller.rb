@@ -38,8 +38,8 @@ class OpenHourController < ApplicationController
 
   def update_params
     params.permit(
-      :openday,
-      :closeday,
+      :open_day,
+      :close_day,
       :open,
       :close
     )

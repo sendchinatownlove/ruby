@@ -6,9 +6,9 @@
 #
 #  id         :bigint           not null, primary key
 #  close      :time
-#  closeday   :integer
+#  close_day  :integer
 #  open       :time
-#  openday    :integer
+#  open_day   :integer
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  seller_id  :bigint           not null
@@ -25,16 +25,16 @@ require 'rails_helper'
 
 RSpec.describe OpenHour, type: :model do
   it { should belong_to(:seller) }
-  it { should validate_presence_of(:openday) }
-  it { should validate_presence_of(:closeday) }
+  it { should validate_presence_of(:open_day) }
+  it { should validate_presence_of(:close_day) }
   it { should validate_presence_of(:open) }
   it { should validate_presence_of(:close) }
 
   it do
-    should define_enum_for(:openday)
+    should define_enum_for(:open_day)
   end
 
   it do
-    should define_enum_for(:closeday)
+    should define_enum_for(:close_day)
   end
 end

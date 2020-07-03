@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_20_045700) do
+ActiveRecord::Schema.define(version: 2020_07_03_213401) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -121,8 +121,8 @@ ActiveRecord::Schema.define(version: 2020_06_20_045700) do
     t.time "close"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.integer "openday"
-    t.integer "closeday"
+    t.integer "open_day"
+    t.integer "close_day"
     t.index ["seller_id"], name: "index_open_hours_on_seller_id"
   end
 
