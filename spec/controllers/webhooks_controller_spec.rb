@@ -24,7 +24,7 @@ RSpec.describe WebhooksController, type: :controller do
       it 'should send one email per unique seller ID' do
         line_items_hash = JSON.parse payment_intent.line_items
         seller_ids = line_items_hash.map { |li| li['seller_id'] }
-        seller_ids.uniq.length.should == 2
+        expect(seller_ids.uniq.length).to eq(2)
 
         expect(EmailManager::DonationReceiptSender).to receive(:call).twice
         post :create, body: request_body

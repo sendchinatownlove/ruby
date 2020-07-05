@@ -71,6 +71,8 @@ Rails.application.routes.draw do
   resources :sellers do
     resources :locations, :menu_items, :items
   end
+  resources :fees do
+  end
   resources :webhooks do
   end
 end

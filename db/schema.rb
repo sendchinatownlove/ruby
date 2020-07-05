@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_17_023402) do
+ActiveRecord::Schema.define(version: 2020_07_05_220208) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -54,6 +54,13 @@ ActiveRecord::Schema.define(version: 2020_06_17_023402) do
     t.string "idempotency_key"
     t.integer "event_type"
     t.index ["idempotency_key", "event_type"], name: "index_existing_events_on_idempotency_key_and_event_type", unique: true
+  end
+
+  create_table "fees", force: :cascade do |t|
+    t.decimal "multiplier", default: "1.0"
+    t.boolean "active", default: true
+    t.bigint "seller_id"
+    t.index ["seller_id"], name: "index_fees_on_seller_id"
   end
 
   create_table "gift_card_amounts", force: :cascade do |t|
@@ -126,6 +133,8 @@ ActiveRecord::Schema.define(version: 2020_06_17_023402) do
     t.bigint "purchaser_id"
     t.bigint "recipient_id"
     t.integer "lock_version"
+    t.bigint "fee_id"
+    t.index ["fee_id"], name: "index_payment_intents_on_fee_id"
     t.index ["purchaser_id"], name: "index_payment_intents_on_purchaser_id"
     t.index ["recipient_id"], name: "index_payment_intents_on_recipient_id"
   end
