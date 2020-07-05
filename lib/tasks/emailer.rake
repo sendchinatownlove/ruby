@@ -5,13 +5,6 @@ namespace :emailer do
   task vouchers_to_merchants: :environment do
     desc 'sends all voucher codes to all of their merchants'
 
-    s_sql = 'select c.email as seller_contact_email,
-        c.name as seller_contact_name,
-        s.seller_id as seller_name	   
-        from contacts c 
-        join sellers s on c.seller_id = s.id
-        where s.id = '
-
     gc_sql = 'select gcd.gift_card_id, 
         gca.value,
         c_r.email as recipient_email,
@@ -29,14 +22,14 @@ namespace :emailer do
         and i.seller_id = '
 
     Seller.all.each do |seller|
+      unless seller.distributor
+        next
+      end
+
       puts('getting gift cards for ' + seller.seller_id)
       html = '' # start building html with an empty string
 
-      # query for seller relevant info
-      s = Seller.connection.select_all(s_sql + seller.id.to_s)
-      s = s[0] # only one row returned
-
-      html += "<h3> Hello #{s['seller_contact_name']} at #{seller.seller_id} </h3>"
+      html += "<h3> Hello #{seller.distributor.name} at #{seller.seller_id} </h3>"
       html += "<p>Here's last weeks vouchers:</p>"
 
       # query for all gift cards info for that seller
@@ -66,7 +59,7 @@ namespace :emailer do
 
       puts(html)
 
-      puts('sending... to ' + s['seller_contact_email'])
+      puts('sending... to ' + seller.distributor.email)
       # EmailManager::Sender.send_receipt(to: ENV['EMAIL_ADDRESS'], html: html)
       puts('sent?')
 
