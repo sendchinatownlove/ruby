@@ -184,6 +184,7 @@ ActiveRecord::Schema.define(version: 2020_07_03_213401) do
     t.integer "cost_per_meal"
     t.string "gallery_image_urls", default: [], null: false, array: true
     t.string "logo_image_url"
+    t.string "non_profit_location_id"
     t.index ["seller_id"], name: "index_sellers_on_seller_id"
   end
 

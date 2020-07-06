@@ -77,6 +77,7 @@ RSpec.configure do |config|
   config.include RequestSpecHelper, type: :request
   config.include ActiveSupport::Testing::TimeHelpers
   config.include FactoryBot::Syntax::Methods
+  config.include MockApiResponseHelper
 
   # start by truncating all the tables but then use the faster transaction
   # strategy the rest of the time.
