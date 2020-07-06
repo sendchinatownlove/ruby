@@ -22,7 +22,7 @@ module EmailManager
            '</head>' \
            '<body>' \
            '<h1>Thank you for your purchase from ' + merchant + '!</h1>' \
-           '<p> View your gift card <b> <a href="' + gift_card_url + '">Here</a></b></p>' \
+           '<p> View your gift card <b> <a href="' + gift_card_url + '">here</a></b></p>' \
            '<p> Gift card balance: <b>$' + amount_string + '</b></p>' \
            '<p> Square receipt: ' + payment_intent.receipt_url + '</p>' \
            "<p> We'll be in touch when " + merchant + ' opens back up with details' \
