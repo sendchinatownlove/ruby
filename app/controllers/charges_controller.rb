@@ -113,7 +113,11 @@ class ChargesController < ApplicationController
   def create_square_payment_request(
     nonce:, amount:, email:, name:, seller:, line_items:, is_distribution:
   )
-    square_location_id = seller.square_location_id
+    square_location_id = if is_distribution && seller.non_profit_location_id.present?
+                           seller.non_profit_location_id
+                         else
+                           seller.square_location_id
+                         end
 
     api_response =
       SquareManager::PaymentCreator.call(

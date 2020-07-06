@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: delivery_types
@@ -18,6 +20,6 @@
 #  fk_rails_...  (delivery_option_id => delivery_options.id)
 #
 class DeliveryType < ApplicationRecord
-	validates_presence_of :name
-	validates_uniqueness_of :name
+  validates_presence_of :name
+  validates_uniqueness_of :name
 end
