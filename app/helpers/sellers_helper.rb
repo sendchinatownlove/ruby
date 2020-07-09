@@ -2,7 +2,7 @@
 
 module SellersHelper
   def self.generate_seller_json(seller:)
-    locations = seller.locations
+    locations = seller.locations[0]
     distributor = seller.distributor
     json = seller.as_json
     json['distributor'] = distributor.as_json unless distributor.nil?
