@@ -15,9 +15,11 @@ module SellersHelper
     # for the customer. eg) We might generate a $10 gift card for GAM, but if
     # there is a 10% fee associated with creating that gift card, then we should
     # charge the customer $11.
-    json['cost_per_meal'] = seller.cost_per_meal + fees.inject(0) { |total, fee|
-      (seller.cost_per_meal * fee.multiplier).ceil
-    } if seller.cost_per_meal.present?
+    if seller.cost_per_meal.present?
+      json['cost_per_meal'] = seller.cost_per_meal + fees.inject(0) do |_total, fee|
+        (seller.cost_per_meal * fee.multiplier).ceil
+      end
+    end
 
     json['donation_amount'] = seller.donation_amount
     json['gift_card_amount'] = seller.gift_card_amount

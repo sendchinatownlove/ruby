@@ -178,7 +178,7 @@ RSpec.describe FeesController, type: :controller do
         let(:params) do
           {
             id: id,
-            seller_id: seller.seller_id,
+            seller_id: seller.seller_id
           }
         end
         let(:multiplier) { 0.1 }

@@ -64,13 +64,12 @@ RSpec.describe SellersHelper, type: :helper do
 
         it 'returns the seller with normal cost per meal including fees' do
           expected_seller['cost_per_meal'] = 1100
-          expected_seller['fees'] = [ fee.as_json ]
+          expected_seller['fees'] = [fee.as_json]
           expect(SellersHelper.generate_seller_json(seller: seller))
             .to eq(expected_seller)
         end
       end
     end
-
 
     context 'with no money raised' do
       it 'returns the list of sellers with `and`' do
