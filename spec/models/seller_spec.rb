@@ -180,6 +180,18 @@ RSpec.describe Seller, type: :model do
           gift_card_detail: gift_card_detail2,
           created_at: Time.current + 1.day
         )
+        # Extraneous gift card amounts that should be ignored since it only
+        # should use the most recent ammount (aka the one updated a day later)
+        create(
+          :gift_card_amount,
+          value: 50_00,
+          gift_card_detail: gift_card_detail2
+        )
+        create(
+          :gift_card_amount,
+          value: 50_00,
+          gift_card_detail: gift_card_detail2
+        )
 
         # Create $100 gift card, refunded
         item_gift_card3 = create(:item, seller: seller, refunded: true)

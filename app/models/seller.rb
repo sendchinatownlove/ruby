@@ -75,26 +75,25 @@ class Seller < ApplicationRecord
 
   # calculates the amount raised from gift cards
   def gift_card_amount
-    GiftCardDetail.joins(:item)
-                  .where(items: {
-                           seller_id: id,
-                           refunded: false
-                         })
-                  .inject(0) do |sum, gift_card|
-      sum + gift_card.amount
-    end
+    GiftCardDetail
+      .joins(:item)
+      .where(items: {
+               seller_id: id,
+               refunded: false
+             })
+      .joins("join (#{GiftCardAmount.latest_amounts_sql}) as la on la.gift_card_detail_id = gift_card_details.id")
+      .sum(:value)
   end
 
   # calculates the amount raised from donations
   def donation_amount
-    DonationDetail.joins(:item)
-                  .where(items: {
-                           seller_id: id,
-                           refunded: false
-                         })
-                  .inject(0) do |sum, donation|
-      sum + donation.amount
-    end
+    DonationDetail
+      .joins(:item)
+      .where(items: {
+               seller_id: id,
+               refunded: false
+             })
+      .sum(:amount)
   end
 
   def num_contributions
