@@ -80,6 +80,10 @@ RSpec.describe Seller, type: :model do
     expect(seller).to_not be_valid
   end
 
+  it 'generates a gift_cards_access_token' do
+    expect(seller.gift_cards_access_token.present?).to eq true
+  end
+
   describe 'globalization' do
     context 'with Chinese locale' do
       before do

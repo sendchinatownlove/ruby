@@ -69,6 +69,8 @@ class Seller < ApplicationRecord
   validates_inclusion_of :sell_gift_cards, in: [true, false]
   validates_inclusion_of :accept_donations, in: [true, false]
 
+  before_create :set_gift_cards_access_token
+
   # returns the total amount raised
   def amount_raised
     gift_card_amount + donation_amount
@@ -121,5 +123,18 @@ class Seller < ApplicationRecord
                            refunded: false
                          })
                   .size
+  end
+
+  private
+
+  def set_gift_cards_access_token
+    self.gift_cards_access_token = generate_gift_cards_access_token
+  end
+
+  def generate_gift_cards_access_token
+    loop do
+      token = SecureRandom.uuid
+      break token unless Seller.where(gift_cards_access_token: token).exists?
+    end
   end
 end
