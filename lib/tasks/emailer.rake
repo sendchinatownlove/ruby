@@ -25,33 +25,30 @@ namespace :emailer do
               .select(:gift_card_id, :value, :name, :email, :created_at, :expiration)
               .joins(:item, :recipient)
               .where(items: {
-                seller_id: seller.id,
-                refunded: false
-              })
+                       seller_id: seller.id,
+                       refunded: false
+                     },
+                     created_at: 1.month.ago...)
               .joins("join (#{GiftCardAmount.latest_amounts_sql}) as la on la.gift_card_detail_id = gift_card_details.id")
               .to_sql
 
       # processing in one query to get a PG::Result, instead multiple queries when building html
       r = GiftCardDetail.connection.select_all(query)
-      
+
       html += '<style> table, tr, td {border: 1px solid black}</style>'
       html += '<table><tr>'
 
       r.columns.each do |col|
         html += '<th>' + col + '</th>'
       end
-  
+
       html += '</tr>'
-  
+
       r.each do |a|
         html += '<tr>'
         a.each do |key, val|
-          if key == 'value' then
-            val = '$' + (val / 100).to_s
-          end
-          if val.blank? then
-            val = 'N/A'
-          end
+          val = '$' + (val / 100).to_s if key == 'value' # format the dollar amount
+          val = 'N/A' if val.blank?
           html += '<td>' + val.to_s + '</td>'
         end
         html += '</tr>'
@@ -64,7 +61,6 @@ namespace :emailer do
       puts('sending... to ' + seller.distributor.email)
       # EmailManager::Sender.send_receipt(to: ENV['EMAIL_ADDRESS'], html: html)
       puts('sent?')
-
     end
   end
 end
