@@ -2,11 +2,19 @@
 
 namespace :emailer do
   desc 'email task runner'
-  task vouchers_to_merchants: :environment do
+  task :vouchers_to_merchants, [:time_range] => [:environment] do |_task, _args|
     desc 'sends all voucher codes to all of their merchants'
 
     ActiveRecord::Base.logger = Logger.new(STDOUT)
     Rails.logger = Logger.new(STDOUT)
+
+    range = 1.year.ago
+    case _args.time_range
+    when 'month'
+      range = 1.month.ago
+    when 'week'
+      range = 1.week.ago
+    end
 
     Seller.all.each do |seller|
       unless seller.distributor
@@ -18,7 +26,7 @@ namespace :emailer do
       html = '' # start building html with an empty string
 
       html += "<h3> Hello #{seller.distributor.name} at #{seller.seller_id} </h3>"
-      html += "<p>Here's last weeks vouchers:</p>"
+      html += "<p>Here's last #{_args.time_range}'s vouchers:</p>"
 
       # query for all gift cards info for that seller
       query = GiftCardDetail
@@ -28,7 +36,7 @@ namespace :emailer do
                        seller_id: seller.id,
                        refunded: false
                      },
-                     created_at: 1.month.ago...)
+                     created_at: range...)
               .joins("join (#{GiftCardAmount.latest_amounts_sql}) as la on la.gift_card_detail_id = gift_card_details.id")
               .to_sql
 
@@ -47,7 +55,8 @@ namespace :emailer do
       r.each do |a|
         html += '<tr>'
         a.each do |key, val|
-          val = '$' + (val / 100).to_s if key == 'value' # format the dollar amount
+          # quick formatting
+          val = '$' + (val / 100).to_s if key == 'value'
           val = 'N/A' if val.blank?
           html += '<td>' + val.to_s + '</td>'
         end
