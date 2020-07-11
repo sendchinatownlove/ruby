@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddGiftCardsSecretToSellers < ActiveRecord::Migration[6.0]
   def change
     add_column :sellers, :gift_cards_access_token, :string, null: false, default: ''

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'SellerGiftCards', type: :request do
@@ -42,8 +44,8 @@ RSpec.describe 'SellerGiftCards', type: :request do
           recipient: contact
         )
         create(
-            :gift_card_amount,
-            gift_card_detail: gift_card_detail
+          :gift_card_amount,
+          gift_card_detail: gift_card_detail
         )
         create(
           :gift_card_amount,
