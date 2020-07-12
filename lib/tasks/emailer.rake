@@ -35,7 +35,7 @@ namespace :emailer do
 
     # query for all gift cards info for that seller
     query = GiftCardDetail
-            .select(:seller_gift_card_id, :value, :name, :email, :single_use, :created_at, :expiration)
+            .select(:seller_gift_card_id, :value, :single_use, :name, :email, :created_at, :expiration)
             .joins(:item, :recipient)
             .where(items: {
                      seller_id: seller.id,
@@ -49,8 +49,8 @@ namespace :emailer do
     # processing in one query to get a PG::Result, instead multiple queries when building html
     r = GiftCardDetail.connection.select_all(query)
 
-    html += '<style> table {border: 1px solid black}</style>'
-    html += '<table><tr>'
+    html += '<style> table {border: 1px solid black}</style>'\
+            '<table><tr>'
 
     r.columns.each do |col|
       col = 'Code' if col == 'seller_gift_card_id'
@@ -75,8 +75,10 @@ namespace :emailer do
       html += '</tr>'
     end
 
-    html += '</table>'
-    html += '<p>All the best from the team at Send Chinatown Love</p>'
+    html += '</table>'\
+            '<p>For questions about how Send Chinatown Love Gift Cards work,'\
+            'please feel free to reply to this email!</p>'\
+            '<p>All the best from the team at Send Chinatown Love</p>'
 
     Rails.logger.info("Sending #{r.rows.length} vouchers for #{seller_name} to #{args.email} from the last #{args.time_range}")
     EmailManager::Sender.send_receipt(to: args.email, html: html)
