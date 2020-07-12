@@ -28,6 +28,7 @@ RSpec.describe SellersHelper, type: :helper do
         'progress_bar_color': seller.progress_bar_color,
         'hero_image_url': seller.hero_image_url,
         'locations': [],
+        'fees': [],
         'gallery_image_urls': [],
         'business_type': seller.business_type,
         'num_employees': seller.num_employees,
@@ -37,18 +38,41 @@ RSpec.describe SellersHelper, type: :helper do
         'square_location_id': seller.square_location_id,
         'distributor': contact,
         'cost_per_meal': seller.cost_per_meal,
-        'non_profit_location_id': seller.non_profit_location_id
+        'non_profit_location_id': seller.non_profit_location_id,
+        'amount_raised': 0,
+        'donation_amount': 0,
+        'gift_card_amount': 0,
+        'num_contributions': 0,
+        'num_gift_cards': 0,
+        'num_donations': 0
       }.as_json
+    end
+
+    context 'with cost_per_meal' do
+      before do
+        seller.update(cost_per_meal: 1000)
+      end
+
+      it 'returns the seller with normal cost per meal' do
+        expected_seller['cost_per_meal'] = 1000
+        expect(SellersHelper.generate_seller_json(seller: seller))
+          .to eq(expected_seller)
+      end
+
+      context 'with fee' do
+        let!(:fee) { create :fee, seller: seller, multiplier: 0.1 }
+
+        it 'returns the seller with normal cost per meal including fees' do
+          expected_seller['cost_per_meal'] = 1100
+          expected_seller['fees'] = [fee.as_json]
+          expect(SellersHelper.generate_seller_json(seller: seller))
+            .to eq(expected_seller)
+        end
+      end
     end
 
     context 'with no money raised' do
       it 'returns the list of sellers with `and`' do
-        expected_seller['amount_raised'] = 0
-        expected_seller['donation_amount'] = 0
-        expected_seller['gift_card_amount'] = 0
-        expected_seller['num_contributions'] = 0
-        expected_seller['num_gift_cards'] = 0
-        expected_seller['num_donations'] = 0
         expect(SellersHelper.generate_seller_json(seller: seller))
           .to eq(expected_seller)
       end

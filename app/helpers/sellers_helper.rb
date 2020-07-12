@@ -4,9 +4,22 @@ module SellersHelper
   def self.generate_seller_json(seller:)
     locations = seller.locations
     distributor = seller.distributor
+    fees = seller.fees
+
     json = seller.as_json
     json['distributor'] = distributor.as_json unless distributor.nil?
     json['locations'] = locations.as_json
+    json['fees'] = fees.as_json
+
+    # Take into account the associated fees when calculating the cost per meal
+    # for the customer. eg) We might generate a $10 gift card for GAM, but if
+    # there is a 10% fee associated with creating that gift card, then we should
+    # charge the customer $11.
+    if seller.cost_per_meal.present?
+      json['cost_per_meal'] = seller.cost_per_meal + fees.inject(0) do |_total, fee|
+        (seller.cost_per_meal * fee.multiplier).ceil
+      end
+    end
 
     json['donation_amount'] = seller.donation_amount
     json['gift_card_amount'] = seller.gift_card_amount
