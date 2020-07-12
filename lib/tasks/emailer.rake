@@ -5,15 +5,14 @@ namespace :emailer do
   task :vouchers_to_merchants, [:time_range] => [:environment] do |_task, _args|
     desc 'sends all voucher codes to all of their merchants'
 
-    ActiveRecord::Base.logger = Logger.new(STDOUT)
-    Rails.logger = Logger.new(STDOUT)
-
     range = 1.year.ago
     case _args.time_range
     when 'month'
       range = 1.month.ago
     when 'week'
       range = 1.week.ago
+    when 'two weeks'
+      range = 2.weeks.ago
     end
 
     Seller.all.each do |seller|
@@ -26,11 +25,11 @@ namespace :emailer do
       html = '' # start building html with an empty string
 
       html += "<h3> Hello #{seller.distributor.name} at #{seller.seller_id} </h3>"
-      html += "<p>Here's last #{_args.time_range}'s vouchers:</p>"
+      html += "<p>Here's all of the latest gift card vouchers:</p>"
 
       # query for all gift cards info for that seller
       query = GiftCardDetail
-              .select(:gift_card_id, :value, :name, :email, :created_at, :expiration)
+              .select(:seller_gift_card_id, :value, :name, :email, :created_at, :expiration)
               .joins(:item, :recipient)
               .where(items: {
                        seller_id: seller.id,
@@ -43,10 +42,12 @@ namespace :emailer do
       # processing in one query to get a PG::Result, instead multiple queries when building html
       r = GiftCardDetail.connection.select_all(query)
 
-      html += '<style> table, tr, td {border: 1px solid black}</style>'
+      html += '<style> table {border: 1px solid black}</style>'
       html += '<table><tr>'
 
       r.columns.each do |col|
+        col = 'Code' if col == 'seller_gift_card_id'
+        col = col.sub '_', ' '
         html += '<th>' + col + '</th>'
       end
 
@@ -57,6 +58,7 @@ namespace :emailer do
         a.each do |key, val|
           # quick formatting
           val = '$' + (val / 100).to_s if key == 'value'
+          val = val.to_formatted_s(:short) if key == 'created_at' || key == 'expiration' && val.present?
           val = 'N/A' if val.blank?
           html += '<td>' + val.to_s + '</td>'
         end
@@ -64,12 +66,10 @@ namespace :emailer do
       end
 
       html += '</table>'
+      html += '<p>All the best from the team at Send Chinatown Love</p>'
 
-      puts(html)
-
-      puts('sending... to ' + seller.distributor.email)
-      # EmailManager::Sender.send_receipt(to: ENV['EMAIL_ADDRESS'], html: html)
-      puts('sent?')
+      Rails.logger.info('Sending vouchers to ' + seller.distributor.email)
+      EmailManager::Sender.send_receipt(to: ENV['EMAIL_ADDRESS'], html: html)
     end
   end
 end
