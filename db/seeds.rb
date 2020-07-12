@@ -118,32 +118,3 @@ end
     GiftCardAmount.create!(gift_card_detail_id: gift_card_detail.id, value: amount, updated_at: Time.now + i.days)
   end
 end
-
-[
-  {
-    seller_id: 'test',
-    cuisine_name: 'Bakery',
-    name: 'test',
-    story: "Storytime",
-    accept_donations: true,
-    sell_gift_cards: true,
-    owner_name: 'The Test Kitchen',
-    owner_image_url: 'assets/test-logo.png',
-    target_amount: 1_000_000,
-    summary: nil,
-    hero_image_url: 'assets/test-hero.png',
-    progress_bar_color: nil,
-    business_type: 'Family-owned',
-    num_employees: 3,
-    founded_year: 2013,
-    website_url: nil,
-    menu_url: nil,
-    # See instructions for setting this up at
-    # https://docs.google.com/document/d/1UPNCwjWS_T7XT5AXsewphu6NvNdV7TQLSJub-RBRAG0/edit
-    square_location_id: "E4R1NCMHG7B2W",
-  }
-].each do |attributes|
-  distributor = Contact.find(1)
-  attributes[:distributor] = distributor
-  Seller.find_or_initialize_by(seller_id: attributes[:seller_id]).update!(attributes)
-end
