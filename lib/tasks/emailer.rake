@@ -76,7 +76,7 @@ namespace :emailer do
     end
 
     html += '</table>'\
-            '<p>For questions about how Send Chinatown Love Gift Cards work, '\
+            '<p>For questions about how Send Chinatown Love vouchers work, '\
             'please feel free to reply to this email!</p>'\
             '<p>All the best from the team at Send Chinatown Love</p>'
 
