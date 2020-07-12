@@ -34,6 +34,7 @@ gem 'globalize', '~> 5.3.0'
 gem 'globalize-accessors'
 
 gem 'actionmailer'
+gem "administrate"
 
 # rails admin
 # gem 'rails_admin', '~> 2.0'

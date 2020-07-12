@@ -64,6 +64,24 @@
 #                  rails_direct_uploads POST   /rails/active_storage/direct_uploads(.:format)                                           active_storage/direct_uploads#create
 
 Rails.application.routes.draw do
+  namespace :admin do
+      resources :refunds
+      resources :items
+      resources :contacts
+      resources :delivery_types
+      resources :existing_events
+      resources :locations
+      resources :payment_intents
+      resources :sellers
+      resources :gift_card_amounts
+      resources :donation_details
+      resources :delivery_options
+      resources :fees
+      resources :menu_items
+      resources :gift_card_details
+
+      root to: "sellers#index"
+    end
   resources :charges do
   end
   resources :gift_cards do
