@@ -31,7 +31,7 @@ namespace :emailer do
 
     seller_name = seller.seller_id.gsub('-', ' ').titlecase
     html += "<h3>Hello #{seller_name}!</h3>"
-    html += "<p>Here's all of the latest gift card vouchers:</p>"
+    html += "<p>Here are your recent voucher purchases</p>"
 
     # query for all gift cards info for that seller
     query = GiftCardDetail
@@ -76,7 +76,7 @@ namespace :emailer do
     end
 
     html += '</table>'\
-            '<p>For questions about how Send Chinatown Love Gift Cards work,'\
+            '<p>For questions about how Send Chinatown Love Gift Cards work, '\
             'please feel free to reply to this email!</p>'\
             '<p>All the best from the team at Send Chinatown Love</p>'
 
