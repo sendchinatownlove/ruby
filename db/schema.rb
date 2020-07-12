@@ -57,9 +57,9 @@ ActiveRecord::Schema.define(version: 2020_07_05_220208) do
   end
 
   create_table "fees", force: :cascade do |t|
-    t.decimal "multiplier", default: "1.0"
+    t.decimal "multiplier", default: "0.0"
     t.boolean "active", default: true
-    t.bigint "seller_id"
+    t.bigint "seller_id", null: false
     t.index ["seller_id"], name: "index_fees_on_seller_id"
   end
 
