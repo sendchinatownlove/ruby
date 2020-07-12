@@ -9,10 +9,14 @@ namespace :emailer do
     case args.time_range
     when 'month'
       range = 1.month.ago
+    when 'two months'
+      range = 2.months.ago
     when 'week'
       range = 1.week.ago
     when 'two weeks'
       range = 2.weeks.ago
+    when 'three weeks'
+      range = 3.weeks.ago
     end
 
     seller = Seller.find_by(seller_id: args.seller_id)
@@ -31,7 +35,7 @@ namespace :emailer do
 
     # query for all gift cards info for that seller
     query = GiftCardDetail
-            .select(:seller_gift_card_id, :value, :name, :email, :created_at, :expiration)
+            .select(:seller_gift_card_id, :value, :name, :email, :single_use, :created_at, :expiration)
             .joins(:item, :recipient)
             .where(items: {
                      seller_id: seller.id,
@@ -39,6 +43,7 @@ namespace :emailer do
                    },
                    created_at: range...)
             .joins("join (#{GiftCardAmount.latest_amounts_sql}) as la on la.gift_card_detail_id = gift_card_details.id")
+            .order(:seller_gift_card_id)
             .to_sql
 
     # processing in one query to get a PG::Result, instead multiple queries when building html
@@ -63,6 +68,7 @@ namespace :emailer do
           val = val.to_formatted_s(:short)
         end
         val = '$' + (val / 100).to_s if key == 'value'
+        val = val ? 'Y' : 'N' if key == 'single_use'
         val = 'N/A' if val.blank?
         html += '<td>' + val.to_s + '</td>'
       end
