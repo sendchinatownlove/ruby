@@ -4,14 +4,17 @@ class OpenHourController < ApplicationController
   before_action :set_seller
   before_action :set_seller_open_hour, only: %i[update destroy]
 
+  # GET /sellers/:seller_id/open_hour
   def index
     json_response(@seller.open_hour)
     end
 
+  # POST /sellers/:seller_id/open_hour
   def create
     json_response(@seller.open_hour.create!(create_open_hour_params), :created)
   end
 
+  # PUT /sellers/:seller_id/open_hour
   def update
     @open_hour.update(update_open_hour_params)
     json_response(@open_hour)
