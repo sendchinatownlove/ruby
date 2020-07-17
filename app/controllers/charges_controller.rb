@@ -111,7 +111,8 @@ class ChargesController < ApplicationController
 
       if is_distribution && seller.cost_per_meal.present? && amount % seller.cost_per_meal != 0
         raise InvalidGiftAMealAmountError,
-              "Gift A Meal amount '#{amount}' must be divisible by seller's cost per meal '#{seller.cost_per_meal}'."
+              "Gift A Meal amount '#{amount}' must be divisible by seller's "\
+              "cost per meal '#{seller.cost_per_meal}'."
       end
     end
   end
