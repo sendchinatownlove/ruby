@@ -33,6 +33,7 @@ RSpec.describe 'Charges API', type: :request do
         seller_id: seller_id,
         square_location_id: ENV['SQUARE_LOCATION_ID'],
         name: 'Shunfa Bakery',
+        cost_per_meal: 100,
         distributor: distributor
       )
     end
@@ -509,6 +510,33 @@ RSpec.describe 'Charges API', type: :request do
       it 'returns a validation failure message' do
         expect(response.body).to match(
           /param is missing or the value is empty: seller_id/
+        )
+      end
+    end
+
+    context 'with an amount that does not divide the seller cost per meal' do
+      let(:is_distribution) { true }
+      let(:line_items) do
+        [
+          {
+            amount: 120,
+            currency: 'usd',
+            item_type: 'gift_card',
+            quantity: 1,
+            seller_id: seller_id,
+          }
+        ]
+      end
+
+      before { post '/charges', params: params, as: :json }
+
+      it 'returns status code 422' do
+        expect(response).to have_http_status(422)
+      end
+
+      it 'returns a validation failure message' do
+        expect(response.body).to match(
+          /^.*Gift A Meal amount '\d+' must be divisible by seller's cost per meal '\d+'..*$/
         )
       end
     end
