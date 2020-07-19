@@ -58,8 +58,8 @@ development:
 test:
   <<: *default
   database: myapp_test
-  user: postgres
-  password: postgres
+#  user: postgres
+#  password: postgres
 
 # As with config/secrets.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -83,5 +83,5 @@ test:
 production:
   <<: *default
   database: myapp_production
-  username: myapp
-  password: <%= ENV['MYAPP_DATABASE_PASSWORD'] %>
+#  username: myapp
+#  password: <%= ENV['MYAPP_DATABASE_PASSWORD'] %>
