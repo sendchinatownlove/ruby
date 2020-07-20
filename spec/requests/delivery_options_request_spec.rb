@@ -81,6 +81,9 @@ RSpec.describe "DeliveryOptions", type: :request do
         expected_json['url'] = nil
         expected_json['seller_id'] = seller.id
         expect(actual_json).to eq(expected_json.with_indifferent_access)
+
+        expected_delivery_option = DeliveryOption.find(json['id'])
+        expect(expected_delivery_option).not_to be_nil
       end
 
       it 'returns status code 201' do

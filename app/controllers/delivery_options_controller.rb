@@ -7,7 +7,7 @@ class DeliveryOptionsController < ApplicationController
     json_response(@seller.delivery_options)
   end
 
-  # POST /sellers/:seller_id/menu_items
+  # POST /sellers/:seller_id/delivery_options
   def create
     json_response(@seller.delivery_options.create!(create_delivery_option_params), :created)
   end
