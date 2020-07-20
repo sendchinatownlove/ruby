@@ -2,11 +2,17 @@
 
 module SellersHelper
   def self.generate_seller_json(seller:)
-    locations = seller.locations[0]
+    if seller.locations.size > 1
+      Rails.logger.info "Seller location has #{seller.locations.size} locations"
+    end
+
+    location = seller.locations.first
+    locations = seller.locations #field is deprecated
     distributor = seller.distributor
     json = seller.as_json
     json['distributor'] = distributor.as_json unless distributor.nil?
-    json['locations'] = locations.as_json
+    json['location'] = location.as_json
+    json['locations'] = locations.as_json #field is deprecated
 
     json['donation_amount'] = seller.donation_amount
     json['gift_card_amount'] = seller.gift_card_amount
