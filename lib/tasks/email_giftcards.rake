@@ -2,7 +2,7 @@
 
 namespace :email_giftcards do
   desc 'Email customers the gift cards that they ordered'
-  task :send_emails, %i[email] => [:environment] do |_task, args|
+  task :send_emails => :environment do
     desc 'send emails'
 
     unique_recipients = GiftCardDetail
@@ -30,7 +30,7 @@ namespace :email_giftcards do
         html += '<tr><p>View your <b>$' + amount_string + '</b> gift card for <b>' + merchant_name + '<a href="' + gift_card_url + '"> here</a></b></p></tr>'
       end
       html += '</table>'
-      EmailManager::Sender.send_receipt(to: args.email, html: html)
+      EmailManager::Sender.send_receipt(to: recipient.email, html: html)
     end
   end
 end
