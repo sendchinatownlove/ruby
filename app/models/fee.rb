@@ -6,8 +6,8 @@
 #
 #  id         :bigint           not null, primary key
 #  active     :boolean          default(TRUE)
-#  multiplier :decimal(, )      default(1.0)
-#  seller_id  :bigint
+#  multiplier :decimal(, )      default(0.0)
+#  seller_id  :bigint           not null
 #
 # Indexes
 #

@@ -10,10 +10,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_05_220208) do
+ActiveRecord::Schema.define(version: 2020_07_23_225140) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "campaigns", force: :cascade do |t|
+    t.boolean "active", default: false
+    t.boolean "is_valid", default: false
+    t.datetime "end_date", null: false
+    t.string "description", null: false
+    t.string "gallery_image_urls", default: [], null: false, array: true
+    t.bigint "location_id", null: false
+    t.bigint "seller_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["location_id"], name: "index_campaigns_on_location_id"
+    t.index ["seller_id"], name: "index_campaigns_on_seller_id"
+  end
 
   create_table "contacts", force: :cascade do |t|
     t.string "email"
@@ -57,9 +71,9 @@ ActiveRecord::Schema.define(version: 2020_07_05_220208) do
   end
 
   create_table "fees", force: :cascade do |t|
-    t.decimal "multiplier", default: "1.0"
+    t.decimal "multiplier", default: "0.0"
     t.boolean "active", default: true
-    t.bigint "seller_id"
+    t.bigint "seller_id", null: false
     t.index ["seller_id"], name: "index_fees_on_seller_id"
   end
 
@@ -186,6 +200,8 @@ ActiveRecord::Schema.define(version: 2020_07_05_220208) do
     t.index ["seller_id"], name: "index_sellers_on_seller_id"
   end
 
+  add_foreign_key "campaigns", "locations"
+  add_foreign_key "campaigns", "sellers"
   add_foreign_key "delivery_options", "sellers"
   add_foreign_key "delivery_types", "delivery_options"
   add_foreign_key "donation_details", "items"
