@@ -4,16 +4,16 @@
 #
 # Table name: contacts
 #
-#  id            :bigint           not null, primary key
-#  email         :string
-#  is_subscribed :boolean          default(TRUE), not null
-#  name          :string
-#  seller_id     :bigint
+#  id             :bigint           not null, primary key
+#  email          :string
+#  is_subscribed  :boolean          default(TRUE), not null
+#  name           :string
+#  distributor_id :bigint
 #
 # Indexes
 #
-#  index_contacts_on_email      (email)
-#  index_contacts_on_seller_id  (seller_id)
+#  index_contacts_on_distributor_id  (distributor_id)
+#  index_contacts_on_email           (email)
 #
 require 'rails_helper'
 

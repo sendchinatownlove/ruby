@@ -26,6 +26,7 @@
 #  fk_rails_...  (seller_id => sellers.id)
 #
 class Campaign < ApplicationRecord
+  # TODO(justintmckibben): Make the default value of valid = true
   belongs_to :location
   belongs_to :seller
 

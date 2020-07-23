@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_29_024223) do
+ActiveRecord::Schema.define(version: 2020_07_26_220247) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -33,17 +33,17 @@ ActiveRecord::Schema.define(version: 2020_07_29_024223) do
     t.string "email"
     t.boolean "is_subscribed", default: true, null: false
     t.string "name"
-    t.bigint "seller_id"
+    t.bigint "distributor_id"
+    t.index ["distributor_id"], name: "index_contacts_on_distributor_id"
     t.index ["email"], name: "index_contacts_on_email"
-    t.index ["seller_id"], name: "index_contacts_on_seller_id"
   end
 
   create_table "delivery_options", force: :cascade do |t|
     t.string "url"
     t.string "phone_number"
+    t.bigint "seller_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.bigint "seller_id", null: false
     t.index ["seller_id"], name: "index_delivery_options_on_seller_id"
   end
 
@@ -54,6 +54,11 @@ ActiveRecord::Schema.define(version: 2020_07_29_024223) do
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "delivery_option_id"
     t.index ["delivery_option_id"], name: "index_delivery_types_on_delivery_option_id"
+  end
+
+  create_table "distributors", force: :cascade do |t|
+    t.string "website_url"
+    t.string "image_url"
   end
 
   create_table "donation_details", force: :cascade do |t|
