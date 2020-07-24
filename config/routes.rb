@@ -3,6 +3,12 @@
 # == Route Map
 #
 #                                Prefix Verb   URI Pattern                                                                              Controller#Action
+#                             campaigns GET    /campaigns(.:format)                                                                     campaigns#index
+#                                       POST   /campaigns(.:format)                                                                     campaigns#create
+#                              campaign GET    /campaigns/:id(.:format)                                                                 campaigns#show
+#                                       PATCH  /campaigns/:id(.:format)                                                                 campaigns#update
+#                                       PUT    /campaigns/:id(.:format)                                                                 campaigns#update
+#                                       DELETE /campaigns/:id(.:format)                                                                 campaigns#destroy
 #                               charges GET    /charges(.:format)                                                                       charges#index
 #                                       POST   /charges(.:format)                                                                       charges#create
 #                                charge GET    /charges/:id(.:format)                                                                   charges#show
@@ -39,6 +45,12 @@
 #                                       PATCH  /sellers/:id(.:format)                                                                   sellers#update
 #                                       PUT    /sellers/:id(.:format)                                                                   sellers#update
 #                                       DELETE /sellers/:id(.:format)                                                                   sellers#destroy
+#                                  fees GET    /fees(.:format)                                                                          fees#index
+#                                       POST   /fees(.:format)                                                                          fees#create
+#                                   fee GET    /fees/:id(.:format)                                                                      fees#show
+#                                       PATCH  /fees/:id(.:format)                                                                      fees#update
+#                                       PUT    /fees/:id(.:format)                                                                      fees#update
+#                                       DELETE /fees/:id(.:format)                                                                      fees#destroy
 #                              webhooks GET    /webhooks(.:format)                                                                      webhooks#index
 #                                       POST   /webhooks(.:format)                                                                      webhooks#create
 #                               webhook GET    /webhooks/:id(.:format)                                                                  webhooks#show
@@ -64,6 +76,8 @@
 #                  rails_direct_uploads POST   /rails/active_storage/direct_uploads(.:format)                                           active_storage/direct_uploads#create
 
 Rails.application.routes.draw do
+  resources :campaigns do
+  end
   resources :charges do
   end
   resources :gift_cards do
