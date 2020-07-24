@@ -11,7 +11,9 @@ class DeliveryOptionsController < ApplicationController
       json
     end
 
-    json_response(delivery_options.sort_by{|de| de['delivery_type']['name'].to_i})
+    Rails.logger.info delivery_options
+    json_response(delivery_options)
+#     json_response(delivery_options.sort_by{|de| de['delivery_type']['name'].to_i})
   end
 
   # POST /sellers/:seller_id/delivery_options
