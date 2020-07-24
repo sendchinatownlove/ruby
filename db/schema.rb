@@ -17,10 +17,10 @@ ActiveRecord::Schema.define(version: 2020_07_23_225140) do
 
   create_table "campaigns", force: :cascade do |t|
     t.boolean "active", default: false
-    t.boolean "is_valid", default: false
+    t.boolean "valid", default: false
     t.datetime "end_date", null: false
-    t.string "description", null: false
-    t.string "gallery_image_urls", default: [], null: false, array: true
+    t.string "description"
+    t.string "gallery_image_urls", array: true
     t.bigint "location_id", null: false
     t.bigint "seller_id", null: false
     t.datetime "created_at", precision: 6, null: false

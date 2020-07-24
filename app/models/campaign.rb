@@ -4,10 +4,10 @@
 #
 #  id                 :bigint           not null, primary key
 #  active             :boolean          default(FALSE)
-#  description        :string           not null
+#  description        :string
 #  end_date           :datetime         not null
-#  gallery_image_urls :string           default([]), not null, is an Array
-#  is_valid           :boolean          default(FALSE)
+#  gallery_image_urls :string           is an Array
+#  valid              :boolean          default(FALSE)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  location_id        :bigint           not null
