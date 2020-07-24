@@ -4,7 +4,14 @@ class DeliveryOptionsController < ApplicationController
 
   # GET /sellers/:seller_id/delivery_options
   def index
-    json_response(@seller.delivery_options)
+    delivery_options = @seller.delivery_options.map do |delivery_option|
+      delivery_type = delivery_option.delivery_type
+      json = delivery_option.as_json
+      json['delivery_type'] = delivery_type.as_json
+      json
+    end
+
+    json_response(delivery_options)
   end
 
   # POST /sellers/:seller_id/delivery_options
