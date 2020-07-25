@@ -5,7 +5,7 @@ class CampaignsController < ApplicationController
 
   # GET /campaigns
   def index
-    json_response(Campaign.all)
+    json_response(Campaign.order(:end_date).all)
   end
 
   # GET /campaigns/:id
