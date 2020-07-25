@@ -400,12 +400,12 @@ RSpec.describe 'Webhooks API', type: :request do
         let(:line_items) do
           [
             {
-            'amount': amount1,
-            'currency': 'usd',
-            'item_type': item_type,
-            'quantity': 1,
-            'seller_id': seller_id,
-            'is_distribution': true
+              'amount': amount1,
+              'currency': 'usd',
+              'item_type': item_type,
+              'quantity': 1,
+              'seller_id': seller_id,
+              'is_distribution': true
             },
             {
               'amount': amount2,
@@ -428,11 +428,11 @@ RSpec.describe 'Webhooks API', type: :request do
           expect(EmailManager::DonationReceiptSender).to receive(:call)
             .once
             .with({
-              payment_intent: payment_intent,
-              amount: amount1 + amount2,
-              merchant: seller1.name,
-              email: payment_intent.purchaser.email
-            })
+                    payment_intent: payment_intent,
+                    amount: amount1 + amount2,
+                    merchant: seller1.name,
+                    email: payment_intent.purchaser.email
+                  })
           post(
             '/webhooks',
             headers: { 'HTTP_X_SQUARE_SIGNATURE' => 'www.squareup.com' },
