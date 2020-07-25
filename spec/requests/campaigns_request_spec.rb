@@ -49,10 +49,66 @@ RSpec.describe 'Campaigns API', type: :request do
 
   context 'POST /campaigns' do
     context 'With invalid parameters' do
-      before { post '/campaigns', params: {} }
+      context 'With no parameters' do
+        before { post '/campaigns', params: {} }
 
-      it 'Returns status code 422' do
-        expect(response).to have_http_status(422)
+        it 'Returns status code 422' do
+          expect(response).to have_http_status(422)
+        end
+      end
+
+      context 'With missing location and missing seller' do
+        before do
+          post(
+            '/campaigns',
+            params: {
+              end_date: Date.tomorrow,
+              location_id: 'missing-location-id',
+              seller_id: 'missing-seller-id',
+            },
+            as: :json,
+          )
+        end
+
+        it 'Returns status code 404' do
+          expect(response).to have_http_status(404)
+        end
+      end
+
+      context 'With missing location and valid seller' do
+        before do
+          post(
+            '/campaigns',
+            params: {
+              end_date: Date.tomorrow,
+              location_id: 'missing-location-id',
+              seller_id: @seller.id,
+            },
+            as: :json,
+          )
+        end
+
+        it 'Returns status code 404' do
+          expect(response).to have_http_status(404)
+        end
+      end
+
+      context 'With valid location and missing seller' do
+        before do
+          post(
+            '/campaigns',
+            params: {
+              end_date: Date.tomorrow,
+              location_id: @location.id,
+              seller_id: 'missing-seller-id',
+            },
+            as: :json,
+          )
+        end
+
+        it 'Returns status code 404' do
+          expect(response).to have_http_status(404)
+        end
       end
     end
 
@@ -71,6 +127,19 @@ RSpec.describe 'Campaigns API', type: :request do
 
       it 'Returns status code 201' do
         expect(response).to have_http_status(201)
+      end
+
+      it 'Creates a Campaign with default values and matching attributes' do
+        response_body = JSON.parse(response.body)
+        expect(response_body).not_to be_nil
+
+        campaign = Campaign.find(response_body['id'])
+        expect(campaign).not_to be_nil
+        expect(campaign.location).to eq @location
+        expect(campaign.seller).to eq @seller
+
+        expect(campaign.active).to eq false
+        expect(campaign.valid).to eq false
       end
     end
   end
