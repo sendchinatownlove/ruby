@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :gift_card_detail do
     gift_card_id { Faker::Alphanumeric.alphanumeric(number: 64) }
-    seller_gift_card_id { Faker::Alphanumeric.alphanumeric(number: 64) }
+    seller_gift_card_id { '#' + Faker::Alphanumeric.alphanumeric(number: 5) }
     receipt_id { Faker::Alphanumeric.alphanumeric(number: 64) }
     expiration do
       Faker::Date.between(

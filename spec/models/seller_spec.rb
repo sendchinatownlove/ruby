@@ -4,35 +4,37 @@
 #
 # Table name: sellers
 #
-#  id                     :bigint           not null, primary key
-#  accept_donations       :boolean          default(TRUE), not null
-#  business_type          :string
-#  cost_per_meal          :integer
-#  cuisine_name           :string
-#  founded_year           :integer
-#  gallery_image_urls     :string           default([]), not null, is an Array
-#  hero_image_url         :string
-#  logo_image_url         :string
-#  menu_url               :string
-#  name                   :string
-#  num_employees          :integer
-#  owner_image_url        :string
-#  owner_name             :string
-#  progress_bar_color     :string
-#  sell_gift_cards        :boolean          default(FALSE), not null
-#  story                  :text
-#  summary                :text
-#  target_amount          :integer          default(1000000)
-#  website_url            :string
-#  created_at             :datetime         not null
-#  updated_at             :datetime         not null
-#  non_profit_location_id :string
-#  seller_id              :string           not null
-#  square_location_id     :string           not null
+#  id                      :bigint           not null, primary key
+#  accept_donations        :boolean          default(TRUE), not null
+#  business_type           :string
+#  cost_per_meal           :integer
+#  cuisine_name            :string
+#  founded_year            :integer
+#  gallery_image_urls      :string           default([]), not null, is an Array
+#  gift_cards_access_token :string           default(""), not null
+#  hero_image_url          :string
+#  logo_image_url          :string
+#  menu_url                :string
+#  name                    :string
+#  num_employees           :integer
+#  owner_image_url         :string
+#  owner_name              :string
+#  progress_bar_color      :string
+#  sell_gift_cards         :boolean          default(FALSE), not null
+#  story                   :text
+#  summary                 :text
+#  target_amount           :integer          default(1000000)
+#  website_url             :string
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  non_profit_location_id  :string
+#  seller_id               :string           not null
+#  square_location_id      :string           not null
 #
 # Indexes
 #
-#  index_sellers_on_seller_id  (seller_id)
+#  index_sellers_on_gift_cards_access_token  (gift_cards_access_token) UNIQUE
+#  index_sellers_on_seller_id                (seller_id)
 #
 require 'rails_helper'
 
@@ -40,6 +42,7 @@ RSpec.describe Seller, type: :model do
   # Association test
   # ensure Seller model has a 1:m relationship with the MenuItem model
   it { should have_many(:menu_items).dependent(:destroy) }
+  it { should have_many(:fees).dependent(:destroy) }
   it { should have_one(:distributor) }
   # Validation tests
 
@@ -77,6 +80,10 @@ RSpec.describe Seller, type: :model do
   it 'is invalid without square_location_id' do
     seller.square_location_id = nil
     expect(seller).to_not be_valid
+  end
+
+  it 'generates a gift_cards_access_token' do
+    expect(seller.gift_cards_access_token.present?).to eq true
   end
 
   describe 'globalization' do
@@ -179,6 +186,18 @@ RSpec.describe Seller, type: :model do
           value: 30_00,
           gift_card_detail: gift_card_detail2,
           created_at: Time.current + 1.day
+        )
+        # Extraneous gift card amounts that should be ignored since it only
+        # should use the most recent ammount (aka the one updated a day later)
+        create(
+          :gift_card_amount,
+          value: 50_00,
+          gift_card_detail: gift_card_detail2
+        )
+        create(
+          :gift_card_amount,
+          value: 50_00,
+          gift_card_detail: gift_card_detail2
         )
 
         # Create $100 gift card, refunded

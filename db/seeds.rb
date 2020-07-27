@@ -118,3 +118,26 @@ end
     GiftCardAmount.create!(gift_card_detail_id: gift_card_detail.id, value: amount, updated_at: Time.now + i.days)
   end
 end
+
+[
+  {
+    active: true,
+    multiplier: 0.1,
+    seller_id: '46-mott'
+  },
+  {
+    active: true,
+    multiplier: 0.1,
+    seller_id: '46-mott'
+  },
+  {
+    active: false,
+    multiplier: 0.1,
+    seller_id: 'shunfa-bakery'
+  }
+].each do |attributes|
+  seller = Seller.find_by(seller_id: attributes[:seller_id])
+  fee_attributes = attributes.except(:seller_id)
+  fee_attributes[:seller_id] = seller.id
+  Fee.create!(fee_attributes)
+end

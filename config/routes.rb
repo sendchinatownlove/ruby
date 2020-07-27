@@ -70,6 +70,9 @@ Rails.application.routes.draw do
   end
   resources :sellers do
     resources :locations, :menu_items, :items, :open_hour
+    resources :gift_cards, controller: 'seller_gift_cards'
+  end
+  resources :fees do
   end
   resources :webhooks do
   end

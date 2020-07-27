@@ -9,6 +9,7 @@ module ExceptionHandler
   class InvalidSquareSignature < StandardError; end
   class DuplicatePaymentCompletedError < StandardError; end
   class InvalidPoolDonationError < StandardError; end
+  class InvalidGiftAMealAmountError < StandardError; end
   class SquarePaymentsError < StandardError
     attr_reader :status_code
     attr_reader :errors
@@ -32,6 +33,7 @@ module ExceptionHandler
                 InvalidParameterError,
                 InvalidLineItem,
                 InvalidGiftCardUpdate,
+                InvalidGiftAMealAmountError,
                 InvalidPoolDonationError do |e|
       json_response({ message: e.message }, :unprocessable_entity)
     end
