@@ -17,7 +17,7 @@ namespace :email_giftcards do
               "  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />" \
               '</head>' \
               '<body>' \
-              '<p> Thank you for supporting local chinatown businesses! As our merchants open up, you will be able to redeem the giftcards you have purchased below.</p>'
+              '<p> Thank you for supporting local Chinatown businesses!</p>'
       recipient = Contact.find_by(id: id)
       gift_cards = GiftCardDetail.where(recipient_id: id).to_a
       html += '<style> table {border: 1px solid black}</style>'\
