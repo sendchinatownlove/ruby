@@ -15,16 +15,36 @@ class ChargesController < ApplicationController
 
     seller_id = charge_params[:seller_id]
 
-    is_distribution = charge_params[:is_distribution] || false
+    # TODO(justintmckibben): Deprecate this boolean in favor of campaign_id
 
-    validate(seller_id: seller_id, line_items: line_items, is_distribution: is_distribution)
+    campaign = if charge_params[:is_distribution].present?
+      # TODO(justintmckibben): Delete this case when we start using campaign_id
+      #                        in the frontend
+      Campaign.find_by(
+        seller_id: seller.id,
+        active: true,
+        valid: true
+      )
+    elsif charge_params[:campaign_id].present?
+      Campaign.find_by(campaign_id: campaign_id)
+    end
+
+    gift_a_meal = campaign.present? || false
+
+    validate(
+      seller_id: seller_id,
+      line_items: line_items,
+      gift_a_meal: gift_a_meal
+    )
 
     # Validate each Item and get all ItemTypes
     item_types = Set.new
     line_items.each do |item|
       item_types.add item['item_type']
       item[:seller_id] = seller_id
-      item[:is_distribution] = is_distribution
+      # TODO(justintmckibben): Deprecate this boolean in favor of campaign_id
+      #                        which his expected to be on the line_item itself
+      item[:is_distribution] = gift_a_meal
     end
 
     seller = Seller.find_by(seller_id: seller_id)
@@ -72,12 +92,14 @@ class ChargesController < ApplicationController
       :seller_id,
       :idempotency_key,
       :is_subscribed,
+      :campaign_id
+      # TODO(justintmckibben): Deprecate this boolean in favor of campaign_id
       :is_distribution,
       line_items: [%i[amount currency item_type quantity]]
     )
   end
 
-  def validate(seller_id:, line_items:, is_distribution:)
+  def validate(seller_id:, line_items:, gift_a_meal:)
     seller = Seller.find_by(seller_id: seller_id)
     unless seller.present?
       raise InvalidLineItem, "Seller does not exist: #{seller_id}"
@@ -109,8 +131,10 @@ class ChargesController < ApplicationController
         raise InvalidLineItem, 'Amount must be at least $0.50 usd'
       end
 
-      unless is_distribution && seller.cost_per_meal.present? && amount % seller.cost_per_meal != 0
-        next
+      if gift_a_meal && seller.cost_per_meal.present? && amount % seller.cost_per_meal != 0
+        raise InvalidGiftAMealAmountError,
+              "Gift A Meal amount '#{amount}' must be divisible by seller's "\
+              "cost per meal '#{seller.cost_per_meal}'."
       end
 
       raise InvalidGiftAMealAmountError,
@@ -120,9 +144,16 @@ class ChargesController < ApplicationController
   end
 
   def create_square_payment_request(
-    nonce:, amount:, email:, name:, seller:, line_items:, is_distribution:
+    nonce:,
+    amount:,
+    email:,
+    name:,
+    seller:,
+    line_items:,
+    campaign:
   )
-    square_location_id = if is_distribution && seller.non_profit_location_id.present?
+    gift_a_meal = campaign.present?
+    square_location_id = if gift_a_meal && seller.non_profit_location_id.present?
                            seller.non_profit_location_id
                          else
                            seller.square_location_id
@@ -155,7 +186,11 @@ class ChargesController < ApplicationController
       purchaser.save!
     end
 
-    recipient = is_distribution ? seller.distributor : purchaser
+    recipient = if gift_a_meal
+      campaign.distributor
+    else
+      purchaser
+    end
 
     # Creates a pending PaymentIntent. See webhooks_controller to see what
     # happens when the PaymentIntent is successful.
