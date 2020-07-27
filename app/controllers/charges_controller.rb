@@ -15,8 +15,6 @@ class ChargesController < ApplicationController
 
     seller_id = charge_params[:seller_id]
 
-    # TODO(justintmckibben): Deprecate this boolean in favor of campaign_id
-
     campaign = if charge_params[:is_distribution].present?
       # TODO(justintmckibben): Delete this case when we start using campaign_id
       #                        in the frontend
@@ -87,7 +85,7 @@ class ChargesController < ApplicationController
       :seller_id,
       :idempotency_key,
       :is_subscribed,
-      :campaign_id
+      :campaign_id,
       # TODO(justintmckibben): Deprecate this boolean in favor of campaign_id
       :is_distribution,
       line_items: [%i[amount currency item_type quantity]]
