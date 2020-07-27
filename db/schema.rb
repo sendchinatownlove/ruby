@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_26_220247) do
+ActiveRecord::Schema.define(version: 2020_07_27_012752) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -164,6 +164,8 @@ ActiveRecord::Schema.define(version: 2020_07_26_220247) do
     t.bigint "recipient_id"
     t.integer "lock_version"
     t.bigint "fee_id"
+    t.bigint "campaign_id"
+    t.index ["campaign_id"], name: "index_payment_intents_on_campaign_id"
     t.index ["fee_id"], name: "index_payment_intents_on_fee_id"
     t.index ["purchaser_id"], name: "index_payment_intents_on_purchaser_id"
     t.index ["recipient_id"], name: "index_payment_intents_on_recipient_id"
@@ -232,6 +234,7 @@ ActiveRecord::Schema.define(version: 2020_07_26_220247) do
   add_foreign_key "locations", "sellers"
   add_foreign_key "menu_items", "sellers"
   add_foreign_key "open_hours", "sellers"
+  add_foreign_key "payment_intents", "campaigns"
   add_foreign_key "payment_intents", "contacts", column: "purchaser_id"
   add_foreign_key "payment_intents", "contacts", column: "recipient_id"
   add_foreign_key "refunds", "payment_intents"

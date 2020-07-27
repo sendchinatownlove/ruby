@@ -29,12 +29,10 @@ class ChargesController < ApplicationController
       Campaign.find_by(campaign_id: campaign_id)
     end
 
-    gift_a_meal = campaign.present? || false
-
     validate(
       seller_id: seller_id,
       line_items: line_items,
-      gift_a_meal: gift_a_meal
+      gift_a_meal: campaign.present?
     )
 
     # Validate each Item and get all ItemTypes
@@ -42,9 +40,6 @@ class ChargesController < ApplicationController
     line_items.each do |item|
       item_types.add item['item_type']
       item[:seller_id] = seller_id
-      # TODO(justintmckibben): Deprecate this boolean in favor of campaign_id
-      #                        which his expected to be on the line_item itself
-      item[:is_distribution] = gift_a_meal
     end
 
     seller = Seller.find_by(seller_id: seller_id)
@@ -62,7 +57,7 @@ class ChargesController < ApplicationController
                                             name: charge_params[:name],
                                             seller: seller,
                                             line_items: line_items,
-                                            is_distribution: is_distribution)
+                                            campaign: campaign)
 
     # Save the contact information only if the charge is succesful
     # Use a job to avoid blocking the request
@@ -200,7 +195,8 @@ class ChargesController < ApplicationController
       line_items: line_items.to_json,
       receipt_url: receipt_url,
       purchaser: purchaser,
-      recipient: recipient
+      recipient: recipient,
+      campaign: campaign
     )
 
     api_response
