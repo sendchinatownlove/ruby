@@ -28,6 +28,28 @@
     square_location_id: ENV['SQUARE_LOCATION_ID']
   },
   {
+    seller_id: '46-mott',
+    cuisine_name: 'Bakery',
+    name: '46 Mott',
+    story: 'Patrick is awesome, tbh',
+    accept_donations: true,
+    sell_gift_cards: true,
+    owner_name: 'Patrick Mock',
+    owner_image_url: 'assets/46-mott-logo.png',
+    target_amount: 1_000_000,
+    summary: nil,
+    hero_image_url: 'assets/46-mott-hero.png',
+    progress_bar_color: nil,
+    business_type: nil,
+    num_employees: 4,
+    founded_year: 2018,
+    website_url: nil,
+    menu_url: nil,
+    square_location_id: 'E4R1NCMHG7B2Y',
+    non_profit_location_id: '1VHM457EG87XX',
+    cost_per_meal: 500
+  },
+  {
     seller_id: 'send-chinatown-love',
     accept_donations: false,
     sell_gift_cards: false,
@@ -95,4 +117,27 @@ end
   attributes[:amounts].each_with_index do |amount, i|
     GiftCardAmount.create!(gift_card_detail_id: gift_card_detail.id, value: amount, updated_at: Time.now + i.days)
   end
+end
+
+[
+  {
+    active: true,
+    multiplier: 0.1,
+    seller_id: '46-mott'
+  },
+  {
+    active: true,
+    multiplier: 0.1,
+    seller_id: '46-mott'
+  },
+  {
+    active: false,
+    multiplier: 0.1,
+    seller_id: 'shunfa-bakery'
+  }
+].each do |attributes|
+  seller = Seller.find_by(seller_id: attributes[:seller_id])
+  fee_attributes = attributes.except(:seller_id)
+  fee_attributes[:seller_id] = seller.id
+  Fee.create!(fee_attributes)
 end

@@ -15,9 +15,9 @@ class ChargesController < ApplicationController
 
     seller_id = charge_params[:seller_id]
 
-    validate(seller_id: seller_id, line_items: line_items)
-
     is_distribution = charge_params[:is_distribution] || false
+
+    validate(seller_id: seller_id, line_items: line_items, is_distribution: is_distribution)
 
     # Validate each Item and get all ItemTypes
     item_types = Set.new
@@ -77,8 +77,9 @@ class ChargesController < ApplicationController
     )
   end
 
-  def validate(seller_id:, line_items:)
-    unless Seller.find_by(seller_id: seller_id).present?
+  def validate(seller_id:, line_items:, is_distribution:)
+    seller = Seller.find_by(seller_id: seller_id)
+    unless seller.present?
       raise InvalidLineItem, "Seller does not exist: #{seller_id}"
     end
 
@@ -107,13 +108,23 @@ class ChargesController < ApplicationController
       unless amount >= 50
         raise InvalidLineItem, 'Amount must be at least $0.50 usd'
       end
+
+      if is_distribution && seller.cost_per_meal.present? && amount % seller.cost_per_meal != 0
+        raise InvalidGiftAMealAmountError,
+              "Gift A Meal amount '#{amount}' must be divisible by seller's "\
+              "cost per meal '#{seller.cost_per_meal}'."
+      end
     end
   end
 
   def create_square_payment_request(
     nonce:, amount:, email:, name:, seller:, line_items:, is_distribution:
   )
-    square_location_id = seller.square_location_id
+    square_location_id = if is_distribution && seller.non_profit_location_id.present?
+                           seller.non_profit_location_id
+                         else
+                           seller.square_location_id
+                         end
 
     api_response =
       SquareManager::PaymentCreator.call(

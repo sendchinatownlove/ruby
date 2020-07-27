@@ -126,53 +126,58 @@ class WebhooksController < ApplicationController
       if seller_id.eql?(Seller::POOL_DONATION_SELLER_ID)
         PoolDonationValidator.call({ type: item_json['item_type'] })
 
-        WebhookManager::PoolDonationCreator.call({
-                                                   seller_id: seller_id,
-                                                   payment_intent: payment_intent,
-                                                   amount: amount
-                                                 })
+        WebhookManager::PoolDonationCreator.call(
+          {
+            seller_id: seller_id,
+            payment_intent: payment_intent,
+            amount: amount
+          }
+        )
 
-        EmailManager::PoolDonationReceiptSender.call({
-                                                       payment_intent: payment_intent,
-                                                       amount: amount,
-                                                       email: payment_intent.purchaser.email
-                                                     })
+        EmailManager::PoolDonationReceiptSender.call(
+          {
+            payment_intent: payment_intent,
+            amount: amount,
+            email: payment_intent.purchaser.email
+          }
+        )
       else
         merchant_name = Seller.find_by(seller_id: seller_id).name
         case item_json['item_type']
         when 'donation'
           is_donation ||= true
 
-          WebhookManager::DonationCreator.call({
-                                                 seller_id: seller_id,
-                                                 payment_intent: payment_intent,
-                                                 amount: amount
-                                               })
+          WebhookManager::DonationCreator.call(
+            {
+              seller_id: seller_id,
+              payment_intent: payment_intent,
+              amount: amount
+            }
+          )
         when 'gift_card'
           is_distribution = item_json['is_distribution']
 
-          gift_card_detail = WebhookManager::GiftCardCreator.call({
-                                                                    amount: amount,
-                                                                    seller_id: seller_id,
-                                                                    payment_intent: payment_intent,
-                                                                    single_use: is_distribution
-                                                                  })
+          gift_card_detail = WebhookManager::GiftCardCreator.call(
+            {
+              amount: amount,
+              seller_id: seller_id,
+              payment_intent: payment_intent,
+              single_use: is_distribution
+            }
+          )
           # Gift a meal purchases are technically donations to the purchaser
           if is_distribution
-            EmailManager::DonationReceiptSender.call({
-                                                       payment_intent: payment_intent,
-                                                       amount: amount,
-                                                       merchant: merchant_name,
-                                                       email: payment_intent.purchaser.email
-                                                     })
+            is_donation ||= true
           else
-            EmailManager::GiftCardReceiptSender.call({
-                                                       payment_intent: payment_intent,
-                                                       amount: amount,
-                                                       merchant: merchant_name,
-                                                       gift_card_detail: gift_card_detail,
-                                                       email: payment_intent.recipient.email
-                                                     })
+            EmailManager::GiftCardReceiptSender.call(
+              {
+                payment_intent: payment_intent,
+                amount: amount,
+                merchant: merchant_name,
+                gift_card_detail: gift_card_detail,
+                email: payment_intent.recipient.email
+              }
+            )
           end
         else
           raise(
@@ -187,11 +192,14 @@ class WebhooksController < ApplicationController
       # Send separate email for each seller.
       grouped_items = items.group_by { |li| li['seller_id'] }
       grouped_items.each_key do |sid|
-        EmailManager::DonationReceiptSender.call({
-                                                   payment_intent: payment_intent,
-                                                   amount: grouped_items[sid].map { |li| li['amount'].to_f }.sum,
-                                                   merchant: Seller.find_by(seller_id: sid).name
-                                                 })
+        EmailManager::DonationReceiptSender.call(
+          {
+            payment_intent: payment_intent,
+            amount: grouped_items[sid].map { |li| li['amount'].to_f }.sum,
+            merchant: Seller.find_by(seller_id: sid).name,
+            email: payment_intent.purchaser.email
+          }
+        )
       end
     end
   end
