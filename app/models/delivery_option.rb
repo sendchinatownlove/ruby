@@ -21,5 +21,5 @@
 #
 class DeliveryOption < ApplicationRecord
   belongs_to :seller
-  has_one :delivery_type
+  has_one :delivery_type, dependent: :destroy
 end
