@@ -6,7 +6,7 @@ RSpec.describe "DeliveryOptions", type: :request do
   let(:current_time) { Time.current.utc.iso8601(3).to_s }
   let!(:seller) { create(:seller) }
   let(:seller_id) { seller.seller_id }
-  let!(:delivery_options) { create_list(:delivery_option, 20, seller_id: seller.id) }
+  let!(:delivery_options) { create_list(:delivery_option, 20, :with_delivery_type, seller_id: seller.id) }
   let(:id) { delivery_options.first.id }
 
   # Test suite for GET /sellers/:seller_id/delivery_options
@@ -20,7 +20,7 @@ RSpec.describe "DeliveryOptions", type: :request do
 
       it 'returns all seller delivery_options' do
         expect(json.size).to eq(20)
-        expect(json).to eq({})
+        expect(json[0]["delivery_type"]).not_to be_nil
       end
     end
 
@@ -129,7 +129,7 @@ RSpec.describe "DeliveryOptions", type: :request do
 
     before { delete "/sellers/#{seller_id}/delivery_options/#{id}", params: valid_attributes, as: :json }
 
-    context 'when deliver_option exists' do
+    context 'when delivery_option exists' do
       it 'returns status code 204' do
         expect(response).to have_http_status(204)
       end
