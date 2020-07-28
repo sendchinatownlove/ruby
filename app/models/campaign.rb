@@ -26,4 +26,6 @@
 class Campaign < ApplicationRecord
   belongs_to :location
   belongs_to :seller
+
+  scope :active, -> (active) { where(active: active) }
 end

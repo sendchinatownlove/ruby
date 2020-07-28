@@ -6,19 +6,60 @@ RSpec.describe 'Campaigns API', type: :request do
   before do
     @seller = create :seller
     @location = create(:location, seller_id: @seller.id)
-    @campaign = create(:campaign, seller_id: @seller.id, location_id: @location.id)
+    @campaign = create(
+      :campaign,
+      active: true,
+      seller_id: @seller.id,
+      location_id: @location.id,
+    )
+    @inactive_campaign = create(
+      :campaign,
+      active: false,
+      seller_id: @seller.id,
+      location_id: @location.id,
+    )
   end
 
   context 'GET /campaigns' do
-    before { get '/campaigns' }
+    context 'Fetching all campaigns' do
+      before { get '/campaigns' }
 
-    it 'Returns campaigns' do
-      expect(json).not_to be_empty
-      expect(json.size).to eq(1)
+      it 'Returns campaigns' do
+        expect(json).not_to be_empty
+        expect(json.size).to eq(2)
+      end
+
+      it 'Returns 200' do
+        expect(response).to have_http_status(200)
+      end
     end
 
-    it 'Returns 200' do
-      expect(response).to have_http_status(200)
+    context 'Fetching active campaigns' do
+      before { get '/campaigns?active=true' }
+
+      it 'Returns active campaigns' do
+        expect(json).not_to be_empty
+        expect(json.size).to eq(1)
+        expect(json[0]['id']).to eq(@campaign.id)
+      end
+
+      it 'Returns 200' do
+        expect(response).to have_http_status(200)
+      end
+    end
+
+    context 'Fetching inactive campaigns' do
+      before { get '/campaigns?active=false' }
+
+      it 'Returns inactive campaigns' do
+        expect(json).not_to be_empty
+        expect(json.size).to eq(1)
+        expect(json[0]['id']).to eq(@inactive_campaign.id)
+      end
+
+      it 'Returns 200' do
+        expect(response).to have_http_status(200)
+      end
     end
   end
 

@@ -5,7 +5,11 @@ class CampaignsController < ApplicationController
 
   # GET /campaigns
   def index
-    json_response(Campaign.order(:end_date).all)
+    if params[:active].present?
+      json_response(Campaign.order(:end_date).active(params[:active]))
+    else
+      json_response(Campaign.order(:end_date).all)
+    end
   end
 
   # GET /campaigns/:id

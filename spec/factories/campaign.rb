@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :campaign do
-    active { true }
+    active { :active }
     valid { true }
     end_date { Faker::Time.forward(days: 30) }
     association :location
