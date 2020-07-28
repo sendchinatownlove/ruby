@@ -20,7 +20,7 @@ RSpec.describe "DeliveryOptions", type: :request do
 
       it 'returns all seller delivery_options' do
         expect(json.size).to eq(20)
-        expect(json[0]["delivery_type"]).not_to be_nil
+        expect(json[0]["delivery_type"]["name"]).not_to be_nil
       end
     end
 
