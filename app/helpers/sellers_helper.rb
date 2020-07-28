@@ -6,7 +6,9 @@ module SellersHelper
     distributor = seller.distributor
     fees = seller.fees
 
-    json = seller.as_json
+    # Do not return the secret token that gives access to all of their gift
+    # cards
+    json = seller.as_json.except('gift_cards_access_token')
     json['distributor'] = distributor.as_json unless distributor.nil?
     json['locations'] = locations.as_json
     json['fees'] = fees.as_json
