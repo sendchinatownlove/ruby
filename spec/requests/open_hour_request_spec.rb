@@ -44,8 +44,8 @@ RSpec.describe 'OpenHours', type: :request do
       {
         open_day: 'MON',
         close_day: 'MON',
-        open: Time.find_zone('UTC').parse('6:30'),
-        close: Time.find_zone('UTC').parse('18:30')
+        open_time: Time.find_zone('UTC').parse('6:30'),
+        close_time: Time.find_zone('UTC').parse('18:30')
       }
     end
 
@@ -59,8 +59,8 @@ RSpec.describe 'OpenHours', type: :request do
       {
         open_day: 'MON',
         close_day: 'MON',
-        open: Time.find_zone('UTC').parse('18:30'),
-        close: Time.find_zone('UTC').parse('6:30')
+        open_time: Time.find_zone('UTC').parse('18:30'),
+        close_time: Time.find_zone('UTC').parse('6:30')
       }
     end
 
@@ -81,10 +81,10 @@ RSpec.describe 'OpenHours', type: :request do
         expected_json['open_day'] = 'MON'
         expected_json['close_day'] = 'MON'
         # workaround since the db modifies the date and messes up the rspec validation
-        expect(actual_json['open'].to_time.strftime('%I:%M%p')).to eq('06:30AM')
-        expect(actual_json['close'].to_time.strftime('%I:%M%p')).to eq('06:30PM')
-        expected_json['open'] = actual_json['open']
-        expected_json['close'] = actual_json['close']
+        expect(actual_json['open_time'].to_time.strftime('%I:%M%p')).to eq('06:30AM')
+        expect(actual_json['close_time'].to_time.strftime('%I:%M%p')).to eq('06:30PM')
+        expected_json['open_time'] = actual_json['open_time']
+        expected_json['close_time'] = actual_json['close_time']
         expected_json['seller_id'] = seller.id
         expect(actual_json).to eq(expected_json.with_indifferent_access)
       end

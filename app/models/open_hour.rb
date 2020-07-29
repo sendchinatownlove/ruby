@@ -5,10 +5,10 @@
 # Table name: open_hours
 #
 #  id         :bigint           not null, primary key
-#  close      :time
 #  close_day  :integer
-#  open       :time
+#  close_time :time
 #  open_day   :integer
+#  open_time  :time
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  seller_id  :bigint           not null
@@ -23,7 +23,7 @@
 #
 class OpenHour < ApplicationRecord
   belongs_to :seller
-  validates_presence_of :open_day, :close_day, :close, :open
+  validates_presence_of :open_day, :close_day, :close_time, :open_time
   enum days: { MON: 0, TUE: 1, WED: 2, THU: 3, FRI: 4, SAT: 5, SUN: 6 }
   enum open_day: { MON: 0, TUE: 1, WED: 2, THU: 3, FRI: 4, SAT: 5, SUN: 6 }, _suffix: true
   enum close_day: { MON: 0, TUE: 1, WED: 2, THU: 3, FRI: 4, SAT: 5, SUN: 6 }, _suffix: true
@@ -34,8 +34,8 @@ class OpenHour < ApplicationRecord
   protected
 
   def opens_before_closes
-    if (open && close && open_day && close_day) && (((open_day == close_day) && (open >= close)) || (open_day > close_day))
-      errors.add(:close, I18n.t('errors.opens_before_closes'))
+    if open_time && close_time && open_day && close_day && (((open_day == close_day) && (open_time >= close_time)) || (open_day > close_day))
+      errors.add(:close_time, I18n.t('errors.opens_before_closes'))
     end
   end
 end

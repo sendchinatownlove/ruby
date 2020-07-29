@@ -14,12 +14,13 @@ class OpenHourController < ApplicationController
     json_response(@seller.open_hour.create!(create_open_hour_params), :created)
   end
 
-  # PUT /sellers/:seller_id/open_hour
+  # PUT /sellers/:seller_id/open_hour/:id
   def update
     @open_hour.update(update_open_hour_params)
     json_response(@open_hour)
   end
 
+  # DELETE /sellers/:seller_id/open_hour/:id
   def destroy
     @open_hour.destroy
 
@@ -43,8 +44,8 @@ class OpenHourController < ApplicationController
     params.permit(
       :open_day,
       :close_day,
-      :open,
-      :close
+      :open_time,
+      :close_time
     )
   end
 
