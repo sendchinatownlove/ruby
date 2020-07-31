@@ -31,7 +31,7 @@ namespace :emailer do
 
     seller_name = seller.seller_id.gsub('-', ' ').titlecase
     html += "<h3>Hello #{seller_name}!</h3>"
-    html += "<p>Here are your recent voucher purchases</p>"
+    html += '<p>Here are your recent voucher purchases</p>'
 
     # query for all gift cards info for that seller
     query = GiftCardDetail

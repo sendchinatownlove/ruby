@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ChangeOpenClose < ActiveRecord::Migration[6.0]
   def change
     rename_column :open_hours, :open, :open_time

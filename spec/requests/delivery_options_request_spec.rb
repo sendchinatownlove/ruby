@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-RSpec.describe "DeliveryOptions", type: :request do
+RSpec.describe 'DeliveryOptions', type: :request do
   # Initialize the test data
   before { freeze_time }
   let(:current_time) { Time.current.utc.iso8601(3).to_s }
@@ -20,7 +22,7 @@ RSpec.describe "DeliveryOptions", type: :request do
 
       it 'returns all seller delivery_options' do
         expect(json.size).to eq(20)
-        expect(json[0]["delivery_type"]["name"]).not_to be_nil
+        expect(json[0]['delivery_type']['name']).not_to be_nil
       end
     end
 
@@ -41,13 +43,13 @@ RSpec.describe "DeliveryOptions", type: :request do
   describe 'POST /sellers/:seller_id/menu_items' do
     let(:valid_attributes) do
       {
-        url: 'www.grubhub.com',
+        url: 'www.grubhub.com'
       }
     end
 
     let(:invalid_attributes) do
       {
-        invalid: 'quick brown fox',
+        invalid: 'quick brown fox'
       }
     end
 
@@ -135,7 +137,7 @@ RSpec.describe "DeliveryOptions", type: :request do
       end
 
       it 'confirms deletion of the delivery_option' do
-        expect{updated_delivery_options = DeliveryOption.find(id)}.to raise_exception(ActiveRecord::RecordNotFound)
+        expect { updated_delivery_options = DeliveryOption.find(id) }.to raise_exception(ActiveRecord::RecordNotFound)
       end
     end
   end

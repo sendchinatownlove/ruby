@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 class DeliveryOptionsController < ApplicationController
   before_action :set_seller
-  before_action :set_seller_delivery_options, only: [:update, :destroy]
+  before_action :set_seller_delivery_options, only: %i[update destroy]
 
   # GET /sellers/:seller_id/delivery_options
   def index
@@ -11,7 +13,7 @@ class DeliveryOptionsController < ApplicationController
       json
     end
 
-    json_response(delivery_options.sort_by{|de| de['delivery_type']['name'].to_i})
+    json_response(delivery_options.sort_by { |de| de['delivery_type']['name'].to_i })
   end
 
   # POST /sellers/:seller_id/delivery_options
@@ -48,7 +50,7 @@ class DeliveryOptionsController < ApplicationController
   def update_params
     params.permit(
       :phone_number,
-      :url,
+      :url
     )
     end
 
@@ -57,6 +59,8 @@ class DeliveryOptionsController < ApplicationController
   end
 
   def set_seller_delivery_options
-    @delivery_option = @seller.delivery_options.find_by!(id: params[:id]) if @seller
+    if @seller
+      @delivery_option = @seller.delivery_options.find_by!(id: params[:id])
+    end
   end
 end

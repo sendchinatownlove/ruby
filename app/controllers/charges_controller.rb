@@ -109,11 +109,13 @@ class ChargesController < ApplicationController
         raise InvalidLineItem, 'Amount must be at least $0.50 usd'
       end
 
-      if is_distribution && seller.cost_per_meal.present? && amount % seller.cost_per_meal != 0
-        raise InvalidGiftAMealAmountError,
-              "Gift A Meal amount '#{amount}' must be divisible by seller's "\
-              "cost per meal '#{seller.cost_per_meal}'."
+      unless is_distribution && seller.cost_per_meal.present? && amount % seller.cost_per_meal != 0
+        next
       end
+
+      raise InvalidGiftAMealAmountError,
+            "Gift A Meal amount '#{amount}' must be divisible by seller's "\
+            "cost per meal '#{seller.cost_per_meal}'."
     end
   end
 
