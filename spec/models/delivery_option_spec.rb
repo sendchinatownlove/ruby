@@ -26,6 +26,6 @@ RSpec.describe DeliveryOption, type: :model do
     create(:delivery_option)
   end
 
-  it { should have_one(:delivery_type) }
+  it { should have_one(:delivery_type).dependent(:destroy) }
   it { should belong_to(:seller) }
 end
