@@ -523,7 +523,7 @@ RSpec.describe 'Charges API', type: :request do
             currency: 'usd',
             item_type: 'gift_card',
             quantity: 1,
-            seller_id: seller_id,
+            seller_id: seller_id
           }
         ]
       end
