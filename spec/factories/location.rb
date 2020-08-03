@@ -8,6 +8,5 @@ FactoryBot.define do
     state { Faker::Address.state_abbr }
     phone_number { Faker::PhoneNumber.cell_phone }
     zip_code { Faker::Address.zip_code }
-    association :seller
   end
 end

@@ -15,22 +15,10 @@ class ChargesController < ApplicationController
 
     seller_id = charge_params[:seller_id]
 
-    campaign = if charge_params[:is_distribution].present?
-      # TODO(justintmckibben): Delete this case when we start using campaign_id
-      #                        in the frontend
-      Campaign.find_by(
-        seller_id: seller.id,
-        active: true,
-        valid: true
-      )
-    elsif charge_params[:campaign_id].present?
-      Campaign.find_by(campaign_id: campaign_id)
-    end
-
     validate(
       seller_id: seller_id,
       line_items: line_items,
-      gift_a_meal: campaign.present?
+      is_distribution: charge_params[:is_distribution]
     )
 
     # Validate each Item and get all ItemTypes
@@ -40,7 +28,6 @@ class ChargesController < ApplicationController
       item[:seller_id] = seller_id
     end
 
-    seller = Seller.find_by(seller_id: seller_id)
 
     # Total all Items
     amount =
@@ -53,9 +40,7 @@ class ChargesController < ApplicationController
                                             amount: amount,
                                             email: email,
                                             name: charge_params[:name],
-                                            seller: seller,
-                                            line_items: line_items,
-                                            campaign: campaign)
+                                            line_items: line_items)
 
     # Save the contact information only if the charge is succesful
     # Use a job to avoid blocking the request
@@ -92,9 +77,9 @@ class ChargesController < ApplicationController
     )
   end
 
-  def validate(seller_id:, line_items:, gift_a_meal:)
-    seller = Seller.find_by(seller_id: seller_id)
-    unless seller.present?
+  def validate(seller_id:, line_items:, is_distribution:)
+    @seller = Seller.find_by(seller_id: seller_id)
+    unless @seller.present?
       raise InvalidLineItem, "Seller does not exist: #{seller_id}"
     end
 
@@ -124,15 +109,23 @@ class ChargesController < ApplicationController
         raise InvalidLineItem, 'Amount must be at least $0.50 usd'
       end
 
-      if gift_a_meal && seller.cost_per_meal.present? && amount % seller.cost_per_meal != 0
-        raise InvalidGiftAMealAmountError,
-              "Gift A Meal amount '#{amount}' must be divisible by seller's "\
-              "cost per meal '#{seller.cost_per_meal}'."
+      @campaign = if is_distribution.present?
+        # TODO(justintmckibben): Delete this case when we start using campaign_id
+        #                        in the frontend
+        Campaign.find_by(
+          seller_id: @seller.id,
+          active: true,
+          valid: true
+        )
+      elsif charge_params[:campaign_id].present?
+        Campaign.find_by(campaign_id: campaign_id)
       end
 
-      raise InvalidGiftAMealAmountError,
-            "Gift A Meal amount '#{amount}' must be divisible by seller's "\
-            "cost per meal '#{seller.cost_per_meal}'."
+      if gift_a_meal? && @seller.cost_per_meal.present? && amount % @seller.cost_per_meal != 0
+        raise InvalidGiftAMealAmountError,
+              "Gift A Meal amount '#{amount}' must be divisible by seller's "\
+              "cost per meal '#{@seller.cost_per_meal}'."
+      end
     end
   end
 
@@ -141,15 +134,12 @@ class ChargesController < ApplicationController
     amount:,
     email:,
     name:,
-    seller:,
-    line_items:,
-    campaign:
+    line_items:
   )
-    gift_a_meal = campaign.present?
-    square_location_id = if gift_a_meal && seller.non_profit_location_id.present?
-                           seller.non_profit_location_id
+    square_location_id = if gift_a_meal? && @seller.non_profit_location_id.present?
+                           @seller.non_profit_location_id
                          else
-                           seller.square_location_id
+                           @seller.square_location_id
                          end
 
     api_response =
@@ -179,11 +169,7 @@ class ChargesController < ApplicationController
       purchaser.save!
     end
 
-    recipient = if gift_a_meal
-      campaign.distributor
-    else
-      purchaser
-    end
+    recipient = gift_a_meal? ? @campaign.distributor.contact : purchaser
 
     # Creates a pending PaymentIntent. See webhooks_controller to see what
     # happens when the PaymentIntent is successful.
@@ -194,9 +180,13 @@ class ChargesController < ApplicationController
       receipt_url: receipt_url,
       purchaser: purchaser,
       recipient: recipient,
-      campaign: campaign
+      campaign: @campaign
     )
 
     api_response
+  end
+
+  def gift_a_meal?
+    @campaign.present?
   end
 end

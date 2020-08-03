@@ -12,13 +12,15 @@
 #  valid              :boolean          default(FALSE)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#  distributor_id     :bigint
 #  location_id        :bigint           not null
 #  seller_id          :bigint           not null
 #
 # Indexes
 #
-#  index_campaigns_on_location_id  (location_id)
-#  index_campaigns_on_seller_id    (seller_id)
+#  index_campaigns_on_distributor_id  (distributor_id)
+#  index_campaigns_on_location_id     (location_id)
+#  index_campaigns_on_seller_id       (seller_id)
 #
 # Foreign Keys
 #
@@ -29,6 +31,7 @@ class Campaign < ApplicationRecord
   # TODO(justintmckibben): Make the default value of valid = true
   belongs_to :location
   belongs_to :seller
+  belongs_to :distributor
 
   scope :active, -> (active) { where(active: active) }
 end

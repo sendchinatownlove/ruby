@@ -35,7 +35,9 @@ FactoryBot.define do
 
     trait :with_distributor do
       after(:create) do |s|
-        FactoryBot.create :contact, seller_id: s.id
+        contact = FactoryBot.create :contact
+        distributor = FactoryBot.create :distributor, contact: contact
+        campaign = FactoryBot.create :campaign, seller_id: s.id, distributor: distributor
       end
     end
   end

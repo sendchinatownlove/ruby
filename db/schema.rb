@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_29_024223) do
+ActiveRecord::Schema.define(version: 2020_08_02_210028) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -25,6 +25,8 @@ ActiveRecord::Schema.define(version: 2020_07_29_024223) do
     t.bigint "seller_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "distributor_id"
+    t.index ["distributor_id"], name: "index_campaigns_on_distributor_id"
     t.index ["location_id"], name: "index_campaigns_on_location_id"
     t.index ["seller_id"], name: "index_campaigns_on_seller_id"
   end
@@ -33,8 +35,6 @@ ActiveRecord::Schema.define(version: 2020_07_29_024223) do
     t.string "email"
     t.boolean "is_subscribed", default: true, null: false
     t.string "name"
-    t.bigint "distributor_id"
-    t.index ["distributor_id"], name: "index_contacts_on_distributor_id"
     t.index ["email"], name: "index_contacts_on_email"
   end
 
@@ -59,6 +59,8 @@ ActiveRecord::Schema.define(version: 2020_07_29_024223) do
   create_table "distributors", force: :cascade do |t|
     t.string "website_url"
     t.string "image_url"
+    t.bigint "contact_id"
+    t.index ["contact_id"], name: "index_distributors_on_contact_id"
   end
 
   create_table "donation_details", force: :cascade do |t|
@@ -123,7 +125,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_024223) do
     t.string "city", null: false
     t.string "state", null: false
     t.string "zip_code", null: false
-    t.bigint "seller_id", null: false
+    t.bigint "seller_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "phone_number"
