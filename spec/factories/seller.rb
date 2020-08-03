@@ -33,7 +33,7 @@ FactoryBot.define do
     menu_url { Faker::Lorem.word }
     square_location_id { Faker::Alphanumeric.alphanumeric(number: 64) }
 
-    trait :with_distributor do
+    trait :with_campaign do
       after(:create) do |s|
         contact = FactoryBot.create :contact
         distributor = FactoryBot.create :distributor, contact: contact

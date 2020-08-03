@@ -28,7 +28,7 @@ RSpec.describe 'Charges API', type: :request do
     end
     let!(:seller) do
       create(:seller,
-        :with_distributor,
+        :with_campaign,
         seller_id: seller_id,
         square_location_id: ENV['SQUARE_LOCATION_ID'],
         name: 'Shunfa Bakery',
