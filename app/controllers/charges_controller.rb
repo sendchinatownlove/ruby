@@ -117,6 +117,7 @@ class ChargesController < ApplicationController
           active: true,
           valid: true
         )
+        raise ActiveRecord::RecordNotFound, "Passed in is_distribution with no active campaign running for seller_id=#{seller_id}"
       elsif charge_params[:campaign_id].present?
         Campaign.find_by(campaign_id: campaign_id)
       end

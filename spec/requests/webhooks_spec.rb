@@ -19,16 +19,10 @@ RSpec.describe 'Webhooks API', type: :request do
     end
     let(:is_distribution) { false }
     let(:purchaser) do
-      create(
-        :contact,
-        seller: Seller.find_by(seller_id: seller_id)
-      )
+      create :contact
     end
     let(:recipient) do
-      create(
-        :contact,
-        seller: Seller.find_by(seller_id: seller_id)
-      )
+      create :contact
     end
     let(:payment_intent) do
       create(
