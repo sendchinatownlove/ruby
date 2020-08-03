@@ -28,7 +28,6 @@ class ChargesController < ApplicationController
       item[:seller_id] = seller_id
     end
 
-
     # Total all Items
     amount =
       line_items.inject(0) do |sum, item|
@@ -110,24 +109,29 @@ class ChargesController < ApplicationController
       end
 
       @campaign = if is_distribution.present?
-        # TODO(justintmckibben): Delete this case when we start using campaign_id
-        #                        in the frontend
-        campaign = Campaign.find_by(
-          seller_id: @seller.id,
-          active: true,
-          valid: true
-        )
-        raise ActiveRecord::RecordNotFound, "Passed in is_distribution with no active campaign running for seller_id=#{seller_id}" unless campaign
-        campaign
-      elsif charge_params[:campaign_id].present?
-        Campaign.find_by(campaign_id: campaign_id)
+                    # TODO(justintmckibben): Delete this case when we start using campaign_id
+                    #                        in the frontend
+                    campaign = Campaign.find_by(
+                      seller_id: @seller.id,
+                      active: true,
+                      valid: true
+                    )
+                    unless campaign
+                      raise ActiveRecord::RecordNotFound, "Passed in is_distribution with no active campaign running for seller_id=#{seller_id}"
+                    end
+
+                    campaign
+                  elsif charge_params[:campaign_id].present?
+                    Campaign.find_by(campaign_id: campaign_id)
       end
 
-      if gift_a_meal? && @seller.cost_per_meal.present? && amount % @seller.cost_per_meal != 0
-        raise InvalidGiftAMealAmountError,
-              "Gift A Meal amount '#{amount}' must be divisible by seller's "\
-              "cost per meal '#{@seller.cost_per_meal}'."
+      unless gift_a_meal? && @seller.cost_per_meal.present? && amount % @seller.cost_per_meal != 0
+        next
       end
+
+      raise InvalidGiftAMealAmountError,
+            "Gift A Meal amount '#{amount}' must be divisible by seller's "\
+            "cost per meal '#{@seller.cost_per_meal}'."
     end
   end
 

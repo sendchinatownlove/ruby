@@ -33,5 +33,5 @@ class Campaign < ApplicationRecord
   belongs_to :seller
   belongs_to :distributor
 
-  scope :active, -> (active) { where(active: active) }
+  scope :active, ->(active) { where(active: active) }
 end

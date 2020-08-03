@@ -10,13 +10,13 @@ RSpec.describe 'Campaigns API', type: :request do
       :campaign,
       active: true,
       seller_id: @seller.id,
-      location_id: @location.id,
+      location_id: @location.id
     )
     @inactive_campaign = create(
       :campaign,
       active: false,
       seller_id: @seller.id,
-      location_id: @location.id,
+      location_id: @location.id
     )
   end
   let(:distributor) { create :distributor }
@@ -109,7 +109,7 @@ RSpec.describe 'Campaigns API', type: :request do
               seller_id: seller_id,
               distributor_id: distributor_id
             },
-            as: :json,
+            as: :json
           )
         end
 
@@ -204,7 +204,7 @@ RSpec.describe 'Campaigns API', type: :request do
       put(
         "/campaigns/#{campaign_id}",
         params: body,
-        as: :json,
+        as: :json
       )
     end
 
@@ -221,7 +221,7 @@ RSpec.describe 'Campaigns API', type: :request do
       let(:body) do
         {
           description: 'Campaign description',
-          gallery_image_urls: ['https://reddit.com/123.png'],
+          gallery_image_urls: ['https://reddit.com/123.png']
         }
       end
 

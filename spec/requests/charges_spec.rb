@@ -28,12 +28,11 @@ RSpec.describe 'Charges API', type: :request do
     end
     let!(:seller) do
       create(:seller,
-        :with_campaign,
-        seller_id: seller_id,
-        square_location_id: ENV['SQUARE_LOCATION_ID'],
-        name: 'Shunfa Bakery',
-        cost_per_meal: 100
-      )
+             :with_campaign,
+             seller_id: seller_id,
+             square_location_id: ENV['SQUARE_LOCATION_ID'],
+             name: 'Shunfa Bakery',
+             cost_per_meal: 100)
     end
 
     let(:expected_line_items) do

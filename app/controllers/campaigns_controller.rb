@@ -60,7 +60,7 @@ class CampaignsController < ApplicationController
       :active,
       :description,
       :valid,
-      gallery_image_urls: [],
+      gallery_image_urls: []
     )
   end
 
@@ -80,4 +80,3 @@ class CampaignsController < ApplicationController
     @distributor = Distributor.find(params[:distributor_id])
   end
 end
-
