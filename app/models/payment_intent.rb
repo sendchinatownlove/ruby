@@ -37,5 +37,5 @@ class PaymentIntent < ApplicationRecord
   has_many :items
   belongs_to :purchaser, class_name: 'Contact'
   belongs_to :recipient, class_name: 'Contact'
-  belongs_to :campaign
+  belongs_to :campaign, optional: true
 end

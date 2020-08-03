@@ -8,7 +8,6 @@ FactoryBot.define do
     square_location_id { Faker::Alphanumeric.alphanumeric(number: 64) }
     association :recipient, factory: :contact
     association :purchaser, factory: :contact
-    association :campaign, factory: :contact
   end
 
   trait :with_line_items do
