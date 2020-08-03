@@ -35,6 +35,7 @@ class CampaignsController < ApplicationController
     params.require(:end_date)
     params.require(:location_id)
     params.require(:seller_id)
+    params.require(:distributor_id)
 
     ret = params.permit(
       :active,
@@ -46,8 +47,10 @@ class CampaignsController < ApplicationController
 
     set_location
     set_seller
+    set_distributor
     ret[:location_id] = @location.id
     ret[:seller_id] = @seller.id
+    ret[:distributor_id] = @distributor.id
 
     ret
   end
@@ -71,6 +74,10 @@ class CampaignsController < ApplicationController
 
   def set_seller
     @seller = Seller.find_by!(seller_id: params[:seller_id])
+  end
+
+  def set_distributor
+    @distributor = Distributor.find(params[:distributor_id])
   end
 end
 
