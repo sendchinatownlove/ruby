@@ -18,7 +18,7 @@ class MigrateDistributorToNewDistributor < ActiveRecord::Migration[6.0]
       # to the real end_date
       campaign = Campaign.create valid: true, end_date: Time.now
       campaign.seller = seller
-      campaign.distributor = Distributor.new
+      campaign.distributor = Distributor.create contact: contact
     end
 
     remove_column :contacts, :seller_id
