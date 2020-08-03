@@ -37,7 +37,7 @@ FactoryBot.define do
       after(:create) do |s|
         contact = FactoryBot.create :contact
         distributor = FactoryBot.create :distributor, contact: contact
-        campaign = FactoryBot.create :campaign, seller_id: s.id, distributor: distributor
+        campaign = FactoryBot.create :campaign, seller_id: s.id, distributor: distributor, active: true
       end
     end
   end

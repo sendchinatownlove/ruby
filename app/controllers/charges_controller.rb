@@ -112,12 +112,13 @@ class ChargesController < ApplicationController
       @campaign = if is_distribution.present?
         # TODO(justintmckibben): Delete this case when we start using campaign_id
         #                        in the frontend
-        Campaign.find_by(
+        campaign = Campaign.find_by(
           seller_id: @seller.id,
           active: true,
           valid: true
         )
-        raise ActiveRecord::RecordNotFound, "Passed in is_distribution with no active campaign running for seller_id=#{seller_id}"
+        raise ActiveRecord::RecordNotFound, "Passed in is_distribution with no active campaign running for seller_id=#{seller_id}" unless campaign
+        campaign
       elsif charge_params[:campaign_id].present?
         Campaign.find_by(campaign_id: campaign_id)
       end
