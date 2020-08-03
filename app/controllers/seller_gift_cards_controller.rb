@@ -12,7 +12,9 @@ class SellerGiftCardsController < ApplicationController
               :name,
               :email,
               :created_at,
-              :expiration
+              :expiration,
+            ).where(
+              single_use: false
             )
             .joins(:item, :recipient)
             .where(

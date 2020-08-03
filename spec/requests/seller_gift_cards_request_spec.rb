@@ -15,33 +15,39 @@ RSpec.describe 'SellerGiftCards', type: :request do
       end
 
       let!(:gift_card1) do
-        create_gift_card refunded: false, contact: contact1, seller: seller
+        create_gift_card refunded: false, contact: contact1, seller: seller, single_use: false
       end
 
       let!(:gift_card2) do
-        create_gift_card refunded: false, contact: contact2, seller: seller
+        create_gift_card refunded: false, contact: contact2, seller: seller, single_use: false
       end
 
       let!(:refunded_gift_card) do
-        create_gift_card refunded: true, contact: contact2, seller: seller
+        create_gift_card refunded: true, contact: contact2, seller: seller, single_use: false
+      end
+
+      let!(:GAM_gift_card) do
+        create_gift_card refunded: false, contact: contact2, seller: seller, single_use: true
       end
 
       let!(:gift_card_for_another_seller) do
         create_gift_card(
           refunded: false,
           contact: contact1,
-          seller: create(:seller)
+          seller: create(:seller),
+          single_use: false
         )
       end
 
       let(:expected_gift_card_amount) { 30_00 }
 
-      def create_gift_card(refunded:, contact:, seller:)
+      def create_gift_card(refunded:, contact:, seller:, single_use:)
         item = create(:item, refunded: refunded, seller: seller)
         gift_card_detail = create(
           :gift_card_detail,
           item: item,
-          recipient: contact
+          recipient: contact,
+          single_use: single_use
         )
         create(
           :gift_card_amount,
@@ -62,7 +68,6 @@ RSpec.describe 'SellerGiftCards', type: :request do
           :gift_card_amount,
           gift_card_detail: gift_card_detail
         )
-
         gift_card_detail
       end
 
@@ -85,7 +90,7 @@ RSpec.describe 'SellerGiftCards', type: :request do
         context 'with valid gift_cards_access_token' do
           let(:gift_cards_access_token) { seller.gift_cards_access_token }
 
-          it 'returns all the gift cards except the refunded one' do
+          it 'returns all the gift cards except the refunded and the GAM ones' do
             expect(json).not_to be_empty
             expect(json.size).to eq 2
             expect(json).to eq(
