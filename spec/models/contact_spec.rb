@@ -8,12 +8,10 @@
 #  email         :string
 #  is_subscribed :boolean          default(TRUE), not null
 #  name          :string
-#  seller_id     :bigint
 #
 # Indexes
 #
-#  index_contacts_on_email      (email)
-#  index_contacts_on_seller_id  (seller_id)
+#  index_contacts_on_email  (email)
 #
 require 'rails_helper'
 
@@ -22,5 +20,4 @@ RSpec.describe Contact, type: :model do
   it { should allow_value(%w[true false]).for(:is_subscribed) }
   it { should have_many(:items) }
   it { should have_many(:gift_card_details) }
-  it { should belong_to(:seller).optional }
 end

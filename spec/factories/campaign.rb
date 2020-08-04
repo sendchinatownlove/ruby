@@ -7,5 +7,6 @@ FactoryBot.define do
     end_date { Faker::Time.forward(days: 30) }
     association :location
     association :seller
+    association :distributor
   end
 end

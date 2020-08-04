@@ -13,22 +13,14 @@ RSpec.describe 'Webhooks API', type: :request do
         'currency': 'usd',
         'item_type': item_type,
         'quantity': 1,
-        'seller_id': seller_id,
-        'is_distribution': is_distribution
+        'seller_id': seller_id
       }].to_json
     end
-    let(:is_distribution) { false }
     let(:purchaser) do
-      create(
-        :contact,
-        seller: Seller.find_by(seller_id: seller_id)
-      )
+      create :contact
     end
     let(:recipient) do
-      create(
-        :contact,
-        seller: Seller.find_by(seller_id: seller_id)
-      )
+      create :contact
     end
     let(:payment_intent) do
       create(
@@ -329,8 +321,18 @@ RSpec.describe 'Webhooks API', type: :request do
       let(:item_type) { 'gift_card' }
       let(:seller_id) { seller1.seller_id }
 
-      context 'with is_distribution = true' do
-        let(:is_distribution) { true }
+      context 'with campaign' do
+        let(:payment_intent) do
+          create(
+            :payment_intent,
+            :with_campaign,
+            square_payment_id: SecureRandom.uuid,
+            square_location_id: SecureRandom.uuid,
+            recipient: recipient,
+            purchaser: purchaser,
+            line_items: line_items
+          )
+        end
 
         before do
           expect(EmailManager::DonationReceiptSender).to receive(:call).once
@@ -354,7 +356,7 @@ RSpec.describe 'Webhooks API', type: :request do
         end
       end
 
-      context 'with is_distribution = false' do
+      context 'without campaign' do
         before do
           expect(EmailManager::GiftCardReceiptSender).to receive(:call)
           post(
@@ -396,7 +398,18 @@ RSpec.describe 'Webhooks API', type: :request do
         end
       end
 
-      context 'with multiple is_distribution gift cards' do
+      context 'with multiple gift cards with campaign' do
+        let(:payment_intent) do
+          create(
+            :payment_intent,
+            :with_campaign,
+            square_payment_id: SecureRandom.uuid,
+            square_location_id: SecureRandom.uuid,
+            recipient: recipient,
+            purchaser: purchaser,
+            line_items: line_items
+          )
+        end
         let(:line_items) do
           [
             {
@@ -404,16 +417,14 @@ RSpec.describe 'Webhooks API', type: :request do
               'currency': 'usd',
               'item_type': item_type,
               'quantity': 1,
-              'seller_id': seller_id,
-              'is_distribution': true
+              'seller_id': seller_id
             },
             {
               'amount': amount2,
               'currency': 'usd',
               'item_type': item_type,
               'quantity': 1,
-              'seller_id': seller_id,
-              'is_distribution': true
+              'seller_id': seller_id
             }
           ].to_json
         end

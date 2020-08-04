@@ -44,7 +44,7 @@ RSpec.describe Seller, type: :model do
   it { should have_many(:menu_items).dependent(:destroy) }
   it { should have_many(:delivery_options).dependent(:destroy) }
   it { should have_many(:fees).dependent(:destroy) }
-  it { should have_one(:distributor) }
+
   # Validation tests
 
   let!(:seller) do

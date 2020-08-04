@@ -10,15 +10,16 @@ RSpec.describe 'Campaigns API', type: :request do
       :campaign,
       active: true,
       seller_id: @seller.id,
-      location_id: @location.id,
+      location_id: @location.id
     )
     @inactive_campaign = create(
       :campaign,
       active: false,
       seller_id: @seller.id,
-      location_id: @location.id,
+      location_id: @location.id
     )
   end
+  let(:distributor) { create :distributor }
 
   context 'GET /campaigns' do
     context 'Fetching all campaigns' do
@@ -89,7 +90,7 @@ RSpec.describe 'Campaigns API', type: :request do
   end
 
   context 'POST /campaigns' do
-    context 'With invalid parameters' do
+    context 'with invalid parameters' do
       context 'With no parameters' do
         before { post '/campaigns', params: {} }
 
@@ -98,89 +99,102 @@ RSpec.describe 'Campaigns API', type: :request do
         end
       end
 
-      context 'With missing location and missing seller' do
+      context 'with all parameters' do
         before do
           post(
             '/campaigns',
             params: {
               end_date: Date.tomorrow,
-              location_id: 'missing-location-id',
-              seller_id: 'missing-seller-id',
+              location_id: location_id,
+              seller_id: seller_id,
+              distributor_id: distributor_id
             },
-            as: :json,
+            as: :json
           )
         end
 
-        it 'Returns status code 404' do
-          expect(response).to have_http_status(404)
-        end
-      end
+        context 'all missing ids' do
+          let(:location_id) { 'missing-location-id' }
+          let(:seller_id) { 'missing-seller-id' }
+          let(:distributor_id) { 'missing-distributor-id' }
 
-      context 'With missing location and valid seller' do
-        before do
-          post(
-            '/campaigns',
-            params: {
-              end_date: Date.tomorrow,
-              location_id: 'missing-location-id',
-              seller_id: @seller.id,
-            },
-            as: :json,
-          )
+          it 'Returns status code 404' do
+            expect(response).to have_http_status(404)
+          end
         end
 
-        it 'Returns status code 404' do
-          expect(response).to have_http_status(404)
-        end
-      end
+        context 'missing location and seller id' do
+          let(:location_id) { 'missing-location-id' }
+          let(:seller_id) { 'missing-seller-id' }
+          let(:distributor_id) { distributor.id }
 
-      context 'With valid location and missing seller' do
-        before do
-          post(
-            '/campaigns',
-            params: {
-              end_date: Date.tomorrow,
-              location_id: @location.id,
-              seller_id: 'missing-seller-id',
-            },
-            as: :json,
-          )
+          it 'returns status code 404' do
+            expect(response).to have_http_status(404)
+          end
         end
 
-        it 'Returns status code 404' do
-          expect(response).to have_http_status(404)
+        context 'missing location and distributor ids' do
+          let(:location_id) { 'missing-location-id' }
+          let(:seller_id) { @seller.seller_id }
+          let(:distributor_id) { 'missing-distributor-id' }
+
+          it 'returns status code 404' do
+            expect(response).to have_http_status(404)
+          end
         end
-      end
-    end
 
-    context 'With valid parameters' do
-      before do
-        post(
-          '/campaigns',
-          params: {
-            end_date: Date.tomorrow,
-            location_id: @location.id,
-            seller_id: @seller.seller_id,
-          },
-          as: :json,
-        )
-      end
+        context 'missing locattion id' do
+          let(:location_id) { 'missing-location-id' }
+          let(:seller_id) { @seller.seller_id }
+          let(:distributor_id) { distributor.id }
 
-      it 'Returns status code 201' do
-        expect(response).to have_http_status(201)
-      end
+          it 'returns status code 404' do
+            expect(response).to have_http_status(404)
+          end
+        end
 
-      it 'Creates a Campaign with default values and matching attributes' do
-        response_body = JSON.parse(response.body)
-        expect(response_body).not_to be_nil
+        context 'missing seller and distributor ids' do
+          let(:location_id) { @location.id }
+          let(:seller_id) { 'missing-seller-id' }
+          let(:distributor_id) { 'missing-distributor-id' }
 
-        campaign = Campaign.find(response_body['id'])
-        expect(campaign).not_to be_nil
-        expect(campaign.location).to eq @location
-        expect(campaign.seller).to eq @seller
+          it 'returns status code 404' do
+            expect(response).to have_http_status(404)
+          end
+        end
 
-        expect(campaign.active).to eq false
-        expect(campaign.valid).to eq false
+        context 'missing seller id' do
+          let(:location_id) { @location.id }
+          let(:seller_id) { 'missing-seller-id' }
+          let(:distributor_id) { distributor.id }
+
+          it 'returns status code 404' do
+            expect(response).to have_http_status(404)
+          end
+        end
+
+        context 'with valid parameters' do
+          let(:location_id) { @location.id }
+          let(:seller_id) { @seller.seller_id }
+          let(:distributor_id) { distributor.id }
+
+          it 'returns status code 201' do
+            expect(response).to have_http_status(201)
+          end
+
+          it 'creates a Campaign with default values and matching attributes' do
+            response_body = JSON.parse(response.body)
+            expect(response_body).not_to be_nil
+
+            campaign = Campaign.find(response_body['id'])
+            expect(campaign).not_to be_nil
+            expect(campaign.location).to eq @location
+            expect(campaign.seller).to eq @seller
+
+            expect(campaign.active).to eq false
+            expect(campaign.valid).to eq false
+          end
+        end
       end
     end
   end
@@ -190,7 +204,7 @@ RSpec.describe 'Campaigns API', type: :request do
       put(
         "/campaigns/#{campaign_id}",
         params: body,
-        as: :json,
+        as: :json
       )
     end
 
@@ -207,7 +221,7 @@ RSpec.describe 'Campaigns API', type: :request do
       let(:body) do
         {
           description: 'Campaign description',
-          gallery_image_urls: ['https://reddit.com/123.png'],
+          gallery_image_urls: ['https://reddit.com/123.png']
         }
       end
 

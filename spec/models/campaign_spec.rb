@@ -12,13 +12,15 @@
 #  valid              :boolean          default(FALSE)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#  distributor_id     :bigint
 #  location_id        :bigint           not null
 #  seller_id          :bigint           not null
 #
 # Indexes
 #
-#  index_campaigns_on_location_id  (location_id)
-#  index_campaigns_on_seller_id    (seller_id)
+#  index_campaigns_on_distributor_id  (distributor_id)
+#  index_campaigns_on_location_id     (location_id)
+#  index_campaigns_on_seller_id       (seller_id)
 #
 # Foreign Keys
 #

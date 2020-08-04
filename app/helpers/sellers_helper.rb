@@ -3,12 +3,13 @@
 module SellersHelper
   def self.generate_seller_json(seller:)
     locations = seller.locations
-    distributor = seller.distributor
+    distributor = get_deprecated_distributor(seller: seller)
     fees = seller.fees
 
     # Do not return the secret token that gives access to all of their gift
     # cards
     json = seller.as_json.except('gift_cards_access_token')
+    # NB(jmckibben): Deprecated field. Use /campaigns/ endpoint instead
     json['distributor'] = distributor.as_json unless distributor.nil?
     json['locations'] = locations.as_json
     json['fees'] = fees.as_json
@@ -32,5 +33,17 @@ module SellersHelper
     json['num_contributions'] = json['num_gift_cards'] + json['num_donations']
 
     json
+  end
+
+  private
+
+  def self.get_deprecated_distributor(seller:)
+    # Get the last active campaign
+    campaign = Campaign.find_by(
+      seller_id: seller.id,
+      active: true,
+      valid: true
+    )
+    campaign.present? ? campaign.distributor.contact : nil
   end
 end

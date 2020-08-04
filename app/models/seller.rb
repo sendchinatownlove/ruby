@@ -60,8 +60,7 @@ class Seller < ApplicationRecord
   has_many :open_hour, dependent: :destroy
   has_many :items, dependent: :destroy
   has_many :fees, dependent: :destroy
-
-  has_one :distributor, class_name: 'Contact'
+  has_many :campaigns, dependent: :destroy
 
   validates_presence_of :seller_id
   validates_presence_of :square_location_id
