@@ -141,3 +141,13 @@ end
   fee_attributes[:seller_id] = seller.id
   Fee.create!(fee_attributes)
 end
+
+seller = Seller.find_by(seller_id: 'shunfa-bakery')
+contact = Contact.find_or_create_by!(name: 'Apex for Youth', email: 'distributor@apexforyouth.com')
+distributor = Distributor.create contact: contact, image_url: 'apexforyouth.com', website_url: 'apexforyouth.com'
+Campaign.create(
+  seller_id: seller.id,
+  distributor: distributor,
+  active: true,
+  end_date: Time.now + 30.days
+)

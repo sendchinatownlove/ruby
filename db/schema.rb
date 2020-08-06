@@ -10,14 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_02_210028) do
+ActiveRecord::Schema.define(version: 2020_08_06_053537) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "campaigns", force: :cascade do |t|
     t.boolean "active", default: false
-    t.boolean "valid", default: false
+    t.boolean "valid", default: true
     t.datetime "end_date", null: false
     t.string "description"
     t.string "gallery_image_urls", array: true
@@ -26,6 +26,8 @@ ActiveRecord::Schema.define(version: 2020_08_02_210028) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "distributor_id"
+    t.integer "target_amount", default: 100000, null: false
+    t.integer "price_per_meal", default: 500, null: false
     t.index ["distributor_id"], name: "index_campaigns_on_distributor_id"
     t.index ["location_id"], name: "index_campaigns_on_location_id"
     t.index ["seller_id"], name: "index_campaigns_on_seller_id"
