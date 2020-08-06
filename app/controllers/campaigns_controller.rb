@@ -6,9 +6,9 @@ class CampaignsController < ApplicationController
   # GET /campaigns
   def index
     if params[:active].present?
-      json_response(Campaign.order(:end_date).active(params[:active]))
+      json_response(valid_campaigns.order(:end_date).active(params[:active]))
     else
-      json_response(Campaign.order(:end_date).all)
+      json_response(valid_campaigns.order(:end_date).all)
     end
   end
 
@@ -41,7 +41,8 @@ class CampaignsController < ApplicationController
       :active,
       :description,
       :end_date,
-      :valid,
+      :cost_per_meal,
+      :target_amount,
       gallery_image_urls: []
     )
 
@@ -78,5 +79,9 @@ class CampaignsController < ApplicationController
 
   def set_distributor
     @distributor = Distributor.find(params[:distributor_id])
+  end
+
+  def valid_campaigns
+    Campaign.where(valid: true)
   end
 end

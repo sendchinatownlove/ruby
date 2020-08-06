@@ -9,7 +9,9 @@
 #  description        :string
 #  end_date           :datetime         not null
 #  gallery_image_urls :string           is an Array
-#  valid              :boolean          default(FALSE)
+#  price_per_meal     :integer          default(500), not null
+#  target_amount      :integer          default(100000), not null
+#  valid              :boolean          default(TRUE)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  distributor_id     :bigint
@@ -34,4 +36,16 @@ class Campaign < ApplicationRecord
   belongs_to :distributor
 
   scope :active, ->(active) { where(active: active) }
+
+  def amount_raised
+    # TODO(justintmckibben): After we add the relationship from items to campaigns
+    #                        calculate this amount correctly
+    1500
+  end
+
+  def last_contribution
+    # TODO(justintmckibben): fter we add the relationship from items to campaigns
+    #                        calculate this amount correctly
+    Time.now
+  end
 end
