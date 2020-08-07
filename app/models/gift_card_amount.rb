@@ -27,4 +27,11 @@ class GiftCardAmount < ApplicationRecord
       .order(:gift_card_detail_id, created_at: :desc)
       .to_sql
   end
+
+  def self.original_amounts_sql
+    GiftCardAmount
+      .select('distinct on (gift_card_detail_id) *')
+      .order(:gift_card_detail_id, created_at: :asc)
+      .to_sql
+  end
 end
