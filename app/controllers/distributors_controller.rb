@@ -18,7 +18,8 @@ class DistributorsController < ApplicationController
     params.permit(
       :website_url,
       :image_url,
-      :contact_id
+      :contact_id,
+      :name
     )
   end
 

@@ -13,6 +13,7 @@ RSpec.describe "Distributors", type: :request do
         expect(json['image_url']).to eq distributor.image_url
         expect(json['website_url']).to eq distributor.website_url
         expect(json['contact_id']).to eq distributor.contact_id
+        expect(json['name']).to eq distributor.name
       end
 
       it 'returns status code 200' do
@@ -48,7 +49,8 @@ RSpec.describe "Distributors", type: :request do
         {
           contact_id: contact.id,
           website_url: 'sendchinatownlove.com',
-          image_url: 'sendchinatownlove.com/lalalllala'
+          image_url: 'sendchinatownlove.com/lalalllala',
+          name: 'Send Chinatown Love'
         }
       end
 
@@ -56,6 +58,7 @@ RSpec.describe "Distributors", type: :request do
         expect(json['image_url']).to eq attrs[:image_url]
         expect(json['website_url']).to eq attrs[:website_url]
         expect(json['contact_id']).to eq attrs[:contact_id]
+        expect(json['name']).to eq attrs[:name]
         expect(json['id']).not_to be_nil
 
         distributor = Distributor.find_by(contact_id: attrs[:contact_id])
@@ -63,6 +66,7 @@ RSpec.describe "Distributors", type: :request do
         expect(distributor.image_url).to eq attrs[:image_url]
         expect(distributor.website_url).to eq attrs[:website_url]
         expect(distributor.contact_id).to eq attrs[:contact_id]
+        expect(distributor.name).to eq attrs[:name]
       end
 
       it 'returns status code 201' do
