@@ -6,6 +6,7 @@
 #
 #  id          :bigint           not null, primary key
 #  image_url   :string
+#  name        :string
 #  website_url :string
 #  contact_id  :bigint
 #
