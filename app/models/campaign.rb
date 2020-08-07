@@ -38,14 +38,32 @@ class Campaign < ApplicationRecord
   scope :active, ->(active) { where(active: active) }
 
   def amount_raised
-    # TODO(justintmckibben): After we add the relationship from items to campaigns
-    #                        calculate this amount correctly
-    1500
+    # NB(justintmckibben): Currently campaigns are designed only for GAM and
+    # therefore only create gift cards. For campaigns where we don't need the
+    # gift cards aka we distribute hot meals, we *could* create donations
+    # instead of gift cards
+    gift_card_amount
   end
 
   def last_contribution
-    # TODO(justintmckibben): fter we add the relationship from items to campaigns
-    #                        calculate this amount correctly
-    Time.now
+    Item.where(
+      campaign_id: id,
+      refunded: false,
+      item_type: :gift_card
+    ).order(created_at: :desc).first&.created_at
+  end
+
+  private
+
+  # calculates the amount raised from gift cards
+  def gift_card_amount
+    GiftCardDetail
+      .joins(:item)
+      .where(items: {
+               campaign_id: id,
+               refunded: false
+             })
+      .joins("join (#{GiftCardAmount.original_amounts_sql}) as la on la.gift_card_detail_id = gift_card_details.id")
+      .sum(:value)
   end
 end

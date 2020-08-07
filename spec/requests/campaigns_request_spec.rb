@@ -4,7 +4,6 @@ require 'rails_helper'
 
 RSpec.describe 'Campaigns API', type: :request do
   before do
-    freeze_time
     @seller = create :seller
     @location = create(:location, seller_id: @seller.id)
     @campaign = create(
@@ -21,7 +20,6 @@ RSpec.describe 'Campaigns API', type: :request do
     )
   end
   let(:distributor) { create :distributor }
-  let(:now) { Time.now.as_json }
 
   context 'GET /campaigns' do
     context 'Fetching all campaigns' do
@@ -46,8 +44,8 @@ RSpec.describe 'Campaigns API', type: :request do
         expect(json[0]['id']).to eq(@campaign.id)
 
         # Has original fields
-        expect(json[0]['amount_raised']).to eq 1500
-        expect(json[0]['last_contribution']).to eq now
+        expect(json[0]['amount_raised']).to eq 0
+        expect(json[0]['last_contribution']).to eq nil
       end
 
       it 'Returns 200' do
@@ -89,8 +87,8 @@ RSpec.describe 'Campaigns API', type: :request do
         expect(json['id']).to eq(@campaign.id)
 
         # Has original fields
-        expect(json['amount_raised']).to eq 1500
-        expect(json['last_contribution']).to eq now
+        expect(json['amount_raised']).to eq 0
+        expect(json['last_contribution']).to eq nil
       end
 
       it 'Returns 200' do
@@ -195,15 +193,15 @@ RSpec.describe 'Campaigns API', type: :request do
           it 'creates a Campaign with default values and matching attributes' do
             response_body = JSON.parse(response.body)
             expect(response_body).not_to be_nil
-            expect(json['amount_raised']).to eq 1500
-            expect(json['last_contribution']).to eq now
+            expect(json['amount_raised']).to eq 0
+            expect(json['last_contribution']).to eq nil
 
             campaign = Campaign.find(response_body['id'])
             expect(campaign).not_to be_nil
             expect(campaign.location).to eq @location
             expect(campaign.seller).to eq @seller
             expect(campaign.target_amount).to eq 100000
-            expect(campaign.amount_raised).to eq 1500
+            expect(campaign.amount_raised).to eq 0
             expect(campaign.price_per_meal).to eq 500
 
             expect(campaign.active).to eq false
@@ -249,8 +247,8 @@ RSpec.describe 'Campaigns API', type: :request do
         expect(json['gallery_image_urls']).to eq(body[:gallery_image_urls])
 
         # Has original fields
-        expect(json['amount_raised']).to eq 1500
-        expect(json['last_contribution']).to eq now
+        expect(json['amount_raised']).to eq 0
+        expect(json['last_contribution']).to eq nil
       end
 
       it 'Updates the fields in the record' do
