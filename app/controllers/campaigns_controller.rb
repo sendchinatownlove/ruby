@@ -5,28 +5,30 @@ class CampaignsController < ApplicationController
 
   # GET /campaigns
   def index
-    if params[:active].present?
-      json_response(valid_campaigns.order(:end_date).active(params[:active]))
+    @campaigns = if params[:active].present?
+      valid_campaigns.order(:end_date).active(params[:active])
     else
-      json_response(valid_campaigns.order(:end_date).all)
+      valid_campaigns.order(:end_date).all
     end
+
+    json_response(campaigns_json)
   end
 
   # GET /campaigns/:id
   def show
-    json_response(@campaign)
+    json_response(campaign_json)
   end
 
   # POST /campaigns
   def create
-    campaign = Campaign.create!(create_params)
-    json_response(campaign, :created)
+    @campaign = Campaign.create!(create_params)
+    json_response(campaign_json, :created)
   end
 
   # PUT /campaigns/:id
   def update
     @campaign.update(update_params)
-    json_response(@campaign)
+    json_response(campaign_json)
   end
 
   private
@@ -79,6 +81,17 @@ class CampaignsController < ApplicationController
 
   def set_distributor
     @distributor = Distributor.find(params[:distributor_id])
+  end
+
+  def campaigns_json
+    @campaigns.map { |c| campaign_json campaign: c }
+  end
+
+  def campaign_json(campaign: @campaign)
+    ret = campaign.as_json
+    ret['amount_raised'] = campaign.amount_raised
+    ret['last_contribution'] = campaign.last_contribution
+    ret
   end
 
   def valid_campaigns
