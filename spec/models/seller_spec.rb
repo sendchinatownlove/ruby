@@ -234,7 +234,7 @@ RSpec.describe Seller, type: :model do
       end
 
       it 'returns total amount' do
-        expect(seller.amount_raised).to eq(290_00)
+        expect(seller.amount_raised).to eq(310_00)
         expect(seller.num_contributions).to eq(4)
       end
     end
