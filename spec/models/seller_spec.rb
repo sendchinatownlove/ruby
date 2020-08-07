@@ -224,7 +224,7 @@ RSpec.describe Seller, type: :model do
       end
 
       it 'returns gift card amounts' do
-        expect(seller.gift_card_amount).to eq(80_00)
+        expect(seller.gift_card_amount).to eq(100_00)
         expect(seller.num_gift_cards).to eq(2)
       end
 
