@@ -46,9 +46,11 @@ class Campaign < ApplicationRecord
   end
 
   def last_contribution
-    # TODO(justintmckibben): After we add the relationship from items to campaigns
-    #                        calculate this amount correctly
-    Time.now
+    Item.where(
+      campaign_id: id,
+      refunded: false,
+      item_type: :gift_card
+    ).order(created_at: :desc).first&.created_at
   end
 
   private

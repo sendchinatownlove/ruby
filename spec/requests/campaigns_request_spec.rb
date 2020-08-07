@@ -4,7 +4,6 @@ require 'rails_helper'
 
 RSpec.describe 'Campaigns API', type: :request do
   before do
-    freeze_time
     @seller = create :seller
     @location = create(:location, seller_id: @seller.id)
     @campaign = create(
@@ -21,7 +20,6 @@ RSpec.describe 'Campaigns API', type: :request do
     )
   end
   let(:distributor) { create :distributor }
-  let(:now) { Time.now.as_json }
 
   context 'GET /campaigns' do
     context 'Fetching all campaigns' do
@@ -47,7 +45,7 @@ RSpec.describe 'Campaigns API', type: :request do
 
         # Has original fields
         expect(json[0]['amount_raised']).to eq 0
-        expect(json[0]['last_contribution']).to eq now
+        expect(json[0]['last_contribution']).to eq nil
       end
 
       it 'Returns 200' do
@@ -90,7 +88,7 @@ RSpec.describe 'Campaigns API', type: :request do
 
         # Has original fields
         expect(json['amount_raised']).to eq 0
-        expect(json['last_contribution']).to eq now
+        expect(json['last_contribution']).to eq nil
       end
 
       it 'Returns 200' do
@@ -196,7 +194,7 @@ RSpec.describe 'Campaigns API', type: :request do
             response_body = JSON.parse(response.body)
             expect(response_body).not_to be_nil
             expect(json['amount_raised']).to eq 0
-            expect(json['last_contribution']).to eq now
+            expect(json['last_contribution']).to eq nil
 
             campaign = Campaign.find(response_body['id'])
             expect(campaign).not_to be_nil
@@ -250,7 +248,7 @@ RSpec.describe 'Campaigns API', type: :request do
 
         # Has original fields
         expect(json['amount_raised']).to eq 0
-        expect(json['last_contribution']).to eq now
+        expect(json['last_contribution']).to eq nil
       end
 
       it 'Updates the fields in the record' do

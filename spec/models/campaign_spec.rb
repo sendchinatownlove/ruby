@@ -36,65 +36,85 @@ RSpec.describe Campaign, type: :model do
   it { should belong_to(:seller) }
   it { should belong_to(:distributor) }
 
+  before { freeze_time }
+
   let!(:campaign) { create :campaign }
 
   it 'should have default values' do
     expect(campaign.amount_raised).to eq(0)
+    expect(campaign.last_contribution).to be_nil
   end
 
   context 'with gift cards' do
-    context 'amount with money raised' do
-      before do
-        # Create $50 gift card
-        item_gift_card1 = create(:item, campaign: campaign)
-        gift_card_detail1 = create(:gift_card_detail, item: item_gift_card1)
-        create(
-          :gift_card_amount,
-          value: 50_00,
-          gift_card_detail: gift_card_detail1
-        )
+    before do
+      # Create $50 gift card
+      item_gift_card1 = create(
+        :item,
+        campaign: campaign,
+        item_type: :gift_card,
+        created_at: Time.current
+      )
+      gift_card_detail1 = create(:gift_card_detail, item: item_gift_card1)
+      create(
+        :gift_card_amount,
+        value: 50_00,
+        gift_card_detail: gift_card_detail1
+      )
 
-        # Create second gift card, which is a $50 gift card with $20 spent
-        item_gift_card2 = create(:item, campaign: campaign)
-        gift_card_detail2 = create(:gift_card_detail, item: item_gift_card2)
-        create(
-          :gift_card_amount,
-          value: 50_00,
-          gift_card_detail: gift_card_detail2
-        )
-        # Updated a day later
-        create(
-          :gift_card_amount,
-          value: 30_00,
-          gift_card_detail: gift_card_detail2,
-          created_at: Time.current + 1.day
-        )
-        # Extraneous gift card amounts that should be ignored since it only
-        # should use the most recent ammount (aka the one updated a day later)
-        create(
-          :gift_card_amount,
-          value: 50_00,
-          gift_card_detail: gift_card_detail2
-        )
-        create(
-          :gift_card_amount,
-          value: 50_00,
-          gift_card_detail: gift_card_detail2
-        )
+      # Create second gift card, which is a $50 gift card with $20 spent
+      item_gift_card2 = create(
+        :item,
+        campaign: campaign,
+        item_type: :gift_card,
+        created_at: Time.current + 1.day
+      )
+      gift_card_detail2 = create(
+        :gift_card_detail,
+        item: item_gift_card2
+      )
+      create(
+        :gift_card_amount,
+        value: 50_00,
+        gift_card_detail: gift_card_detail2
+      )
+      # Updated a day later
+      create(
+        :gift_card_amount,
+        value: 30_00,
+        gift_card_detail: gift_card_detail2,
+        created_at: Time.current + 1.day
+      )
+      # Extraneous gift card amounts that should be ignored since it only
+      # should use the most recent ammount (aka the one updated a day later)
+      create(
+        :gift_card_amount,
+        value: 50_00,
+        gift_card_detail: gift_card_detail2
+      )
+      create(
+        :gift_card_amount,
+        value: 50_00,
+        gift_card_detail: gift_card_detail2
+      )
 
-        # Create $100 gift card, refunded
-        item_gift_card3 = create(:item, campaign: campaign, refunded: true)
-        gift_card_detail3 = create(:gift_card_detail, item: item_gift_card3)
-        create(
-          :gift_card_amount,
-          value: 100_00,
-          gift_card_detail: gift_card_detail3
-        )
-      end
+      # Create $100 gift card, refunded
+      item_gift_card3 = create(
+        :item,
+        item_type: :gift_card,
+        campaign: campaign,
+        refunded: true
+      )
+      gift_card_detail3 = create(:gift_card_detail, item: item_gift_card3)
+      create(
+        :gift_card_amount,
+        value: 100_00,
+        gift_card_detail: gift_card_detail3
+      )
+    end
 
-      it 'returns gift card amounts' do
-        expect(campaign.amount_raised).to eq(100_00)
-      end
+    it 'returns gift card amounts' do
+      expect(campaign.amount_raised).to eq(100_00)
+      expect(campaign.last_contribution).to eq(Time.current + 1.day)
     end
   end
 end
