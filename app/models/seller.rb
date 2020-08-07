@@ -86,7 +86,7 @@ class Seller < ApplicationRecord
                seller_id: id,
                refunded: false
              })
-      .joins("join (#{GiftCardAmount.latest_amounts_sql}) as la on la.gift_card_detail_id = gift_card_details.id")
+      .joins("join (#{GiftCardAmount.original_amounts_sql}) as la on la.gift_card_detail_id = gift_card_details.id")
       .sum(:value)
   end
 
