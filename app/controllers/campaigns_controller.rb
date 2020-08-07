@@ -91,6 +91,7 @@ class CampaignsController < ApplicationController
     ret = campaign.as_json
     ret['amount_raised'] = campaign.amount_raised
     ret['last_contribution'] = campaign.last_contribution
+    ret['seller_id'] = campaign.seller.seller_id
     ret
   end
 
