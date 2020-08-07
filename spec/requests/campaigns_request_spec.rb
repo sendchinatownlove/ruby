@@ -46,6 +46,7 @@ RSpec.describe 'Campaigns API', type: :request do
         # Has original fields
         expect(json[0]['amount_raised']).to eq 0
         expect(json[0]['last_contribution']).to eq nil
+        expect(json[0]['seller_id']).to eq @seller.seller_id
       end
 
       it 'Returns 200' do
@@ -89,6 +90,7 @@ RSpec.describe 'Campaigns API', type: :request do
         # Has original fields
         expect(json['amount_raised']).to eq 0
         expect(json['last_contribution']).to eq nil
+        expect(json['seller_id']).to eq @seller.seller_id
       end
 
       it 'Returns 200' do
@@ -249,6 +251,7 @@ RSpec.describe 'Campaigns API', type: :request do
         # Has original fields
         expect(json['amount_raised']).to eq 0
         expect(json['last_contribution']).to eq nil
+        expect(json['seller_id']).to eq @seller.seller_id
       end
 
       it 'Updates the fields in the record' do
