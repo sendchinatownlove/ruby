@@ -94,26 +94,36 @@ end
     email: 'testytesterson@gmail.com',
     item_type: Item.gift_card,
     refunded: false,
-    amounts: [10_000, 8000]
+    amounts: [10_000, 8000],
+    single_use: false
   },
   {
     email: 'testytesterson2@gmail.com',
     item_type: Item.gift_card,
     refunded: true,
-    amounts: [7500, 3000]
+    amounts: [7500, 3000],
+    single_use: false
   },
   {
     email: 'testytesterson3@gmail.com',
     item_type: Item.gift_card,
     refunded: false,
-    amounts: [5000]
+    amounts: [5000],
+    single_use: false
+  },
+  {
+    email: 'testytesterson4@gmail.com',
+    item_type: Item.gift_card,
+    refunded: false,
+    amounts: [5000],
+    single_use: true
   }
 ].each do |attributes|
   seller = Seller.find_by(seller_id: 'shunfa-bakery')
   contact = Contact.find_or_create_by!(email: attributes[:email])
   payment_intent = PaymentIntent.create!(recipient: contact, purchaser: contact, square_location_id: seller.square_location_id, square_payment_id: Faker::Alphanumeric.alpha(number: 64))
   item = Item.create!(purchaser: contact, item_type: attributes[:item_type], refunded: attributes[:refunded], seller_id: seller.id, payment_intent_id: payment_intent.id)
-  gift_card_detail = GiftCardDetail.create!(recipient: contact, item_id: item.id, gift_card_id: Faker::Alphanumeric.alpha(number: 64), seller_gift_card_id: Faker::Alphanumeric.alpha(number: 64))
+  gift_card_detail = GiftCardDetail.create!(recipient: contact, item_id: item.id, gift_card_id: Faker::Alphanumeric.alpha(number: 64), seller_gift_card_id: Faker::Alphanumeric.alpha(number: 64), single_use: attributes[:single_use])
   attributes[:amounts].each_with_index do |amount, i|
     GiftCardAmount.create!(gift_card_detail_id: gift_card_detail.id, value: amount, updated_at: Time.now + i.days)
   end
@@ -145,9 +155,11 @@ end
 seller = Seller.find_by(seller_id: 'shunfa-bakery')
 contact = Contact.find_or_create_by!(name: 'Apex for Youth', email: 'distributor@apexforyouth.com')
 distributor = Distributor.create contact: contact, image_url: 'apexforyouth.com', website_url: 'apexforyouth.com', name: 'Apex for Youth'
+location = Location.create(address1: '123 Mott St.', city: 'Zoo York', state: 'NY', zip_code: '12345')
 Campaign.create(
   seller_id: seller.id,
   distributor: distributor,
+  location: location,
   active: true,
   end_date: Time.now + 30.days
 )
