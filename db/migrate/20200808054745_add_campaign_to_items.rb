@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddCampaignToItems < ActiveRecord::Migration[6.0]
   def change
     Seller.all.each do |seller|

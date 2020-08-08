@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DistributorsController < ApplicationController
   before_action :set_distributor, only: %i[show]
 

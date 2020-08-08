@@ -5,6 +5,6 @@ FactoryBot.define do
     association :contact
     image_url { Faker::Alphanumeric.alphanumeric(number: 64) }
     website_url { Faker::Alphanumeric.alphanumeric(number: 64) }
-    name { Faker::name }
+    name { Faker.name }
   end
 end

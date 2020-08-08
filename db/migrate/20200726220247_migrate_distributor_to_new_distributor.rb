@@ -21,7 +21,8 @@ class MigrateDistributorToNewDistributor < ActiveRecord::Migration[6.0]
         valid: true,
         end_date: Time.now,
         distributor: distributor,
-        seller: seller)
+        seller: seller
+      )
     end
 
     remove_column :contacts, :seller_id

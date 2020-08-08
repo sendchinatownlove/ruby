@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-RSpec.describe "Distributors", type: :request do
+RSpec.describe 'Distributors', type: :request do
   describe 'GET /distributors/:id' do
     let!(:distributor) { create :distributor }
     before { get "/distributors/#{distributor_id}" }
