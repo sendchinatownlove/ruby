@@ -12,7 +12,7 @@ class SellerGiftCardsController < ApplicationController
               :name,
               :email,
               :created_at,
-              :expiration,
+              :expiration
             )
             .joins(:item, :recipient)
             .where(
@@ -24,9 +24,7 @@ class SellerGiftCardsController < ApplicationController
             .joins(
               "join (#{GiftCardAmount.latest_amounts_sql}) as la on la.gift_card_detail_id = gift_card_details.id"
             )
-    if params.has_key?('filterGAM')
-      query = query.where(single_use: false)
-    end
+    query = query.where(single_use: false) if params.key?('filterGAM')
     query = query.to_sql
 
     # processing in one query to get a PG::Result, instead multiple queries when building html

@@ -132,7 +132,7 @@ RSpec.describe 'SellerGiftCards', type: :request do
         let(:seller_id) { seller.seller_id }
         let(:gift_cards_access_token) { seller.gift_cards_access_token }
 
-        it 'returns all the gift cards except the refunded one' do
+        it 'returns all the gift cards except the refunded and the GAM one' do
           expect(json).not_to be_empty
           expect(json.size).to eq 2
           expect(json).to eq(
