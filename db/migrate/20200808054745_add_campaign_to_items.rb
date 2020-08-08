@@ -9,7 +9,7 @@ class AddCampaignToItems < ActiveRecord::Migration[6.0]
       # to the correct campaign
       item = Item.joins(:gift_card_detail).where(
         seller_id: seller.id,
-        gift_card_detail: { single_use: true }
+        gift_card_details: { single_use: true }
       )
       item.update(campaign: campaign)
       item.payment_intent.update(campaign: campaign)
