@@ -13,6 +13,9 @@ RSpec.describe 'SellerGiftCards', type: :request do
       let!(:contact2) do
         create :contact
       end
+      let!(:contact3) do
+        create :contact
+      end
 
       let!(:gift_card1) do
         create_gift_card refunded: false, contact: contact1, seller: seller, single_use: false
@@ -26,8 +29,8 @@ RSpec.describe 'SellerGiftCards', type: :request do
         create_gift_card refunded: true, contact: contact2, seller: seller, single_use: false
       end
 
-      let!(:GAM_gift_card) do
-        create_gift_card refunded: false, contact: contact2, seller: seller, single_use: true
+      let!(:gift_cardGAM) do
+        create_gift_card refunded: false, contact: contact3, seller: seller, single_use: true
       end
 
       let!(:gift_card_for_another_seller) do
@@ -82,17 +85,16 @@ RSpec.describe 'SellerGiftCards', type: :request do
         }.as_json
       end
 
-      before { get "/sellers/#{seller_id}/gift_cards/#{gift_cards_access_token}" }
-
       context 'with valid seller_id' do
+        before { get "/sellers/#{seller_id}/gift_cards/#{gift_cards_access_token}" }
         let(:seller_id) { seller.seller_id }
 
         context 'with valid gift_cards_access_token' do
           let(:gift_cards_access_token) { seller.gift_cards_access_token }
 
-          it 'returns all the gift cards except the refunded and the GAM ones' do
+          it 'returns all the gift cards except the refunded one' do
             expect(json).not_to be_empty
-            expect(json.size).to eq 2
+            expect(json.size).to eq 3
             expect(json).to eq(
               [
                 expected_gift_card_json(
@@ -102,6 +104,10 @@ RSpec.describe 'SellerGiftCards', type: :request do
                 expected_gift_card_json(
                   gift_card_detail: gift_card2,
                   contact: contact2
+                ),
+                expected_gift_card_json(
+                  gift_card_detail: gift_cardGAM,
+                  contact: contact3
                 )
               ]
             )
@@ -121,7 +127,35 @@ RSpec.describe 'SellerGiftCards', type: :request do
         end
       end
 
+      context 'with filtering GAM' do
+        before { get "/sellers/#{seller_id}/gift_cards/#{gift_cards_access_token}?filterGAM=true" }
+        let(:seller_id) { seller.seller_id }
+        let(:gift_cards_access_token) { seller.gift_cards_access_token }
+
+        it 'returns all the gift cards except the refunded one' do
+          expect(json).not_to be_empty
+          expect(json.size).to eq 2
+          expect(json).to eq(
+            [
+              expected_gift_card_json(
+                gift_card_detail: gift_card1,
+                contact: contact1
+              ),
+              expected_gift_card_json(
+                gift_card_detail: gift_card2,
+                contact: contact2
+              )
+            ]
+          )
+        end
+
+        it 'returns 200' do
+          expect(response).to have_http_status(200)
+        end
+      end
+
       context 'with invalid seller_id' do
+        before { get "/sellers/#{seller_id}/gift_cards/#{gift_cards_access_token}" }
         let(:seller_id) { 'blahblahblah' }
         let(:gift_cards_access_token) { seller.gift_cards_access_token }
 
