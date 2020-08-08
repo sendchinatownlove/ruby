@@ -202,7 +202,7 @@ RSpec.describe 'Campaigns API', type: :request do
             expect(campaign).not_to be_nil
             expect(campaign.location).to eq @location
             expect(campaign.seller).to eq @seller
-            expect(campaign.target_amount).to eq 100000
+            expect(campaign.target_amount).to eq 100_000
             expect(campaign.amount_raised).to eq 0
             expect(campaign.price_per_meal).to eq 500
 
