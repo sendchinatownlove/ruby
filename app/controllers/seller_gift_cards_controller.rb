@@ -39,8 +39,8 @@ class SellerGiftCardsController < ApplicationController
   def set_seller
     @seller = Seller.find_by!(seller_id: params[:seller_id])
 
-    #if @seller.gift_cards_access_token != params[:id]
-    #  raise ActiveRecord::RecordNotFound
-    #end
+    if @seller.gift_cards_access_token != params[:id]
+      raise ActiveRecord::RecordNotFound
+    end
   end
 end
