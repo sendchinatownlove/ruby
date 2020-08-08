@@ -7,7 +7,10 @@ class AddCampaignToItems < ActiveRecord::Migration[6.0]
       campaign = Campaign.find_by(seller_id: seller.id)
       # We want to modify all Items including the refunded ones to be associated
       # to the correct campaign
-      item = Item.joins(:gift_card_detail).where(items: { seller_id: seller.id, single_use: true })
+      item = Item.joins(:gift_card_detail).where(
+        seller_id: seller.id,
+        gift_card_detail: { single_use: true }
+      )
       item.update(campaign: campaign)
       item.payment_intent.update(campaign: campaign)
       # NB(justintmckibben): After we run this migration, single_use isn't the
