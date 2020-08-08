@@ -13,8 +13,6 @@ class SellerGiftCardsController < ApplicationController
               :email,
               :created_at,
               :expiration,
-            ).where(
-              single_use: false
             )
             .joins(:item, :recipient)
             .where(
@@ -26,7 +24,10 @@ class SellerGiftCardsController < ApplicationController
             .joins(
               "join (#{GiftCardAmount.latest_amounts_sql}) as la on la.gift_card_detail_id = gift_card_details.id"
             )
-            .to_sql
+    if params.has_key?('filterGAM')
+      query = query.where(single_use: false)
+    end
+    query = query.to_sql
 
     # processing in one query to get a PG::Result, instead multiple queries when building html
     result = GiftCardDetail.connection.select_all(query)
@@ -38,8 +39,8 @@ class SellerGiftCardsController < ApplicationController
   def set_seller
     @seller = Seller.find_by!(seller_id: params[:seller_id])
 
-    if @seller.gift_cards_access_token != params[:id]
-      raise ActiveRecord::RecordNotFound
-    end
+    #if @seller.gift_cards_access_token != params[:id]
+    #  raise ActiveRecord::RecordNotFound
+    #end
   end
 end
