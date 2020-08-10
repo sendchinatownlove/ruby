@@ -42,8 +42,9 @@ RSpec.describe Seller, type: :model do
   # Association test
   # ensure Seller model has a 1:m relationship with the MenuItem model
   it { should have_many(:menu_items).dependent(:destroy) }
+  it { should have_many(:delivery_options).dependent(:destroy) }
   it { should have_many(:fees).dependent(:destroy) }
-  it { should have_one(:distributor) }
+
   # Validation tests
 
   let!(:seller) do
@@ -223,7 +224,7 @@ RSpec.describe Seller, type: :model do
       end
 
       it 'returns gift card amounts' do
-        expect(seller.gift_card_amount).to eq(80_00)
+        expect(seller.gift_card_amount).to eq(100_00)
         expect(seller.num_gift_cards).to eq(2)
       end
 
@@ -233,7 +234,7 @@ RSpec.describe Seller, type: :model do
       end
 
       it 'returns total amount' do
-        expect(seller.amount_raised).to eq(290_00)
+        expect(seller.amount_raised).to eq(310_00)
         expect(seller.num_contributions).to eq(4)
       end
     end

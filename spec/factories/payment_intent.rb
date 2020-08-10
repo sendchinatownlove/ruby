@@ -10,6 +10,10 @@ FactoryBot.define do
     association :purchaser, factory: :contact
   end
 
+  trait :with_campaign do
+    association :campaign
+  end
+
   trait :with_line_items do
     line_items do
       %(

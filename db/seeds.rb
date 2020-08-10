@@ -94,29 +94,29 @@ end
     email: 'testytesterson@gmail.com',
     item_type: Item.gift_card,
     refunded: false,
-    single_use: false,
-    amounts: [10_000, 8000]
+    amounts: [10_000, 8000],
+    single_use: false
   },
   {
     email: 'testytesterson2@gmail.com',
     item_type: Item.gift_card,
     refunded: true,
-    single_use: false,
-    amounts: [7500, 3000]
+    amounts: [7500, 3000],
+    single_use: false
   },
   {
     email: 'testytesterson3@gmail.com',
     item_type: Item.gift_card,
     refunded: false,
-    single_use: false,
-    amounts: [5000]
+    amounts: [5000],
+    single_use: false
   },
   {
     email: 'testytesterson4@gmail.com',
     item_type: Item.gift_card,
     refunded: false,
-    single_use: true,
-    amounts: [1000]
+    amounts: [1000],
+    single_use: true
   }
 ].each do |attributes|
   seller = Seller.find_by(seller_id: 'shunfa-bakery')
@@ -151,3 +151,15 @@ end
   fee_attributes[:seller_id] = seller.id
   Fee.create!(fee_attributes)
 end
+
+seller = Seller.find_by(seller_id: 'shunfa-bakery')
+contact = Contact.find_or_create_by!(name: 'Apex for Youth', email: 'distributor@apexforyouth.com')
+distributor = Distributor.create contact: contact, image_url: 'apexforyouth.com', website_url: 'apexforyouth.com', name: 'Apex for Youth'
+location = Location.create(address1: '123 Mott St.', city: 'Zoo York', state: 'NY', zip_code: '12345')
+Campaign.create(
+  seller_id: seller.id,
+  distributor: distributor,
+  location: location,
+  active: true,
+  end_date: Time.now + 30.days
+)

@@ -17,7 +17,8 @@ module WebhookManager
         seller: seller,
         purchaser: payment_intent.purchaser,
         item_type: item_type,
-        payment_intent: payment_intent
+        payment_intent: payment_intent,
+        campaign_id: payment_intent.campaign_id
       )
     end
   end

@@ -3,10 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe SellersHelper, type: :helper do
-  let(:contact) { create :contact }
-  let(:seller) { create :seller, distributor: contact }
-
-  # TODO(jxue) add some tests including returned giftcards/donations
+  let(:seller) { create :seller, :with_campaign }
 
   describe 'generate_seller_json' do
     let(:expected_seller) do
@@ -36,7 +33,7 @@ RSpec.describe SellersHelper, type: :helper do
         'website_url': seller.website_url,
         'menu_url': seller.menu_url,
         'square_location_id': seller.square_location_id,
-        'distributor': contact,
+        'distributor': seller.campaigns.first.distributor.contact,
         'cost_per_meal': seller.cost_per_meal,
         'non_profit_location_id': seller.non_profit_location_id,
         'amount_raised': 0,
@@ -114,8 +111,8 @@ RSpec.describe SellersHelper, type: :helper do
         create(:donation_detail, item: item_donation2, amount: 10_00)
 
         expected_seller['donation_amount'] = 210_00
-        expected_seller['amount_raised'] = 290_00
-        expected_seller['gift_card_amount'] = 80_00
+        expected_seller['amount_raised'] = 310_00
+        expected_seller['gift_card_amount'] = 100_00
         expected_seller['num_contributions'] = 4
         expected_seller['num_gift_cards'] = 2
         expected_seller['num_donations'] = 2

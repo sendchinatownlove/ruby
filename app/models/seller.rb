@@ -60,8 +60,7 @@ class Seller < ApplicationRecord
   has_many :open_hour, dependent: :destroy
   has_many :items, dependent: :destroy
   has_many :fees, dependent: :destroy
-
-  has_one :distributor, class_name: 'Contact'
+  has_many :campaigns, dependent: :destroy
 
   validates_presence_of :seller_id
   validates_presence_of :square_location_id
@@ -87,7 +86,7 @@ class Seller < ApplicationRecord
                seller_id: id,
                refunded: false
              })
-      .joins("join (#{GiftCardAmount.latest_amounts_sql}) as la on la.gift_card_detail_id = gift_card_details.id")
+      .joins("join (#{GiftCardAmount.original_amounts_sql}) as la on la.gift_card_detail_id = gift_card_details.id")
       .sum(:value)
   end
 

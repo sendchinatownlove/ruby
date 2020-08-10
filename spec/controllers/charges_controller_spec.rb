@@ -7,8 +7,8 @@ RSpec.describe ChargesController, type: :controller do
 
   describe 'POST create' do
     let!(:mock_response) { MockApiResponseHelper::MockSquareApiResponse.new }
-    let!(:seller) { create :seller, :with_distributor, square_location_id: '1234', seller_id: 42 }
-    let!(:seller_non_prof) { create :seller, :with_distributor, non_profit_location_id: '4321', seller_id: 43 }
+    let!(:seller) { create :seller, :with_campaign, square_location_id: '1234', seller_id: 42, cost_per_meal: 50 }
+    let!(:seller_non_prof) { create :seller, :with_campaign, non_profit_location_id: '4321', seller_id: 43 }
 
     context 'when seller has a non_profit_location_id' do
       it 'should create a payment_intent using the non_profit_location_id' do
