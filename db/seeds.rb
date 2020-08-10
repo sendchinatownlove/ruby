@@ -163,3 +163,21 @@ Campaign.create(
   active: true,
   end_date: Time.now + 30.days
 )
+
+for i in 0..6
+  name = Faker::Name.name
+  contact = Contact.find_or_create_by!(email: Faker::Internet.email(name: name), name: name)
+
+  ticket_id = "#{rand(1000...9999)}-#{Faker::Alphanumeric.alpha(number: 1).upcase}"
+  participant = Seller.find_by(seller_id: '46-mott')
+  sponsor = i.even? ? Seller.find_by(seller_id: 'shunfa-bakery') : nil
+  redeemed_at = i % 3 == 0 ? Time.now - i.days : nil
+
+  Ticket.create!(
+    ticket_id: ticket_id,
+    contact: contact,
+    participating_seller: participant,
+    sponsor_seller: sponsor,
+    redeemed_at: redeemed_at
+  )
+end
