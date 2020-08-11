@@ -245,6 +245,7 @@ ActiveRecord::Schema.define(version: 2020_08_10_231217) do
   add_foreign_key "items", "sellers"
   add_foreign_key "locations", "sellers"
   add_foreign_key "menu_items", "sellers"
+  add_foreign_key "open_hours", "sellers"
   add_foreign_key "payment_intents", "contacts", column: "purchaser_id"
   add_foreign_key "payment_intents", "contacts", column: "recipient_id"
   add_foreign_key "refunds", "payment_intents"
