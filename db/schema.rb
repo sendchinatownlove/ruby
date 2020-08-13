@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_08_054745) do
+ActiveRecord::Schema.define(version: 2020_08_13_020145) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -34,10 +34,12 @@ ActiveRecord::Schema.define(version: 2020_08_08_054745) do
   end
 
   create_table "contacts", force: :cascade do |t|
-    t.string "email"
+    t.string "email", null: false
     t.boolean "is_subscribed", default: true, null: false
     t.string "name"
-    t.index ["email"], name: "index_contacts_on_email"
+    t.string "instagram"
+    t.string "rewards_redemption_access_token"
+    t.index ["email"], name: "index_contacts_on_email", unique: true
   end
 
   create_table "delivery_options", force: :cascade do |t|
