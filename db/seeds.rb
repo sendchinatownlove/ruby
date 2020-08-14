@@ -155,7 +155,7 @@ end
 seller = Seller.find_by(seller_id: 'shunfa-bakery')
 contact = Contact.find_or_create_by!(name: 'Apex for Youth', email: 'distributor@apexforyouth.com')
 distributor = Distributor.create contact: contact, image_url: 'apexforyouth.com', website_url: 'apexforyouth.com', name: 'Apex for Youth'
-location = Location.create(address1: '123 Mott St.', city: 'Zoo York', state: 'NY', zip_code: '12345')
+location = Location.create(address1: '123 Mott St.', city: 'Zoo York', neighborhood: 'Chinatown', state: 'NY', zip_code: '12345')
 Campaign.create(
   seller_id: seller.id,
   distributor: distributor,
