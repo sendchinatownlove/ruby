@@ -8,6 +8,7 @@
 #  address1     :string           not null
 #  address2     :string
 #  city         :string           not null
+#  neighborhood :string
 #  phone_number :string
 #  state        :string           not null
 #  zip_code     :string           not null

@@ -34,10 +34,12 @@ ActiveRecord::Schema.define(version: 2020_08_14_172026) do
   end
 
   create_table "contacts", force: :cascade do |t|
-    t.string "email"
+    t.string "email", null: false
     t.boolean "is_subscribed", default: true, null: false
     t.string "name"
-    t.index ["email"], name: "index_contacts_on_email"
+    t.string "instagram"
+    t.string "rewards_redemption_access_token"
+    t.index ["email"], name: "index_contacts_on_email", unique: true
   end
 
   create_table "delivery_options", force: :cascade do |t|
@@ -134,6 +136,7 @@ ActiveRecord::Schema.define(version: 2020_08_14_172026) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "phone_number"
+    t.string "neighborhood"
     t.index ["seller_id"], name: "index_locations_on_seller_id"
   end
 

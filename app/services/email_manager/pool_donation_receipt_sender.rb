@@ -21,7 +21,7 @@ module EmailManager
            '<h1>Thank you for your donation to Send Chinatown Love!</h1>' \
            '<p> Donation amount: <b>$' + amount_string + '</b></p>' \
            '<p> Square receipt: ' + payment_intent.receipt_url + '</p>' \
-           '<p> You\'re donation will be distributed evenly between our merchants. Sending ' \
+           '<p> Your donation will be distributed evenly between our merchants. Sending ' \
            '  thanks from us and from Chinatown for your support! </p>' \
            '<p> Love,<p>' \
            '<p> the Send Chinatown Love team</p>' \
