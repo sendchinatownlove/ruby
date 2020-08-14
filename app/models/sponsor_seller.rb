@@ -6,11 +6,11 @@
 #  logo_url    :string
 #  name        :string
 #  reward      :string
-#  reward_cost :integer
+#  reward_cost :integer          default(3), not null
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #  location_id :bigint
 #
 class SponsorSeller < ApplicationRecord
-    validates_presence_of :logo_url, :name, :reward, :reward_cost
+    validates_presence_of :reward_cost
 end

@@ -11,5 +11,5 @@
 #  seller_id      :bigint
 #
 class ParticipatingSeller < ApplicationRecord
-    validates_presence_of :name, :tickets_secret
+    validates_presence_of :name
 end
