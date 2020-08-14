@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_14_034110) do
+ActiveRecord::Schema.define(version: 2020_08_14_172026) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -162,6 +162,15 @@ ActiveRecord::Schema.define(version: 2020_08_14_034110) do
     t.index ["seller_id"], name: "index_open_hours_on_seller_id"
   end
 
+  create_table "participating_sellers", force: :cascade do |t|
+    t.string "name"
+    t.bigint "seller_id"
+    t.string "stamp_url"
+    t.string "tickets_secret"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "payment_intents", force: :cascade do |t|
     t.text "line_items"
     t.datetime "created_at", precision: 6, null: false
@@ -228,6 +237,16 @@ ActiveRecord::Schema.define(version: 2020_08_14_034110) do
     t.string "gift_cards_access_token", default: "", null: false
     t.index ["gift_cards_access_token"], name: "index_sellers_on_gift_cards_access_token", unique: true
     t.index ["seller_id"], name: "index_sellers_on_seller_id"
+  end
+
+  create_table "sponsor_sellers", force: :cascade do |t|
+    t.string "name"
+    t.bigint "location_id"
+    t.string "logo_url"
+    t.string "reward"
+    t.integer "reward_cost", default: 3, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   add_foreign_key "campaigns", "locations"
