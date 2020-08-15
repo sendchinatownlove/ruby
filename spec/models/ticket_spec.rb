@@ -9,7 +9,7 @@
 #  redeemed_at             :date
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
-#  contact_id              :bigint
+#  contact_id              :bigint           not null
 #  participating_seller_id :bigint           not null
 #  sponsor_seller_id       :bigint
 #  ticket_id               :string
@@ -23,8 +23,8 @@
 # Foreign Keys
 #
 #  fk_rails_...  (contact_id => contacts.id)
-#  fk_rails_...  (participating_seller_id => sellers.id)
-#  fk_rails_...  (sponsor_seller_id => sellers.id)
+#  fk_rails_...  (participating_seller_id => participating_sellers.id)
+#  fk_rails_...  (sponsor_seller_id => sponsor_sellers.id)
 #
 require 'rails_helper'
 

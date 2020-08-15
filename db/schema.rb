@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_15_013131) do
+ActiveRecord::Schema.define(version: 2020_08_15_211059) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -250,6 +250,20 @@ ActiveRecord::Schema.define(version: 2020_08_15_013131) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "tickets", force: :cascade do |t|
+    t.bigint "contact_id", null: false
+    t.string "ticket_id"
+    t.bigint "participating_seller_id", null: false
+    t.bigint "sponsor_seller_id"
+    t.date "redeemed_at"
+    t.date "expiration"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["contact_id"], name: "index_tickets_on_contact_id"
+    t.index ["participating_seller_id"], name: "index_tickets_on_participating_seller_id"
+    t.index ["sponsor_seller_id"], name: "index_tickets_on_sponsor_seller_id"
+  end
+
   add_foreign_key "campaigns", "locations"
   add_foreign_key "campaigns", "sellers"
   add_foreign_key "delivery_options", "sellers"
@@ -269,4 +283,7 @@ ActiveRecord::Schema.define(version: 2020_08_15_013131) do
   add_foreign_key "payment_intents", "contacts", column: "purchaser_id"
   add_foreign_key "payment_intents", "contacts", column: "recipient_id"
   add_foreign_key "refunds", "payment_intents"
+  add_foreign_key "tickets", "contacts"
+  add_foreign_key "tickets", "participating_sellers"
+  add_foreign_key "tickets", "sponsor_sellers"
 end

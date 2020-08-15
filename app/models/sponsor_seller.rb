@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: sponsor_sellers
@@ -12,5 +14,5 @@
 #  location_id :bigint
 #
 class SponsorSeller < ApplicationRecord
-    validates_presence_of :reward_cost
+  validates_presence_of :reward_cost
 end

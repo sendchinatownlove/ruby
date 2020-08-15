@@ -9,7 +9,7 @@
 #  redeemed_at             :date
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
-#  contact_id              :bigint
+#  contact_id              :bigint           not null
 #  participating_seller_id :bigint           not null
 #  sponsor_seller_id       :bigint
 #  ticket_id               :string
@@ -23,13 +23,13 @@
 # Foreign Keys
 #
 #  fk_rails_...  (contact_id => contacts.id)
-#  fk_rails_...  (participating_seller_id => sellers.id)
-#  fk_rails_...  (sponsor_seller_id => sellers.id)
+#  fk_rails_...  (participating_seller_id => participating_sellers.id)
+#  fk_rails_...  (sponsor_seller_id => sponsor_sellers.id)
 #
 class Ticket < ApplicationRecord
   belongs_to :contact
-  belongs_to :participating_seller, class_name: :Seller, foreign_key: :participating_seller_id
-  belongs_to :sponsor_seller, class_name: :Seller, foreign_key: :sponsor_seller_id, optional: true
+  belongs_to :participating_seller
+  belongs_to :sponsor_seller, optional: true
 
   validates_presence_of :ticket_id, :participating_seller_id
   validates_uniqueness_of :ticket_id
