@@ -115,7 +115,7 @@ end
     email: 'testytesterson4@gmail.com',
     item_type: Item.gift_card,
     refunded: false,
-    amounts: [5000],
+    amounts: [1000],
     single_use: true
   }
 ].each do |attributes|

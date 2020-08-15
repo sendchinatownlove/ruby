@@ -24,7 +24,8 @@ class SellerGiftCardsController < ApplicationController
             .joins(
               "join (#{GiftCardAmount.latest_amounts_sql}) as la on la.gift_card_detail_id = gift_card_details.id"
             )
-            .to_sql
+    query = query.where(single_use: false) if params.key?('filterGAM')
+    query = query.to_sql
 
     # processing in one query to get a PG::Result, instead multiple queries when building html
     result = GiftCardDetail.connection.select_all(query)
