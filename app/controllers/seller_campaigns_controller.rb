@@ -8,7 +8,7 @@ class SellerCampaignsController < ApplicationController
     @campaigns = if params[:active].present?
                    valid_campaigns.order(:end_date).active(params[:active])
                  else
-                   valid_campaigns.order(:end_date).all
+                   valid_campaigns.order(:end_date)
     end
 
     json_response(campaigns_json)

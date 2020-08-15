@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'SellerCampaigns', type: :request do
@@ -13,6 +15,13 @@ RSpec.describe 'SellerCampaigns', type: :request do
     @inactive_campaign = create(
       :campaign,
       active: false,
+      seller_id: @seller.id,
+      location_id: @location.id
+    )
+    @invalid_campaign = create(
+      :campaign,
+      active: false,
+      valid: false,
       seller_id: @seller.id,
       location_id: @location.id
     )
@@ -33,12 +42,15 @@ RSpec.describe 'SellerCampaigns', type: :request do
       context 'Without an active flag' do
         before { get "/sellers/#{seller_id}/campaigns" }
 
-        it 'Returns all campaigns for the seller' do
+        it 'Returns all valid campaigns for the seller' do
           expect(json).not_to be_empty
           expect(json.size).to eq(2)
 
-          seller_ids = json.map{|campaign| campaign['seller_id'] }
-          expect(seller_ids.all? {|id| id == seller_id}).to be true
+          seller_ids = json.map { |campaign| campaign['seller_id'] }
+          expect(seller_ids.all? { |id| id == seller_id }).to be true
+
+          valid_states = json.map { |campaign| campaign['valid'] }
+          expect(valid_states.all?).to be true
         end
 
         it 'Returns 200' do
@@ -66,7 +78,7 @@ RSpec.describe 'SellerCampaigns', type: :request do
           expect(json).not_to be_empty
           expect(json[0]['id']).to eq(@inactive_campaign.id)
         end
-  
+
         it 'Returns 200' do
           expect(response).to have_http_status(200)
         end
