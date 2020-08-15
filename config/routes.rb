@@ -78,6 +78,8 @@
 Rails.application.routes.draw do
   resources :campaigns do
   end
+  resources :contacts do
+  end
   resources :charges do
   end
   resources :distributors do

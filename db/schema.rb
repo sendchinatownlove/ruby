@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_08_054745) do
+ActiveRecord::Schema.define(version: 2020_08_15_013131) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -34,10 +34,12 @@ ActiveRecord::Schema.define(version: 2020_08_08_054745) do
   end
 
   create_table "contacts", force: :cascade do |t|
-    t.string "email"
+    t.string "email", null: false
     t.boolean "is_subscribed", default: true, null: false
     t.string "name"
-    t.index ["email"], name: "index_contacts_on_email"
+    t.string "instagram"
+    t.string "rewards_redemption_access_token"
+    t.index ["email"], name: "index_contacts_on_email", unique: true
   end
 
   create_table "delivery_options", force: :cascade do |t|
@@ -134,6 +136,8 @@ ActiveRecord::Schema.define(version: 2020_08_08_054745) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "phone_number"
+    t.string "neighborhood"
+    t.string "borough"
     t.index ["seller_id"], name: "index_locations_on_seller_id"
   end
 
@@ -157,6 +161,15 @@ ActiveRecord::Schema.define(version: 2020_08_08_054745) do
     t.integer "open_day"
     t.integer "close_day"
     t.index ["seller_id"], name: "index_open_hours_on_seller_id"
+  end
+
+  create_table "participating_sellers", force: :cascade do |t|
+    t.string "name"
+    t.bigint "seller_id"
+    t.string "stamp_url"
+    t.string "tickets_secret"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "payment_intents", force: :cascade do |t|
@@ -225,6 +238,16 @@ ActiveRecord::Schema.define(version: 2020_08_08_054745) do
     t.string "gift_cards_access_token", default: "", null: false
     t.index ["gift_cards_access_token"], name: "index_sellers_on_gift_cards_access_token", unique: true
     t.index ["seller_id"], name: "index_sellers_on_seller_id"
+  end
+
+  create_table "sponsor_sellers", force: :cascade do |t|
+    t.string "name"
+    t.bigint "location_id"
+    t.string "logo_url"
+    t.string "reward"
+    t.integer "reward_cost", default: 3, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   add_foreign_key "campaigns", "locations"
