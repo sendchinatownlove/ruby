@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class DistributorsController < ApplicationController
-  before_action :set_distributor, only: %i[show]
+  before_action :set_distributor, only: %i[show update]
 
   # POST /distributors
   def create
@@ -13,10 +13,25 @@ class DistributorsController < ApplicationController
     json_response(@distributor)
   end
 
+  # PUT /distributors/:id
+  def update
+    @distributor.update(update_params)
+    json_response(@distributor)
+  end
+
   private
 
   def create_params
     params.require(:contact_id)
+    params.permit(
+      :website_url,
+      :image_url,
+      :contact_id,
+      :name
+    )
+  end
+
+  def update_params
     params.permit(
       :website_url,
       :image_url,
