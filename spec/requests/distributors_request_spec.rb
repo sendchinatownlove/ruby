@@ -90,4 +90,50 @@ RSpec.describe 'Distributors', type: :request do
       end
     end
   end
+
+  describe 'PUT /distributors/:id' do
+    let!(:distributor) { create :distributor }
+    let!(:contact) { create :contact }
+    before do
+      put(
+        "/distributors/#{distributor_id}",
+        params: attrs,
+        as: :json
+      )
+    end
+
+    context 'with valid attrs' do
+      let(:distributor_id) { distributor.id }
+      let(:attrs) do
+        {
+          website_url: 'sendchinatownlove.com',
+          image_url: 'sendchinatownlove.com/lalalllala',
+          name: 'Send Chinatown Love',
+          contact_id: contact.id,
+        }
+      end
+
+      it 'updates the distributor' do
+        distributor = Distributor.find_by(contact_id: attrs[:contact_id])
+        expect(distributor).not_to be_nil
+        expect(distributor.image_url).to eq attrs[:image_url]
+        expect(distributor.website_url).to eq attrs[:website_url]
+        expect(distributor.contact_id).to eq attrs[:contact_id]
+        expect(distributor.name).to eq attrs[:name]
+      end
+
+      it 'returns the updated distributor' do
+        distributor = Distributor.find_by(contact_id: attrs[:contact_id])
+        expect(json['image_url']).to eq attrs[:image_url]
+        expect(json['website_url']).to eq attrs[:website_url]
+        expect(json['name']).to eq attrs[:name]
+        expect(json['contact_id']).to eq attrs[:contact_id]
+        expect(json['id']).to eq distributor.id
+      end
+
+      it 'returns status code 200' do
+        expect(response).to have_http_status(200)
+      end
+    end
+  end
 end
