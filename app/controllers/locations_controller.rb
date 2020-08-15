@@ -37,7 +37,7 @@ class LocationsController < ApplicationController
   end
 
   def update_location_params
-    params.permit(:city, :state, :address1, :address2, :zip_code, :phone_number, :neighborhood)
+    params.permit(:city, :state, :address1, :address2, :zip_code, :phone_number, :neighborhood, :borough)
   end
 
   def set_seller

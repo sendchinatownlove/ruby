@@ -7,6 +7,7 @@
 #  id           :bigint           not null, primary key
 #  address1     :string           not null
 #  address2     :string
+#  borough      :string
 #  city         :string           not null
 #  neighborhood :string
 #  phone_number :string
