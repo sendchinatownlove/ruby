@@ -12,7 +12,7 @@
 #  contact_id              :bigint           not null
 #  participating_seller_id :bigint           not null
 #  sponsor_seller_id       :bigint
-#  ticket_id               :string
+#  ticket_id               :string           not null
 #
 # Indexes
 #

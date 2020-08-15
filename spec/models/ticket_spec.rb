@@ -12,7 +12,7 @@
 #  contact_id              :bigint           not null
 #  participating_seller_id :bigint           not null
 #  sponsor_seller_id       :bigint
-#  ticket_id               :string
+#  ticket_id               :string           not null
 #
 # Indexes
 #
@@ -32,4 +32,6 @@ RSpec.describe Ticket, type: :model do
   # Association tests
   it { should belong_to(:contact) }
   it { should belong_to(:participating_seller) }
+  it { should validate_uniqueness_of(:ticket_id) }
+  it { should validate_presence_of(:ticket_id) }
 end

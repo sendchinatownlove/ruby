@@ -252,7 +252,7 @@ ActiveRecord::Schema.define(version: 2020_08_15_211059) do
 
   create_table "tickets", force: :cascade do |t|
     t.bigint "contact_id", null: false
-    t.string "ticket_id"
+    t.string "ticket_id", null: false
     t.bigint "participating_seller_id", null: false
     t.bigint "sponsor_seller_id"
     t.date "redeemed_at"
