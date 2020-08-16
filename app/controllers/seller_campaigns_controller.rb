@@ -35,7 +35,7 @@ class SellerCampaignsController < ApplicationController
   def valid_campaigns
     Campaign.where(
       valid: true,
-      seller_id: @seller.id,
+      seller_id: @seller.id
     )
   end
 end
