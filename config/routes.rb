@@ -80,6 +80,7 @@ Rails.application.routes.draw do
   resources :campaigns do
   end
   resources :contacts do
+    resources :tickets, controller: 'contact_tickets'
   end
   resources :charges do
   end
