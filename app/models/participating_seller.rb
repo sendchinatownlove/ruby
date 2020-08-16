@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: participating_sellers
@@ -11,5 +13,5 @@
 #  seller_id      :bigint
 #
 class ParticipatingSeller < ApplicationRecord
-    validates_presence_of :name
+  validates_presence_of :name
 end

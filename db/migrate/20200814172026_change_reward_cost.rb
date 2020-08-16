@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ChangeRewardCost < ActiveRecord::Migration[6.0]
   def change
     change_column_default :sponsor_sellers, :reward_cost, from: nil, to: 3

@@ -109,7 +109,7 @@ RSpec.describe 'Distributors', type: :request do
           website_url: 'sendchinatownlove.com',
           image_url: 'sendchinatownlove.com/lalalllala',
           name: 'Send Chinatown Love',
-          contact_id: contact.id,
+          contact_id: contact.id
         }
       end
 

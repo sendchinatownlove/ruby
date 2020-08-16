@@ -163,3 +163,43 @@ Campaign.create(
   active: true,
   end_date: Time.now + 30.days
 )
+
+[
+  {
+    name: '46 Mott',
+    seller_id: '2',
+    stamp_url: 'http://example.com/placeholder.jpg'
+  }
+].each do |attributes|
+  attributes[:tickets_secret] = Faker::Internet.uuid
+  ParticipatingSeller.find_or_create_by!(name: attributes[:name]).update!(attributes)
+end
+[
+  {
+    name: "Boys Don't Cry",
+    location_id: '2',
+    logo_url: 'http://example.com/placeholder.jpg',
+    reward: 'One free shot',
+    reward_cost: 3
+  }
+].each do |attributes|
+  SponsorSeller.find_or_create_by!(name: attributes[:name]).update!(attributes)
+end
+
+(0..6).each do |i|
+  name = Faker::Name.name
+  contact = Contact.find_or_create_by!(email: Faker::Internet.email(name: name), name: name)
+
+  ticket_id = Faker::Alphanumeric.alphanumeric(number: 5).upcase.insert(4, '-')
+  participant = ParticipatingSeller.find_by(seller_id: 2)
+  sponsor = i.even? ? SponsorSeller.find_by(location_id: 2) : nil
+  redeemed_at = i % 3 == 0 ? Time.now - i.days : nil
+
+  Ticket.create!(
+    ticket_id: ticket_id,
+    contact: contact,
+    participating_seller: participant,
+    sponsor_seller: sponsor,
+    redeemed_at: redeemed_at
+  )
+end
