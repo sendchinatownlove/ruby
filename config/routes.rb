@@ -39,6 +39,7 @@
 #                                       PATCH  /sellers/:seller_id/items/:id(.:format)                                                  items#update
 #                                       PUT    /sellers/:seller_id/items/:id(.:format)                                                  items#update
 #                                       DELETE /sellers/:seller_id/items/:id(.:format)                                                  items#destroy
+#                      seller_campaigns GET    /sellers/:seller_id/campaigns(.:format)                                                  seller_campaigns#index
 #                               sellers GET    /sellers(.:format)                                                                       sellers#index
 #                                       POST   /sellers(.:format)                                                                       sellers#create
 #                                seller GET    /sellers/:id(.:format)                                                                   sellers#show
@@ -90,6 +91,7 @@ Rails.application.routes.draw do
   end
   resources :sellers do
     resources :locations, :menu_items, :items, :open_hour, :delivery_options
+    resources :campaigns, controller: 'seller_campaigns', only: [:index]
     resources :gift_cards, controller: 'seller_gift_cards'
   end
   resources :webhooks do
