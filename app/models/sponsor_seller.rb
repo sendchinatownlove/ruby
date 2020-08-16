@@ -15,4 +15,5 @@
 #
 class SponsorSeller < ApplicationRecord
   validates_presence_of :reward_cost
+  belongs_to :location, optional: true
 end

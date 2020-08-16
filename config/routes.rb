@@ -94,6 +94,8 @@ Rails.application.routes.draw do
     resources :campaigns, controller: 'seller_campaigns', only: [:index]
     resources :gift_cards, controller: 'seller_gift_cards'
   end
+  resources :sponsor_sellers do
+  end
   resources :webhooks do
   end
 end
