@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-RSpec.describe "SponsorSellers", type: :request do
+RSpec.describe 'SponsorSellers', type: :request do
   # Test suite for GET /sellers
   describe 'GET /sponsor_sellers' do
     let!(:sponsor_seller1) { create :sponsor_seller }
@@ -179,5 +181,4 @@ RSpec.describe "SponsorSellers", type: :request do
       end
     end
   end
-
 end

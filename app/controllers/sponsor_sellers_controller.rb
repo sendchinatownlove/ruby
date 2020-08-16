@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SponsorSellersController < ApplicationController
   before_action :set_sponsor_seller, only: %i[show update]
 
