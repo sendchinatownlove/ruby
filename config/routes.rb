@@ -77,10 +77,6 @@
 #                  rails_direct_uploads POST   /rails/active_storage/direct_uploads(.:format)                                           active_storage/direct_uploads#create
 
 Rails.application.routes.draw do
-  get 'participating_sellers/index'
-  get 'participating_sellers/create'
-  get 'participating_sellers/show'
-  get 'participating_sellers/update'
   resources :campaigns do
   end
   resources :contacts do
