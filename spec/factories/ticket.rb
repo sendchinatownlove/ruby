@@ -19,6 +19,5 @@ FactoryBot.define do
     end
     association :contact
     association :participating_seller
-    association :sponsor_seller
   end
 end
