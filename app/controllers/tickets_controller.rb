@@ -18,21 +18,19 @@ class TicketsController < ApplicationController
 
   # POST /tickets
   def create
-
     puts(params[:number_of_tickets])
     savedCorrectly = true
     createdTickets = []
 
-    (1..params[:number_of_tickets]).each do |i|
+    (1..params[:number_of_tickets]).each do |_i|
       attributes = {}
       attributes[:ticket_id] = SecureRandom.alphanumeric(5).upcase.insert(4, '-')
       attributes[:participating_seller] = @participating_seller
-  
+
       @ticket = Ticket.new(attributes)
-      savedCorrectly = savedCorrectly && @ticket.save
+      savedCorrectly &&= @ticket.save
       createdTickets << @ticket
     end
-
 
     if savedCorrectly
       render json: createdTickets, status: :created
