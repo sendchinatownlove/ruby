@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 class TicketsController < ApplicationController
-  before_action :set_ticket, only: %i[show update destroy]
+  before_action :set_ticket, only: %i[show update]
+  before_action :set_participating_seller, only: %i[create]
 
   # GET /tickets
   def index
@@ -17,19 +18,31 @@ class TicketsController < ApplicationController
 
   # POST /tickets
   def create
-    @ticket = Ticket.new(ticket_params)
 
-    if @ticket.save
-      render json: @ticket, status: :created, location: @ticket
+    puts(params[:number_of_tickets])
+    savedCorrectly = true
+    createdTickets = []
+
+    (1..params[:number_of_tickets]).each do |i|
+      attributes = {}
+      attributes[:ticket_id] = SecureRandom.alphanumeric(5).upcase.insert(4, '-')
+      attributes[:participating_seller] = @participating_seller
+  
+      @ticket = Ticket.new(attributes)
+      savedCorrectly = savedCorrectly && @ticket.save
+      createdTickets << @ticket
+    end
+
+
+    if savedCorrectly
+      render json: createdTickets, status: :created
     else
-      render json: @ticket.errors, status: :unprocessable_entity
+      render 'Error', status: :unprocessable_entity
     end
   end
 
   # PATCH/PUT /tickets/1
   def update
-    # params.permit(:contact_id)
-
     if @ticket.update(ticket_params)
       render json: @ticket
     else
@@ -42,6 +55,10 @@ class TicketsController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_ticket
     @ticket = Ticket.find(params[:id])
+  end
+
+  def set_participating_seller
+    @participating_seller = ParticipatingSeller.find_by!(id: params[:participating_seller_id])
   end
 
   # Only allow a trusted parameter "white list" through.

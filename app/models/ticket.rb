@@ -9,7 +9,7 @@
 #  redeemed_at             :date
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
-#  contact_id              :bigint           not null
+#  contact_id              :bigint
 #  participating_seller_id :bigint           not null
 #  sponsor_seller_id       :bigint
 #  ticket_id               :string           not null
