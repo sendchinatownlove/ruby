@@ -41,8 +41,8 @@ RSpec.describe "ParticipatingSellerTickets", type: :request do
       end
     end
 
-    context 'with invalid gift_cards_access_token' do
-      let(:tickets_secret) { participating_seller2.id }
+    context 'with invalid tickets_secret' do
+      let(:tickets_secret) { participating_seller2.tickets_secret }
 
       it 'returns 404' do
         expect(response).to have_http_status(404)
@@ -50,7 +50,7 @@ RSpec.describe "ParticipatingSellerTickets", type: :request do
     end
   end
 
-  context 'with invalid seller_id' do
+  context 'with invalid participating_seller_id' do
     before { get "/participating_sellers/#{participating_seller_id}/tickets/#{tickets_secret}" }
     let(:participating_seller_id) { 'blahblahblah' }
     let(:tickets_secret) { participating_seller1.tickets_secret }

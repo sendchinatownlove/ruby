@@ -28,7 +28,6 @@ RSpec.describe "ParticipatingSellers", type: :request do
         expect(json['id']).to eq participating_seller.id
         expect(json['seller_id']).to eq participating_seller.seller_id
         expect(json['stamp_url']).to eq participating_seller.stamp_url
-        expect(json['tickets_secret']).to eq participating_seller.tickets_secret
         expect(json['name']).to eq participating_seller.name
       end
 
@@ -66,7 +65,6 @@ RSpec.describe "ParticipatingSellers", type: :request do
           seller_id: seller.id,
           name: '46 Mott',
           stamp_url: 'sendchinatownlove.com/test_stamp_url',
-          tickets_secret: 'supersecret',
         }
       end
 
@@ -76,12 +74,10 @@ RSpec.describe "ParticipatingSellers", type: :request do
         expect(json['id']).to eq participating_seller.id
         expect(json['name']).to eq participating_seller.name
         expect(json['stamp_url']).to eq participating_seller.stamp_url
-        expect(json['tickets_secret']).to eq participating_seller.tickets_secret
 
         expect(participating_seller).not_to be_nil
         expect(participating_seller.name).to eq attrs[:name]
         expect(participating_seller.stamp_url).to eq attrs[:stamp_url]
-        expect(participating_seller.tickets_secret).to eq attrs[:tickets_secret]
       end
 
       it 'returns status code 201' do
@@ -95,7 +91,6 @@ RSpec.describe "ParticipatingSellers", type: :request do
           seller_id: seller.id,
           name: '46 Mott',
           stamp_url: 'sendchinatownlove.com/test_stamp_url',
-          tickets_secret: 'supersecret',
           extra: 'extra read all about it'
         }
       end
@@ -106,12 +101,10 @@ RSpec.describe "ParticipatingSellers", type: :request do
         expect(json['id']).to eq participating_seller.id
         expect(json['name']).to eq participating_seller.name
         expect(json['stamp_url']).to eq participating_seller.stamp_url
-        expect(json['tickets_secret']).to eq participating_seller.tickets_secret
 
         expect(participating_seller).not_to be_nil
         expect(participating_seller.name).to eq attrs[:name]
         expect(participating_seller.stamp_url).to eq attrs[:stamp_url]
-        expect(participating_seller.tickets_secret).to eq attrs[:tickets_secret]
       end
 
       it 'returns status code 201' do
@@ -138,7 +131,6 @@ RSpec.describe "ParticipatingSellers", type: :request do
           seller_id: seller.id,
           name: '46 Mott',
           stamp_url: 'sendchinatownlove.com/test_stamp_url',
-          tickets_secret: 'supersecret',
         }
       end
 
@@ -147,7 +139,6 @@ RSpec.describe "ParticipatingSellers", type: :request do
         expect(participating_seller).not_to be_nil
         expect(participating_seller.name).to eq attrs[:name]
         expect(participating_seller.stamp_url).to eq attrs[:stamp_url]
-        expect(participating_seller.tickets_secret).to eq attrs[:tickets_secret]
       end
 
       it 'returns the updated distributor' do
@@ -155,7 +146,6 @@ RSpec.describe "ParticipatingSellers", type: :request do
         expect(json['id']).to eq participating_seller.id
         expect(json['name']).to eq participating_seller.name
         expect(json['stamp_url']).to eq participating_seller.stamp_url
-        expect(json['tickets_secret']).to eq participating_seller.tickets_secret
       end
 
       it 'returns status code 200' do

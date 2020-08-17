@@ -28,11 +28,15 @@ class ParticipatingSellersController < ApplicationController
       :name,
       :seller_id,
       :stamp_url,
-      :tickets_secret
     )
   end
 
   def set_participating_seller
     @participating_seller = ParticipatingSeller.find(params[:id])
+  end
+
+  def participating_seller_json
+    # Do not return the tickets_secret
+    json = participating_seller.as_json.except('tickets_secret')
   end
 end

@@ -1,7 +1,7 @@
 class ParticipatingSellerTicketsController < ApplicationController
   before_action :set_participating_seller
 
-  # GET /participating_sellers/:participating_seller_id/tickets/:access_token
+  # GET /participating_sellers/:participating_seller_id/tickets/:tickets_secret
   def show
     # NB(justintmckibben): Do we want to hide the tickets that have already
     #                      been redeemed aka the ones with associated contacts?
