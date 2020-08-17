@@ -27,7 +27,7 @@
 #  fk_rails_...  (sponsor_seller_id => sponsor_sellers.id)
 #
 class Ticket < ApplicationRecord
-  belongs_to :contact
+  belongs_to :contact, optional: true
   belongs_to :participating_seller
   belongs_to :sponsor_seller, optional: true
 

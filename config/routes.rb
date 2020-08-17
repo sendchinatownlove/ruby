@@ -96,6 +96,8 @@ Rails.application.routes.draw do
   end
   resources :sponsor_sellers do
   end
+  resources :tickets do
+  end
   resources :webhooks do
   end
 end
