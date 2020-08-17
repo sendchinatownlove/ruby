@@ -90,6 +90,9 @@ Rails.application.routes.draw do
   end
   resources :gift_cards do
   end
+  resources :participating_sellers do
+    resources :tickets, controller: 'participating_seller_tickets'
+  end
   resources :sellers do
     resources :locations, :menu_items, :items, :open_hour, :delivery_options
     resources :campaigns, controller: 'seller_campaigns', only: [:index]
