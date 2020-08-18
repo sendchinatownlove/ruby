@@ -14,4 +14,17 @@
 #
 class ParticipatingSeller < ApplicationRecord
   validates_presence_of :name
+  
+  before_create :set_tickets_secret
+
+  def set_tickets_secret
+    self.tickets_secret = generate_tickets_secret
+  end
+
+  def generate_tickets_secret
+    loop do
+      secret = SecureRandom.uuid
+      break secret unless ParticipatingSeller.where(tickets_secret: secret).exists?
+    end
+  end
 end
