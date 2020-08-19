@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :ticket do
-    ticket_id { Faker::Alphanumeric.alphanumeric(number: 5).upcase.insert(4, '-') }
+    ticket_id { Ticket.generate_ticket_id }
 
     redeemed_at do
       Faker::Date.between(

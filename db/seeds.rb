@@ -190,7 +190,7 @@ end
   name = Faker::Name.name
   contact = Contact.find_or_create_by!(email: Faker::Internet.email(name: name), name: name)
 
-  ticket_id = Faker::Alphanumeric.alphanumeric(number: 5).upcase.insert(4, '-')
+  ticket_id = Ticket.generate_ticket_id
   participant = ParticipatingSeller.find_by(seller_id: 2)
   sponsor = i.even? ? SponsorSeller.find_by(location_id: 2) : nil
   redeemed_at = i % 3 == 0 ? Time.now - i.days : nil

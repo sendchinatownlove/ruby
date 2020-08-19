@@ -27,7 +27,7 @@ class TicketsController < ApplicationController
       ActiveRecord::Base.transaction do
         (1..numTix).each do
           attributes = {}
-          attributes[:ticket_id] = SecureRandom.alphanumeric(5).upcase.insert(4, '-')
+          attributes[:ticket_id] = Ticket.generate_ticket_id
           attributes[:participating_seller] = @participating_seller
     
           @ticket = Ticket.new(attributes)
