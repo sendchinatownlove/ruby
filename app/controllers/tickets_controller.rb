@@ -9,12 +9,12 @@ class TicketsController < ApplicationController
   def index
     @tickets = Ticket.all
 
-    render json: @tickets
+    json_response(@tickets)
   end
 
   # GET /tickets/1
   def show
-    render json: @ticket
+    json_response(@ticket)
   end
 
   # POST /tickets
@@ -41,18 +41,18 @@ class TicketsController < ApplicationController
 
 
     if savedCorrectly
-      render json: createdTickets, status: :created
+      json_response(createdTickets, :created)
     else
-      render 'Error', status: :unprocessable_entity
+      json_response({message: 'Error: malformed request, expecting participating_seller_id and number_of_tickets'}, :unprocessable_entity)
     end
   end
 
   # PATCH/PUT /tickets/1
   def update
     if @ticket.update!(ticket_params)
-      render json: @ticket
+      json_response(@ticket)
     else
-      render json: @ticket.errors, status: :unprocessable_entity
+      json_response(@ticket.errors, :unprocessable_entity)
     end
   end
 

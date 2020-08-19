@@ -154,11 +154,11 @@ RSpec.describe '/tickets', type: :request do
         end.to change(Ticket, :count).by(0)
       end
 
-      it 'renders a plain text response with errors for the new ticket without a valid number of tickets' do
+      it 'renders a JSON response with errors for the new ticket without a valid number of tickets' do
         post tickets_url,
              params: invalid_number_attributes, as: :json
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.content_type).to match(a_string_including('text/plain'))
+        expect(response.content_type).to match(a_string_including('application/json'))
       end
     end
   end
