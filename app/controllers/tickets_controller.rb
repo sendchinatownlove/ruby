@@ -29,7 +29,7 @@ class TicketsController < ApplicationController
           attributes = {}
           attributes[:ticket_id] = Ticket.generate_ticket_id
           attributes[:participating_seller] = @participating_seller
-    
+
           @ticket = Ticket.new(attributes)
           savedCorrectly &&= @ticket.save!
           createdTickets << @ticket
@@ -39,11 +39,10 @@ class TicketsController < ApplicationController
       savedCorrectly = false
     end
 
-
     if savedCorrectly
       json_response(createdTickets, :created)
     else
-      json_response({message: 'Error: malformed request, expecting participating_seller_id and number_of_tickets'}, :unprocessable_entity)
+      json_response({ message: 'Error: malformed request, expecting participating_seller_id and number_of_tickets' }, :unprocessable_entity)
     end
   end
 
@@ -58,7 +57,6 @@ class TicketsController < ApplicationController
 
   private
 
-  # Use callbacks to share common setup or constraints between actions.
   def set_ticket
     @ticket = Ticket.find(params[:id])
   end

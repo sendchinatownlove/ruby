@@ -47,7 +47,7 @@ RSpec.describe Ticket, type: :model do
       :ticket,
       ticket_id: ticket_id1,
       contact: contact1,
-      participating_seller: participating_seller1,
+      participating_seller: participating_seller1
     )
   end
   let(:ticket2) do
