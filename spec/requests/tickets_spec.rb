@@ -32,6 +32,15 @@ RSpec.describe '/tickets', type: :request do
     }
   end
 
+  let(:base_attributes_with_contact) do
+    # skip('Add a hash of attributes valid for your model')
+    {
+      participating_seller: participating_seller1,
+      ticket_id: 'AEIO-U',
+      contact_id: contact1.id
+    }
+  end
+
   let(:create_attributes) do
     {
       participating_seller_id: participating_seller1.id,
@@ -55,8 +64,27 @@ RSpec.describe '/tickets', type: :request do
 
   let(:invalid_number_attributes) do
     {
-      participating_seller_id: 100,
+      participating_seller_id: participating_seller1.id,
       number_of_tickets: -1
+    }
+  end
+
+  let(:update_attributes) do
+    {
+      contact_id: contact2.id
+    }
+  end
+
+  let(:update_additional_attributes) do
+    {
+      contact_id: contact2.id,
+      ticket_id: 'new_id'
+    }
+  end
+
+  let(:invalid_update_attributes) do
+    {
+      unexpected_property: 'value'
     }
   end
 
@@ -105,54 +133,89 @@ RSpec.describe '/tickets', type: :request do
     end
 
     context 'with invalid parameters' do
-      it 'does not create a new Ticket' do
+      it 'does not create a new Ticket without a valid participating seller' do
         expect do
           post tickets_url,
                params: invalid_participating_seller_attributes, as: :json
         end.to change(Ticket, :count).by(0)
       end
 
-      it 'renders a JSON response with errors for the new ticket' do
+      it 'renders a JSON response with errors for the new ticket without a valid participating seller' do
         post tickets_url,
              params: invalid_participating_seller_attributes, as: :json
         expect(response).to have_http_status(:not_found)
         expect(response.content_type).to match(a_string_including('application/json'))
       end
+
+      it 'does not create a new Ticket without a valid number of tickets' do
+        expect do
+          post tickets_url,
+               params: invalid_number_attributes, as: :json
+        end.to change(Ticket, :count).by(0)
+      end
+
+      it 'renders a plain text response with errors for the new ticket without a valid number of tickets' do
+        post tickets_url,
+             params: invalid_number_attributes, as: :json
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.content_type).to match(a_string_including('text/plain'))
+      end
     end
   end
 
-  # describe 'PATCH /update' do
-  #   context 'with valid parameters' do
-  #     let(:new_attributes) do
-  #       skip('Add a hash of attributes valid for your model')
-  #     end
+  describe 'PATCH /update' do
+    context 'with valid parameters' do
+      it 'updates the requested ticket with a valid contact' do
+        ticket = Ticket.create! base_attributes
+        patch ticket_url(ticket),
+              params: update_attributes, as: :json
+        ticket.reload
+        expect(ticket[:contact_id]).not_to be_nil
+        expect(ticket[:contact_id]).to eq(contact2.id)
+      end
 
-  #     it 'updates the requested ticket' do
-  #       ticket = Ticket.create! valid_attributes
-  #       patch ticket_url(ticket),
-  #             params: { ticket: invalid_attributes }, as: :json
-  #       ticket.reload
-  #       skip('Add assertions for updated state')
-  #     end
+      it 'renders a JSON response with the ticket with a valid contact' do
+        ticket = Ticket.create! base_attributes
+        patch ticket_url(ticket),
+              params: update_attributes, as: :json
+        expect(response).to have_http_status(:ok)
+        expect(response.content_type).to match(a_string_including('application/json'))
+      end
 
-  #     it 'renders a JSON response with the ticket' do
-  #       ticket = Ticket.create! valid_attributes
-  #       patch ticket_url(ticket),
-  #             params: { ticket: invalid_attributes }, as: :json
-  #       expect(response).to have_http_status(:ok)
-  #       expect(response.content_type).to eq('application/json')
-  #     end
-  #   end
+      it 'overwrites contact appropriately' do
+        ticket = Ticket.create! base_attributes_with_contact
+        expect(ticket.contact_id).to eq(contact1.id)
 
-  #   context 'with invalid parameters' do
-  #     it 'renders a JSON response with errors for the ticket' do
-  #       ticket = Ticket.create! valid_attributes
-  #       patch ticket_url(ticket),
-  #             params: { ticket: invalid_attributes }, as: :json
-  #       expect(response).to have_http_status(:unprocessable_entity)
-  #       expect(response.content_type).to eq('application/json')
-  #     end
-  #   end
-  # end
+        patch ticket_url(ticket),
+              params: update_attributes, as: :json
+        expect(response).to have_http_status(:ok)
+        expect(response.content_type).to match(a_string_including('application/json'))
+
+        body = JSON.parse response.body
+        expect(body['contact_id']).to eq(contact2.id)
+      end
+
+      it 'does not change any attribute other than contact_id' do
+        ticket = Ticket.create! base_attributes
+        patch ticket_url(ticket),
+              params: update_attributes, as: :json
+        expect(response).to have_http_status(:ok)
+        expect(response.content_type).to match(a_string_including('application/json'))
+
+        body = JSON.parse response.body
+        expect(body['ticket_id']).to eq(ticket.ticket_id)
+      end
+    end
+
+    context 'with invalid parameters' do
+      it 'renders a JSON response with errors for the ticket without a valid contact' do
+        ticket = Ticket.create! base_attributes
+        patch ticket_url(ticket),
+              params: invalid_update_attributes, as: :json
+        expect(response).to have_http_status(:not_found)
+        expect(response.content_type).to match(a_string_including('application/json'))
+      end
+    end
+  end
 
 end
