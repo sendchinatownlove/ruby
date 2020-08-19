@@ -18,50 +18,87 @@ RSpec.describe '/tickets', type: :request do
   # This should return the minimal set of attributes required to create a valid
   # Ticket. As you add validations to Ticket, be sure to
   # adjust the attributes here as well.
-  let(:valid_attributes) do
-    skip('Add a hash of attributes valid for your model')
+
+  let(:participating_seller1) { create :participating_seller }
+  let(:sponsor_seller1) { create :sponsor_seller }
+  let(:contact1) { create :contact }
+  let(:contact2) { create :contact }
+
+  let(:base_attributes) do
+    # skip('Add a hash of attributes valid for your model')
+    {
+      participating_seller: participating_seller1,
+      ticket_id: 'AEIO-U'
+    }
   end
 
-  let(:invalid_attributes) do
-    skip('Add a hash of attributes invalid for your model')
+  let(:create_attributes) do
+    {
+      participating_seller_id: participating_seller1.id,
+      number_of_tickets: 1
+    }
   end
 
-  # This should return the minimal set of values that should be in the headers
-  # in order to pass any filters (e.g. authentication) defined in
-  # TicketsController, or in your router and rack
-  # middleware. Be sure to keep this updated too.
-  let(:valid_headers) do
-    {}
+  let(:create_ten_attributes) do
+    {
+      participating_seller_id: participating_seller1.id,
+      number_of_tickets: 10
+    }
+  end
+
+  let(:invalid_participating_seller_attributes) do
+    {
+      participating_seller_id: 100,
+      number_of_tickets: 1
+    }
+  end
+
+  let(:invalid_number_attributes) do
+    {
+      participating_seller_id: 100,
+      number_of_tickets: -1
+    }
   end
 
   describe 'GET /index' do
     it 'renders a successful response' do
-      Ticket.create! valid_attributes
-      get tickets_url, headers: valid_headers, as: :json
+      Ticket.create! base_attributes
+      get tickets_url, as: :json
       expect(response).to be_successful
     end
   end
 
   describe 'GET /show' do
     it 'renders a successful response' do
-      ticket = Ticket.create! valid_attributes
+      ticket = Ticket.create! base_attributes
       get ticket_url(ticket), as: :json
+      # binding.pry
       expect(response).to be_successful
     end
   end
 
   describe 'POST /create' do
+    
     context 'with valid parameters' do
       it 'creates a new Ticket' do
+        # create :participating_seller
         expect do
           post tickets_url,
-               params: { ticket: valid_attributes }, headers: valid_headers, as: :json
+               params: create_attributes, as: :json
         end.to change(Ticket, :count).by(1)
+      end
+
+      it 'creates ten new Tickets' do
+        # create :participating_seller
+        expect do
+          post tickets_url,
+               params: create_ten_attributes, as: :json
+        end.to change(Ticket, :count).by(10)
       end
 
       it 'renders a JSON response with the new ticket' do
         post tickets_url,
-             params: { ticket: valid_attributes }, headers: valid_headers, as: :json
+             params: create_attributes, as: :json
         expect(response).to have_http_status(:created)
         expect(response.content_type).to match(a_string_including('application/json'))
       end
@@ -71,59 +108,51 @@ RSpec.describe '/tickets', type: :request do
       it 'does not create a new Ticket' do
         expect do
           post tickets_url,
-               params: { ticket: invalid_attributes }, as: :json
+               params: invalid_participating_seller_attributes, as: :json
         end.to change(Ticket, :count).by(0)
       end
 
       it 'renders a JSON response with errors for the new ticket' do
         post tickets_url,
-             params: { ticket: invalid_attributes }, headers: valid_headers, as: :json
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.content_type).to eq('application/json')
+             params: invalid_participating_seller_attributes, as: :json
+        expect(response).to have_http_status(:not_found)
+        expect(response.content_type).to match(a_string_including('application/json'))
       end
     end
   end
 
-  describe 'PATCH /update' do
-    context 'with valid parameters' do
-      let(:new_attributes) do
-        skip('Add a hash of attributes valid for your model')
-      end
+  # describe 'PATCH /update' do
+  #   context 'with valid parameters' do
+  #     let(:new_attributes) do
+  #       skip('Add a hash of attributes valid for your model')
+  #     end
 
-      it 'updates the requested ticket' do
-        ticket = Ticket.create! valid_attributes
-        patch ticket_url(ticket),
-              params: { ticket: invalid_attributes }, headers: valid_headers, as: :json
-        ticket.reload
-        skip('Add assertions for updated state')
-      end
+  #     it 'updates the requested ticket' do
+  #       ticket = Ticket.create! valid_attributes
+  #       patch ticket_url(ticket),
+  #             params: { ticket: invalid_attributes }, as: :json
+  #       ticket.reload
+  #       skip('Add assertions for updated state')
+  #     end
 
-      it 'renders a JSON response with the ticket' do
-        ticket = Ticket.create! valid_attributes
-        patch ticket_url(ticket),
-              params: { ticket: invalid_attributes }, headers: valid_headers, as: :json
-        expect(response).to have_http_status(:ok)
-        expect(response.content_type).to eq('application/json')
-      end
-    end
+  #     it 'renders a JSON response with the ticket' do
+  #       ticket = Ticket.create! valid_attributes
+  #       patch ticket_url(ticket),
+  #             params: { ticket: invalid_attributes }, as: :json
+  #       expect(response).to have_http_status(:ok)
+  #       expect(response.content_type).to eq('application/json')
+  #     end
+  #   end
 
-    context 'with invalid parameters' do
-      it 'renders a JSON response with errors for the ticket' do
-        ticket = Ticket.create! valid_attributes
-        patch ticket_url(ticket),
-              params: { ticket: invalid_attributes }, headers: valid_headers, as: :json
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.content_type).to eq('application/json')
-      end
-    end
-  end
+  #   context 'with invalid parameters' do
+  #     it 'renders a JSON response with errors for the ticket' do
+  #       ticket = Ticket.create! valid_attributes
+  #       patch ticket_url(ticket),
+  #             params: { ticket: invalid_attributes }, as: :json
+  #       expect(response).to have_http_status(:unprocessable_entity)
+  #       expect(response.content_type).to eq('application/json')
+  #     end
+  #   end
+  # end
 
-  describe 'DELETE /destroy' do
-    it 'destroys the requested ticket' do
-      ticket = Ticket.create! valid_attributes
-      expect do
-        delete ticket_url(ticket), headers: valid_headers, as: :json
-      end.to change(Ticket, :count).by(-1)
-    end
-  end
 end
