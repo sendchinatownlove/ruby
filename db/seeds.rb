@@ -188,15 +188,12 @@ end
 
 (0..6).each do |i|
   name = Faker::Name.name
-  contact = Contact.find_or_create_by!(email: Faker::Internet.email(name: name), name: name)
-
-  ticket_id = Ticket.generate_ticket_id
+  contact = i.odd? ? Contact.find_or_create_by!(email: Faker::Internet.email(name: name), name: name) : nil
   participant = ParticipatingSeller.find_by(seller_id: 2)
   sponsor = i.even? ? SponsorSeller.find_by(location_id: 2) : nil
   redeemed_at = i % 3 == 0 ? Time.now - i.days : nil
 
   Ticket.create!(
-    ticket_id: ticket_id,
     contact: contact,
     participating_seller: participant,
     sponsor_seller: sponsor,

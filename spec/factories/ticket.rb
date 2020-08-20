@@ -2,8 +2,6 @@
 
 FactoryBot.define do
   factory :ticket do
-    ticket_id { Ticket.generate_ticket_id }
-
     redeemed_at do
       Faker::Date.between(
         from: Date.today - 30.days,

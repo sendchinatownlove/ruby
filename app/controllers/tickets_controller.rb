@@ -29,16 +29,14 @@ class TicketsController < ApplicationController
 
     ActiveRecord::Base.transaction do
       (1..numTix).each do
-        attributes = {}
-        attributes[:ticket_id] = Ticket.generate_ticket_id
-        attributes[:participating_seller] = @participating_seller
+        attributes = { participating_seller: @participating_seller }
 
         @ticket = Ticket.new(attributes)
         savedCorrectly &&= @ticket.save!
         createdTickets << @ticket
       end
     end
-      
+
     json_response(createdTickets, :created)
   end
 

@@ -34,7 +34,8 @@ class Ticket < ApplicationRecord
   validates_presence_of :ticket_id, :participating_seller_id
   validates_uniqueness_of :ticket_id
 
-  def self.generate_ticket_id
-    SecureRandom.alphanumeric(5).upcase
+  def initialize(attributes = {})
+    super
+    self.ticket_id = (attributes && attributes[:ticket_id]) || SecureRandom.alphanumeric(5).upcase
   end
 end

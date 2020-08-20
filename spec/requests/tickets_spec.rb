@@ -149,7 +149,7 @@ RSpec.describe '/tickets', type: :request do
       it 'updates the requested ticket with a valid contact' do
         ticket = Ticket.create! base_attributes
         put ticket_url(ticket),
-              params: update_attributes, as: :json
+            params: update_attributes, as: :json
         ticket.reload
         expect(ticket[:contact_id]).not_to be_nil
         expect(ticket[:contact_id]).to eq(contact2.id)
@@ -158,7 +158,7 @@ RSpec.describe '/tickets', type: :request do
       it 'renders a JSON response with the ticket with a valid contact' do
         ticket = Ticket.create! base_attributes
         put ticket_url(ticket),
-              params: update_attributes, as: :json
+            params: update_attributes, as: :json
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to match(a_string_including('application/json'))
       end
@@ -168,7 +168,7 @@ RSpec.describe '/tickets', type: :request do
         expect(ticket.contact_id).to eq(contact1.id)
 
         put ticket_url(ticket),
-              params: update_attributes, as: :json
+            params: update_attributes, as: :json
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to match(a_string_including('application/json'))
 
@@ -179,7 +179,7 @@ RSpec.describe '/tickets', type: :request do
       it 'does not change any attribute other than contact_id' do
         ticket = Ticket.create! base_attributes
         put ticket_url(ticket),
-              params: update_attributes, as: :json
+            params: update_attributes, as: :json
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to match(a_string_including('application/json'))
 
@@ -192,7 +192,7 @@ RSpec.describe '/tickets', type: :request do
       it 'renders a JSON response with errors for the ticket without a valid contact' do
         ticket = Ticket.create! base_attributes
         put ticket_url(ticket),
-              params: invalid_update_attributes, as: :json
+            params: invalid_update_attributes, as: :json
         expect(response).to have_http_status(:not_found)
         expect(response.content_type).to match(a_string_including('application/json'))
       end
