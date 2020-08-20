@@ -19,21 +19,19 @@ class TicketsController < ApplicationController
 
   # POST /tickets
   def create
-    savedCorrectly = true
-    createdTickets = []
     numTix = params[:number_of_tickets]
 
     if numTix.blank? || numTix < 1
       raise InvalidParameterError, 'Error: malformed request, expecting participating_seller_id and number_of_tickets'
     end
 
+    createdTickets = []
+    attributes = { participating_seller: @participating_seller }
+
     ActiveRecord::Base.transaction do
       (1..numTix).each do
-        attributes = { participating_seller: @participating_seller }
-
-        @ticket = Ticket.new(attributes)
-        savedCorrectly &&= @ticket.save!
-        createdTickets << @ticket
+        new_ticket = Ticket.create!(attributes)
+        createdTickets << new_ticket
       end
     end
 
@@ -43,6 +41,7 @@ class TicketsController < ApplicationController
   # PATCH/PUT /tickets/1
   def update
     @ticket.update!(ticket_params)
+
     json_response(@ticket)
   end
 
