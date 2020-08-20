@@ -80,6 +80,7 @@ Rails.application.routes.draw do
   resources :campaigns do
   end
   resources :contacts do
+    resources :tickets, controller: 'contact_tickets'
   end
   resources :charges do
   end
@@ -88,6 +89,9 @@ Rails.application.routes.draw do
   resources :fees do
   end
   resources :gift_cards do
+  end
+  resources :participating_sellers do
+    resources :tickets, controller: 'participating_seller_tickets'
   end
   resources :sellers do
     resources :locations, :menu_items, :items, :open_hour, :delivery_options
