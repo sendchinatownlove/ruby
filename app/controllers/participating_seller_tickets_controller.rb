@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ParticipatingSellerTicketsController < ApplicationController
   before_action :set_participating_seller
 

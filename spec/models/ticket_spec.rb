@@ -9,7 +9,7 @@
 #  redeemed_at             :date
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
-#  contact_id              :bigint           not null
+#  contact_id              :bigint
 #  participating_seller_id :bigint           not null
 #  sponsor_seller_id       :bigint
 #  ticket_id               :string           not null
@@ -30,7 +30,6 @@ require 'rails_helper'
 
 RSpec.describe Ticket, type: :model do
   # Association tests
-  it { should belong_to(:contact) }
   it { should belong_to(:participating_seller) }
 
   # Uniqueness and presence test for ticket_id
@@ -42,20 +41,19 @@ RSpec.describe Ticket, type: :model do
   let(:participating_seller1) { create :participating_seller }
   let(:sponsor_seller1) { create :sponsor_seller }
   let(:contact1) { create :contact }
-  let(:contact2) { create :contact }
 
   let(:ticket1) do
     create(
       :ticket,
       ticket_id: ticket_id1,
-      contact: contact1
+      contact: contact1,
+      participating_seller: participating_seller1
     )
   end
   let(:ticket2) do
     create(
       :ticket,
       ticket_id: ticket_id2,
-      contact: contact2,
       participating_seller: participating_seller1,
       sponsor_seller: sponsor_seller1
     )
