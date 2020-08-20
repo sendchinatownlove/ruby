@@ -19,21 +19,21 @@ class TicketsController < ApplicationController
 
   # POST /tickets
   def create
-    numTix = params[:number_of_tickets]
+    num_tix = params[:number_of_tickets]
 
-    if numTix.blank? || numTix < 1
+    if num_tix.blank? || num_tix < 1
       raise InvalidParameterError, 'Error: malformed request, expecting participating_seller_id and number_of_tickets'
     end
 
-    createdTickets = []
+    created_tickets = []
 
     ActiveRecord::Base.transaction do
-      (1..numTix).each do
-        createdTickets << Ticket.create!({ participating_seller: @participating_seller })
+      (1..num_tix).each do
+        created_tickets << Ticket.create!({ participating_seller: @participating_seller })
       end
     end
 
-    json_response(createdTickets, :created)
+    json_response(created_tickets, :created)
   end
 
   # PATCH/PUT /tickets/1
