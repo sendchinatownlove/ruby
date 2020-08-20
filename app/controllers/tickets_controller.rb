@@ -23,36 +23,29 @@ class TicketsController < ApplicationController
     createdTickets = []
     numTix = params[:number_of_tickets]
 
-    if numTix.present? && numTix > 0
-      ActiveRecord::Base.transaction do
-        (1..numTix).each do
-          attributes = {}
-          attributes[:ticket_id] = Ticket.generate_ticket_id
-          attributes[:participating_seller] = @participating_seller
+    if numTix.blank? || numTix < 1
+      raise InvalidParameterError, 'Error: malformed request, expecting participating_seller_id and number_of_tickets'
+    end
 
-          @ticket = Ticket.new(attributes)
-          savedCorrectly &&= @ticket.save!
-          createdTickets << @ticket
-        end
+    ActiveRecord::Base.transaction do
+      (1..numTix).each do
+        attributes = {}
+        attributes[:ticket_id] = Ticket.generate_ticket_id
+        attributes[:participating_seller] = @participating_seller
+
+        @ticket = Ticket.new(attributes)
+        savedCorrectly &&= @ticket.save!
+        createdTickets << @ticket
       end
-    else
-      savedCorrectly = false
     end
-
-    if savedCorrectly
-      json_response(createdTickets, :created)
-    else
-      json_response({ message: 'Error: malformed request, expecting participating_seller_id and number_of_tickets' }, :unprocessable_entity)
-    end
+      
+    json_response(createdTickets, :created)
   end
 
   # PATCH/PUT /tickets/1
   def update
-    if @ticket.update!(ticket_params)
-      json_response(@ticket)
-    else
-      json_response(@ticket.errors, :unprocessable_entity)
-    end
+    @ticket.update!(ticket_params)
+    json_response(@ticket)
   end
 
   private
