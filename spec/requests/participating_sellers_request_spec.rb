@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-RSpec.describe "ParticipatingSellers", type: :request do
-
+RSpec.describe 'ParticipatingSellers', type: :request do
   describe 'GET /participating_sellers' do
     let!(:participating_seller1) { create :participating_seller }
     let!(:participating_seller2) { create :participating_seller }
@@ -64,7 +65,7 @@ RSpec.describe "ParticipatingSellers", type: :request do
         {
           seller_id: seller.id,
           name: '46 Mott',
-          stamp_url: 'sendchinatownlove.com/test_stamp_url',
+          stamp_url: 'sendchinatownlove.com/test_stamp_url'
         }
       end
 
@@ -130,7 +131,7 @@ RSpec.describe "ParticipatingSellers", type: :request do
         {
           seller_id: seller.id,
           name: '46 Mott',
-          stamp_url: 'sendchinatownlove.com/test_stamp_url',
+          stamp_url: 'sendchinatownlove.com/test_stamp_url'
         }
       end
 
@@ -153,5 +154,4 @@ RSpec.describe "ParticipatingSellers", type: :request do
       end
     end
   end
-
 end

@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-RSpec.describe "ParticipatingSellerTickets", type: :request do
+RSpec.describe 'ParticipatingSellerTickets', type: :request do
   let!(:ticket1) do
     create :ticket, participating_seller: participating_seller1
   end

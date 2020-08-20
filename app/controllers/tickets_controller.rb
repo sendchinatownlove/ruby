@@ -26,12 +26,10 @@ class TicketsController < ApplicationController
     end
 
     createdTickets = []
-    attributes = { participating_seller: @participating_seller }
 
     ActiveRecord::Base.transaction do
       (1..numTix).each do
-        new_ticket = Ticket.create!(attributes)
-        createdTickets << new_ticket
+        createdTickets << Ticket.create!({ participating_seller: @participating_seller })
       end
     end
 

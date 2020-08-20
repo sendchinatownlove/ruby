@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ParticipatingSellersController < ApplicationController
   before_action :set_participating_seller, only: %i[show update]
 
@@ -27,7 +29,7 @@ class ParticipatingSellersController < ApplicationController
     params.permit(
       :name,
       :seller_id,
-      :stamp_url,
+      :stamp_url
     )
   end
 
