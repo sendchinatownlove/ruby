@@ -15,15 +15,35 @@ class ContactTicketsController < ApplicationController
       raise ActiveRecord::RecordNotFound
     end
 
-    # If there are any invalid ticket ids, don't update any tickets
-    ActiveRecord::Base.transaction do
-      update_params[:tickets].each do |t|
-        ticket = Ticket.find_by(id: t[:id], contact: @contact)
+    # Hash of sponsor_seller_id -> Ticket object array
+    sponsor_seller_id_to_tickets = {}
 
+    update_params[:tickets].each do |t|
+      ticket = Ticket.find_by(
+        id: t[:id],
         # Only allow for contact to update their own ticket
-        raise ActiveRecord::RecordNotFound unless ticket.present?
+        contact: @contact,
+        # Also don't allow for contact to spend an already spent ticket
+        sponsor_seller_id: nil
+      )
+      raise ActiveRecord::RecordNotFound unless ticket.present?
 
-        ticket.update!(sponsor_seller_id: t[:redeemed_at])
+      sponsor_seller_id = t[:redeemed_at]
+      if sponsor_seller_id_to_tickets[sponsor_seller_id].nil?
+        sponsor_seller_id_to_tickets[sponsor_seller_id] = []
+      end
+      sponsor_seller_id_to_tickets[sponsor_seller_id].push(ticket)
+    end
+
+    # If there are any invalid tickets, don't update any tickets
+    ActiveRecord::Base.transaction do
+      sponsor_seller_id_to_tickets.each do |sponsor_seller_id, tickets|
+        sponsor_seller = SponsorSeller.find(sponsor_seller_id)
+
+        # Show error if the wrong number of tickets was given
+        raise TicketRedemptionError, "Expected #{sponsor_seller.reward_cost} tickets, but got #{tickets.size}" unless sponsor_seller.reward_cost == tickets.size
+
+        tickets.each { |ticket| ticket.update!(sponsor_seller: sponsor_seller) }
       end
     end
 
