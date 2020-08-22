@@ -43,7 +43,7 @@ class CampaignsController < ApplicationController
       :active,
       :description,
       :end_date,
-      :cost_per_meal,
+      :price_per_meal,
       :target_amount,
       gallery_image_urls: []
     )
@@ -63,6 +63,7 @@ class CampaignsController < ApplicationController
       :active,
       :description,
       :valid,
+      :price_per_meal,
       gallery_image_urls: []
     )
   end
