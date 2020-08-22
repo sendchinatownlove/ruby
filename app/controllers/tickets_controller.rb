@@ -5,14 +5,7 @@ class TicketsController < ApplicationController
   before_action :set_contact, only: %i[update]
   before_action :set_participating_seller, only: %i[create]
 
-  # GET /tickets
-  def index
-    @tickets = Ticket.all
-
-    json_response(@tickets)
-  end
-
-  # GET /tickets/1
+  # GET /tickets/:ticket_id
   def show
     json_response(@ticket)
   end
@@ -36,7 +29,7 @@ class TicketsController < ApplicationController
     json_response(created_tickets, :created)
   end
 
-  # PATCH/PUT /tickets/1
+  # PATCH/PUT /tickets/:ticket_id
   def update
     @ticket.update!(ticket_params)
 
@@ -46,7 +39,7 @@ class TicketsController < ApplicationController
   private
 
   def set_ticket
-    @ticket = Ticket.find(params[:id])
+    @ticket = Ticket.find_by(ticket_id: params[:id])
   end
 
   def set_participating_seller
