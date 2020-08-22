@@ -91,8 +91,8 @@ RSpec.describe 'ContactTickets', type: :request do
       let(:attrs) do
         {
           tickets: [
-            { id: redeemed_ticket.id, redeemed_at: sponsor_seller2.id },
-            { id: ticket3.id, redeemed_at: sponsor_seller2.id }
+            { id: redeemed_ticket.id, sponsor_seller_id: sponsor_seller2.id },
+            { id: ticket3.id, sponsor_seller_id: sponsor_seller2.id }
           ]
         }
       end
@@ -106,8 +106,8 @@ RSpec.describe 'ContactTickets', type: :request do
       let(:attrs) do
         {
           tickets: [
-            { id: ticket1.id, redeemed_at: sponsor_seller2.id },
-            { id: ticket2.id, redeemed_at: sponsor_seller2.id }
+            { id: ticket1.id, sponsor_seller_id: sponsor_seller2.id },
+            { id: ticket2.id, sponsor_seller_id: sponsor_seller2.id }
           ]
         }
       end
@@ -137,10 +137,10 @@ RSpec.describe 'ContactTickets', type: :request do
             ]
           )
           expect(updated_ticket1.sponsor_seller.id).to eq(
-            attrs[:tickets][0][:redeemed_at]
+            attrs[:tickets][0][:sponsor_seller_id]
           )
           expect(updated_ticket2.sponsor_seller.id).to eq(
-            attrs[:tickets][1][:redeemed_at]
+            attrs[:tickets][1][:sponsor_seller_id]
           )
         end
 
@@ -152,8 +152,8 @@ RSpec.describe 'ContactTickets', type: :request do
           let(:attrs) do
             {
               tickets: [
-                { id: ticket1.id, redeemed_at: sponsor_seller1.id },
-                { id: ticket3.id, redeemed_at: sponsor_seller2.id } # does not own
+                { id: ticket1.id, sponsor_seller_id: sponsor_seller1.id },
+                { id: ticket3.id, sponsor_seller_id: sponsor_seller2.id } # does not own
               ]
             }
           end
@@ -177,7 +177,7 @@ RSpec.describe 'ContactTickets', type: :request do
         {
           tickets: [
             # sponsor_seller2 has a reward_cost of 2
-            { id: ticket1.id, redeemed_at: sponsor_seller2.id }
+            { id: ticket1.id, sponsor_seller_id: sponsor_seller2.id }
           ]
         }
       end
@@ -199,8 +199,8 @@ RSpec.describe 'ContactTickets', type: :request do
         {
           tickets: [
             # sponsor_seller1 has a reward_cost of 1
-            { id: ticket1.id, redeemed_at: sponsor_seller1.id },
-            { id: ticket2.id, redeemed_at: sponsor_seller1.id }
+            { id: ticket1.id, sponsor_seller_id: sponsor_seller1.id },
+            { id: ticket2.id, sponsor_seller_id: sponsor_seller1.id }
           ]
         }
       end
