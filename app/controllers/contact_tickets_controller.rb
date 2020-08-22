@@ -28,7 +28,7 @@ class ContactTicketsController < ApplicationController
       )
       raise ActiveRecord::RecordNotFound unless ticket.present?
 
-      sponsor_seller_id = t[:redeemed_at]
+      sponsor_seller_id = t[:sponsor_seller_id]
       if sponsor_seller_id_to_tickets[sponsor_seller_id].nil?
         sponsor_seller_id_to_tickets[sponsor_seller_id] = []
       end
@@ -54,7 +54,7 @@ class ContactTicketsController < ApplicationController
 
   def update_params
     params.require(:tickets)
-    params.permit(tickets: %i[id redeemed_at])
+    params.permit(tickets: %i[id sponsor_seller_id])
   end
 
   def set_contact
