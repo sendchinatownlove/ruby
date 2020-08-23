@@ -91,11 +91,14 @@ Rails.application.routes.draw do
   end
   resources :gift_cards do
   end
+  resources :locations do
+  end
   resources :participating_sellers do
     resources :tickets, controller: 'participating_seller_tickets'
   end
   resources :sellers do
-    resources :locations, :menu_items, :items, :open_hour, :delivery_options
+    resources :menu_items, :items, :open_hour, :delivery_options
+    resources :locations, controller: 'seller_locations'
     resources :campaigns, controller: 'seller_campaigns', only: [:index]
     resources :gift_cards, controller: 'seller_gift_cards'
   end
