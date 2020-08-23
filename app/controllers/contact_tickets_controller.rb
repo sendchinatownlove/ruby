@@ -5,8 +5,11 @@ class ContactTicketsController < ApplicationController
 
   # GET /contacts/:contact_id/tickets/:access_token
   def index
-    # Don't need the access token for seeing tickets
-    json_response(Ticket.where(contact: @contact))
+    # Don't need the access token for seeing tickets but don't return ticket_id
+    # otherwise people can "steal" tickets from other people
+    json_response(Ticket.where(contact: @contact).map do |ticket|
+      ticket.as_json.except(:ticket_id)
+    end)
   end
 
   def update

@@ -39,8 +39,8 @@ RSpec.describe 'ContactTickets', type: :request do
       expect(json.size).to eq 2
       expect(json).to eq(
         [
-          ticket1.as_json,
-          ticket2.as_json
+          ticket1.as_json.except(:ticket_id),
+          ticket2.as_json.except(:ticket_id)
         ]
       )
     end
