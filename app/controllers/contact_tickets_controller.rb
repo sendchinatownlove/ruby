@@ -41,7 +41,9 @@ class ContactTicketsController < ApplicationController
         sponsor_seller = SponsorSeller.find(sponsor_seller_id)
 
         # Show error if the wrong number of tickets was given
-        raise TicketRedemptionError, "Expected #{sponsor_seller.reward_cost} tickets, but got #{tickets.size}" unless sponsor_seller.reward_cost == tickets.size
+        unless sponsor_seller.reward_cost == tickets.size
+          raise TicketRedemptionError, "Expected #{sponsor_seller.reward_cost} tickets, but got #{tickets.size}"
+        end
 
         tickets.each { |ticket| ticket.update!(sponsor_seller: sponsor_seller) }
       end
