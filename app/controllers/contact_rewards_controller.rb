@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'ulid'
-
 class ContactRewardsController < ApplicationController
   # POST /contacts/:contact_id/rewards
   def create
