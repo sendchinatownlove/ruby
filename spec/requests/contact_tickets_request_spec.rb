@@ -78,6 +78,7 @@ RSpec.describe 'ContactTickets', type: :request do
 
   context 'with valid contact id' do
     before do
+      freeze_time
       put(
         "/contacts/#{contact_id}/tickets/#{rewards_redemption_access_token}",
         params: attrs,
@@ -142,6 +143,8 @@ RSpec.describe 'ContactTickets', type: :request do
           expect(updated_ticket2.sponsor_seller.id).to eq(
             attrs[:tickets][1][:sponsor_seller_id]
           )
+          expect(updated_ticket1.redeemed_at).to eq(Date.today)
+          expect(updated_ticket2.redeemed_at).to eq(Date.today)
         end
 
         it 'returns 200' do
