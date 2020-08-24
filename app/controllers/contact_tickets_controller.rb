@@ -35,6 +35,7 @@ class ContactTicketsController < ApplicationController
       sponsor_seller_id_to_tickets[sponsor_seller_id].push(ticket)
     end
 
+    redeemed_at = Date.today
     # If there are any invalid tickets, don't update any tickets
     ActiveRecord::Base.transaction do
       sponsor_seller_id_to_tickets.each do |sponsor_seller_id, tickets|
@@ -45,7 +46,13 @@ class ContactTicketsController < ApplicationController
           raise TicketRedemptionError, "Expected #{sponsor_seller.reward_cost} tickets, but got #{tickets.size}"
         end
 
-        tickets.each { |ticket| ticket.update!(sponsor_seller: sponsor_seller) }
+        tickets.each do |ticket|
+          ticket.update!(
+            sponsor_seller: sponsor_seller,
+            redeemed_at: redeemed_at
+          )
+        end
+
       end
     end
 
