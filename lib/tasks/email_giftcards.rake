@@ -2,14 +2,15 @@
 
 namespace :email_giftcards do
   desc 'Email customers the gift cards that they ordered'
-  task :send_emails => :environment do
+  task send_emails: :environment do
     desc 'send emails'
 
     unique_recipients = GiftCardDetail
+                        .where(single_use: false)
                         .joins(:item, :recipient)
                         .where(items: { refunded: false })
                         .distinct.pluck(:recipient_id)
-
+    Rails.logger.info('Sending #{unique_recipients.length} emails')
     unique_recipients.each do |id|
       html = '<!DOCTYPE html>' \
               '<html>' \
@@ -17,8 +18,9 @@ namespace :email_giftcards do
               "  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />" \
               '</head>' \
               '<body>' \
-              '<p> Thank you for supporting local Chinatown businesses!</p>'
+              '<p> Thank you for supporting local Chinatown businesses! You can access your gift card(s) below:</p>'
       recipient = Contact.find_by(id: id)
+      Rails.logger.info('Sending gift cards for #{recipient.email}')
       gift_cards = GiftCardDetail.where(recipient_id: id).to_a
       html += '<style> table {border: 1px solid black}</style>'\
             '<table>'
@@ -27,10 +29,10 @@ namespace :email_giftcards do
         amount_string = EmailManager::Sender.format_amount(amount: gc.amount)
         item = Item.find_by(id: gc.item_id)
         merchant_name = Seller.find_by(id: item.seller_id).name
-        html += '<tr><p>View your <b>$' + amount_string + '</b> gift card for <b>' + merchant_name + '<a href="' + gift_card_url + '"> here</a></b></p></tr>'
+        html += '<tr><p>View your <b>$' + amount_string + '</b> gift card for <b>' + merchant_name + ' <a href="' + gift_card_url + '">here</a></b></p></tr>'
       end
       html += '</table>'
-      EmailManager::Sender.send_receipt(to: recipient.email, html: html)
+      EmailManager::Sender.send_receipt_with_subject(to: recipient.email, html: html, subject: 'Your gift cards from Send Chinatown Love')
     end
   end
 end

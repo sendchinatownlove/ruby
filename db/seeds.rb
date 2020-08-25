@@ -94,22 +94,32 @@ end
     email: 'testytesterson@gmail.com',
     item_type: Item.gift_card,
     refunded: false,
-    amounts: [10_000, 8000]
+    amounts: [10_000, 8000],
+    seller_id: 'shunfa-bakery'
   },
   {
     email: 'testytesterson2@gmail.com',
     item_type: Item.gift_card,
     refunded: true,
-    amounts: [7500, 3000]
+    amounts: [7500, 3000],
+    seller_id: 'shunfa-bakery'
   },
   {
     email: 'testytesterson3@gmail.com',
     item_type: Item.gift_card,
     refunded: false,
-    amounts: [5000]
+    amounts: [5000],
+    seller_id: 'shunfa-bakery'
+  },
+  {
+    email: 'testytesterson3@gmail.com',
+    item_type: Item.gift_card,
+    refunded: false,
+    amounts: [1000],
+    seller_id: '46-mott'
   }
 ].each do |attributes|
-  seller = Seller.find_by(seller_id: 'shunfa-bakery')
+  seller = Seller.find_by(seller_id: attributes[:seller_id])
   contact = Contact.find_or_create_by!(email: attributes[:email])
   payment_intent = PaymentIntent.create!(recipient: contact, purchaser: contact, square_location_id: seller.square_location_id, square_payment_id: Faker::Alphanumeric.alpha(number: 64))
   item = Item.create!(purchaser: contact, item_type: attributes[:item_type], refunded: attributes[:refunded], seller_id: seller.id, payment_intent_id: payment_intent.id)
