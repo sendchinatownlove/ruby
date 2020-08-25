@@ -3,10 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe SellersHelper, type: :helper do
-  let(:contact) { create :contact }
-  let(:seller) { create :seller, distributor: contact }
-
-  # TODO(jxue) add some tests including returned giftcards/donations
+  let(:seller) { create :seller, :with_campaign }
 
   describe 'generate_seller_json' do
     let(:expected_seller) do
@@ -28,6 +25,7 @@ RSpec.describe SellersHelper, type: :helper do
         'progress_bar_color': seller.progress_bar_color,
         'hero_image_url': seller.hero_image_url,
         'locations': [],
+        'fees': [],
         'gallery_image_urls': [],
         'business_type': seller.business_type,
         'num_employees': seller.num_employees,
@@ -35,20 +33,43 @@ RSpec.describe SellersHelper, type: :helper do
         'website_url': seller.website_url,
         'menu_url': seller.menu_url,
         'square_location_id': seller.square_location_id,
-        'distributor': contact,
+        'distributor': seller.campaigns.first.distributor.contact,
         'cost_per_meal': seller.cost_per_meal,
-        'non_profit_location_id': seller.non_profit_location_id
+        'non_profit_location_id': seller.non_profit_location_id,
+        'amount_raised': 0,
+        'donation_amount': 0,
+        'gift_card_amount': 0,
+        'num_contributions': 0,
+        'num_gift_cards': 0,
+        'num_donations': 0
       }.as_json
+    end
+
+    context 'with cost_per_meal' do
+      before do
+        seller.update(cost_per_meal: 1000)
+      end
+
+      it 'returns the seller with normal cost per meal' do
+        expected_seller['cost_per_meal'] = 1000
+        expect(SellersHelper.generate_seller_json(seller: seller))
+          .to eq(expected_seller)
+      end
+
+      context 'with fee' do
+        let!(:fee) { create :fee, seller: seller, multiplier: 0.1 }
+
+        it 'returns the seller with normal cost per meal including fees' do
+          expected_seller['cost_per_meal'] = 1100
+          expected_seller['fees'] = [fee.as_json]
+          expect(SellersHelper.generate_seller_json(seller: seller))
+            .to eq(expected_seller)
+        end
+      end
     end
 
     context 'with no money raised' do
       it 'returns the list of sellers with `and`' do
-        expected_seller['amount_raised'] = 0
-        expected_seller['donation_amount'] = 0
-        expected_seller['gift_card_amount'] = 0
-        expected_seller['num_contributions'] = 0
-        expected_seller['num_gift_cards'] = 0
-        expected_seller['num_donations'] = 0
         expect(SellersHelper.generate_seller_json(seller: seller))
           .to eq(expected_seller)
       end
@@ -90,8 +111,8 @@ RSpec.describe SellersHelper, type: :helper do
         create(:donation_detail, item: item_donation2, amount: 10_00)
 
         expected_seller['donation_amount'] = 210_00
-        expected_seller['amount_raised'] = 290_00
-        expected_seller['gift_card_amount'] = 80_00
+        expected_seller['amount_raised'] = 310_00
+        expected_seller['gift_card_amount'] = 100_00
         expected_seller['num_contributions'] = 4
         expected_seller['num_gift_cards'] = 2
         expected_seller['num_donations'] = 2
