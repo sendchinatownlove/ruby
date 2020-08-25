@@ -1,28 +1,26 @@
 # frozen_string_literal: true
 
 class LocationsController < ApplicationController
-  before_action :set_seller
-  before_action :set_seller_location, only: %i[show update]
+  before_action :set_location, only: %i[show update]
 
-  # GET /sellers/:seller_id/locations
+  # GET /locations
   def index
-    json_response(@seller.locations)
+    json_response(Location.all)
   end
 
-  # GET /sellers/:seller_id/locations/:id
+  # GET /locations/:id
   def show
     json_response(@location)
   end
 
-  # POST /sellers/:seller_id/locations
+  # POST /locations
   def create
-    json_response(@seller.locations.create!(location_params), :created)
+    json_response(Location.create!(location_params), :created)
   end
 
-  # PUT /sellers/:seller_id/locations/:id
+  # PUT /locations/:id
   def update
     @location.update(update_location_params)
-    @location.save
     json_response(@location)
   end
 
@@ -37,14 +35,10 @@ class LocationsController < ApplicationController
   end
 
   def update_location_params
-    params.permit(:city, :state, :address1, :address2, :zip_code, :phone_number)
+    params.permit(:city, :state, :address1, :address2, :zip_code, :phone_number, :neighborhood, :borough)
   end
 
-  def set_seller
-    @seller = Seller.find_by!(seller_id: params[:seller_id])
-  end
-
-  def set_seller_location
-    @location = @seller.locations.find_by!(id: params[:id]) if @seller
+  def set_location
+    @location = Location.find(params[:id])
   end
 end

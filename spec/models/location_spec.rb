@@ -7,13 +7,15 @@
 #  id           :bigint           not null, primary key
 #  address1     :string           not null
 #  address2     :string
+#  borough      :string
 #  city         :string           not null
+#  neighborhood :string
 #  phone_number :string
 #  state        :string           not null
 #  zip_code     :string           not null
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
-#  seller_id    :bigint           not null
+#  seller_id    :bigint
 #
 # Indexes
 #

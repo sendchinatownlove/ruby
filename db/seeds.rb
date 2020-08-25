@@ -96,6 +96,7 @@ end
     refunded: false,
     amounts: [10_000, 8000],
     seller_id: 'shunfa-bakery'
+    single_use: false
   },
   {
     email: 'testytesterson2@gmail.com',
@@ -103,6 +104,7 @@ end
     refunded: true,
     amounts: [7500, 3000],
     seller_id: 'shunfa-bakery'
+    single_use: false
   },
   {
     email: 'testytesterson3@gmail.com',
@@ -117,14 +119,95 @@ end
     refunded: false,
     amounts: [1000],
     seller_id: '46-mott'
+    single_use: false
+  },
+  {
+    email: 'testytesterson4@gmail.com',
+    item_type: Item.gift_card,
+    refunded: false,
+    amounts: [1000],
+    seller_id: 'shunfa-bakery'
+    single_use: true
   }
 ].each do |attributes|
   seller = Seller.find_by(seller_id: attributes[:seller_id])
   contact = Contact.find_or_create_by!(email: attributes[:email])
   payment_intent = PaymentIntent.create!(recipient: contact, purchaser: contact, square_location_id: seller.square_location_id, square_payment_id: Faker::Alphanumeric.alpha(number: 64))
   item = Item.create!(purchaser: contact, item_type: attributes[:item_type], refunded: attributes[:refunded], seller_id: seller.id, payment_intent_id: payment_intent.id)
-  gift_card_detail = GiftCardDetail.create!(recipient: contact, item_id: item.id, gift_card_id: Faker::Alphanumeric.alpha(number: 64), seller_gift_card_id: Faker::Alphanumeric.alpha(number: 64))
+  gift_card_detail = GiftCardDetail.create!(recipient: contact, item_id: item.id, gift_card_id: Faker::Alphanumeric.alpha(number: 64), seller_gift_card_id: Faker::Alphanumeric.alpha(number: 64), single_use: attributes[:single_use])
   attributes[:amounts].each_with_index do |amount, i|
     GiftCardAmount.create!(gift_card_detail_id: gift_card_detail.id, value: amount, updated_at: Time.now + i.days)
   end
+end
+
+[
+  {
+    active: true,
+    multiplier: 0.1,
+    seller_id: '46-mott'
+  },
+  {
+    active: true,
+    multiplier: 0.1,
+    seller_id: '46-mott'
+  },
+  {
+    active: false,
+    multiplier: 0.1,
+    seller_id: 'shunfa-bakery'
+  }
+].each do |attributes|
+  seller = Seller.find_by(seller_id: attributes[:seller_id])
+  fee_attributes = attributes.except(:seller_id)
+  fee_attributes[:seller_id] = seller.id
+  Fee.create!(fee_attributes)
+end
+
+seller = Seller.find_by(seller_id: 'shunfa-bakery')
+contact = Contact.find_or_create_by!(name: 'Apex for Youth', email: 'distributor@apexforyouth.com')
+distributor = Distributor.create contact: contact, image_url: 'apexforyouth.com', website_url: 'apexforyouth.com', name: 'Apex for Youth'
+location = Location.create(address1: '123 Mott St.', city: 'Zoo York', neighborhood: 'Chinatown', state: 'NY', zip_code: '12345')
+Campaign.create(
+  seller_id: seller.id,
+  distributor: distributor,
+  location: location,
+  active: true,
+  end_date: Time.now + 30.days
+)
+
+[
+  {
+    name: '46 Mott',
+    seller_id: '2',
+    stamp_url: 'http://example.com/placeholder.jpg'
+  }
+].each do |attributes|
+  attributes[:tickets_secret] = Faker::Internet.uuid
+  ParticipatingSeller.find_or_create_by!(name: attributes[:name]).update!(attributes)
+end
+[
+  {
+    name: "Boys Don't Cry",
+    location_id: '2',
+    logo_url: 'http://example.com/placeholder.jpg',
+    reward: 'One free shot',
+    reward_cost: 3
+  }
+].each do |attributes|
+  SponsorSeller.find_or_create_by!(name: attributes[:name]).update!(attributes)
+end
+
+(0..6).each do |i|
+  name = Faker::Name.name
+  contact = i.odd? ? Contact.find_or_create_by!(email: Faker::Internet.email(name: name), name: name) : nil
+  participant = ParticipatingSeller.find_by(seller_id: 2)
+  sponsor = i.even? ? SponsorSeller.find_by(location_id: 2) : nil
+  redeemed_at = i % 3 == 0 ? Time.now - i.days : nil
+
+  Ticket.create!(
+    contact: contact,
+    participating_seller: participant,
+    sponsor_seller: sponsor,
+    redeemed_at: redeemed_at
+  )
 end

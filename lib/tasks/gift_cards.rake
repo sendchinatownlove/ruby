@@ -54,6 +54,6 @@ namespace :gift_cards do
       end
     end
 
-    puts "Successfully created gift cards with args : #{options.inspect}"
+    Rails.logger.info "Successfully created gift cards with args : #{options.inspect}"
   end
 end

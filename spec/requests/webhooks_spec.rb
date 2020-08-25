@@ -13,22 +13,14 @@ RSpec.describe 'Webhooks API', type: :request do
         'currency': 'usd',
         'item_type': item_type,
         'quantity': 1,
-        'seller_id': seller_id,
-        'is_distribution': is_distribution
+        'seller_id': seller_id
       }].to_json
     end
-    let(:is_distribution) { false }
     let(:purchaser) do
-      create(
-        :contact,
-        seller: Seller.find_by(seller_id: seller_id)
-      )
+      create :contact
     end
     let(:recipient) do
-      create(
-        :contact,
-        seller: Seller.find_by(seller_id: seller_id)
-      )
+      create :contact
     end
     let(:payment_intent) do
       create(
@@ -74,11 +66,6 @@ RSpec.describe 'Webhooks API', type: :request do
     end
 
     before do
-      allow(GiftCardIdGenerator)
-        .to receive(:generate_seller_gift_card_id_hash)
-        .and_return('abcde')
-      allow(SecureRandom).to receive(:uuid)
-        .and_return('aweofijn-3n3400-oawjiefwef-0iawef-0i')
       allow(Digest::SHA1).to receive(:base64digest)
         .and_return(true)
 
@@ -89,6 +76,9 @@ RSpec.describe 'Webhooks API', type: :request do
 
     describe 'donations' do
       before do
+        # Add stub for header verification
+        allow(SecureRandom).to receive(:uuid)
+          .and_return('aweofijn-3n3400-oawjiefwef-0iawef-0i')
         post(
           '/webhooks',
           headers: { 'HTTP_X_SQUARE_SIGNATURE' => 'www.squareup.com' },
@@ -311,22 +301,14 @@ RSpec.describe 'Webhooks API', type: :request do
     end
 
     describe 'gift cards' do
-      def verify_gift_card(single_use:)
-        item = Item.where(
-          seller_id: seller1.id,
-          item_type: 'gift_card'
-        ).first
+      def verify_gift_card(item:, single_use:, amount:)
         expect(item).not_to be_nil
 
         gift_card_detail = item.gift_card_detail
         expect(gift_card_detail).not_to be_nil
-        expect(gift_card_detail.gift_card_id).to eq(
-          'aweofijn-3n3400-oawjiefwef-0iawef-0i'
-        )
         expect(gift_card_detail.single_use).to eq(single_use)
-        expect(gift_card_detail.seller_gift_card_id).to eq('#ABC-DE')
         expect(gift_card_detail.expiration).to eq(Date.today + 1.year)
-        expect(gift_card_detail.amount).to eq(5000)
+        expect(gift_card_detail.amount).to eq(amount)
 
         payment_intent = item.payment_intent
         expect(payment_intent.successful).to be true
@@ -339,11 +321,21 @@ RSpec.describe 'Webhooks API', type: :request do
       let(:item_type) { 'gift_card' }
       let(:seller_id) { seller1.seller_id }
 
-      context 'with is_distribution = true' do
-        let(:is_distribution) { true }
+      context 'with campaign' do
+        let(:payment_intent) do
+          create(
+            :payment_intent,
+            :with_campaign,
+            square_payment_id: SecureRandom.uuid,
+            square_location_id: SecureRandom.uuid,
+            recipient: recipient,
+            purchaser: purchaser,
+            line_items: line_items
+          )
+        end
 
         before do
-          expect(EmailManager::DonationReceiptSender).to receive(:call)
+          expect(EmailManager::DonationReceiptSender).to receive(:call).once
           post(
             '/webhooks',
             headers: { 'HTTP_X_SQUARE_SIGNATURE' => 'www.squareup.com' },
@@ -352,7 +344,11 @@ RSpec.describe 'Webhooks API', type: :request do
         end
 
         it 'creates a single use gift card' do
-          verify_gift_card(single_use: true)
+          item = Item.where(
+            seller_id: seller1.id,
+            item_type: 'gift_card'
+          ).first
+          verify_gift_card(item: item, single_use: true, amount: amount)
         end
 
         it 'returns status code 200' do
@@ -360,7 +356,7 @@ RSpec.describe 'Webhooks API', type: :request do
         end
       end
 
-      context 'with is_distribution = false' do
+      context 'without campaign' do
         before do
           expect(EmailManager::GiftCardReceiptSender).to receive(:call)
           post(
@@ -371,7 +367,11 @@ RSpec.describe 'Webhooks API', type: :request do
         end
 
         it 'creates a gift card' do
-          verify_gift_card(single_use: false)
+          item = Item.where(
+            seller_id: seller1.id,
+            item_type: 'gift_card'
+          ).first
+          verify_gift_card(item: item, single_use: false, amount: amount)
         end
 
         it 'returns status code 200' do
@@ -395,6 +395,79 @@ RSpec.describe 'Webhooks API', type: :request do
 
             expect(response).to have_http_status(409)
           end
+        end
+      end
+
+      context 'with multiple gift cards with campaign' do
+        let(:payment_intent) do
+          create(
+            :payment_intent,
+            :with_campaign,
+            square_payment_id: SecureRandom.uuid,
+            square_location_id: SecureRandom.uuid,
+            recipient: recipient,
+            purchaser: purchaser,
+            line_items: line_items
+          )
+        end
+        let(:line_items) do
+          [
+            {
+              'amount': amount1,
+              'currency': 'usd',
+              'item_type': item_type,
+              'quantity': 1,
+              'seller_id': seller_id
+            },
+            {
+              'amount': amount2,
+              'currency': 'usd',
+              'item_type': item_type,
+              'quantity': 1,
+              'seller_id': seller_id
+            }
+          ].to_json
+        end
+
+        let(:amount1) { 1000 }
+        let(:amount2) { 2000 }
+        let(:item_type) { 'gift_card' }
+        let(:seller_id) { seller1.seller_id }
+
+        before do
+          # Sends only one email, even though two gift cards were created
+          expect(EmailManager::DonationReceiptSender).to receive(:call)
+            .once
+            .with({
+                    payment_intent: payment_intent,
+                    amount: amount1 + amount2,
+                    merchant: seller1.name,
+                    email: payment_intent.purchaser.email
+                  })
+          post(
+            '/webhooks',
+            headers: { 'HTTP_X_SQUARE_SIGNATURE' => 'www.squareup.com' },
+            params: payload.to_json
+          )
+        end
+
+        it 'creates a single use gift card' do
+          # verify_gift_card(single_use: true)
+          items = Item.where(
+            seller_id: seller1.id,
+            item_type: 'gift_card'
+          )
+          expect(items.size).to eq 2
+          verify_gift_card(item: items.first, single_use: true, amount: amount1)
+          verify_gift_card(
+            item: items.second,
+            single_use: true,
+            amount: amount2
+          )
+        end
+
+        it 'returns status code 200' do
+          expect(response).to have_http_status(200)
         end
       end
     end

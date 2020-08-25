@@ -26,15 +26,17 @@ RSpec.describe 'Charges API', type: :request do
         is_distribution: is_distribution
       }
     end
-    let(:distributor) { create :contact }
     let!(:seller) do
-      create(
-        :seller,
-        seller_id: seller_id,
-        square_location_id: ENV['SQUARE_LOCATION_ID'],
-        name: 'Shunfa Bakery',
-        distributor: distributor
-      )
+      create(:seller,
+             :with_campaign,
+             seller_id: seller_id,
+             square_location_id: ENV['SQUARE_LOCATION_ID'],
+             name: 'Shunfa Bakery',
+             cost_per_meal: 100)
+    end
+
+    let(:expected_line_items) do
+      line_items.map { |li| li.except(:is_distribution) }
     end
 
     context 'using Square' do
@@ -135,7 +137,7 @@ RSpec.describe 'Charges API', type: :request do
 
           expect(contact).not_to be_nil
           expect(
-            PaymentIntent.find_by(recipient: contact, line_items: line_items.to_json)
+            PaymentIntent.find_by(recipient: contact, line_items: expected_line_items.to_json)
           ).not_to be_nil
         end
 
@@ -179,7 +181,7 @@ RSpec.describe 'Charges API', type: :request do
 
           expect(contact).not_to be_nil
           expect(
-            PaymentIntent.find_by(recipient: contact, line_items: line_items.to_json)
+            PaymentIntent.find_by(recipient: contact, line_items: expected_line_items.to_json)
           ).not_to be_nil
         end
 
@@ -214,14 +216,15 @@ RSpec.describe 'Charges API', type: :request do
           expect(payment['buyer_email_address']).to eq(email)
 
           contact = Contact.find_by(email: email, name: name)
-          payment_intent =
-            PaymentIntent.find_by(purchaser: contact,
-                                  line_items: line_items.to_json)
+          payment_intent = PaymentIntent.find_by(
+            purchaser: contact,
+            line_items: expected_line_items.to_json
+          )
 
           expect(contact).not_to be_nil
           expect(payment_intent).not_to be_nil
           expect(payment_intent.recipient).not_to eq(contact)
-          expect(payment_intent.recipient).to eq(distributor)
+          expect(payment_intent.recipient).to eq(seller.campaigns.first.distributor.contact)
           expect(payment_intent.recipient).not_to eq(payment_intent.purchaser)
         end
 
@@ -509,6 +512,33 @@ RSpec.describe 'Charges API', type: :request do
       it 'returns a validation failure message' do
         expect(response.body).to match(
           /param is missing or the value is empty: seller_id/
+        )
+      end
+    end
+
+    context 'with an amount that does not divide the seller cost per meal' do
+      let(:is_distribution) { true }
+      let(:line_items) do
+        [
+          {
+            amount: 120,
+            currency: 'usd',
+            item_type: 'gift_card',
+            quantity: 1,
+            seller_id: seller_id
+          }
+        ]
+      end
+
+      before { post '/charges', params: params, as: :json }
+
+      it 'returns status code 422' do
+        expect(response).to have_http_status(422)
+      end
+
+      it 'returns a validation failure message' do
+        expect(response.body).to match(
+          /^.*Gift A Meal amount '\d+' must be divisible by seller's cost per meal '\d+'..*$/
         )
       end
     end

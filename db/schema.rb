@@ -10,26 +10,44 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_17_023402) do
+ActiveRecord::Schema.define(version: 2020_08_17_030307) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
+  create_table "campaigns", force: :cascade do |t|
+    t.boolean "active", default: false
+    t.boolean "valid", default: true
+    t.datetime "end_date", null: false
+    t.string "description"
+    t.string "gallery_image_urls", array: true
+    t.bigint "location_id", null: false
+    t.bigint "seller_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.bigint "distributor_id"
+    t.integer "target_amount", default: 100000, null: false
+    t.integer "price_per_meal", default: 500, null: false
+    t.index ["distributor_id"], name: "index_campaigns_on_distributor_id"
+    t.index ["location_id"], name: "index_campaigns_on_location_id"
+    t.index ["seller_id"], name: "index_campaigns_on_seller_id"
+  end
+
   create_table "contacts", force: :cascade do |t|
-    t.string "email"
+    t.string "email", null: false
     t.boolean "is_subscribed", default: true, null: false
     t.string "name"
-    t.bigint "seller_id"
-    t.index ["email"], name: "index_contacts_on_email"
-    t.index ["seller_id"], name: "index_contacts_on_seller_id"
+    t.string "instagram"
+    t.string "rewards_redemption_access_token"
+    t.index ["email"], name: "index_contacts_on_email", unique: true
   end
 
   create_table "delivery_options", force: :cascade do |t|
     t.string "url"
     t.string "phone_number"
-    t.bigint "seller_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "seller_id", null: false
     t.index ["seller_id"], name: "index_delivery_options_on_seller_id"
   end
 
@@ -40,6 +58,14 @@ ActiveRecord::Schema.define(version: 2020_06_17_023402) do
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "delivery_option_id"
     t.index ["delivery_option_id"], name: "index_delivery_types_on_delivery_option_id"
+  end
+
+  create_table "distributors", force: :cascade do |t|
+    t.string "website_url"
+    t.string "image_url"
+    t.bigint "contact_id"
+    t.string "name"
+    t.index ["contact_id"], name: "index_distributors_on_contact_id"
   end
 
   create_table "donation_details", force: :cascade do |t|
@@ -54,6 +80,13 @@ ActiveRecord::Schema.define(version: 2020_06_17_023402) do
     t.string "idempotency_key"
     t.integer "event_type"
     t.index ["idempotency_key", "event_type"], name: "index_existing_events_on_idempotency_key_and_event_type", unique: true
+  end
+
+  create_table "fees", force: :cascade do |t|
+    t.decimal "multiplier", default: "0.0"
+    t.boolean "active", default: true
+    t.bigint "seller_id", null: false
+    t.index ["seller_id"], name: "index_fees_on_seller_id"
   end
 
   create_table "gift_card_amounts", force: :cascade do |t|
@@ -86,6 +119,8 @@ ActiveRecord::Schema.define(version: 2020_06_17_023402) do
     t.bigint "payment_intent_id"
     t.boolean "refunded", default: false
     t.bigint "purchaser_id"
+    t.bigint "campaign_id"
+    t.index ["campaign_id"], name: "index_items_on_campaign_id"
     t.index ["payment_intent_id"], name: "index_items_on_payment_intent_id"
     t.index ["purchaser_id"], name: "index_items_on_purchaser_id"
     t.index ["seller_id"], name: "index_items_on_seller_id"
@@ -97,10 +132,12 @@ ActiveRecord::Schema.define(version: 2020_06_17_023402) do
     t.string "city", null: false
     t.string "state", null: false
     t.string "zip_code", null: false
-    t.bigint "seller_id", null: false
+    t.bigint "seller_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "phone_number"
+    t.string "neighborhood"
+    t.string "borough"
     t.index ["seller_id"], name: "index_locations_on_seller_id"
   end
 
@@ -115,6 +152,26 @@ ActiveRecord::Schema.define(version: 2020_06_17_023402) do
     t.index ["seller_id"], name: "index_menu_items_on_seller_id"
   end
 
+  create_table "open_hours", force: :cascade do |t|
+    t.bigint "seller_id", null: false
+    t.time "open_time"
+    t.time "close_time"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.integer "open_day"
+    t.integer "close_day"
+    t.index ["seller_id"], name: "index_open_hours_on_seller_id"
+  end
+
+  create_table "participating_sellers", force: :cascade do |t|
+    t.string "name"
+    t.bigint "seller_id"
+    t.string "stamp_url"
+    t.string "tickets_secret"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "payment_intents", force: :cascade do |t|
     t.text "line_items"
     t.datetime "created_at", precision: 6, null: false
@@ -126,6 +183,10 @@ ActiveRecord::Schema.define(version: 2020_06_17_023402) do
     t.bigint "purchaser_id"
     t.bigint "recipient_id"
     t.integer "lock_version"
+    t.bigint "fee_id"
+    t.bigint "campaign_id"
+    t.index ["campaign_id"], name: "index_payment_intents_on_campaign_id"
+    t.index ["fee_id"], name: "index_payment_intents_on_fee_id"
     t.index ["purchaser_id"], name: "index_payment_intents_on_purchaser_id"
     t.index ["recipient_id"], name: "index_payment_intents_on_recipient_id"
   end
@@ -174,21 +235,55 @@ ActiveRecord::Schema.define(version: 2020_06_17_023402) do
     t.string "gallery_image_urls", default: [], null: false, array: true
     t.string "logo_image_url"
     t.string "non_profit_location_id"
+    t.string "gift_cards_access_token", default: "", null: false
+    t.index ["gift_cards_access_token"], name: "index_sellers_on_gift_cards_access_token", unique: true
     t.index ["seller_id"], name: "index_sellers_on_seller_id"
   end
 
+  create_table "sponsor_sellers", force: :cascade do |t|
+    t.string "name"
+    t.bigint "location_id"
+    t.string "logo_url"
+    t.string "reward"
+    t.integer "reward_cost", default: 3, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "tickets", force: :cascade do |t|
+    t.bigint "contact_id"
+    t.string "ticket_id", null: false
+    t.bigint "participating_seller_id", null: false
+    t.bigint "sponsor_seller_id"
+    t.date "redeemed_at"
+    t.date "expiration"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["contact_id"], name: "index_tickets_on_contact_id"
+    t.index ["participating_seller_id"], name: "index_tickets_on_participating_seller_id"
+    t.index ["sponsor_seller_id"], name: "index_tickets_on_sponsor_seller_id"
+  end
+
+  add_foreign_key "campaigns", "locations"
+  add_foreign_key "campaigns", "sellers"
   add_foreign_key "delivery_options", "sellers"
   add_foreign_key "delivery_types", "delivery_options"
   add_foreign_key "donation_details", "items"
   add_foreign_key "gift_card_amounts", "gift_card_details"
   add_foreign_key "gift_card_details", "contacts", column: "recipient_id"
   add_foreign_key "gift_card_details", "items"
+  add_foreign_key "items", "campaigns"
   add_foreign_key "items", "contacts", column: "purchaser_id"
   add_foreign_key "items", "payment_intents"
   add_foreign_key "items", "sellers"
   add_foreign_key "locations", "sellers"
   add_foreign_key "menu_items", "sellers"
+  add_foreign_key "open_hours", "sellers"
+  add_foreign_key "payment_intents", "campaigns"
   add_foreign_key "payment_intents", "contacts", column: "purchaser_id"
   add_foreign_key "payment_intents", "contacts", column: "recipient_id"
   add_foreign_key "refunds", "payment_intents"
+  add_foreign_key "tickets", "contacts"
+  add_foreign_key "tickets", "participating_sellers"
+  add_foreign_key "tickets", "sponsor_sellers"
 end

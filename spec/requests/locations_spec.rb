@@ -4,14 +4,12 @@ require 'rails_helper'
 
 RSpec.describe 'Locations API' do
   # Initialize the test data
-  let!(:seller) { create(:seller) }
-  let!(:locations) { create_list(:location, 20, seller_id: seller.id) }
-  let(:seller_id) { seller.seller_id }
+  let!(:locations) { create_list(:location, 20) }
   let(:id) { locations.first.id }
 
   # Test suite for GET /sellers/:seller_id/locations
-  describe 'GET /sellers/:seller_id/locations' do
-    before { get "/sellers/#{seller_id}/locations" }
+  describe 'GET /locations' do
+    before { get "/locations" }
 
     context 'when seller exists' do
       it 'returns status code 200' do
@@ -22,25 +20,13 @@ RSpec.describe 'Locations API' do
         expect(json.size).to eq(20)
       end
     end
-
-    context 'when seller does not exist' do
-      let(:seller_id) { 0 }
-
-      it 'returns status code 404' do
-        expect(response).to have_http_status(404)
-      end
-
-      it 'returns a not found message' do
-        expect(response.body).to match(/Couldn't find Seller/)
-      end
-    end
   end
 
-  # Test suite for GET /sellers/:seller_id/locations/:id
-  describe 'GET /sellers/:seller_id/locations/:id' do
-    before { get "/sellers/#{seller_id}/locations/#{id}" }
+  # Test suite for GET /locations/:id
+  describe 'GET /locations/:id' do
+    before { get "/locations/#{id}" }
 
-    context 'when seller location exists' do
+    context 'when location exists' do
       it 'returns status code 200' do
         expect(response).to have_http_status(200)
       end
@@ -50,7 +36,7 @@ RSpec.describe 'Locations API' do
       end
     end
 
-    context 'when seller location does not exist' do
+    context 'when location does not exist' do
       let(:id) { 0 }
 
       it 'returns status code 404' do
@@ -63,8 +49,8 @@ RSpec.describe 'Locations API' do
     end
   end
 
-  # Test suite for PUT /sellers/:seller_id/locations
-  describe 'POST /sellers/:seller_id/locations' do
+  # Test suite for POST /locations
+  describe 'POST /locations' do
     let(:valid_attributes) do
       {
         address1: '123 Justin Way',
@@ -78,7 +64,7 @@ RSpec.describe 'Locations API' do
     context 'when request attributes are valid' do
       before do
         post(
-          "/sellers/#{seller_id}/locations",
+          "/locations",
           params: valid_attributes,
           as: :json
         )
@@ -90,7 +76,7 @@ RSpec.describe 'Locations API' do
     end
 
     context 'when an invalid request' do
-      before { post "/sellers/#{seller_id}/locations", params: {} }
+      before { post "/locations", params: {} }
 
       it 'returns status code 422' do
         expect(response).to have_http_status(422)
@@ -104,13 +90,13 @@ RSpec.describe 'Locations API' do
     end
   end
 
-  # Test suite for PUT /sellers/:seller_id/locations/:id
-  describe 'PUT /sellers/:seller_id/locations/:id' do
+  # Test suite for PUT /locations/:id
+  describe 'PUT /locations/:id' do
     let(:valid_attributes) { { address1: '123 Mozart' } }
 
     before do
       put(
-        "/sellers/#{seller_id}/locations/#{id}",
+        "/locations/#{id}",
         params: valid_attributes,
         as: :json
       )

@@ -6,5 +6,6 @@ FactoryBot.define do
     association :payment_intent
     association :purchaser, factory: :contact
     item_type { Faker::Number.within(range: 0..1) }
+    refunded { false }
   end
 end
