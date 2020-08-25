@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-namespace :email_giftcards do
+namespace :emailer do
   desc 'Email customers the gift cards that they ordered'
-  task send_emails: :environment do
+  task vouchers_to_customers: :environment do
     desc 'send emails'
 
     unique_recipients = GiftCardDetail
