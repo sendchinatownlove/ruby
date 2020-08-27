@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_27_050811) do
+ActiveRecord::Schema.define(version: 2020_08_27_044947) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -45,9 +45,9 @@ ActiveRecord::Schema.define(version: 2020_08_27_050811) do
   create_table "delivery_options", force: :cascade do |t|
     t.string "url"
     t.string "phone_number"
+    t.bigint "seller_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.bigint "seller_id", null: false
     t.index ["seller_id"], name: "index_delivery_options_on_seller_id"
   end
 
@@ -260,6 +260,7 @@ ActiveRecord::Schema.define(version: 2020_08_27_050811) do
     t.date "expiration"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.boolean "printed", default: false, null: false
     t.index ["contact_id"], name: "index_tickets_on_contact_id"
     t.index ["participating_seller_id"], name: "index_tickets_on_participating_seller_id"
     t.index ["sponsor_seller_id"], name: "index_tickets_on_sponsor_seller_id"

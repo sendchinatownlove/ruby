@@ -6,6 +6,7 @@
 #
 #  id                      :bigint           not null, primary key
 #  expiration              :date
+#  printed                 :boolean          default(FALSE), not null
 #  redeemed_at             :date
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
