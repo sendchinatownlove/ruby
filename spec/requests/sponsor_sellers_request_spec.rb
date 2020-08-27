@@ -30,6 +30,7 @@ RSpec.describe 'SponsorSellers', type: :request do
         expect(json['id']).to eq sponsor_seller.id
         expect(json['reward_cost']).to eq sponsor_seller.reward_cost
         expect(json['reward']).to eq sponsor_seller.reward
+        expect(json['reward_detail']).to eq sponsor_seller.reward_detail
         expect(json['logo_url']).to eq sponsor_seller.logo_url
         expect(json['location_id']).to eq sponsor_seller.location_id
         expect(json['name']).to eq sponsor_seller.name
@@ -70,7 +71,8 @@ RSpec.describe 'SponsorSellers', type: :request do
           name: 'Boys Sometimes Cry',
           logo_url: 'sendchinatownlove.com/lalalllala',
           reward: 'Free Shot in the Dark',
-          reward_cost: 3
+          reward_cost: 3,
+          reward_detail: 'only valid after sunset'
         }
       end
 
@@ -80,6 +82,7 @@ RSpec.describe 'SponsorSellers', type: :request do
         expect(json['id']).to eq sponsor_seller.id
         expect(json['reward_cost']).to eq sponsor_seller.reward_cost
         expect(json['reward']).to eq sponsor_seller.reward
+        expect(json['reward_detail']).to eq sponsor_seller.reward_detail
         expect(json['logo_url']).to eq sponsor_seller.logo_url
         expect(json['location_id']).to eq sponsor_seller.location_id
         expect(json['name']).to eq sponsor_seller.name
@@ -87,6 +90,7 @@ RSpec.describe 'SponsorSellers', type: :request do
         expect(sponsor_seller).not_to be_nil
         expect(sponsor_seller.reward_cost).to eq attrs[:reward_cost]
         expect(sponsor_seller.reward).to eq attrs[:reward]
+        expect(sponsor_seller.reward_detail).to eq attrs[:reward_detail]
         expect(sponsor_seller.logo_url).to eq attrs[:logo_url]
         expect(sponsor_seller.location_id).to eq attrs[:location_id]
         expect(sponsor_seller.name).to eq attrs[:name]
@@ -115,6 +119,7 @@ RSpec.describe 'SponsorSellers', type: :request do
         expect(json['id']).to eq sponsor_seller.id
         expect(json['reward_cost']).to eq sponsor_seller.reward_cost
         expect(json['reward']).to eq sponsor_seller.reward
+        expect(json['reward_detail']).to eq sponsor_seller.reward_detail
         expect(json['logo_url']).to eq sponsor_seller.logo_url
         expect(json['location_id']).to eq sponsor_seller.location_id
         expect(json['name']).to eq sponsor_seller.name
@@ -122,6 +127,7 @@ RSpec.describe 'SponsorSellers', type: :request do
         expect(sponsor_seller).not_to be_nil
         expect(sponsor_seller.reward_cost).to eq attrs[:reward_cost]
         expect(sponsor_seller.reward).to eq attrs[:reward]
+        expect(sponsor_seller.reward_detail).to eq attrs[:reward_detail]
         expect(sponsor_seller.logo_url).to eq attrs[:logo_url]
         expect(sponsor_seller.location_id).to eq attrs[:location_id]
         expect(sponsor_seller.name).to eq attrs[:name]
@@ -152,7 +158,8 @@ RSpec.describe 'SponsorSellers', type: :request do
           name: 'Boys Sometimes Cry',
           logo_url: 'sendchinatownlove.com/lalalllala',
           reward: 'Free Shot in the Dark',
-          reward_cost: 3
+          reward_cost: 3,
+          reward_detail: 'only valid after sunset'
         }
       end
 
@@ -161,6 +168,7 @@ RSpec.describe 'SponsorSellers', type: :request do
         expect(sponsor_seller).not_to be_nil
         expect(sponsor_seller.reward_cost).to eq attrs[:reward_cost]
         expect(sponsor_seller.reward).to eq attrs[:reward]
+        expect(sponsor_seller.reward_detail).to eq attrs[:reward_detail]
         expect(sponsor_seller.logo_url).to eq attrs[:logo_url]
         expect(sponsor_seller.location_id).to eq attrs[:location_id]
         expect(sponsor_seller.name).to eq attrs[:name]
@@ -171,6 +179,7 @@ RSpec.describe 'SponsorSellers', type: :request do
         sponsor_seller = SponsorSeller.find(json['id'])
         expect(json['reward_cost']).to eq sponsor_seller.reward_cost
         expect(json['reward']).to eq sponsor_seller.reward
+        expect(json['reward_detail']).to eq sponsor_seller.reward_detail
         expect(json['logo_url']).to eq sponsor_seller.logo_url
         expect(json['location_id']).to eq sponsor_seller.location_id
         expect(json['name']).to eq sponsor_seller.name
