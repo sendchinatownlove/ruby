@@ -31,7 +31,8 @@ class SponsorSellersController < ApplicationController
       :location_id,
       :logo_url,
       :reward,
-      :reward_cost
+      :reward_cost,
+      :reward_detail
     )
   end
 
