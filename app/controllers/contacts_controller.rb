@@ -32,7 +32,9 @@ class ContactsController < ApplicationController
   def get_contact_json
     # Be careful not to return any private information because we don't want
     # our DB to become an email -> instagram/name lookup for people to abuse
-    @contact.as_json.slice('id')
+    ret = @contact.as_json.slice('id')
+    ret[:instagram] = @contact.instagram.present?
+    ret
   end
 
   def update_contact_json
