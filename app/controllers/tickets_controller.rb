@@ -31,7 +31,7 @@ class TicketsController < ApplicationController
 
   # PATCH/PUT /tickets/:ticket_id
   def update
-    @ticket.update!(ticket_params)
+    @ticket.update!(ticket_params.merge({ associated_with_contact_at: Time.now }))
 
     json_response(@ticket)
   end

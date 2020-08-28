@@ -4,16 +4,17 @@
 #
 # Table name: tickets
 #
-#  id                      :bigint           not null, primary key
-#  expiration              :date
-#  printed                 :boolean          default(FALSE), not null
-#  redeemed_at             :date
-#  created_at              :datetime         not null
-#  updated_at              :datetime         not null
-#  contact_id              :bigint
-#  participating_seller_id :bigint           not null
-#  sponsor_seller_id       :bigint
-#  ticket_id               :string           not null
+#  id                         :bigint           not null, primary key
+#  associated_with_contact_at :datetime
+#  expiration                 :date
+#  printed                    :boolean          default(FALSE), not null
+#  redeemed_at                :date
+#  created_at                 :datetime         not null
+#  updated_at                 :datetime         not null
+#  contact_id                 :bigint
+#  participating_seller_id    :bigint           not null
+#  sponsor_seller_id          :bigint
+#  ticket_id                  :string           not null
 #
 # Indexes
 #
