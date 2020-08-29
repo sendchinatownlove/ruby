@@ -53,7 +53,7 @@ module EmailManager
         </body>
       </html>
       EOF
-      EmailManager::Sender.send_receipt_with_subject(
+      EmailManager::Sender.send_receipt(
         to: email,
         html: html,
         subject: "Send Chinatown Love Food Crawl: Redeem Your Reward!",

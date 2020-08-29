@@ -18,7 +18,7 @@ class ContactTicketsController < ApplicationController
       raise ActiveRecord::RecordNotFound
     end
 
-    # Don't let someon redeem tickets if the token has expired.
+    # Don't let someone redeem tickets if the token has expired.
     if Time.now >= @contact.expires_at
       raise ActiveRecord::RecordNotFound
     end
