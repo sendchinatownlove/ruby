@@ -32,21 +32,21 @@ module EmailManager
             By visiting our Food Crawl vendors, you can now access a local
             reward to redeem in Chinatown. In the Passport to Chinatown,
             you will be able to view local rewards and redeem them when you
-            are at the local rewards partner. <b>Please note that the reward
-            must be redeemed in person. Once you click on “Redeem Now” you
-            will have 5 minutes to show the vendor host.</b>
+            are at the local rewards partner. <strong>Please note that the
+            reward must be redeemed in person. Once you click on “Redeem Now”
+            you will have 5 minutes to show the vendor host.</strong>
           </p>
           <p>
             Click through this unique link to view your available local
             rewards!
           </p>
-          <p>
-            <i>This link will expire in 30 minutes. You can request a new
-            email again if the link expires.</i>
+          <p style="font-style: italic">
+            This link will expire in 30 minutes. You can request a new
+            email again if the link expires.
           </p>
           <p>
             <a href="#{redemption_url}" target="_blank">
-              <b>MY LOCAL REWARDS</b>
+              <strong>MY LOCAL REWARDS</strong>
             </a>
           </p>
           <p>(Best viewed on mobile).</p>
