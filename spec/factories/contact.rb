@@ -6,5 +6,6 @@ FactoryBot.define do
     name { Faker::Name.name }
     is_subscribed { Faker::Boolean }
     rewards_redemption_access_token { Faker::Alphanumeric.alphanumeric(number: 64) }
+    expires_at { Time.now + 30.minutes }
   end
 end

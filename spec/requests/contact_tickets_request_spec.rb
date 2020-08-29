@@ -9,6 +9,9 @@ RSpec.describe 'ContactTickets', type: :request do
   let!(:contact2) do
     create :contact
   end
+  let!(:contact_with_expired_token) do
+    create :contact, expires_at: Time.now
+  end
 
   let!(:ticket1) do
     create :ticket, contact: contact1
@@ -116,6 +119,16 @@ RSpec.describe 'ContactTickets', type: :request do
       context 'with invalid rewards_redemption_access_token' do
         let(:rewards_redemption_access_token) do
           contact2.rewards_redemption_access_token
+        end
+
+        it 'returns 404' do
+          expect(response).to have_http_status(404)
+        end
+      end
+
+      context 'with valid but expired rewards_redemption_access_token' do
+        let(:rewards_redemption_access_token) do
+          contact_with_expired_token.rewards_redemption_access_token
         end
 
         it 'returns 404' do
