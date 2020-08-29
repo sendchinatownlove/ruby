@@ -14,19 +14,50 @@ module EmailManager
     def call
       redemption_url = 'https://merchant.sendchinatownlove.com/passport/' + contact_id.to_s \
         + '/redeem/' + token
-      html = '<!DOCTYPE html>' \
-           '<html>' \
-           '<head>' \
-           "  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />" \
-           '</head>' \
-           '<body>' \
-           '<p> Ticket Redemption URL: ' + redemption_url + '</p>' \
-           '<p> Sending thanks from us and from Chinatown for your support! </p>' \
-           '<p> Love,<p>' \
-           '<p> Send Chinatown Love</p>' \
-           '</body>' \
-           '</html>'
-      EmailManager::Sender.send_receipt(to: email, html: html)
+      html = <<~EOF
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+        </head>
+        <body>
+          <p>Congratulations!</p>
+          <p>
+            You have unlocked a reward for your participation in the
+            <a href="https://www.sendchinatownlove.com/food-crawl.html" target="_blank">
+              Send Chinatown Love Food Crawl.
+            </a>
+          </p>
+          <p>
+            By visiting our Food Crawl vendors, you can now access a local
+            reward to redeem in Chinatown. In the Passport to Chinatown,
+            you will be able to view local rewards and redeem them when you
+            are at the local rewards partner. <strong>Please note that the
+            reward must be redeemed in person. Once you click on “Redeem Now”
+            you will have 5 minutes to show the vendor host.</strong>
+          </p>
+          <p>
+            Click through this unique link to view your available local
+            rewards!
+          </p>
+          <p style="font-style: italic">
+            This link will expire in 30 minutes. You can request a new
+            email again if the link expires.
+          </p>
+          <p>
+            <a href="#{redemption_url}" target="_blank">
+              <strong>MY LOCAL REWARDS</strong>
+            </a>
+          </p>
+          <p>(Best viewed on mobile).</p>
+        </body>
+      </html>
+      EOF
+      EmailManager::Sender.send_receipt(
+        to: email,
+        html: html,
+        subject: "Send Chinatown Love Food Crawl: Redeem Your Reward!",
+      )
     rescue StandardError
       Rails.logger.error 'Passport redemption e-mail errored out. ' \
               "email: #{email}"
