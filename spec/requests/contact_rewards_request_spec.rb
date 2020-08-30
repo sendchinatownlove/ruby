@@ -4,7 +4,8 @@ require 'rails_helper'
 
 RSpec.describe 'ContactRewards', type: :request do
   before do
-    @contact = create :contact
+    freeze_time
+    @contact = create :contact, expires_at: Time.now
   end
 
   context 'POST /contacts/:id/rewards' do
@@ -16,28 +17,65 @@ RSpec.describe 'ContactRewards', type: :request do
       end
     end
 
-    context 'With an existing contact id' do
+    context 'with token that has expired' do
       before(:each) do
-        allow(EmailManager::ContactRewardsSender).to receive(:call)
+        allow(Time).to receive(:now).and_return(Time.now - 1.minute)
       end
 
-      it 'Sends an e-mail to the contact' do
-        expect(EmailManager::ContactRewardsSender).to receive(:call)
-          .once
-          .with({
-                  contact_id: @contact.id,
-                  email: @contact.email,
-                  token: anything
-                })
+      context 'With an existing contact id' do
+        before(:each) do
+          allow(EmailManager::ContactRewardsSender).to receive(:call)
+          allow(Time).to receive(:now).and_return(Time.now - 1.minute)
+        end
 
-        post "/contacts/#{@contact.id}/rewards"
+        it 'Sends an e-mail to the contact' do
+          expect(EmailManager::ContactRewardsSender).to receive(:call)
+            .once
+            .with({
+                    contact_id: @contact.id,
+                    email: @contact.email,
+                    token: anything
+                  })
+
+          post "/contacts/#{@contact.id}/rewards"
+        end
+
+        it 'Updates the Contact token' do
+          post "/contacts/#{@contact.id}/rewards"
+
+          updated_contact = Contact.find(@contact.id)
+          expect(updated_contact.rewards_redemption_access_token).to eq(@contact.rewards_redemption_access_token)
+          expect(updated_contact.expires_at).to eq(Time.now + 30.minutes)
+        end
       end
+    end
 
-      it 'Updates the Contact token' do
-        post "/contacts/#{@contact.id}/rewards"
+    context 'with token that has not expired' do
 
-        updated_contact = Contact.find(@contact.id)
-        expect(updated_contact.rewards_redemption_access_token).not_to eq(@contact.rewards_redemption_access_token)
+      context 'With an existing contact id' do
+        before(:each) do
+          allow(EmailManager::ContactRewardsSender).to receive(:call)
+        end
+
+        it 'Sends an e-mail to the contact' do
+          expect(EmailManager::ContactRewardsSender).to receive(:call)
+            .once
+            .with({
+                    contact_id: @contact.id,
+                    email: @contact.email,
+                    token: anything
+                  })
+
+          post "/contacts/#{@contact.id}/rewards"
+        end
+
+        it 'Updates the Contact token' do
+          post "/contacts/#{@contact.id}/rewards"
+
+          updated_contact = Contact.find(@contact.id)
+          expect(updated_contact.rewards_redemption_access_token).not_to eq(@contact.rewards_redemption_access_token)
+          expect(updated_contact.expires_at).to eq(Time.now + 30.minutes)
+        end
       end
     end
   end
