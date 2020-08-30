@@ -5,7 +5,15 @@ class ContactRewardsController < ApplicationController
   def create
     ActiveRecord::Base.transaction do
       contact = Contact.find(params[:contact_id])
-      token = 'token_' + ULID.generate
+
+      # If they've already requested an email within the last 30 minutes, use
+      # the same token
+      token = if Time.now < contact.expires_at
+        contact.rewards_redemption_access_token
+      else
+        # Otherwise generate a new one
+        'token_' + ULID.generate
+      end
 
       contact.update(
         expires_at: Time.now + 30.minutes,
