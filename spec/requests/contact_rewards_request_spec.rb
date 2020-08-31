@@ -5,10 +5,10 @@ require 'rails_helper'
 RSpec.describe 'ContactRewards', type: :request do
   before do
     freeze_time
-    @contact = create :contact, expires_at: Time.now
   end
 
   context 'POST /contacts/:id/rewards' do
+    let!(:contact) { create :contact, expires_at: Time.now }
     context 'With a missing contact id' do
       before { post '/contacts/missing/rewards' }
 
@@ -32,20 +32,44 @@ RSpec.describe 'ContactRewards', type: :request do
           expect(EmailManager::ContactRewardsSender).to receive(:call)
             .once
             .with({
-                    contact_id: @contact.id,
-                    email: @contact.email,
+                    contact_id: contact.id,
+                    email: contact.email,
                     token: anything
                   })
 
-          post "/contacts/#{@contact.id}/rewards"
+          post "/contacts/#{contact.id}/rewards"
         end
 
-        it 'Updates the Contact token' do
-          post "/contacts/#{@contact.id}/rewards"
+        it 'does not update the Contact token' do
+          post "/contacts/#{contact.id}/rewards"
 
-          updated_contact = Contact.find(@contact.id)
-          expect(updated_contact.rewards_redemption_access_token).to eq(@contact.rewards_redemption_access_token)
+          updated_contact = Contact.find(contact.id)
+          expect(updated_contact.rewards_redemption_access_token).to eq(contact.rewards_redemption_access_token)
           expect(updated_contact.expires_at).to eq(Time.now + 30.minutes)
+        end
+
+        context 'with nil expires at' do
+          let!(:contact) { create :contact, expires_at: nil }
+
+          it 'Sends an e-mail to the contact' do
+            expect(EmailManager::ContactRewardsSender).to receive(:call)
+              .once
+              .with({
+                      contact_id: contact.id,
+                      email: contact.email,
+                      token: anything
+                    })
+
+            post "/contacts/#{contact.id}/rewards"
+          end
+
+          it 'updates the Contact token' do
+            post "/contacts/#{contact.id}/rewards"
+
+            updated_contact = Contact.find(contact.id)
+            expect(updated_contact.rewards_redemption_access_token).not_to eq(contact.rewards_redemption_access_token)
+            expect(updated_contact.expires_at).to eq(Time.now + 30.minutes)
+          end
         end
       end
     end
@@ -61,20 +85,44 @@ RSpec.describe 'ContactRewards', type: :request do
           expect(EmailManager::ContactRewardsSender).to receive(:call)
             .once
             .with({
-                    contact_id: @contact.id,
-                    email: @contact.email,
+                    contact_id: contact.id,
+                    email: contact.email,
                     token: anything
                   })
 
-          post "/contacts/#{@contact.id}/rewards"
+          post "/contacts/#{contact.id}/rewards"
         end
 
-        it 'Updates the Contact token' do
-          post "/contacts/#{@contact.id}/rewards"
+        it 'updates the Contact token' do
+          post "/contacts/#{contact.id}/rewards"
 
-          updated_contact = Contact.find(@contact.id)
-          expect(updated_contact.rewards_redemption_access_token).not_to eq(@contact.rewards_redemption_access_token)
+          updated_contact = Contact.find(contact.id)
+          expect(updated_contact.rewards_redemption_access_token).not_to eq(contact.rewards_redemption_access_token)
           expect(updated_contact.expires_at).to eq(Time.now + 30.minutes)
+        end
+
+        context 'with nil expires at' do
+          let!(:contact) { create :contact, expires_at: nil }
+
+          it 'Sends an e-mail to the contact' do
+            expect(EmailManager::ContactRewardsSender).to receive(:call)
+              .once
+              .with({
+                      contact_id: contact.id,
+                      email: contact.email,
+                      token: anything
+                    })
+
+            post "/contacts/#{contact.id}/rewards"
+          end
+
+          it 'updates the Contact token' do
+            post "/contacts/#{contact.id}/rewards"
+
+            updated_contact = Contact.find(contact.id)
+            expect(updated_contact.rewards_redemption_access_token).not_to eq(contact.rewards_redemption_access_token)
+            expect(updated_contact.expires_at).to eq(Time.now + 30.minutes)
+          end
         end
       end
     end
