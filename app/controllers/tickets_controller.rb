@@ -39,7 +39,7 @@ class TicketsController < ApplicationController
   private
 
   def set_ticket
-    @ticket = Ticket.find_by(ticket_id: params[:id])
+    @ticket = Ticket.find_by!(ticket_id: params[:id])
   end
 
   def set_participating_seller
