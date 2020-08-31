@@ -191,5 +191,15 @@ RSpec.describe '/tickets', type: :request do
         expect(response.content_type).to match(a_string_including('application/json'))
       end
     end
+
+    context 'with invalid ticket' do
+      it 'renders a JSON response with errors for the ticket without a valid contact' do
+        ticket = Ticket.create! base_attributes
+        put ticket_url('oijawefo'),
+            params: update_attributes, as: :json
+        expect(response).to have_http_status(:not_found)
+        expect(response.content_type).to match(a_string_including('application/json'))
+      end
+    end
   end
 end
