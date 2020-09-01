@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddPrintedToTickets < ActiveRecord::Migration[6.0]
   def change
     add_column :tickets, :printed, :boolean, null: false, default: false

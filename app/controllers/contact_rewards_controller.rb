@@ -9,15 +9,15 @@ class ContactRewardsController < ApplicationController
       # If they've already requested an email within the last 30 minutes, use
       # the same token
       token = if contact.expires_at.present? && Time.now < contact.expires_at
-        contact.rewards_redemption_access_token
-      else
-        # Otherwise generate a new one
-        'token_' + ULID.generate
+                contact.rewards_redemption_access_token
+              else
+                # Otherwise generate a new one
+                'token_' + ULID.generate
       end
 
       contact.update(
         expires_at: Time.now + 30.minutes,
-        rewards_redemption_access_token: token,
+        rewards_redemption_access_token: token
       )
 
       EmailManager::ContactRewardsSender.call(

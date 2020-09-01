@@ -14,13 +14,16 @@ RSpec.describe 'ContactTickets', type: :request do
   end
 
   let!(:ticket1) do
-    create :ticket, contact: contact1
+    create :ticket, contact: contact1, associated_with_contact_at: Time.now + 1.hour
   end
   let!(:ticket2) do
-    create :ticket, contact: contact1
+    create :ticket, contact: contact1, associated_with_contact_at: Time.now
   end
   let!(:ticket3) do
     create :ticket, contact: contact2
+  end
+  let!(:ticket4) do
+    create :ticket, contact: contact1, associated_with_contact_at: Time.now + 2.hours
   end
   let!(:redeemed_ticket) do
     create :ticket, contact: contact2, sponsor_seller: sponsor_seller2
@@ -37,13 +40,14 @@ RSpec.describe 'ContactTickets', type: :request do
     before { get "/contacts/#{contact_id}/tickets" }
     let(:contact_id) { contact1.id }
 
-    it 'returns all the tickets this contact has redeemed' do
+    it 'returns all the tickets this contact has redeemed in asc order' do
       expect(json).not_to be_empty
-      expect(json.size).to eq 2
+      expect(json.size).to eq 3
       expect(json).to eq(
         [
+          ticket2.as_json.except(:ticket_id),
           ticket1.as_json.except(:ticket_id),
-          ticket2.as_json.except(:ticket_id)
+          ticket4.as_json.except(:ticket_id)
         ]
       )
     end

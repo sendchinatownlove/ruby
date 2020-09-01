@@ -2,7 +2,7 @@
 
 namespace :emailer do
   desc 'Email customers the gift cards that they ordered'
-  task :vouchers_to_customers => :environment do
+  task vouchers_to_customers: :environment do
     desc 'send emails'
 
     unique_recipients = GiftCardDetail
@@ -26,14 +26,14 @@ namespace :emailer do
             '<table>'
       has_valid_giftcard = false
       gift_cards.each do |gc|
-        if (gc.amount != 0)
-          has_valid_giftcard = true
-          gift_card_url = 'merchant.sendchinatownlove.com/voucher/' + gc.gift_card_id
-          amount_string = EmailManager::Sender.format_amount(amount: gc.amount)
-          item = Item.find_by(id: gc.item_id)
-          merchant_name = Seller.find_by(id: item.seller_id).name
-          html += '<tr><p>View your <b>$' + amount_string + '</b> gift card for <b>' + merchant_name + ' <a href="' + gift_card_url + '">here</a></b></p></tr>'
-        end
+        next unless gc.amount != 0
+
+        has_valid_giftcard = true
+        gift_card_url = 'merchant.sendchinatownlove.com/voucher/' + gc.gift_card_id
+        amount_string = EmailManager::Sender.format_amount(amount: gc.amount)
+        item = Item.find_by(id: gc.item_id)
+        merchant_name = Seller.find_by(id: item.seller_id).name
+        html += '<tr><p>View your <b>$' + amount_string + '</b> gift card for <b>' + merchant_name + ' <a href="' + gift_card_url + '">here</a></b></p></tr>'
       end
       html += '</table>'
       if has_valid_giftcard

@@ -7,9 +7,12 @@ class ContactTicketsController < ApplicationController
   def index
     # Don't need the access token for seeing tickets but don't return ticket_id
     # otherwise people can "steal" tickets from other people
-    json_response(Ticket.where(contact: @contact).map do |ticket|
-      ticket.as_json.except(:ticket_id)
-    end)
+    json_response(
+      Ticket.where(contact: @contact)
+        .order(associated_with_contact_at: :asc).map do |ticket|
+        ticket.as_json.except(:ticket_id)
+      end
+    )
   end
 
   def update
@@ -19,9 +22,7 @@ class ContactTicketsController < ApplicationController
     end
 
     # Don't let someone redeem tickets if the token has expired.
-    if Time.now >= @contact.expires_at
-      raise ActiveRecord::RecordNotFound
-    end
+    raise ActiveRecord::RecordNotFound if Time.now >= @contact.expires_at
 
     # Hash of sponsor_seller_id -> Ticket object array
     sponsor_seller_id_to_tickets = {}
@@ -44,6 +45,7 @@ class ContactTicketsController < ApplicationController
     end
 
     redeemed_at = Date.today
+    updated_tickets = []
     # If there are any invalid tickets, don't update any tickets
     ActiveRecord::Base.transaction do
       sponsor_seller_id_to_tickets.each do |sponsor_seller_id, tickets|
@@ -59,12 +61,12 @@ class ContactTicketsController < ApplicationController
             sponsor_seller: sponsor_seller,
             redeemed_at: redeemed_at
           )
+          updated_tickets << ticket
         end
-
       end
     end
 
-    json_response(Ticket.where(contact: @contact))
+    json_response(updated_tickets)
   end
 
   private

@@ -75,7 +75,6 @@ RSpec.describe 'ContactRewards', type: :request do
     end
 
     context 'with token that has not expired' do
-
       context 'With an existing contact id' do
         before(:each) do
           allow(EmailManager::ContactRewardsSender).to receive(:call)
