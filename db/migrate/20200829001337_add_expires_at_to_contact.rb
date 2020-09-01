@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddExpiresAtToContact < ActiveRecord::Migration[6.0]
   def change
     add_column :contacts, :expires_at, :datetime

@@ -22,9 +22,7 @@ class ContactTicketsController < ApplicationController
     end
 
     # Don't let someone redeem tickets if the token has expired.
-    if Time.now >= @contact.expires_at
-      raise ActiveRecord::RecordNotFound
-    end
+    raise ActiveRecord::RecordNotFound if Time.now >= @contact.expires_at
 
     # Hash of sponsor_seller_id -> Ticket object array
     sponsor_seller_id_to_tickets = {}
@@ -65,7 +63,6 @@ class ContactTicketsController < ApplicationController
           )
           updated_tickets << ticket
         end
-
       end
     end
 
