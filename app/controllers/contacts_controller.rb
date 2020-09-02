@@ -58,7 +58,7 @@ class ContactsController < ApplicationController
                            params[:instagram].tr('@', '')
     end
 
-    params[:email] = params[:email].downcase
+    params[:email] = params[:email].downcase if params[:email].present?
 
     params.permit(
       :email,
