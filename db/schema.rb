@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_17_030307) do
+ActiveRecord::Schema.define(version: 2020_09_03_012833) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -86,6 +86,8 @@ ActiveRecord::Schema.define(version: 2020_08_17_030307) do
     t.decimal "multiplier", default: "0.0"
     t.boolean "active", default: true
     t.bigint "seller_id", null: false
+    t.decimal "flat_cost", precision: 8, scale: 2, default: "0.0"
+    t.boolean "covered_by_customer"
     t.index ["seller_id"], name: "index_fees_on_seller_id"
   end
 
