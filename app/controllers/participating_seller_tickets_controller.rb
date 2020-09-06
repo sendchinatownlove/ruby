@@ -7,10 +7,20 @@ class ParticipatingSellerTicketsController < ApplicationController
   def show
     # NB(justintmckibben): Do we want to hide the tickets that have already
     #                      been redeemed aka the ones with associated contacts?
-    json_response(Ticket.where(participating_seller: @participating_seller))
+
+    tickets = if ticket_params[:last].present?
+      Ticket.where(participating_seller: @participating_seller).last(ticket_params[:last])
+    else
+      Ticket.where(participating_seller: @participating_seller)
+    end
+    json_response(tickets)
   end
 
   private
+
+  def ticket_params
+    params.permit(:last)
+  end
 
   def set_participating_seller
     @participating_seller = ParticipatingSeller.find(params[:participating_seller_id])

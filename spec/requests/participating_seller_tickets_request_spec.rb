@@ -21,8 +21,11 @@ RSpec.describe 'ParticipatingSellerTickets', type: :request do
   end
 
   context 'with valid participating_seller_id' do
-    before { get "/participating_sellers/#{participating_seller_id}/tickets/#{tickets_secret}" }
+    before do
+      get("/participating_sellers/#{participating_seller_id}/tickets/#{tickets_secret}?last=#{last}")
+    end
     let(:participating_seller_id) { participating_seller1.id }
+    let(:last) { nil }
 
     context 'with valid tickets_secret' do
       let(:tickets_secret) { participating_seller1.tickets_secret }
@@ -40,6 +43,23 @@ RSpec.describe 'ParticipatingSellerTickets', type: :request do
 
       it 'returns 200' do
         expect(response).to have_http_status(200)
+      end
+
+      context 'with last' do
+        let(:last) { 1 }
+        it 'returns all the tickets for seller' do
+          expect(json).not_to be_empty
+          expect(json.size).to eq 1
+          expect(json).to eq(
+            [
+              ticket2.as_json
+            ]
+          )
+        end
+
+        it 'returns 200' do
+          expect(response).to have_http_status(200)
+        end
       end
     end
 
