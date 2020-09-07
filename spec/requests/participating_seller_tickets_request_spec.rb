@@ -79,4 +79,107 @@ RSpec.describe 'ParticipatingSellerTickets', type: :request do
       expect(response).to have_http_status(200)
     end
   end
+
+  context 'with query params' do
+    # setup different query param variations
+    let!(:participating_sellerA) do
+      create :participating_seller
+    end
+
+    let!(:ticket00) do
+      create :ticket, participating_seller: participating_sellerA, printed: false, associated_with_contact_at: nil
+    end
+    let!(:ticket01) do
+      create :ticket, participating_seller: participating_sellerA, printed: false, associated_with_contact_at: Date.current
+    end
+    let!(:ticket10) do
+      create :ticket, participating_seller: participating_sellerA, printed: true, associated_with_contact_at: nil
+    end
+    let!(:ticket11) do
+      create :ticket, participating_seller: participating_sellerA, printed: true, associated_with_contact_at: Date.current
+    end
+
+    let(:tickets_secret) { participating_sellerA.tickets_secret }
+    let(:participating_seller_id) { participating_sellerA.id }
+
+    it 'returns all four tickets with no query params' do
+      get "/participating_sellers/#{participating_seller_id}/tickets/#{tickets_secret}"
+
+      expect(json['data']).not_to be_empty
+      expect(json['data'].size).to eq 4
+      expect(json['data']).to eq(
+        [
+          ticket00.as_json,
+          ticket01.as_json,
+          ticket10.as_json,
+          ticket11.as_json
+        ]
+      )
+    end
+
+    it 'returns correct two tickets for printed: false' do
+      get "/participating_sellers/#{participating_seller_id}/tickets/#{tickets_secret}?printed=false"
+
+      expect(json['data']).not_to be_empty
+      expect(json['data'].size).to eq 2
+      expect(json['data']).to eq(
+        [
+          ticket00.as_json,
+          ticket01.as_json
+        ]
+      )
+    end
+
+    it 'returns correct two tickets for printed: true' do
+      get "/participating_sellers/#{participating_seller_id}/tickets/#{tickets_secret}?printed=true"
+
+      expect(json['data']).not_to be_empty
+      expect(json['data'].size).to eq 2
+      expect(json['data']).to eq(
+        [
+          ticket10.as_json,
+          ticket11.as_json
+        ]
+      )
+    end
+
+    it 'returns correct two tickets for associated: false' do
+      get "/participating_sellers/#{participating_seller_id}/tickets/#{tickets_secret}?associated=false"
+
+      expect(json['data']).not_to be_empty
+      expect(json['data'].size).to eq 2
+      expect(json['data']).to eq(
+        [
+          ticket00.as_json,
+          ticket10.as_json
+        ]
+      )
+    end
+
+    it 'returns correct two tickets for associated: true' do
+      get "/participating_sellers/#{participating_seller_id}/tickets/#{tickets_secret}?associated=true"
+
+      expect(json['data']).not_to be_empty
+      expect(json['data'].size).to eq 2
+      expect(json['data']).to eq(
+        [
+          ticket01.as_json,
+          ticket11.as_json
+        ]
+      )
+    end
+
+    # spot check one double query case
+    it 'returns correct two tickets for printed: false, associated: false' do
+      get "/participating_sellers/#{participating_seller_id}/tickets/#{tickets_secret}?printed=false&associated=false"
+
+      expect(json['data']).not_to be_empty
+      expect(json['data'].size).to eq 1
+      expect(json['data']).to eq(
+        [
+          ticket00.as_json
+        ]
+      )
+    end
+  end
 end
