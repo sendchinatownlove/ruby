@@ -77,7 +77,7 @@
 # See https://ddnexus.github.io/pagy/extras/items
 require 'pagy/extras/items'
 Pagy::VARS[:items_param] = :items    # default
-Pagy::VARS[:max_items]   = 1000
+Pagy::VARS[:max_items]   = 1000 # standard set of ticket printing, also a reasonable cap for perfomance reasons
 
 # Overflow extra: Allow for easy handling of overflowing pages
 # See https://ddnexus.github.io/pagy/extras/overflow
@@ -103,7 +103,7 @@ require 'pagy/extras/metadata'
 
 # Instance variables
 # See https://ddnexus.github.io/pagy/api/pagy#instance-variables
-# Pagy::VARS[:items] = 20                                   # default
+Pagy::VARS[:items] = 50 # nice round number to default to
 
 # Other Variables
 # See https://ddnexus.github.io/pagy/api/pagy#other-variables

@@ -28,9 +28,9 @@ RSpec.describe 'ParticipatingSellerTickets', type: :request do
       let(:tickets_secret) { participating_seller1.tickets_secret }
 
       it 'returns all the tickets for seller' do
-        expect(json).not_to be_empty
-        expect(json.size).to eq 2
-        expect(json).to eq(
+        expect(json['data']).not_to be_empty
+        expect(json['data'].size).to eq 2
+        expect(json['data']).to eq(
           [
             ticket1.as_json,
             ticket2.as_json
@@ -72,7 +72,7 @@ RSpec.describe 'ParticipatingSellerTickets', type: :request do
     before { get "/participating_sellers/#{participating_seller_id}/tickets/#{tickets_secret}" }
 
     it 'returns empty array' do
-      expect(json).to be_empty
+      expect(json['data']).to be_empty
     end
 
     it 'returns 200' do
