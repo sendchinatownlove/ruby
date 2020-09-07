@@ -7,9 +7,6 @@ class ParticipatingSellerTicketsController < ApplicationController
 
   # GET /participating_sellers/:participating_seller_id/tickets/:tickets_secret
   def show
-    # NB(justintmckibben): Do we want to hide the tickets that have already
-    #                      been redeemed aka the ones with associated contacts?
-
     query = Ticket.where(participating_seller: @participating_seller)
     query = query.where(printed: params[:printed]) if params.key?('printed')
 
