@@ -28,9 +28,9 @@ RSpec.describe 'ParticipatingSellerTickets', type: :request do
       let(:tickets_secret) { participating_seller1.tickets_secret }
 
       it 'returns all the tickets for seller' do
-        expect(json['data']).not_to be_empty
-        expect(json['data'].size).to eq 2
-        expect(json['data']).to eq(
+        expect(json).not_to be_empty
+        expect(json.size).to eq 2
+        expect(json).to eq(
           [
             ticket1.as_json,
             ticket2.as_json
@@ -72,7 +72,7 @@ RSpec.describe 'ParticipatingSellerTickets', type: :request do
     before { get "/participating_sellers/#{participating_seller_id}/tickets/#{tickets_secret}" }
 
     it 'returns empty array' do
-      expect(json['data']).to be_empty
+      expect(json).to be_empty
     end
 
     it 'returns 200' do
@@ -105,9 +105,9 @@ RSpec.describe 'ParticipatingSellerTickets', type: :request do
     it 'returns all four tickets with no query params' do
       get "/participating_sellers/#{participating_seller_id}/tickets/#{tickets_secret}"
 
-      expect(json['data']).not_to be_empty
-      expect(json['data'].size).to eq 4
-      expect(json['data']).to eq(
+      expect(json).not_to be_empty
+      expect(json.size).to eq 4
+      expect(json).to eq(
         [
           ticket00.as_json,
           ticket01.as_json,
@@ -120,9 +120,9 @@ RSpec.describe 'ParticipatingSellerTickets', type: :request do
     it 'returns correct two tickets for printed: false' do
       get "/participating_sellers/#{participating_seller_id}/tickets/#{tickets_secret}?printed=false"
 
-      expect(json['data']).not_to be_empty
-      expect(json['data'].size).to eq 2
-      expect(json['data']).to eq(
+      expect(json).not_to be_empty
+      expect(json.size).to eq 2
+      expect(json).to eq(
         [
           ticket00.as_json,
           ticket01.as_json
@@ -133,9 +133,9 @@ RSpec.describe 'ParticipatingSellerTickets', type: :request do
     it 'returns correct two tickets for printed: true' do
       get "/participating_sellers/#{participating_seller_id}/tickets/#{tickets_secret}?printed=true"
 
-      expect(json['data']).not_to be_empty
-      expect(json['data'].size).to eq 2
-      expect(json['data']).to eq(
+      expect(json).not_to be_empty
+      expect(json.size).to eq 2
+      expect(json).to eq(
         [
           ticket10.as_json,
           ticket11.as_json
@@ -146,9 +146,9 @@ RSpec.describe 'ParticipatingSellerTickets', type: :request do
     it 'returns correct two tickets for associated: false' do
       get "/participating_sellers/#{participating_seller_id}/tickets/#{tickets_secret}?associated=false"
 
-      expect(json['data']).not_to be_empty
-      expect(json['data'].size).to eq 2
-      expect(json['data']).to eq(
+      expect(json).not_to be_empty
+      expect(json.size).to eq 2
+      expect(json).to eq(
         [
           ticket00.as_json,
           ticket10.as_json
@@ -159,9 +159,9 @@ RSpec.describe 'ParticipatingSellerTickets', type: :request do
     it 'returns correct two tickets for associated: true' do
       get "/participating_sellers/#{participating_seller_id}/tickets/#{tickets_secret}?associated=true"
 
-      expect(json['data']).not_to be_empty
-      expect(json['data'].size).to eq 2
-      expect(json['data']).to eq(
+      expect(json).not_to be_empty
+      expect(json.size).to eq 2
+      expect(json).to eq(
         [
           ticket01.as_json,
           ticket11.as_json
@@ -173,13 +173,39 @@ RSpec.describe 'ParticipatingSellerTickets', type: :request do
     it 'returns correct two tickets for printed: false, associated: false' do
       get "/participating_sellers/#{participating_seller_id}/tickets/#{tickets_secret}?printed=false&associated=false"
 
-      expect(json['data']).not_to be_empty
-      expect(json['data'].size).to eq 1
-      expect(json['data']).to eq(
+      expect(json).not_to be_empty
+      expect(json.size).to eq 1
+      expect(json).to eq(
         [
           ticket00.as_json
         ]
       )
     end
+  end
+
+  context 'with some basic pagination' do
+    let(:tickets_secret) { participating_seller1.tickets_secret }
+    let(:participating_seller_id) { participating_seller1.id }
+
+    it 'returns both records for default pagination' do
+      get "/participating_sellers/#{participating_seller_id}/tickets/#{tickets_secret}"
+      expect(json).not_to be_empty
+      expect(json.size).to eq 2
+
+      expect(response.headers['Current-Page'].to_i).to eq 1
+      expect(response.headers['Total-Pages'].to_i).to eq 1
+      expect(response.headers['Total-Count'].to_i).to eq 2
+    end
+
+    it 'returns one record and two total pages when specifying one per page' do
+      get "/participating_sellers/#{participating_seller_id}/tickets/#{tickets_secret}?items=1"
+      expect(json).not_to be_empty
+      expect(json.size).to eq 1
+
+      expect(response.headers['Current-Page'].to_i).to eq 1
+      expect(response.headers['Total-Pages'].to_i).to eq 2
+      expect(response.headers['Total-Count'].to_i).to eq 2
+    end
+
   end
 end

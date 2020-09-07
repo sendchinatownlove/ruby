@@ -4,10 +4,11 @@ include Pagy::Backend
 
 class ParticipatingSellerTicketsController < ApplicationController
   before_action :set_participating_seller
+  after_action { pagy_headers_merge(@pagy) if @pagy }
 
   # GET /participating_sellers/:participating_seller_id/tickets/:tickets_secret
   def show
-    query = Ticket.where(participating_seller: @participating_seller)
+    query = Ticket.where(participating_seller: @participating_seller).order(id: :asc)
     query = query.where(printed: params[:printed]) if params.key?('printed')
 
     if params.key?('associated')
@@ -19,7 +20,7 @@ class ParticipatingSellerTicketsController < ApplicationController
     end
 
     @pagy, @records = pagy(query)
-    json_response({ data: @records, pagy: pagy_metadata(@pagy) })
+    json_response(@records)
   end
 
   private
