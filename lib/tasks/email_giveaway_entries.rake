@@ -20,12 +20,8 @@ namespace :emailer do
       number_of_entries = (number_of_tickets / 3).floor()
       # Send email to anybody who has participated in the food crawl, even if
       # they have no entries
-      if number_of_tickets.present?
-        EmailManager::ContactRewardsSender.call(
-          contact_id: contact.id,
-          email: contact.email,
-          token: token
-        )
+      if number_of_tickets > 0
+        EmailManager::GiveawayEntriesSender.call(contact_id: contact.id)
       end
   end
 end
