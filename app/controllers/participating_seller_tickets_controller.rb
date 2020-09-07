@@ -1,13 +1,26 @@
 # frozen_string_literal: true
 
+include Pagy::Backend
+
 class ParticipatingSellerTicketsController < ApplicationController
   before_action :set_participating_seller
+  after_action { pagy_headers_merge(@pagy) if @pagy }
 
   # GET /participating_sellers/:participating_seller_id/tickets/:tickets_secret
   def show
-    # NB(justintmckibben): Do we want to hide the tickets that have already
-    #                      been redeemed aka the ones with associated contacts?
-    json_response(Ticket.where(participating_seller: @participating_seller))
+    query = Ticket.where(participating_seller: @participating_seller).order(id: :asc)
+    query = query.where(printed: params[:printed]) if params.key?('printed')
+
+    if params.key?('associated')
+      query = if params[:associated].downcase == 'true'
+                query.where.not(associated_with_contact_at: nil)
+              else
+                query.where(associated_with_contact_at: nil)
+              end
+    end
+
+    @pagy, @records = pagy(query)
+    json_response(@records)
   end
 
   private

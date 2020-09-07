@@ -80,3 +80,6 @@ gem "annotate", "~> 3.1"
 gem 'safe_attributes'
 
 gem 'ulid'
+
+# pagination gem
+gem 'pagy', '~> 3.8'
