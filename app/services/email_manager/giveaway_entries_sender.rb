@@ -38,7 +38,8 @@ module EmailManager
         </html>
       EOF
       EmailManager::Sender.send_receipt(
-        to: email,
+
+        to: @email,
         html: html,
         subject: 'Send Chinatown Love Food Crawl: Weekly Giveaway'
       )
