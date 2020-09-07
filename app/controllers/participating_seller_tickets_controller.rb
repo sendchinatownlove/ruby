@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+include Pagy::Backend
+
 class ParticipatingSellerTicketsController < ApplicationController
   before_action :set_participating_seller
 
@@ -7,7 +9,20 @@ class ParticipatingSellerTicketsController < ApplicationController
   def show
     # NB(justintmckibben): Do we want to hide the tickets that have already
     #                      been redeemed aka the ones with associated contacts?
-    json_response(Ticket.where(participating_seller: @participating_seller))
+
+    query = Ticket.where(participating_seller: @participating_seller)
+    query = query.where(printed: params[:printed]) if params.key?('printed')
+
+    if params.key?('associated')
+      query = if params[:associated].downcase == 'true'
+                query.where.not(associated_with_contact_at: nil)
+              else
+                query.where(associated_with_contact_at: nil)
+              end
+    end
+
+    @pagy, @records = pagy(query)
+    json_response({ data: @records, pagy: pagy_metadata(@pagy) })
   end
 
   private
