@@ -45,7 +45,7 @@ module EmailManager
       )
     rescue StandardError
       Rails.logger.error 'Weekly Giveaway Entries Email errored out' \
-              "email: #{@email}"
+              "email: #{email}"
     end
     # rubocop:enable Layout/LineLength
   end
