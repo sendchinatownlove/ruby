@@ -33,19 +33,18 @@ module EmailManager
             <p>
               Check out this week’s giveaway items at our <a href="https://www.sendchinatownlove.com/food-crawl.html" target="_blank">Food Crawl website</a> to see what you can win.
             </p>
-            <p>We will be announcing the winners on <a href="https://www.instagram.com/sendchinatownlove/" target="_blank">IG</a> Monday, Sep. 7th at 10PM EST!</p>
+            <p>We will be announcing the winners on <a href="https://www.instagram.com/sendchinatownlove/" target="_blank">IG</a> Monday, Sep. 14th at 10PM EST!</p>
           </body>
         </html>
       EOF
       EmailManager::Sender.send_receipt(
-
         to: @email,
         html: html,
         subject: 'Send Chinatown Love Food Crawl: Weekly Giveaway'
       )
     rescue StandardError
       Rails.logger.error 'Weekly Giveaway Entries Email errored out' \
-              "email: #{email}"
+              "email: #{@email}"
     end
     # rubocop:enable Layout/LineLength
   end
