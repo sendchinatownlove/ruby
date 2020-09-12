@@ -19,9 +19,13 @@ module WebhookManager
                                                   seller_id: seller_id,
                                                   payment_intent: payment_intent
                                                 })
+        amount_after_fees = WebhookManager::FeeManager.call({
+          payment_intent: payment_intent
+          amount: amount
+        })
         donation = DonationDetail.create!(
           item: item,
-          amount: amount
+          amount: amount_after_fees
         )
         payment_intent.successful = true
         payment_intent.save!

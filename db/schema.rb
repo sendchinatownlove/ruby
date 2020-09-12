@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_03_012833) do
+ActiveRecord::Schema.define(version: 2020_09_12_025546) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -28,9 +28,15 @@ ActiveRecord::Schema.define(version: 2020_09_03_012833) do
     t.bigint "distributor_id"
     t.integer "target_amount", default: 100000, null: false
     t.integer "price_per_meal", default: 500, null: false
+    t.boolean "has_square_fee", default: true
     t.index ["distributor_id"], name: "index_campaigns_on_distributor_id"
     t.index ["location_id"], name: "index_campaigns_on_location_id"
     t.index ["seller_id"], name: "index_campaigns_on_seller_id"
+  end
+
+  create_table "campaigns_fees", id: false, force: :cascade do |t|
+    t.bigint "campaign_id", null: false
+    t.bigint "fee_id", null: false
   end
 
   create_table "contacts", force: :cascade do |t|
@@ -85,10 +91,9 @@ ActiveRecord::Schema.define(version: 2020_09_03_012833) do
   create_table "fees", force: :cascade do |t|
     t.decimal "multiplier", default: "0.0"
     t.boolean "active", default: true
-    t.bigint "seller_id", null: false
     t.decimal "flat_cost", precision: 8, scale: 2, default: "0.0"
     t.boolean "covered_by_customer"
-    t.index ["seller_id"], name: "index_fees_on_seller_id"
+    t.string "description"
   end
 
   create_table "gift_card_amounts", force: :cascade do |t|

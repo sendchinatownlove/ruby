@@ -29,7 +29,11 @@ module WebhookManager
           recipient: payment_intent.recipient,
           single_use: single_use
         )
-        GiftCardAmount.create!(value: amount, gift_card_detail: gift_card_detail)
+        amount_after_fees = WebhookManager::FeeManager.call({
+          payment_intent: payment_intent
+          amount: amount
+        })
+        GiftCardAmount.create!(value: amount_after_fees, gift_card_detail: gift_card_detail)
         payment_intent.successful = true
         payment_intent.save!
 
