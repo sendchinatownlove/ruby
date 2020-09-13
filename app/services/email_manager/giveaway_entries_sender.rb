@@ -8,11 +8,10 @@ module EmailManager
       @email = @contact.email
     end
 
-    # rubocop:disable Layout/LineLength
     def call
       number_of_tickets = Ticket.where(contact: @contact).size
 
-      number_of_entries = (number_of_tickets / 3).floor()
+      number_of_entries = (number_of_tickets / 3).floor
 
       html = <<~EOF
         <!DOCTYPE html>
@@ -46,6 +45,5 @@ module EmailManager
       Rails.logger.error 'Weekly Giveaway Entries Email errored out' \
               "email: #{@email}"
     end
-    # rubocop:enable Layout/LineLength
   end
 end

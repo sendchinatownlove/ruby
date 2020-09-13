@@ -17,13 +17,12 @@ namespace :emailer do
 
   def send_email(contact:)
     number_of_tickets = Ticket.where(contact: contact).size
-      number_of_entries = (number_of_tickets / 3).floor()
-      # Send email to anybody who has participated in the food crawl, even if
-      # they have no entries
+    number_of_entries = (number_of_tickets / 3).floor
+    # Send email to anybody who has participated in the food crawl, even if
+    # they have no entries
 
-      #change
-      if number_of_tickets > 0
-        EmailManager::GiveawayEntriesSender.call(contact_id: contact.id)
-      end
+    if number_of_tickets > 0
+      EmailManager::GiveawayEntriesSender.call(contact_id: contact.id)
+    end
   end
 end
