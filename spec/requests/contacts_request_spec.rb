@@ -4,7 +4,8 @@ require 'rails_helper'
 
 RSpec.describe 'Contacts', type: :request do
   describe 'GET /contacts/:id' do
-    let!(:contact) { create :contact }
+    let!(:contact) { create :contact, instagram: instagram }
+    let(:instagram) { nil }
     let(:id) { contact.id }
     before do
       get(
@@ -22,7 +23,19 @@ RSpec.describe 'Contacts', type: :request do
       end
 
       it 'returns the contact with only the id' do
-        expect(json).to eq({ id: contact.id }.as_json)
+        expect(json).to eq({ id: contact.id, instagram: false }.as_json)
+      end
+
+      context 'with instagram' do
+        let(:instagram) { '@blah' }
+
+        it 'returns a 200' do
+          expect(response).to have_http_status(200)
+        end
+
+        it 'returns the contact with only the id' do
+          expect(json).to eq({ id: contact.id, instagram: true }.as_json)
+        end
       end
     end
 
@@ -33,12 +46,16 @@ RSpec.describe 'Contacts', type: :request do
         }
       end
 
-      it 'returns a 200' do
-        expect(response).to have_http_status(200)
-      end
+      context 'with instagram' do
+        let(:instagram) { '@blah' }
 
-      it 'returns the contact with only the id' do
-        expect(json).to eq({ id: contact.id }.as_json)
+        it 'returns a 200' do
+          expect(response).to have_http_status(200)
+        end
+
+        it 'returns the contact with only the id' do
+          expect(json).to eq({ id: contact.id, instagram: true }.as_json)
+        end
       end
     end
 
@@ -56,7 +73,8 @@ RSpec.describe 'Contacts', type: :request do
   end
 
   describe 'GET /contacts' do
-    let!(:contact) { create :contact }
+    let!(:contact) { create :contact, instagram: instagram }
+    let(:instagram) { nil }
     before do
       get(
         '/contacts',
@@ -77,7 +95,19 @@ RSpec.describe 'Contacts', type: :request do
       end
 
       it 'returns the contact with only the id' do
-        expect(json).to eq({ id: contact.id }.as_json)
+        expect(json).to eq({ id: contact.id, instagram: false }.as_json)
+      end
+
+      context 'with instagram' do
+        let(:instagram) { '@blah' }
+
+        it 'returns a 200' do
+          expect(response).to have_http_status(200)
+        end
+
+        it 'returns the contact with only the id' do
+          expect(json).to eq({ id: contact.id, instagram: true }.as_json)
+        end
       end
     end
 

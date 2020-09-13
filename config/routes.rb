@@ -80,6 +80,8 @@ Rails.application.routes.draw do
   resources :campaigns do
   end
   resources :contacts do
+    resources :rewards, controller: 'contact_rewards', only: [:create]
+    resources :tickets, controller: 'contact_tickets'
   end
   resources :charges do
   end
@@ -89,10 +91,20 @@ Rails.application.routes.draw do
   end
   resources :gift_cards do
   end
+  resources :locations do
+  end
+  resources :participating_sellers do
+    resources :tickets, controller: 'participating_seller_tickets'
+  end
   resources :sellers do
-    resources :locations, :menu_items, :items, :open_hour, :delivery_options
+    resources :menu_items, :items, :open_hour, :delivery_options
+    resources :locations, controller: 'seller_locations'
     resources :campaigns, controller: 'seller_campaigns', only: [:index]
     resources :gift_cards, controller: 'seller_gift_cards'
+  end
+  resources :sponsor_sellers do
+  end
+  resources :tickets do
   end
   resources :webhooks do
   end

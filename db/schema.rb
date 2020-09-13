@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_15_211059) do
+ActiveRecord::Schema.define(version: 2020_09_12_190203) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -39,15 +39,16 @@ ActiveRecord::Schema.define(version: 2020_08_15_211059) do
     t.string "name"
     t.string "instagram"
     t.string "rewards_redemption_access_token"
+    t.datetime "expires_at"
     t.index ["email"], name: "index_contacts_on_email", unique: true
   end
 
   create_table "delivery_options", force: :cascade do |t|
     t.string "url"
     t.string "phone_number"
+    t.bigint "seller_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.bigint "seller_id", null: false
     t.index ["seller_id"], name: "index_delivery_options_on_seller_id"
   end
 
@@ -141,6 +142,17 @@ ActiveRecord::Schema.define(version: 2020_08_15_211059) do
     t.index ["seller_id"], name: "index_locations_on_seller_id"
   end
 
+  create_table "lyft_rewards", force: :cascade do |t|
+    t.string "code", null: false
+    t.string "state", default: "new", null: false
+    t.string "token"
+    t.date "expires_at"
+    t.bigint "contact_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["contact_id"], name: "index_lyft_rewards_on_contact_id"
+  end
+
   create_table "menu_items", force: :cascade do |t|
     t.string "name"
     t.string "description"
@@ -170,6 +182,7 @@ ActiveRecord::Schema.define(version: 2020_08_15_211059) do
     t.string "tickets_secret"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.boolean "is_lyft_sponsored", default: false
   end
 
   create_table "payment_intents", force: :cascade do |t|
@@ -248,10 +261,11 @@ ActiveRecord::Schema.define(version: 2020_08_15_211059) do
     t.integer "reward_cost", default: 3, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "reward_detail"
   end
 
   create_table "tickets", force: :cascade do |t|
-    t.bigint "contact_id", null: false
+    t.bigint "contact_id"
     t.string "ticket_id", null: false
     t.bigint "participating_seller_id", null: false
     t.bigint "sponsor_seller_id"
@@ -259,6 +273,8 @@ ActiveRecord::Schema.define(version: 2020_08_15_211059) do
     t.date "expiration"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.boolean "printed", default: false, null: false
+    t.datetime "associated_with_contact_at"
     t.index ["contact_id"], name: "index_tickets_on_contact_id"
     t.index ["participating_seller_id"], name: "index_tickets_on_participating_seller_id"
     t.index ["sponsor_seller_id"], name: "index_tickets_on_sponsor_seller_id"
@@ -277,6 +293,7 @@ ActiveRecord::Schema.define(version: 2020_08_15_211059) do
   add_foreign_key "items", "payment_intents"
   add_foreign_key "items", "sellers"
   add_foreign_key "locations", "sellers"
+  add_foreign_key "lyft_rewards", "contacts"
   add_foreign_key "menu_items", "sellers"
   add_foreign_key "open_hours", "sellers"
   add_foreign_key "payment_intents", "campaigns"

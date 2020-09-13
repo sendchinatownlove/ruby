@@ -95,6 +95,7 @@ end
     item_type: Item.gift_card,
     refunded: false,
     amounts: [10_000, 8000],
+    seller_id: 'shunfa-bakery',
     single_use: false
   },
   {
@@ -102,6 +103,7 @@ end
     item_type: Item.gift_card,
     refunded: true,
     amounts: [7500, 3000],
+    seller_id: 'shunfa-bakery',
     single_use: false
   },
   {
@@ -109,6 +111,15 @@ end
     item_type: Item.gift_card,
     refunded: false,
     amounts: [5000],
+    seller_id: 'shunfa-bakery',
+    single_use: false
+  },
+  {
+    email: 'testytesterson3@gmail.com',
+    item_type: Item.gift_card,
+    refunded: false,
+    amounts: [2000],
+    seller_id: '46-mott',
     single_use: false
   },
   {
@@ -116,10 +127,27 @@ end
     item_type: Item.gift_card,
     refunded: false,
     amounts: [1000],
+    seller_id: 'shunfa-bakery',
     single_use: true
+  },
+  {
+    email: 'testytesterson4@gmail.com',
+    item_type: Item.gift_card,
+    refunded: false,
+    amounts: [2500, 0],
+    seller_id: 'shunfa-bakery',
+    single_use: false
+  },
+  {
+    email: 'testytesterson5@gmail.com',
+    item_type: Item.gift_card,
+    refunded: false,
+    amounts: [1500, 0],
+    seller_id: 'shunfa-bakery',
+    single_use: false
   }
 ].each do |attributes|
-  seller = Seller.find_by(seller_id: 'shunfa-bakery')
+  seller = Seller.find_by(seller_id: attributes[:seller_id])
   contact = Contact.find_or_create_by!(email: attributes[:email])
   payment_intent = PaymentIntent.create!(recipient: contact, purchaser: contact, square_location_id: seller.square_location_id, square_payment_id: Faker::Alphanumeric.alpha(number: 64))
   item = Item.create!(purchaser: contact, item_type: attributes[:item_type], refunded: attributes[:refunded], seller_id: seller.id, payment_intent_id: payment_intent.id)
@@ -188,15 +216,12 @@ end
 
 (0..6).each do |i|
   name = Faker::Name.name
-  contact = Contact.find_or_create_by!(email: Faker::Internet.email(name: name), name: name)
-
-  ticket_id = Faker::Alphanumeric.alphanumeric(number: 5).upcase.insert(4, '-')
+  contact = i.odd? ? Contact.find_or_create_by!(email: Faker::Internet.email(name: name), name: name) : nil
   participant = ParticipatingSeller.find_by(seller_id: 2)
   sponsor = i.even? ? SponsorSeller.find_by(location_id: 2) : nil
   redeemed_at = i % 3 == 0 ? Time.now - i.days : nil
 
   Ticket.create!(
-    ticket_id: ticket_id,
     contact: contact,
     participating_seller: participant,
     sponsor_seller: sponsor,

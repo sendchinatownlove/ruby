@@ -6,6 +6,7 @@
 #
 #  id                              :bigint           not null, primary key
 #  email                           :string           not null
+#  expires_at                      :datetime
 #  instagram                       :string
 #  is_subscribed                   :boolean          default(TRUE), not null
 #  name                            :string
