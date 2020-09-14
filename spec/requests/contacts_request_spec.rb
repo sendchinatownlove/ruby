@@ -23,7 +23,12 @@ RSpec.describe 'Contacts', type: :request do
       end
 
       it 'returns the contact with only the id' do
-        expect(json).to eq({ id: contact.id, instagram: false }.as_json)
+        expect(json).to eq({
+          id: contact.id,
+          instagram: false,
+          unique_seller_tickets: 0,
+          weekly_giveaway_entries: 0
+        }.as_json)
       end
 
       context 'with instagram' do
@@ -34,9 +39,72 @@ RSpec.describe 'Contacts', type: :request do
         end
 
         it 'returns the contact with only the id' do
-          expect(json).to eq({ id: contact.id, instagram: true }.as_json)
+          expect(json).to eq({
+            id: contact.id,
+            instagram: true,
+            unique_seller_tickets: 0,
+            weekly_giveaway_entries: 0
+          }.as_json)
         end
       end
+
+      context 'with tickets at unique participating sellers' do
+        let!(:ticket1) { create :ticket, contact: contact }
+        let!(:ticket2) { create :ticket, contact: contact }
+        let!(:ticket3) { create :ticket, contact: contact }
+        let!(:ticket4) { create :ticket, contact: contact }
+        let!(:ticket5) { create :ticket, contact: contact }
+
+        before do
+          # TODO(justintmckibben): Makes the request twice for this test.
+          #                        Restructure this test to only make this call
+          #                        once.
+          get(
+            "/contacts/#{id}",
+            params: attrs
+          )
+        end
+
+        it 'returns a 200' do
+          expect(response).to have_http_status(200)
+        end
+
+        it 'returns the number of entries this contact has' do
+          expect(json['weekly_giveaway_entries']).to eq(1)
+        end
+      end
+
+      context 'with tickets with some revisits' do
+        let!(:particpiating_seller1) { create :participating_seller }
+        let!(:particpiating_seller2) { create :participating_seller }
+        let!(:particpiating_seller3) { create :participating_seller }
+        let!(:particpiating_seller4) { create :participating_seller }
+        let!(:ticket1) { create :ticket, contact: contact, participating_seller: particpiating_seller1 }
+        let!(:ticket2) { create :ticket, contact: contact, participating_seller: particpiating_seller2 }
+        let!(:ticket3) { create :ticket, contact: contact, participating_seller: particpiating_seller3 }
+        let!(:ticket4) { create :ticket, contact: contact, participating_seller: particpiating_seller4 }
+        let!(:ticket5) { create :ticket, contact: contact, participating_seller: particpiating_seller4 }
+
+        before do
+          # TODO(justintmckibben): Makes the request twice from the earlier
+          #                        context.
+          #                        Restructure this test to only make this call
+          #                        once.
+          get(
+            "/contacts/#{id}",
+            params: attrs
+          )
+        end
+
+        it 'returns a 200' do
+          expect(response).to have_http_status(200)
+        end
+
+        it 'returns the number of tickets from unique participating sellers this contact has' do
+          expect(json['unique_seller_tickets']).to eq(4)
+        end
+      end
+
     end
 
     context 'with random attributes' do
@@ -54,7 +122,11 @@ RSpec.describe 'Contacts', type: :request do
         end
 
         it 'returns the contact with only the id' do
-          expect(json).to eq({ id: contact.id, instagram: true }.as_json)
+          expect(json).to eq({
+            id: contact.id,
+            instagram: true,
+            unique_seller_tickets: 0,
+            weekly_giveaway_entries: 0 }.as_json)
         end
       end
     end
@@ -95,7 +167,12 @@ RSpec.describe 'Contacts', type: :request do
       end
 
       it 'returns the contact with only the id' do
-        expect(json).to eq({ id: contact.id, instagram: false }.as_json)
+        expect(json).to eq({
+          id: contact.id,
+          instagram: false,
+          unique_seller_tickets: 0,
+          weekly_giveaway_entries: 0
+        }.as_json)
       end
 
       context 'with instagram' do
@@ -106,7 +183,12 @@ RSpec.describe 'Contacts', type: :request do
         end
 
         it 'returns the contact with only the id' do
-          expect(json).to eq({ id: contact.id, instagram: true }.as_json)
+          expect(json).to eq({
+            id: contact.id,
+            instagram: true,
+            unique_seller_tickets: 0,
+            weekly_giveaway_entries: 0
+          }.as_json)
         end
       end
     end
