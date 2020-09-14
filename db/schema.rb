@@ -46,9 +46,9 @@ ActiveRecord::Schema.define(version: 2020_09_12_190203) do
   create_table "delivery_options", force: :cascade do |t|
     t.string "url"
     t.string "phone_number"
-    t.bigint "seller_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "seller_id", null: false
     t.index ["seller_id"], name: "index_delivery_options_on_seller_id"
   end
 

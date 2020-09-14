@@ -69,6 +69,7 @@ class ContactsController < ApplicationController
 
   def set_contact_by_email
     params.require(:email)
+    params[:email] = params[:email].downcase
     @contact = Contact.find_by!(email: params[:email])
   end
 
