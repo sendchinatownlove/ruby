@@ -22,4 +22,17 @@ class Contact < ApplicationRecord
 
   validates_uniqueness_of :email
   validates :is_subscribed, inclusion: { in: [true, false] }
+
+  def is_eligible_for_lyft_reward
+    if has_redeemed_lyft_reward
+      false
+    end
+
+    available_rewards = LyftRewards
+                        .where(state)
+  end  
+
+  def has_redeemed_lyft_reward
+    LyftRewards.where(contact_id: id, state: 'verified').count > 0
+  end
 end
