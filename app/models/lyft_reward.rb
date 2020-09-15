@@ -6,7 +6,7 @@
 #
 #  id         :bigint           not null, primary key
 #  code       :string           not null
-#  expires_at :date
+#  expires_at :datetime
 #  state      :string           default("new"), not null
 #  token      :string
 #  created_at :datetime         not null
