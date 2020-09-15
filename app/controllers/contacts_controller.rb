@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class ContactsController < ApplicationController
+  before_action :downcase_email
   before_action :set_contact_by_email, only: %i[index]
   before_action :set_contact_by_id, only: %i[show update]
 
@@ -68,13 +69,15 @@ class ContactsController < ApplicationController
                            params[:instagram].tr('@', '')
     end
 
-    params[:email] = params[:email].downcase if params[:email].present?
-
     params.permit(
       :email,
       :instagram,
       :name
     )
+  end
+
+  def downcase_email
+    params[:email] = params[:email].downcase if params[:email].present?
   end
 
   def set_contact_by_email

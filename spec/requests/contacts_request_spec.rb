@@ -144,6 +144,49 @@ RSpec.describe 'Contacts', type: :request do
     end
   end
 
+  describe 'GET /contacts/:email' do
+    let(:email) { 'bob@sendchinatownlove.com' }
+    let!(:contact) { create :contact, instagram: nil, email: email }
+    before do
+      get(
+        "/contacts",
+        params: attrs
+      )
+    end
+
+    context 'with the a valid email, in the same lowercase' do
+      let(:attrs) do
+        {
+          email: email
+        }
+      end
+
+      it 'returns a 200' do
+        expect(response).to have_http_status(200)
+      end
+
+      it 'returns the contact with only the id' do
+        expect(json.to_s).to include({ id: contact.id, instagram: false }.as_json.to_s.to_s[0..-2])
+      end
+    end
+
+    context 'with the a valid email, in a different case' do
+      let(:attrs) do
+        {
+          email: email.upcase
+        }
+      end
+      
+      it 'returns a 200' do
+        expect(response).to have_http_status(200)
+      end
+
+      it 'returns the contact with only the id' do
+        expect(json.to_s).to include({ id: contact.id, instagram: false }.as_json.to_s[0..-2])
+      end
+    end
+  end
+
   describe 'GET /contacts' do
     let!(:contact) { create :contact, instagram: instagram }
     let(:instagram) { nil }
@@ -282,6 +325,24 @@ RSpec.describe 'Contacts', type: :request do
 
       it 'returns a missing param message' do
         expect(response.body).to match(/param is missing or the value is empty: email/)
+      end
+    end
+
+    context 'with an uppercased email' do
+      let(:attrs) do
+        {
+          name: 'Bob',
+          instagram: '@sendchinatownlove',
+          email: email.upcase
+        }
+      end
+
+      it 'creates a lowercased new contact and returns it' do
+        # It filters out the leading @
+        contact = Contact.find_by(email: email, name: 'Bob', instagram: 'sendchinatownlove')
+  
+        expect(contact).to_not be_nil
+        expect(json).to eq(contact.as_json)
       end
     end
 
