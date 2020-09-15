@@ -94,7 +94,7 @@ RSpec.describe 'Contacts', type: :request do
       end
 
       it 'returns the contact with only the id' do
-        expect(json).to include({ id: contact.id, instagram: false }.as_json[0..-2])
+        expect(json.to_s).to include({ id: contact.id, instagram: false }.as_json.to_s.to_s[0..-2])
       end
     end
 
@@ -110,7 +110,7 @@ RSpec.describe 'Contacts', type: :request do
       end
 
       it 'returns the contact with only the id' do
-        expect(json).to include({ id: contact.id, instagram: false }.as_json[0..-2])
+        expect(json.to_s).to include({ id: contact.id, instagram: false }.as_json.to_s[0..-2])
       end
     end
   end
