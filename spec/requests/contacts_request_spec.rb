@@ -7,27 +7,30 @@ RSpec.describe 'Contacts', type: :request do
     let!(:contact) { create :contact, instagram: instagram }
     let(:instagram) { nil }
     let(:id) { contact.id }
-    before do
+    let(:attrs) do
+      nil
+    end
+    subject do
       get(
         "/contacts/#{id}",
         params: attrs
       )
     end
-    let(:attrs) do
-      nil
-    end
 
     context 'with valid id' do
       it 'returns a 200' do
+        subject
         expect(response).to have_http_status(200)
       end
 
       it 'returns the contact with only the id' do
+        subject
         expect(json).to eq({
           id: contact.id,
           instagram: false,
           unique_seller_tickets: 0,
-          weekly_giveaway_entries: 0
+          weekly_giveaway_entries: 0,
+          is_eligible_for_lyft_reward: false
         }.as_json)
       end
 
@@ -35,15 +38,35 @@ RSpec.describe 'Contacts', type: :request do
         let(:instagram) { '@blah' }
 
         it 'returns a 200' do
+          subject
           expect(response).to have_http_status(200)
         end
 
         it 'returns the contact with only the id' do
+          subject
           expect(json).to eq({
             id: contact.id,
             instagram: true,
             unique_seller_tickets: 0,
-            weekly_giveaway_entries: 0
+            weekly_giveaway_entries: 0,
+            is_eligible_for_lyft_reward: false
+          }.as_json)
+        end
+      end
+
+      context 'when is_eligible_for_lyft_reward is true for the contact' do
+        before do
+          allow_any_instance_of(Contact).to receive(:is_eligible_for_lyft_reward).and_return(true)
+        end
+
+        it 'returns the contact with is_eligible_for_lyft_reward set to true' do
+          subject
+          expect(json).to eq({
+            id: contact.id,
+            instagram: false,
+            unique_seller_tickets: 0,
+            weekly_giveaway_entries: 0,
+            is_eligible_for_lyft_reward: true
           }.as_json)
         end
       end
@@ -55,21 +78,13 @@ RSpec.describe 'Contacts', type: :request do
         let!(:ticket4) { create :ticket, contact: contact }
         let!(:ticket5) { create :ticket, contact: contact }
 
-        before do
-          # TODO(justintmckibben): Makes the request twice for this test.
-          #                        Restructure this test to only make this call
-          #                        once.
-          get(
-            "/contacts/#{id}",
-            params: attrs
-          )
-        end
-
         it 'returns a 200' do
+          subject
           expect(response).to have_http_status(200)
         end
 
         it 'returns the number of entries this contact has' do
+          subject
           expect(json['weekly_giveaway_entries']).to eq(1)
         end
       end
@@ -85,26 +100,16 @@ RSpec.describe 'Contacts', type: :request do
         let!(:ticket4) { create :ticket, contact: contact, participating_seller: particpiating_seller4 }
         let!(:ticket5) { create :ticket, contact: contact, participating_seller: particpiating_seller4 }
 
-        before do
-          # TODO(justintmckibben): Makes the request twice from the earlier
-          #                        context.
-          #                        Restructure this test to only make this call
-          #                        once.
-          get(
-            "/contacts/#{id}",
-            params: attrs
-          )
-        end
-
         it 'returns a 200' do
+          subject
           expect(response).to have_http_status(200)
         end
 
         it 'returns the number of tickets from unique participating sellers this contact has' do
+          subject
           expect(json['unique_seller_tickets']).to eq(4)
         end
       end
-
     end
 
     context 'with random attributes' do
@@ -118,15 +123,19 @@ RSpec.describe 'Contacts', type: :request do
         let(:instagram) { '@blah' }
 
         it 'returns a 200' do
+          subject
           expect(response).to have_http_status(200)
         end
 
         it 'returns the contact with only the id' do
+          subject
           expect(json).to eq({
             id: contact.id,
             instagram: true,
             unique_seller_tickets: 0,
-            weekly_giveaway_entries: 0 }.as_json)
+            weekly_giveaway_entries: 0,
+            is_eligible_for_lyft_reward: false
+          }.as_json)
         end
       end
     end
@@ -135,10 +144,12 @@ RSpec.describe 'Contacts', type: :request do
       let(:id) { 9999 }
 
       it 'returns status code 404' do
+        subject
         expect(response).to have_http_status(404)
       end
 
       it 'returns a not found message' do
+        subject
         expect(response.body).to match(/Couldn't find Contact/)
       end
     end
@@ -149,7 +160,7 @@ RSpec.describe 'Contacts', type: :request do
     let!(:contact) { create :contact, instagram: nil, email: email }
     before do
       get(
-        "/contacts",
+        '/contacts',
         params: attrs
       )
     end
@@ -176,7 +187,7 @@ RSpec.describe 'Contacts', type: :request do
           email: email.upcase
         }
       end
-      
+
       it 'returns a 200' do
         expect(response).to have_http_status(200)
       end
@@ -214,7 +225,8 @@ RSpec.describe 'Contacts', type: :request do
           id: contact.id,
           instagram: false,
           unique_seller_tickets: 0,
-          weekly_giveaway_entries: 0
+          weekly_giveaway_entries: 0,
+          is_eligible_for_lyft_reward: false
         }.as_json)
       end
 
@@ -230,7 +242,8 @@ RSpec.describe 'Contacts', type: :request do
             id: contact.id,
             instagram: true,
             unique_seller_tickets: 0,
-            weekly_giveaway_entries: 0
+            weekly_giveaway_entries: 0,
+            is_eligible_for_lyft_reward: false
           }.as_json)
         end
       end
@@ -340,7 +353,7 @@ RSpec.describe 'Contacts', type: :request do
       it 'creates a lowercased new contact and returns it' do
         # It filters out the leading @
         contact = Contact.find_by(email: email, name: 'Bob', instagram: 'sendchinatownlove')
-  
+
         expect(contact).to_not be_nil
         expect(json).to eq(contact.as_json)
       end

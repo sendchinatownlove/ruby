@@ -206,6 +206,5 @@ RSpec.describe 'ParticipatingSellerTickets', type: :request do
       expect(response.headers['Total-Pages'].to_i).to eq 2
       expect(response.headers['Total-Count'].to_i).to eq 2
     end
-
   end
 end

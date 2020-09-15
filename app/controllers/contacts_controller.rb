@@ -35,6 +35,7 @@ class ContactsController < ApplicationController
     # our DB to become an email -> instagram/name lookup for people to abuse
     ret = @contact.as_json.slice('id')
     ret[:instagram] = @contact.instagram.present?
+    ret[:is_eligible_for_lyft_reward] = @contact.is_eligible_for_lyft_reward
 
     tickets = Ticket.where(contact: @contact)
     # NB(justintmckibben): Currently assumes that it takes 3 tickets to get
@@ -42,8 +43,8 @@ class ContactsController < ApplicationController
     ret[:weekly_giveaway_entries] = (tickets.size / 3).floor
 
     # Get the number of Participating Sellers this Contact has visited
-    ret[:unique_seller_tickets] = tickets.map { |t| t.participating_seller_id }
-      .to_set.size
+    ret[:unique_seller_tickets] = tickets.map(&:participating_seller_id)
+                                         .to_set.size
 
     ret
   end
