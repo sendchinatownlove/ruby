@@ -80,6 +80,7 @@ Rails.application.routes.draw do
   resources :campaigns do
   end
   resources :contacts do
+    resources :lyft_rewards, controller: 'contact_lyft_rewards', only: [:create]
     resources :rewards, controller: 'contact_rewards', only: [:create]
     resources :tickets, controller: 'contact_tickets'
   end
