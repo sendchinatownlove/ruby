@@ -6,5 +6,6 @@ FactoryBot.define do
     seller_id { rand(3) }
     stamp_url { 'https://example.com/placeholder.jpg' }
     tickets_secret { Faker::Internet.uuid }
+    is_lyft_sponsored { false }
   end
 end

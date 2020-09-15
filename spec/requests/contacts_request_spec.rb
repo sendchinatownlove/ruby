@@ -7,34 +7,60 @@ RSpec.describe 'Contacts', type: :request do
     let!(:contact) { create :contact, instagram: instagram }
     let(:instagram) { nil }
     let(:id) { contact.id }
-    before do
+    let(:attrs) do
+      nil
+    end
+    subject do
       get(
         "/contacts/#{id}",
         params: attrs
       )
     end
-    let(:attrs) do
-      nil
-    end
 
     context 'with valid id' do
       it 'returns a 200' do
+        subject
         expect(response).to have_http_status(200)
       end
 
       it 'returns the contact with only the id' do
-        expect(json).to eq({ id: contact.id, instagram: false }.as_json)
+        subject
+        expect(json).to eq({ id: contact.id, instagram: false, has_redeemed_lyft_reward: false, is_eligible_for_lyft_reward: false }.as_json)
       end
 
       context 'with instagram' do
         let(:instagram) { '@blah' }
 
         it 'returns a 200' do
+          subject
           expect(response).to have_http_status(200)
         end
 
         it 'returns the contact with only the id' do
-          expect(json).to eq({ id: contact.id, instagram: true }.as_json)
+          subject
+          expect(json).to eq({ id: contact.id, instagram: true, has_redeemed_lyft_reward: false, is_eligible_for_lyft_reward: false }.as_json)
+        end
+      end
+
+      context 'when is_eligible_for_lyft_reward is true for the contact' do
+        before do
+          allow(contact).to receive(:is_eligible_for_lyft_reward).and_return(true)
+        end
+
+        it 'returns the contact with is_eligible_for_lyft_reward set to true' do
+          subject
+          expect(json).to eq({ id: contact.id, instagram: false, has_redeemed_lyft_reward: false, is_eligible_for_lyft_reward: true }.as_json)
+        end
+      end
+
+      context 'when has_redeemed_lyft_reward is true for the contact' do
+        before do
+          allow(contact).to receive(:has_redeemed_lyft_reward).and_return(true)
+        end
+
+        it 'returns the contact with is_eligible_for_lyft_reward set to true' do
+          subject
+          expect(json).to eq({ id: contact.id, instagram: false, has_redeemed_lyft_reward: true, is_eligible_for_lyft_reward: false }.as_json)
         end
       end
     end
@@ -50,11 +76,13 @@ RSpec.describe 'Contacts', type: :request do
         let(:instagram) { '@blah' }
 
         it 'returns a 200' do
+          subject
           expect(response).to have_http_status(200)
         end
 
         it 'returns the contact with only the id' do
-          expect(json).to eq({ id: contact.id, instagram: true }.as_json)
+          subject
+          expect(json).to eq({ id: contact.id, instagram: true, has_redeemed_lyft_reward: false, is_eligible_for_lyft_reward: false }.as_json)
         end
       end
     end
@@ -63,10 +91,12 @@ RSpec.describe 'Contacts', type: :request do
       let(:id) { 9999 }
 
       it 'returns status code 404' do
+        subject
         expect(response).to have_http_status(404)
       end
 
       it 'returns a not found message' do
+        subject
         expect(response.body).to match(/Couldn't find Contact/)
       end
     end
@@ -95,7 +125,7 @@ RSpec.describe 'Contacts', type: :request do
       end
 
       it 'returns the contact with only the id' do
-        expect(json).to eq({ id: contact.id, instagram: false }.as_json)
+        expect(json).to eq({ id: contact.id, instagram: false, has_redeemed_lyft_reward: false, is_eligible_for_lyft_reward: false }.as_json)
       end
 
       context 'with instagram' do
@@ -106,7 +136,7 @@ RSpec.describe 'Contacts', type: :request do
         end
 
         it 'returns the contact with only the id' do
-          expect(json).to eq({ id: contact.id, instagram: true }.as_json)
+          expect(json).to eq({ id: contact.id, instagram: true, has_redeemed_lyft_reward: false, is_eligible_for_lyft_reward: false }.as_json)
         end
       end
     end

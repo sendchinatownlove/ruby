@@ -3,8 +3,6 @@
 class ContactsController < ApplicationController
   before_action :set_contact_by_email, only: %i[index]
   before_action :set_contact_by_id, only: %i[show update]
-  before_action :set_tickets, only: %i[index]
-  before_action :set_lyft_sponsored_participating_sellers, only: %i[index]
 
   # POST /contacts
   def create
@@ -36,7 +34,8 @@ class ContactsController < ApplicationController
     # our DB to become an email -> instagram/name lookup for people to abuse
     ret = @contact.as_json.slice('id')
     ret[:instagram] = @contact.instagram.present?
-    ret[:eligible_for_lyft_reward]
+    ret[:is_eligible_for_lyft_reward] = @contact.is_eligible_for_lyft_reward
+    ret[:has_redeemed_lyft_reward] = @contact.has_redeemed_lyft_reward
     ret
   end
 
