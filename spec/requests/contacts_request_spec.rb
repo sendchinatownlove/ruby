@@ -10,12 +10,12 @@ RSpec.describe 'Contacts', type: :request do
     let(:attrs) do
       nil
     end
-    subject {
+    subject do
       get(
         "/contacts/#{id}",
         params: attrs
       )
-    }
+    end
 
     context 'with valid id' do
       it 'returns a 200' do
