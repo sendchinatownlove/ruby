@@ -10,12 +10,12 @@ RSpec.describe 'Contacts', type: :request do
     let(:attrs) do
       nil
     end
-    subject do
+    subject {
       get(
         "/contacts/#{id}",
         params: attrs
       )
-    end
+    }
 
     context 'with valid id' do
       it 'returns a 200' do
@@ -25,7 +25,14 @@ RSpec.describe 'Contacts', type: :request do
 
       it 'returns the contact with only the id' do
         subject
-        expect(json).to eq({ id: contact.id, instagram: false, has_redeemed_lyft_reward: false, is_eligible_for_lyft_reward: false }.as_json)
+        expect(json).to eq({
+          id: contact.id,
+          instagram: false,
+          unique_seller_tickets: 0,
+          weekly_giveaway_entries: 0,
+          has_redeemed_lyft_reward: false,
+          is_eligible_for_lyft_reward: false
+        }.as_json)
       end
 
       context 'with instagram' do
@@ -38,29 +45,90 @@ RSpec.describe 'Contacts', type: :request do
 
         it 'returns the contact with only the id' do
           subject
-          expect(json).to eq({ id: contact.id, instagram: true, has_redeemed_lyft_reward: false, is_eligible_for_lyft_reward: false }.as_json)
+          expect(json).to eq({
+            id: contact.id,
+            instagram: true,
+            unique_seller_tickets: 0,
+            weekly_giveaway_entries: 0,
+            has_redeemed_lyft_reward: false,
+            is_eligible_for_lyft_reward: false
+          }.as_json)
         end
       end
 
       context 'when is_eligible_for_lyft_reward is true for the contact' do
         before do
-          allow(contact).to receive(:is_eligible_for_lyft_reward).and_return(true)
+          allow_any_instance_of(Contact).to receive(:is_eligible_for_lyft_reward).and_return(true)
         end
 
         it 'returns the contact with is_eligible_for_lyft_reward set to true' do
           subject
-          expect(json).to eq({ id: contact.id, instagram: false, has_redeemed_lyft_reward: false, is_eligible_for_lyft_reward: true }.as_json)
+          expect(json).to eq({
+            id: contact.id,
+            instagram: false,
+            unique_seller_tickets: 0,
+            weekly_giveaway_entries: 0,
+            has_redeemed_lyft_reward: false,
+            is_eligible_for_lyft_reward: true
+          }.as_json)
         end
       end
 
       context 'when has_redeemed_lyft_reward is true for the contact' do
         before do
-          allow(contact).to receive(:has_redeemed_lyft_reward).and_return(true)
+          allow_any_instance_of(Contact).to receive(:has_redeemed_lyft_reward).and_return(true)
         end
 
         it 'returns the contact with is_eligible_for_lyft_reward set to true' do
           subject
-          expect(json).to eq({ id: contact.id, instagram: false, has_redeemed_lyft_reward: true, is_eligible_for_lyft_reward: false }.as_json)
+          expect(json).to eq({
+            id: contact.id,
+            instagram: false,
+            unique_seller_tickets: 0,
+            weekly_giveaway_entries: 0,
+            has_redeemed_lyft_reward: true,
+            is_eligible_for_lyft_reward: false
+          }.as_json)
+        end
+      end
+
+      context 'with tickets at unique participating sellers' do
+        let!(:ticket1) { create :ticket, contact: contact }
+        let!(:ticket2) { create :ticket, contact: contact }
+        let!(:ticket3) { create :ticket, contact: contact }
+        let!(:ticket4) { create :ticket, contact: contact }
+        let!(:ticket5) { create :ticket, contact: contact }
+
+        it 'returns a 200' do
+          subject
+          expect(response).to have_http_status(200)
+        end
+
+        it 'returns the number of entries this contact has' do
+          subject
+          expect(json['weekly_giveaway_entries']).to eq(1)
+        end
+      end
+
+      context 'with tickets with some revisits' do
+        let!(:particpiating_seller1) { create :participating_seller }
+        let!(:particpiating_seller2) { create :participating_seller }
+        let!(:particpiating_seller3) { create :participating_seller }
+        let!(:particpiating_seller4) { create :participating_seller }
+        let!(:ticket1) { create :ticket, contact: contact, participating_seller: particpiating_seller1 }
+        let!(:ticket2) { create :ticket, contact: contact, participating_seller: particpiating_seller2 }
+        let!(:ticket3) { create :ticket, contact: contact, participating_seller: particpiating_seller3 }
+        let!(:ticket4) { create :ticket, contact: contact, participating_seller: particpiating_seller4 }
+        let!(:ticket5) { create :ticket, contact: contact, participating_seller: particpiating_seller4 }
+
+        it 'returns a 200' do
+          subject
+          expect(response).to have_http_status(200)
+        end
+
+        it 'returns the number of tickets from unique participating sellers this contact has' do
+          subject
+          expect(json['unique_seller_tickets']).to eq(4)
         end
       end
     end
@@ -82,7 +150,14 @@ RSpec.describe 'Contacts', type: :request do
 
         it 'returns the contact with only the id' do
           subject
-          expect(json).to eq({ id: contact.id, instagram: true, has_redeemed_lyft_reward: false, is_eligible_for_lyft_reward: false }.as_json)
+          expect(json).to eq({
+            id: contact.id,
+            instagram: true,
+            unique_seller_tickets: 0,
+            weekly_giveaway_entries: 0,
+            has_redeemed_lyft_reward: false,
+            is_eligible_for_lyft_reward: false
+          }.as_json)
         end
       end
     end
@@ -98,6 +173,49 @@ RSpec.describe 'Contacts', type: :request do
       it 'returns a not found message' do
         subject
         expect(response.body).to match(/Couldn't find Contact/)
+      end
+    end
+  end
+
+  describe 'GET /contacts/:email' do
+    let(:email) { 'bob@sendchinatownlove.com' }
+    let!(:contact) { create :contact, instagram: nil, email: email }
+    before do
+      get(
+        '/contacts',
+        params: attrs
+      )
+    end
+
+    context 'with the a valid email, in the same lowercase' do
+      let(:attrs) do
+        {
+          email: email
+        }
+      end
+
+      it 'returns a 200' do
+        expect(response).to have_http_status(200)
+      end
+
+      it 'returns the contact with only the id' do
+        expect(json.to_s).to include({ id: contact.id, instagram: false }.as_json.to_s.to_s[0..-2])
+      end
+    end
+
+    context 'with the a valid email, in a different case' do
+      let(:attrs) do
+        {
+          email: email.upcase
+        }
+      end
+
+      it 'returns a 200' do
+        expect(response).to have_http_status(200)
+      end
+
+      it 'returns the contact with only the id' do
+        expect(json.to_s).to include({ id: contact.id, instagram: false }.as_json.to_s[0..-2])
       end
     end
   end
@@ -125,7 +243,14 @@ RSpec.describe 'Contacts', type: :request do
       end
 
       it 'returns the contact with only the id' do
-        expect(json).to eq({ id: contact.id, instagram: false, has_redeemed_lyft_reward: false, is_eligible_for_lyft_reward: false }.as_json)
+        expect(json).to eq({
+          id: contact.id,
+          instagram: false,
+          unique_seller_tickets: 0,
+          weekly_giveaway_entries: 0,
+          has_redeemed_lyft_reward: false,
+          is_eligible_for_lyft_reward: false
+        }.as_json)
       end
 
       context 'with instagram' do
@@ -136,7 +261,14 @@ RSpec.describe 'Contacts', type: :request do
         end
 
         it 'returns the contact with only the id' do
-          expect(json).to eq({ id: contact.id, instagram: true, has_redeemed_lyft_reward: false, is_eligible_for_lyft_reward: false }.as_json)
+          expect(json).to eq({
+            id: contact.id,
+            instagram: true,
+            unique_seller_tickets: 0,
+            weekly_giveaway_entries: 0,
+            has_redeemed_lyft_reward: false,
+            is_eligible_for_lyft_reward: false
+          }.as_json)
         end
       end
     end
@@ -230,6 +362,24 @@ RSpec.describe 'Contacts', type: :request do
 
       it 'returns a missing param message' do
         expect(response.body).to match(/param is missing or the value is empty: email/)
+      end
+    end
+
+    context 'with an uppercased email' do
+      let(:attrs) do
+        {
+          name: 'Bob',
+          instagram: '@sendchinatownlove',
+          email: email.upcase
+        }
+      end
+
+      it 'creates a lowercased new contact and returns it' do
+        # It filters out the leading @
+        contact = Contact.find_by(email: email, name: 'Bob', instagram: 'sendchinatownlove')
+
+        expect(contact).to_not be_nil
+        expect(json).to eq(contact.as_json)
       end
     end
 

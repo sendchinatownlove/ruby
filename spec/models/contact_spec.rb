@@ -31,7 +31,7 @@ RSpec.describe Contact, type: :model do
 
   context 'has_redeemed_lyft_reward' do
     context 'with an unverified reward' do
-      context 'with a new reward' do
+      context 'with no reward assigned to the contact' do
         it 'should return false' do
           expect(@contact.has_redeemed_lyft_reward).to eq(false)
         end
