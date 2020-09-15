@@ -36,7 +36,6 @@ class ContactsController < ApplicationController
     ret = @contact.as_json.slice('id')
     ret[:instagram] = @contact.instagram.present?
     ret[:is_eligible_for_lyft_reward] = @contact.is_eligible_for_lyft_reward
-    ret[:has_redeemed_lyft_reward] = @contact.has_redeemed_lyft_reward
 
     tickets = Ticket.where(contact: @contact)
     # NB(justintmckibben): Currently assumes that it takes 3 tickets to get

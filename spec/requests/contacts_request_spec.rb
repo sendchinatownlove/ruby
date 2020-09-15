@@ -30,7 +30,6 @@ RSpec.describe 'Contacts', type: :request do
           instagram: false,
           unique_seller_tickets: 0,
           weekly_giveaway_entries: 0,
-          has_redeemed_lyft_reward: false,
           is_eligible_for_lyft_reward: false
         }.as_json)
       end
@@ -50,7 +49,6 @@ RSpec.describe 'Contacts', type: :request do
             instagram: true,
             unique_seller_tickets: 0,
             weekly_giveaway_entries: 0,
-            has_redeemed_lyft_reward: false,
             is_eligible_for_lyft_reward: false
           }.as_json)
         end
@@ -68,26 +66,7 @@ RSpec.describe 'Contacts', type: :request do
             instagram: false,
             unique_seller_tickets: 0,
             weekly_giveaway_entries: 0,
-            has_redeemed_lyft_reward: false,
             is_eligible_for_lyft_reward: true
-          }.as_json)
-        end
-      end
-
-      context 'when has_redeemed_lyft_reward is true for the contact' do
-        before do
-          allow_any_instance_of(Contact).to receive(:has_redeemed_lyft_reward).and_return(true)
-        end
-
-        it 'returns the contact with is_eligible_for_lyft_reward set to true' do
-          subject
-          expect(json).to eq({
-            id: contact.id,
-            instagram: false,
-            unique_seller_tickets: 0,
-            weekly_giveaway_entries: 0,
-            has_redeemed_lyft_reward: true,
-            is_eligible_for_lyft_reward: false
           }.as_json)
         end
       end
@@ -155,7 +134,6 @@ RSpec.describe 'Contacts', type: :request do
             instagram: true,
             unique_seller_tickets: 0,
             weekly_giveaway_entries: 0,
-            has_redeemed_lyft_reward: false,
             is_eligible_for_lyft_reward: false
           }.as_json)
         end
@@ -248,7 +226,6 @@ RSpec.describe 'Contacts', type: :request do
           instagram: false,
           unique_seller_tickets: 0,
           weekly_giveaway_entries: 0,
-          has_redeemed_lyft_reward: false,
           is_eligible_for_lyft_reward: false
         }.as_json)
       end
@@ -266,7 +243,6 @@ RSpec.describe 'Contacts', type: :request do
             instagram: true,
             unique_seller_tickets: 0,
             weekly_giveaway_entries: 0,
-            has_redeemed_lyft_reward: false,
             is_eligible_for_lyft_reward: false
           }.as_json)
         end
