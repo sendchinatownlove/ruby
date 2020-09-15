@@ -94,7 +94,7 @@ RSpec.describe 'Contacts', type: :request do
       end
 
       it 'returns the contact with only the id' do
-        expect(json).to eq({ id: contact.id, instagram: false, unique_seller_tickets: 0, weekly_giveaway_entries: 0 }.as_json)
+        expect(json).to eq({ id: contact.id, instagram: false }.as_json)
       end
     end
 
@@ -110,7 +110,7 @@ RSpec.describe 'Contacts', type: :request do
       end
 
       it 'returns the contact with only the id' do
-        expect(json).to eq({ id: contact.id, instagram: false, unique_seller_tickets: 0, weekly_giveaway_entries: 0 }.as_json)
+        expect(json).to eq({ id: contact.id, instagram: false }.as_json)
       end
     end
   end
