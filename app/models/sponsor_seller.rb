@@ -5,6 +5,7 @@
 # Table name: sponsor_sellers
 #
 #  id            :bigint           not null, primary key
+#  active        :boolean
 #  logo_url      :string
 #  name          :string
 #  reward        :string
