@@ -314,7 +314,7 @@ RSpec.describe 'Webhooks API', type: :request do
         gift_card_detail = item.gift_card_detail
         if payment_intent.campaign.present?
           fee = payment_intent.campaign.fees.first
-          expect(gift_card_detail.amount).to eq((((amount * (1 - fee.multiplier)) - fee.flat_cost).floor))
+          expect(gift_card_detail.amount).to eq((((amount * (0.99)) - 30).floor))
         else
           expect(gift_card_detail.amount).to eq(square_fee(amount))
         end
@@ -333,7 +333,7 @@ RSpec.describe 'Webhooks API', type: :request do
       let(:item_type) { 'gift_card' }
       let(:seller_id) { seller1.seller_id }
       let(:fee1) do
-        create :fee
+        create :fee, multiplier: 0.01, flat_cost: 0.30
       end
 
       context 'with campaign' do
