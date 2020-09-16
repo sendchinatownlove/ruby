@@ -5,6 +5,10 @@ require 'rails_helper'
 describe WebhookManager::GiftCardCreator, '#call' do
   let(:seller) { create :seller }
 
+  def square_fee(amount)
+    ((amount * 0.9725) - 30).floor
+  end
+
   it 'creates gift_card_details' do
     payment_intent = create :payment_intent
 
@@ -17,7 +21,7 @@ describe WebhookManager::GiftCardCreator, '#call' do
     expect(item.purchaser).to eq(payment_intent.purchaser)
     expect(item.item_type).to eq('gift_card')
     expect(gift_card_details.item).to eq(item)
-    expect(gift_card_details.amount).to eq(payload[:amount])
+    expect(gift_card_details.amount).to eq(square_fee(payload[:amount]))
     expect(gift_card_details.recipient).to eq(payment_intent.recipient)
     expect(PaymentIntent.last.successful).to be true
   end
@@ -39,7 +43,7 @@ describe WebhookManager::GiftCardCreator, '#call' do
     expect(item.purchaser).to eq(payment_intent_1.purchaser)
     expect(item.item_type).to eq('gift_card')
     expect(gift_card_details.item).to eq(item)
-    expect(gift_card_details.amount).to eq(payload[:amount])
+    expect(gift_card_details.amount).to eq(square_fee(payload[:amount]))
     expect(gift_card_details.recipient).to eq(payment_intent_1.recipient)
     expect(PaymentIntent.last.successful).to be true
 
@@ -55,7 +59,7 @@ describe WebhookManager::GiftCardCreator, '#call' do
     {
       seller_id: seller.seller_id,
       payment_intent: payment_intent,
-      amount: 50,
+      amount: 500,
       single_use: true
     }
   end

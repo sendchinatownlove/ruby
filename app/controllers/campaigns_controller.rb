@@ -22,6 +22,11 @@ class CampaignsController < ApplicationController
   # POST /campaigns
   def create
     @campaign = Campaign.create!(create_params)
+    if params[:has_square_fee]
+      @fee = Fee.find(1)
+      @campaign.fees << @fee
+      @fee.campaigns << @campaign
+    end
     json_response(campaign_json, :created)
   end
 

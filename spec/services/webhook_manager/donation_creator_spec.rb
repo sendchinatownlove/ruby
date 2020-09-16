@@ -5,6 +5,10 @@ require 'rails_helper'
 describe WebhookManager::DonationCreator, '#call' do
   let(:seller) { create :seller }
 
+  def square_fee(amount)
+    ((amount * 0.9725) - 30).floor
+  end
+
   it 'creates donation' do
     payment_intent = create :payment_intent
     payload = new_payload(payment_intent)
@@ -16,7 +20,7 @@ describe WebhookManager::DonationCreator, '#call' do
     expect(item.purchaser).to eq(payment_intent.purchaser)
     expect(item.item_type).to eq('donation')
     expect(donation.item).to eq(item)
-    expect(donation.amount).to eq(payload[:amount])
+    expect(donation.amount).to eq(square_fee(payload[:amount]))
     expect(PaymentIntent.last.successful).to be true
   end
 
@@ -37,7 +41,7 @@ describe WebhookManager::DonationCreator, '#call' do
     expect(item.purchaser).to eq(payment_intent_1.purchaser)
     expect(item.item_type).to eq('donation')
     expect(donation.item).to eq(item)
-    expect(donation.amount).to eq(payload[:amount])
+    expect(donation.amount).to eq(square_fee(payload[:amount]))
     expect(PaymentIntent.last.successful).to be true
 
     payload = new_payload(payment_intent_2)
@@ -52,7 +56,7 @@ describe WebhookManager::DonationCreator, '#call' do
     {
       seller_id: seller.seller_id,
       payment_intent: payment_intent,
-      amount: 50
+      amount: 500
     }
   end
 end

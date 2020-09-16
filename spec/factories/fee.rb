@@ -2,8 +2,9 @@
 
 FactoryBot.define do
   factory :fee do
-    multiplier { Faker::Number.decimal(l_digits: 2) }
+    multiplier { Faker::Number.positive(from: 0.01, to: 0.10) }
+    flat_cost { Faker::Number.positive(from: 0.10, to: 0.90)}
+    description { Faker::Bank.name }
     active { true }
-    association :seller
   end
 end

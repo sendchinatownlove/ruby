@@ -4,7 +4,7 @@ module SellersHelper
   def self.generate_seller_json(seller:)
     locations = seller.locations
     distributor = get_deprecated_distributor(seller: seller)
-    fees = seller.fees
+    # fees = seller.fees
 
     # Do not return the secret token that gives access to all of their gift
     # cards
@@ -12,7 +12,7 @@ module SellersHelper
     # NB(jmckibben): Deprecated field. Use /campaigns/ endpoint instead
     json['distributor'] = distributor.as_json unless distributor.nil?
     json['locations'] = locations.as_json
-    #json['fees'] = fees.as_json
+    # json['fees'] = fees.as_json
 
     # Take into account the associated fees when calculating the cost per meal
     # for the customer. eg) We might generate a $10 gift card for GAM, but if
@@ -20,11 +20,11 @@ module SellersHelper
     # charge the customer $11.
 
     # TODO: change this to use fees through campaigns instead
-    if seller.cost_per_meal.present?
-      json['cost_per_meal'] = seller.cost_per_meal + fees.inject(0) do |_total, fee|
-        (seller.cost_per_meal * fee.multiplier).ceil + fee.flat_cost
-      end
-    end
+    #if seller.cost_per_meal.present?
+    #  json['cost_per_meal'] = seller.cost_per_meal + fees.inject(0) do |_total, fee|
+    #    (seller.cost_per_meal * fee.multiplier).ceil + fee.flat_cost
+    #  end
+    #end
 
     json['donation_amount'] = seller.donation_amount
     json['gift_card_amount'] = seller.gift_card_amount

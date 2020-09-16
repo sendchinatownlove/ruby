@@ -5,6 +5,10 @@ require 'rails_helper'
 describe WebhookManager::PoolDonationCreator, '#call' do
   let(:seller) { create :seller, accept_donations: true }
 
+  def square_fee(amount)
+    ((amount * 0.9725) - 30).floor
+  end
+
   it 'creates donation' do
     # Initialize more than one seller
     create :seller, accept_donations: true
@@ -16,7 +20,7 @@ describe WebhookManager::PoolDonationCreator, '#call' do
     expect(Item.count).to eq(2)
     expect(DonationDetail.count).to eq(Item.count)
     donations.each do |donation|
-      expect(donation.amount).to eq(payload[:amount] / 2)
+      expect(donation.amount).to eq(square_fee(payload[:amount]) / 2)
       item = donation.item
       expect(item.purchaser).to eq(payment_intent.purchaser)
       expect(item.item_type).to eq('donation')
@@ -40,7 +44,7 @@ describe WebhookManager::PoolDonationCreator, '#call' do
     expect(Item.count).to eq(2)
     expect(DonationDetail.count).to eq(Item.count)
     donations.each do |donation|
-      expect(donation.amount).to eq(payload[:amount] / 2)
+      expect(donation.amount).to eq(square_fee(payload[:amount]) / 2)
       item = donation.item
       expect(item.purchaser).to eq(payment_intent_1.purchaser)
       expect(item.item_type).to eq('donation')
@@ -59,7 +63,7 @@ describe WebhookManager::PoolDonationCreator, '#call' do
     {
       seller_id: seller.seller_id,
       payment_intent: payment_intent,
-      amount: 50
+      amount: 500
     }
   end
 end
