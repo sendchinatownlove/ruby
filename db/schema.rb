@@ -262,7 +262,7 @@ ActiveRecord::Schema.define(version: 2020_09_16_000828) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "reward_detail"
-    t.boolean "active"
+    t.boolean "active", default: true, null: false
   end
 
   create_table "tickets", force: :cascade do |t|

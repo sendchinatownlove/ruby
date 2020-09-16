@@ -4,7 +4,7 @@ class SponsorSellersController < ApplicationController
   before_action :set_sponsor_seller, only: %i[show update]
 
   def index
-    json_response(SponsorSeller.all)
+    json_response(SponsorSeller.where(active: true))
   end
 
   # POST /sponsor_sellers
