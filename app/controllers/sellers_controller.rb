@@ -71,6 +71,7 @@ class SellersController < ApplicationController
       :menu_url,
       :target_amount,
       :square_location_id,
+      :non_profit_location_id,
       :logo_image_url,
       gallery_image_urls: []
     )

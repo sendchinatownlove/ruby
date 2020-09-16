@@ -9,7 +9,7 @@ RSpec.describe 'Locations API' do
 
   # Test suite for GET /sellers/:seller_id/locations
   describe 'GET /locations' do
-    before { get "/locations" }
+    before { get '/locations' }
 
     context 'when seller exists' do
       it 'returns status code 200' do
@@ -64,7 +64,7 @@ RSpec.describe 'Locations API' do
     context 'when request attributes are valid' do
       before do
         post(
-          "/locations",
+          '/locations',
           params: valid_attributes,
           as: :json
         )
@@ -76,7 +76,7 @@ RSpec.describe 'Locations API' do
     end
 
     context 'when an invalid request' do
-      before { post "/locations", params: {} }
+      before { post '/locations', params: {} }
 
       it 'returns status code 422' do
         expect(response).to have_http_status(422)

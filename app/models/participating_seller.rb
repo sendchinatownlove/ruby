@@ -4,13 +4,14 @@
 #
 # Table name: participating_sellers
 #
-#  id             :bigint           not null, primary key
-#  name           :string
-#  stamp_url      :string
-#  tickets_secret :string
-#  created_at     :datetime         not null
-#  updated_at     :datetime         not null
-#  seller_id      :bigint
+#  id                :bigint           not null, primary key
+#  is_lyft_sponsored :boolean          default(FALSE)
+#  name              :string
+#  stamp_url         :string
+#  tickets_secret    :string
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  seller_id         :bigint
 #
 class ParticipatingSeller < ApplicationRecord
   validates_presence_of :name

@@ -4,7 +4,7 @@ class SponsorSellersController < ApplicationController
   before_action :set_sponsor_seller, only: %i[show update]
 
   def index
-    json_response(SponsorSeller.all)
+    json_response(SponsorSeller.where(active: true))
   end
 
   # POST /sponsor_sellers
@@ -31,7 +31,9 @@ class SponsorSellersController < ApplicationController
       :location_id,
       :logo_url,
       :reward,
-      :reward_cost
+      :reward_cost,
+      :reward_detail,
+      :active
     )
   end
 

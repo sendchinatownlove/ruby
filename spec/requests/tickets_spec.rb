@@ -137,6 +137,7 @@ RSpec.describe '/tickets', type: :request do
   end
 
   describe 'PATCH /update' do
+    before { freeze_time }
     context 'with valid parameters' do
       it 'updates the requested ticket with a valid contact' do
         ticket = Ticket.create! base_attributes
@@ -144,6 +145,7 @@ RSpec.describe '/tickets', type: :request do
             params: update_attributes, as: :json
         ticket.reload
         expect(ticket[:contact_id]).not_to be_nil
+        expect(ticket[:associated_with_contact_at]).to eq(Time.now.as_json)
         expect(ticket[:contact_id]).to eq(contact2.id)
       end
 
@@ -185,6 +187,16 @@ RSpec.describe '/tickets', type: :request do
         ticket = Ticket.create! base_attributes
         put ticket_url(ticket.ticket_id),
             params: invalid_update_attributes, as: :json
+        expect(response).to have_http_status(:not_found)
+        expect(response.content_type).to match(a_string_including('application/json'))
+      end
+    end
+
+    context 'with invalid ticket' do
+      it 'renders a JSON response with errors for the ticket without a valid contact' do
+        ticket = Ticket.create! base_attributes
+        put ticket_url('oijawefo'),
+            params: update_attributes, as: :json
         expect(response).to have_http_status(:not_found)
         expect(response.content_type).to match(a_string_including('application/json'))
       end
