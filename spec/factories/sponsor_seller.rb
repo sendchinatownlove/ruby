@@ -7,5 +7,6 @@ FactoryBot.define do
     logo_url { 'https://example.com/placeholder.jpg' }
     reward { Faker::Movies::StarWars.planet }
     reward_cost { rand(10) }
+    active { true }
   end
 end
