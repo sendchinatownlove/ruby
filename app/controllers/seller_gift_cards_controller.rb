@@ -8,11 +8,14 @@ class SellerGiftCardsController < ApplicationController
     query = GiftCardDetail
             .select(
               :seller_gift_card_id,
-              :value,
+              'la.value as latest_value',
+              'og.value as original_value',
               :name,
               :email,
               :created_at,
-              :expiration
+              :updated_at,
+              :expiration,
+              :single_use
             )
             .joins(:item, :recipient)
             .where(
@@ -23,6 +26,9 @@ class SellerGiftCardsController < ApplicationController
             )
             .joins(
               "join (#{GiftCardAmount.latest_amounts_sql}) as la on la.gift_card_detail_id = gift_card_details.id"
+            )
+            .joins(
+              "join (#{GiftCardAmount.original_amounts_sql}) as og on og.gift_card_detail_id = gift_card_details.id"
             )
     query = query.where(single_use: false) if params.key?('filterGAM')
     query = query.to_sql
