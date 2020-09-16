@@ -9,7 +9,7 @@
 #  covered_by_customer :boolean
 #  description         :string
 #  flat_cost           :decimal(8, 2)    default(0.0)
-#  multiplier          :decimal(, )      default(0.0)
+#  multiplier          :decimal(6, 4)    default(0.0)
 #
 require 'rails_helper'
 
