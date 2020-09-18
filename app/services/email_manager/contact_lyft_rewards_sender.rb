@@ -12,7 +12,7 @@ module EmailManager
 
     # rubocop:disable Layout/LineLength
     def call
-      redemption_url = 'https://merchant.sendchinatownlove.com/passport/lyft_rewards' + contact_id.to_s \
+      redemption_url = 'https://merchant.sendchinatownlove.com/passport/lyft_rewards/' + contact_id.to_s \
         + '/redeem/' + token
       html = <<~EOF
         <!DOCTYPE html>
