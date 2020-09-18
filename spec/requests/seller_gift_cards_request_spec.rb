@@ -56,7 +56,7 @@ RSpec.describe 'SellerGiftCards', type: :request do
         # the original amount, which matters
         create(
           :gift_card_amount,
-          value: expected_gift_card_original_amount, 
+          value: expected_gift_card_original_amount,
           gift_card_detail: gift_card_detail
         )
         create(
@@ -87,7 +87,7 @@ RSpec.describe 'SellerGiftCards', type: :request do
           created_at: gift_card_detail.created_at.utc,
           expiration: gift_card_detail.expiration,
           single_use: gift_card_detail.single_use,
-          updated_at: gift_card_detail.updated_at.utc,
+          updated_at: gift_card_detail.updated_at.utc
         }.as_json
       end
 
