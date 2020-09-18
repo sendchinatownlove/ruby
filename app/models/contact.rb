@@ -54,11 +54,6 @@ class Contact < ApplicationRecord
           is_lyft_sponsored: true
         }
       )
-      .where.not(
-        tickets: {
-          redeemed_at: nil
-        }
-      )
       .count > 0
   end
 end

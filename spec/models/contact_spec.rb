@@ -102,13 +102,6 @@ RSpec.describe Contact, type: :model do
     end
 
     context 'when the contact has redeemed a ticket from a lyft sponsored participating seller' do
-      let(:redeemed_at) do
-        Faker::Date.between(
-          from: Date.today - 30.days,
-          to: Date.today - 1.days
-        )
-      end
-
       before do
         participating_seller = create(
           :participating_seller,
@@ -118,16 +111,7 @@ RSpec.describe Contact, type: :model do
           :ticket,
           contact: @contact,
           participating_seller: participating_seller,
-          redeemed_at: redeemed_at
         )
-      end
-
-      context 'when the ticket has not been redeemed' do
-        let(:redeemed_at) { nil }
-
-        it 'should return false' do
-          expect(@contact.is_eligible_for_lyft_reward).to eq(false)
-        end
       end
 
       context 'when there is a new reward' do
