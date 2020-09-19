@@ -44,6 +44,7 @@ class Contact < ApplicationRecord
   private
 
   def has_redeemed_lyft_sponsored_ticket
+    lyft_rewards_launch_date = Date.new(2020, 9, 18)
     Ticket
       .joins(:participating_seller)
       .where(
@@ -54,6 +55,7 @@ class Contact < ApplicationRecord
           is_lyft_sponsored: true
         }
       )
+      .where('tickets.associated_with_contact_at >= ?', lyft_rewards_launch_date)
       .count > 0
   end
 end
