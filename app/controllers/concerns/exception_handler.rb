@@ -10,6 +10,7 @@ module ExceptionHandler
   class DuplicatePaymentCompletedError < StandardError; end
   class InvalidPoolDonationError < StandardError; end
   class InvalidGiftAMealAmountError < StandardError; end
+  class InvalidLyftRewardsContactError < StandardError; end
   class TicketRedemptionError < StandardError; end
   class SquarePaymentsError < StandardError
     attr_reader :status_code
@@ -33,6 +34,7 @@ module ExceptionHandler
                 ActionController::ParameterMissing,
                 InvalidParameterError,
                 InvalidLineItem,
+                InvalidLyftRewardsContactError,
                 InvalidGiftCardUpdate,
                 InvalidGiftAMealAmountError,
                 InvalidPoolDonationError do |e|

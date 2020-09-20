@@ -141,6 +141,7 @@ GEM
     nio4r (2.5.2)
     nokogiri (1.10.9)
       mini_portile2 (~> 2.4.0)
+    pagy (3.8.3)
     parallel (1.19.1)
     parser (2.7.1.1)
       ast (~> 2.4.0)
@@ -287,6 +288,7 @@ DEPENDENCIES
   globalize (~> 5.3.0)
   globalize-accessors
   listen (>= 3.0.5, < 3.2)
+  pagy (~> 3.8)
   pg
   pry-byebug
   puma (~> 4.3)

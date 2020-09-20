@@ -42,7 +42,8 @@ RSpec.describe 'SellerGiftCards', type: :request do
         )
       end
 
-      let(:expected_gift_card_amount) { 30_00 }
+      let(:expected_gift_card_latest_amount) { 30_00 }
+      let(:expected_gift_card_original_amount) { 10_00 }
 
       def create_gift_card(refunded:, contact:, seller:, single_use:)
         item = create(:item, refunded: refunded, seller: seller)
@@ -52,18 +53,20 @@ RSpec.describe 'SellerGiftCards', type: :request do
           recipient: contact,
           single_use: single_use
         )
+        # the original amount, which matters
         create(
           :gift_card_amount,
+          value: expected_gift_card_original_amount,
           gift_card_detail: gift_card_detail
         )
         create(
           :gift_card_amount,
           gift_card_detail: gift_card_detail
         )
-        # The amount that matters
+        # The latest amount, which matters
         create(
           :gift_card_amount,
-          value: expected_gift_card_amount,
+          value: expected_gift_card_latest_amount,
           gift_card_detail: gift_card_detail,
           created_at: Time.current + 1.day
         )
@@ -77,11 +80,14 @@ RSpec.describe 'SellerGiftCards', type: :request do
       def expected_gift_card_json(gift_card_detail:, contact:)
         {
           seller_gift_card_id: gift_card_detail.seller_gift_card_id,
-          value: expected_gift_card_amount,
+          latest_value: expected_gift_card_latest_amount,
+          original_value: expected_gift_card_original_amount,
           name: contact.name,
           email: contact.email,
           created_at: gift_card_detail.created_at.utc,
-          expiration: gift_card_detail.expiration
+          expiration: gift_card_detail.expiration,
+          single_use: gift_card_detail.single_use,
+          updated_at: gift_card_detail.updated_at.utc
         }.as_json
       end
 

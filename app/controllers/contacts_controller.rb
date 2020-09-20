@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class ContactsController < ApplicationController
+  before_action :downcase_email
   before_action :set_contact_by_email, only: %i[index]
   before_action :set_contact_by_id, only: %i[show update]
 
@@ -34,6 +35,17 @@ class ContactsController < ApplicationController
     # our DB to become an email -> instagram/name lookup for people to abuse
     ret = @contact.as_json.slice('id')
     ret[:instagram] = @contact.instagram.present?
+    ret[:is_eligible_for_lyft_reward] = @contact.is_eligible_for_lyft_reward
+
+    tickets = Ticket.where(contact: @contact)
+    # NB(justintmckibben): Currently assumes that it takes 3 tickets to get
+    #                      one giveaway entry
+    ret[:weekly_giveaway_entries] = (tickets.size / 3).floor
+
+    # Get the number of Participating Sellers this Contact has visited
+    ret[:unique_seller_tickets] = tickets.map(&:participating_seller_id)
+                                         .to_set.size
+
     ret
   end
 
@@ -58,13 +70,15 @@ class ContactsController < ApplicationController
                            params[:instagram].tr('@', '')
     end
 
-    params[:email] = params[:email].downcase if params[:email].present?
-
     params.permit(
       :email,
       :instagram,
       :name
     )
+  end
+
+  def downcase_email
+    params[:email] = params[:email].downcase if params[:email].present?
   end
 
   def set_contact_by_email

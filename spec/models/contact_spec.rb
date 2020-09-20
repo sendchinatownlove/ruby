@@ -19,9 +19,166 @@
 require 'rails_helper'
 
 RSpec.describe Contact, type: :model do
-  before { create :contact }
+  before do
+    @contact = create :contact
+    @lyft_reward = create :lyft_reward
+  end
+
   it { should validate_uniqueness_of(:email) }
   it { should allow_value(%w[true false]).for(:is_subscribed) }
   it { should have_many(:items) }
   it { should have_many(:gift_card_details) }
+
+  context 'has_redeemed_lyft_reward' do
+    context 'with an unverified reward' do
+      context 'with no reward assigned to the contact' do
+        it 'should return false' do
+          expect(@contact.has_redeemed_lyft_reward).to eq(false)
+        end
+      end
+
+      context 'with a delivered reward' do
+        before do
+          @lyft_reward.update(
+            state: 'delivered',
+            contact: @contact
+          )
+        end
+
+        it 'should return false' do
+          expect(@contact.has_redeemed_lyft_reward).to eq(false)
+        end
+      end
+    end
+
+    context 'with a verified reward' do
+      before do
+        @lyft_reward.update(
+          state: 'verified',
+          contact: @contact
+        )
+      end
+
+      it 'should return true' do
+        expect(@contact.has_redeemed_lyft_reward).to eq(true)
+      end
+    end
+  end
+
+  context 'is_eligible_for_lyft_reward' do
+    context 'when the contact has already redeemed a reward' do
+      before do
+        @lyft_reward.update(
+          state: 'verified',
+          contact: @contact
+        )
+      end
+
+      it 'should return false' do
+        expect(@contact.is_eligible_for_lyft_reward).to eq(false)
+      end
+    end
+
+    context 'when the contact has not redeemed a ticket from a lyft sponsored participating seller' do
+      before do
+        @lyft_reward.update(
+          state: 'delivered',
+          contact: @contact
+        )
+        participating_seller = create(
+          :participating_seller,
+          is_lyft_sponsored: false
+        )
+        ticket = create(
+          :ticket,
+          contact: @contact,
+          participating_seller: participating_seller
+        )
+      end
+
+      it 'should return false' do
+        expect(@contact.is_eligible_for_lyft_reward).to eq(false)
+      end
+    end
+
+    context 'when the contact has redeemed a ticket from a lyft sponsored participating seller' do
+      let(:associated_with_contact_at) do
+        Faker::Date.between(
+          from: Date.new(2020, 9, 18),
+          to: Date.new(2020, 9, 18) + 30.days
+        )
+      end
+
+      before do
+        participating_seller = create(
+          :participating_seller,
+          is_lyft_sponsored: true
+        )
+        ticket = create(
+          :ticket,
+          contact: @contact,
+          participating_seller: participating_seller,
+          associated_with_contact_at: associated_with_contact_at
+        )
+      end
+
+      context 'when the ticket was not associated on or after the launch date' do
+        let(:associated_with_contact_at) do
+          Faker::Date.between(
+            from: Date.new(2020, 9, 18) - 30.days,
+            to: Date.new(2020, 9, 18) - 1.days
+          )
+        end
+
+        it 'should return false' do
+          expect(@contact.is_eligible_for_lyft_reward).to eq(false)
+        end
+      end
+
+      context 'when there is a new reward' do
+        before do
+          @lyft_reward.update(
+            state: 'new'
+          )
+        end
+
+        it 'should return true' do
+          expect(@contact.is_eligible_for_lyft_reward).to eq(true)
+        end
+      end
+
+      context 'when the contact has a delivered reward' do
+        before do
+          @lyft_reward.update(
+            state: 'delivered'
+          )
+        end
+
+        context 'when the reward has expired' do
+          before do
+            @lyft_reward.update(
+              expires_at: Time.now - 1.days
+            )
+            new_lyft_reward = create :lyft_reward
+          end
+
+          it 'should return true' do
+            expect(@contact.is_eligible_for_lyft_reward).to eq(true)
+          end
+        end
+
+        context 'when the reward has not expired' do
+          before do
+            @lyft_reward.update(
+              expires_at: Time.now + 1.days
+            )
+          end
+
+          it 'should return false' do
+            expect(@contact.is_eligible_for_lyft_reward).to eq(false)
+          end
+        end
+      end
+    end
+  end
 end

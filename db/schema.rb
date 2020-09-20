@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_29_001337) do
+ActiveRecord::Schema.define(version: 2020_09_16_000828) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -142,6 +142,17 @@ ActiveRecord::Schema.define(version: 2020_08_29_001337) do
     t.index ["seller_id"], name: "index_locations_on_seller_id"
   end
 
+  create_table "lyft_rewards", force: :cascade do |t|
+    t.string "code", null: false
+    t.string "state", default: "new", null: false
+    t.string "token"
+    t.datetime "expires_at"
+    t.bigint "contact_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["contact_id"], name: "index_lyft_rewards_on_contact_id"
+  end
+
   create_table "menu_items", force: :cascade do |t|
     t.string "name"
     t.string "description"
@@ -171,6 +182,7 @@ ActiveRecord::Schema.define(version: 2020_08_29_001337) do
     t.string "tickets_secret"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.boolean "is_lyft_sponsored", default: false
   end
 
   create_table "payment_intents", force: :cascade do |t|
@@ -250,6 +262,7 @@ ActiveRecord::Schema.define(version: 2020_08_29_001337) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "reward_detail"
+    t.boolean "active", default: true, null: false
   end
 
   create_table "tickets", force: :cascade do |t|
@@ -281,6 +294,7 @@ ActiveRecord::Schema.define(version: 2020_08_29_001337) do
   add_foreign_key "items", "payment_intents"
   add_foreign_key "items", "sellers"
   add_foreign_key "locations", "sellers"
+  add_foreign_key "lyft_rewards", "contacts"
   add_foreign_key "menu_items", "sellers"
   add_foreign_key "open_hours", "sellers"
   add_foreign_key "payment_intents", "campaigns"
