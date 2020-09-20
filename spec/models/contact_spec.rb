@@ -157,8 +157,9 @@ RSpec.describe Contact, type: :model do
         context 'when the reward has expired' do
           before do
             @lyft_reward.update(
-              expires_at: Date.today - 1.days
+              expires_at: Time.now - 1.days
             )
+            new_lyft_reward = create :lyft_reward
           end
 
           it 'should return true' do
@@ -169,7 +170,7 @@ RSpec.describe Contact, type: :model do
         context 'when the reward has not expired' do
           before do
             @lyft_reward.update(
-              expires_at: Date.today + 1.days
+              expires_at: Time.now + 1.days
             )
           end
 
