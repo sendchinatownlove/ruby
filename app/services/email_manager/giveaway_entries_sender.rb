@@ -19,7 +19,7 @@ module EmailManager
         if number_of_tickets % 3 == 0
           entry_status = "You have been entered into this week's giveaway!"
         else
-          entry_status = "You have been entered into this week's giveaway! Only #{number_of_tickets % 3} more tickets until your next entry!"
+          entry_status = "You have been entered into this week's giveaway! Only #{(3 - number_of_tickets) % 3} more tickets until your next entry!"
         end
       end
 
