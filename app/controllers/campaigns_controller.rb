@@ -22,8 +22,8 @@ class CampaignsController < ApplicationController
   # POST /campaigns
   def create
     @campaign = Campaign.create!(create_params)
-    if params[:has_square_fee]
-      @fee = Fee.find(1)
+    if params[:fee_id].present?
+      @fee = Fee.find(params[:fee_id])
       @campaign.fees << @fee
       @fee.campaigns << @campaign
     end

@@ -3,15 +3,9 @@
 # Creates donation and item with the corresponding payload
 module WebhookManager
     class FeeHandler < BaseService
-        attr_reader :payment_intent, :amount
 
-    def initialize(params)
-      @payment_intent = params[:payment_intent]
-      @amount = params[:amount]
-    end
-
-    def call
-        return_amount = @amount
+    def self.calculate_amount(payment_intent, amount)
+        return_amount = amount
         campaign = Campaign.find_by_id(payment_intent.campaign_id)
         if(campaign.present?)
             # Apply each fee

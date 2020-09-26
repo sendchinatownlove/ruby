@@ -17,7 +17,6 @@ class FeesController < ApplicationController
   # PUT /fees/:id
   def update
     @fee.update(update_params)
-    @fee.save
     json_response(@fee)
   end
 

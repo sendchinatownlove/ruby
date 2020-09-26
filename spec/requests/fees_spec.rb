@@ -2,11 +2,13 @@
 
 require 'rails_helper'
 
-RSpec.describe FeesController, type: :controller do
+RSpec.describe 'Fees', type: :request do
+
+let!(:fee) { create :fee }
+
   context 'GET /fees' do
-    let(:response) { get :index }
+    before { get "/fees" }
     context 'with fees' do
-      let!(:fee) { create :fee }
 
       it 'returns fees' do
         fees = JSON.parse(response.body)
@@ -19,16 +21,6 @@ RSpec.describe FeesController, type: :controller do
       end
     end
 
-    context 'without fees' do
-      it 'returns no fees' do
-        fees = JSON.parse(response.body)
-        expect(fees.size).to eq 0
-      end
-
-      it 'returns 200' do
-        expect(response.response_code).to eq 200
-      end
-    end
   end
 
   context 'POST /fees' do
