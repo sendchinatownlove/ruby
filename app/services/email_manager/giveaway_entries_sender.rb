@@ -32,7 +32,6 @@ module EmailManager
             <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
           </head>
           <body>
-
             <p>
               Thank you for your support during our Send Chinatown Love Food Crawl this month. It is heart-warming to see all the love you have been sending our small businesses.
             </p>
