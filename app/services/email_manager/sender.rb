@@ -20,12 +20,15 @@ module EmailManager
                       subject: subject,
                       html: html
 
-      # Send to Receipts Eng so that they know what their receipts in prod looks like
-      RestClient.post api_url,
-                      from: 'receipts@sendchinatownlove.com',
-                      to: 'receipts@sendchinatownlove.com',
-                      subject: subject,
-                      html: html
+      #Send to Receipts Eng so that they know what their receipts in prod looks like
+      
+      # commented out before sending giveaway blast
+
+      #RestClient.post api_url,
+      #                from: 'receipts@sendchinatownlove.com',
+      #                to: 'receipts@sendchinatownlove.com',
+      #                subject: subject,
+      #                html: html
     end
   end
 end
