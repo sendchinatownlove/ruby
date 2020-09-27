@@ -42,12 +42,14 @@ module EmailManager
             </p>
 
             <p>
-              Check out this week’s giveaway items and our Grand Prize giveaway items at our <a href="https://www.sendchinatownlove.com/food-crawl.html" target="_blank">Food Crawl website</a>.
+              Check out this week’s giveaway and our Grand Prize giveaway items at our <a href="https://www.sendchinatownlove.com/food-crawl.html" target="_blank">Food Crawl website</a>.
             </p>
               
             <p>
               We will be announcing this week's winners Monday, Sep. 28th and Grand Prize winners on Oct. 1st on our <a href="https://www.instagram.com/sendchinatownlove/" target="_blank">Instagram</a>.
             </p>
+
+            <br>
 
             <p>
               #{entry_status}
