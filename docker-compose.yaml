@@ -5,6 +5,7 @@ services:
     environment:
       - PGDATA=/var/lib/postgresql/data/pgdata
       - POSTGRES_HOST_AUTH_METHOD=trust
+      # NOTE: You will need to update config/database.yml file as well with the value for POSTGRES_USER as well
       - POSTGRES_USER=postgres
     volumes:
       -  postgres-data-volume:/var/lib/postgresql/data
