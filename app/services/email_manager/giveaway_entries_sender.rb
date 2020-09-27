@@ -23,7 +23,7 @@ module EmailManager
         end
       end
 
-      if number_of_tickets > 12 && Ticket.where(contact: @contact).distinct.pluck(participating_seller_id).size > 12
+      if number_of_tickets > 12 && Ticket.where(contact: @contact).uniq(&:participating_seller_id).size > 12
           grand_prize_status = "You have also been entered into our Grand Prize Giveaway!"
       else
         grand_prize_status = ""
