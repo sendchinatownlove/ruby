@@ -16,6 +16,7 @@ module EmailManager
       if number_of_entries == 0
         entry_status = "You're not entered into the giveaway yet, only #{3 - number_of_tickets} more ticket#{3 - number_of_tickets == 1 ? '' : 's'} until your first entry!"
       else
+        grand_prize_status = "You have also been entered into our Grand Prize Giveaway!"
         if number_of_tickets % 3 == 0
           entry_status = "You have been entered into this week's giveaway!"
         else
