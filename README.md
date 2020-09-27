@@ -109,23 +109,23 @@ https://docs.google.com/document/d/1UPNCwjWS_T7XT5AXsewphu6NvNdV7TQLSJub-RBRAG0/
 Anytime a new migration is created, you'll have to run `rails db:migrate` for your local dev environment, and `rails db:migrate RAILS_ENV=test` for your local test environment
 
 ## containerized
-requires
-- docker
-- docker-compose
+Running a containerized version of the app requires Docker and Docker Compose. In addition, some updates will be required to the `config/database.yml` file for the app to work within Docker. You may also need to enable Square webhooks in order for some pages, so reference the [Enabling Webhooks](##Enabling-Webhooks-locally) section.
 
 ```
 docker volume create --name=postgres-data-volume
-cd api && docker-compose up
-# navigate to localhost:3000
+cd <scl-be directory> && docker-compose up
 ```
 accessing rail CLI after `docker-compose` is running.
 
 ```
-docker exec -it api_web_1 bash
-# now inside docker container example of commands that can be run
+# Replace <scl-be directory name> with the name of the direcotry that you cloned the repo into
+docker exec -it <scl-be directory name>_web_1 bash
 
+# now inside docker container example of commands that can be run
 bundle exec rake db:create
 bundle exec rake db:migrate
+
+bundle exec rake db:seed
 
 bundle exec rails g model Todo title:string created_by:string
 ```
