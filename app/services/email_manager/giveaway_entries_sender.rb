@@ -15,14 +15,18 @@ module EmailManager
 
       if number_of_entries == 0
         entry_status = "You're not entered into the giveaway yet, only #{3 - number_of_tickets} more ticket#{3 - number_of_tickets == 1 ? '' : 's'} until your first entry!"
-        grand_prize_status = ""
       else
-        grand_prize_status = "You have also been entered into our Grand Prize Giveaway!"
         if number_of_tickets % 3 == 0
           entry_status = "You have been entered into this week's giveaway!"
         else
           entry_status = "You have been entered into this week's giveaway! Only #{(3 - number_of_tickets) % 3} more ticket#{(3 - number_of_tickets) % 3 == 1 ? '': 's'} until your next entry!"
         end
+      end
+
+      if number_of_tickets > 12 && Ticket.where(contact: @contact).distinct.pluck(participating_seller_id).size > 12
+          grand_prize_status = "You have also been entered into our Grand Prize Giveaway!"
+      else
+        grand_prize_status = ""
       end
 
       html = <<~EOF
