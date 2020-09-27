@@ -109,7 +109,7 @@ https://docs.google.com/document/d/1UPNCwjWS_T7XT5AXsewphu6NvNdV7TQLSJub-RBRAG0/
 Anytime a new migration is created, you'll have to run `rails db:migrate` for your local dev environment, and `rails db:migrate RAILS_ENV=test` for your local test environment
 
 ## containerized
-Running a containerized version of the app requires Docker and Docker Compose. In addition, some updates will be required to the `config/database.yml` file for the app to work within Docker. You may also need to enable Square webhooks in order for some pages, so reference the [Enabling Webhooks](##Enabling-Webhooks-locally) section.
+Running a containerized version of the app requires Docker and Docker Compose. In addition, some updates will be required to the `config/database.yml` file for the app to work within Docker. You may also need to enable Square webhooks, so reference the [Enabling Webhooks](##Enabling-Webhooks-locally) section.
 
 ```
 docker volume create --name=postgres-data-volume
