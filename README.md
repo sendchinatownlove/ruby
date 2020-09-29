@@ -52,8 +52,7 @@ If you get a migration error like `PG::UndefinedTable: ERROR:` or `PG::NotNullVi
 
   [source](https://stackoverflow.com/questions/52862529/no-such-file-or-directory-rb-sysopen-tmp-pids-puma-pid)
 
-- Run the server on port 3001: `heroku local web -p 3001`
-You'll need to do this if you're getting cors errors from the frontend. Stop your frontend server, start the rails server on 3001, then start the local server again from port 3000 using `yarn start`
+- Run the server on port 5000: `heroku local web -p 5000`
 - Run all tests: `heroku local:run bundle exec rspec`
 - Run specific tests: `heroku local:run bundle exec rspec -e "<insert string from test description>"`
 - Run console: `heroku local:run rails console`
