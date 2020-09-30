@@ -29,6 +29,11 @@ development:
   # To create additional roles in postgres see `$ createuser --help`.
   # When left blank, postgres will use the default role. This is
   # the same name as the operating system user that initialized the database.
+  # NOTE: If you are setting up the app with Docker, you will need to uncomment
+  #...and use the `username` value that corresponds with
+  #...the POSTGRES_USER value in docker-compose.yml.
+  #...You will also need to uncomment the host value, see below for the
+  #...corresponding instructions
   #username: myapp
 
   # The password associated with the postgres role (username).
@@ -37,7 +42,14 @@ development:
   # Connect on a TCP socket. Omitted by default since the client uses a
   # domain socket that doesn't need configuration. Windows does not have
   # domain sockets, so uncomment these lines.
-  #host: localhost
+  #
+  # NOTE: If you are setting up the app with Docker, you will need to uncomment
+  #...Line 50 of this file(where it says host: db) and check to make sure it
+  #...corresponds with the name of the Postgres service in the
+  #...docker-compose.yml file. This can be checked in the services
+  #...property in docker-compose.yml where the name of the service to run
+  #... the app is nested inside
+  #host: db
 
   # The TCP port the server listens on. Defaults to 5432.
   # If your server runs on a different port number, change accordingly.
