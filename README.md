@@ -112,13 +112,14 @@ Running a containerized version of the app requires Docker and Docker Compose. I
 
 ```
 docker volume create --name=postgres-data-volume
-cd <scl-be directory> && docker-compose up
+cd <local repo directory name> && docker-compose up
 ```
 accessing rail CLI after `docker-compose` is running.
 
 ```
-# Replace <scl-be directory name> with the name of the direcotry that you cloned the repo into
-docker exec -it <scl-be directory name>_web_1 bash
+# check what containers are being run by Docker Compose
+cd <local repo directory name> && docker-compose ps
+docker exec -it <name of the container with "web_1" in it> bash
 
 # now inside docker container example of commands that can be run
 bundle exec rake db:create
