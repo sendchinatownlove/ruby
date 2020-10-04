@@ -45,12 +45,14 @@ class CampaignsController < ApplicationController
       :end_date,
       :price_per_meal,
       :target_amount,
+      :nonprofit_id,
       gallery_image_urls: []
     )
 
     set_location
     set_seller
     set_distributor
+
     ret[:location_id] = @location.id
     ret[:seller_id] = @seller.id
     ret[:distributor_id] = @distributor.id
@@ -64,6 +66,7 @@ class CampaignsController < ApplicationController
       :description,
       :valid,
       :price_per_meal,
+      :nonprofit_id,
       gallery_image_urls: []
     )
   end

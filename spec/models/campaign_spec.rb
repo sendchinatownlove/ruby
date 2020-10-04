@@ -16,12 +16,14 @@
 #  updated_at         :datetime         not null
 #  distributor_id     :bigint
 #  location_id        :bigint           not null
+#  nonprofit_id       :bigint
 #  seller_id          :bigint           not null
 #
 # Indexes
 #
 #  index_campaigns_on_distributor_id  (distributor_id)
 #  index_campaigns_on_location_id     (location_id)
+#  index_campaigns_on_nonprofit_id    (nonprofit_id)
 #  index_campaigns_on_seller_id       (seller_id)
 #
 # Foreign Keys
