@@ -9,6 +9,14 @@ class LocationsController < ApplicationController
     json_response(@seller.locations)
   end
 
+  # DELETE /sellers/:seller_id/locations/:id
+  def destroy
+    @location.destroy
+
+    head :no_content
+  end
+
+
   # GET /sellers/:seller_id/locations/:id
   def show
     json_response(@location)
@@ -24,13 +32,6 @@ class LocationsController < ApplicationController
     @location.update(update_location_params)
     @location.save
     json_response(@location)
-  end
-
-  # DELETE /sellers/:seller_id/locations/:id
-  def destroy
-    @location.destroy
-
-    head :no_content
   end
 
   private

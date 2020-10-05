@@ -19,6 +19,12 @@ class GiftCardsController < ApplicationController
     json_response(item_gift_card_detail_json)
   end
 
+  # GET /gift_cards/show_all
+  def display_gift_cards
+    @all_gift_cards = GiftCardDetail.all
+    json_response(@all_gift_cards.as_json)
+  end
+
   private
 
   def gift_card_params
