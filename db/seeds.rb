@@ -63,6 +63,121 @@
 end
 
 [
+    {
+        seller_id: 1,
+        open_time: '2000-01-01T07:00:00.000Z',
+        close_time: '2000-01-01T18:00:00.000Z',
+        open_day: 'MON',
+        close_day: 'MON'
+    },
+    {
+        seller_id: 1,
+        open_time: '2000-01-01T07:00:00.000Z',
+        close_time: '2000-01-01T00:30:00.000Z',
+        open_day: 'TUE',
+        close_day: 'WED'
+    },
+    {
+        seller_id: 1,
+        open_time: '2000-01-01T07:00:00.000Z',
+        close_time: '2000-01-01T18:00:00.000Z',
+        open_day: 'THU',
+        close_day: 'THU'
+    },
+    {
+        seller_id: 1,
+        open_time: '2000-01-01T07:00:00.000Z',
+        close_time: '2000-01-01T18:00:00.000Z',
+        open_day: 'SUN',
+        close_day: 'SUN'
+    }
+].each do |attributes|
+  OpenHour.find_or_create_by(seller_id: attributes[:seller_id], open_day: attributes[:open_day]).update!(attributes)
+end
+
+[
+  {
+    id: 1,
+    seller_id: 1,
+    phone_number: '111-111-1111',
+  },
+  {
+    id: 2,
+    seller_id: 1,
+    url: 'http://caviar.com/restaurant/',
+  },
+  {
+    id: 3,
+    seller_id: 1,
+    url: 'http://doordash.com/menu/',
+  },
+  {
+    id: 4,
+    seller_id: 1,
+    url: 'http://grubhub.com/restaurant/',
+  },
+  {
+    id: 5,
+    seller_id: 2,
+    url: 'http://postmates.com/restaurant/',
+
+  },
+  {
+    id: 6,
+    seller_id: 2,
+    url: 'http://seamless.com/menu/',
+  },
+  {
+    id: 7,
+    seller_id: 2,
+    url: 'http://ubereats.com/new-york/food-delivery/',
+  },
+].each do |attributes|
+  DeliveryOption.find_or_create_by(id: attributes[:id]).update!(attributes)
+end
+
+[
+  {
+    name: 'Phone',
+    icon_url: './assets/Call@2x.png',
+    delivery_option_id: 1
+  },
+  {
+    name: 'Caviar',
+    icon_url: './assets/Caviar@2x.png',
+    delivery_option_id: 2
+  },
+  {
+    name: 'DoorDash',
+    icon_url: './assets/DoorDash@2x.png',
+    delivery_option_id: 3
+  },
+  {
+    name: 'Grubhub',
+    icon_url: './assets/Grubhub@2x.png',
+    delivery_option_id: 4
+  },
+  {
+    name: 'Postmates',
+    icon_url: './assets/Postmates@2x.png',
+    delivery_option_id: 5
+  },
+  {
+    name: 'Seamless',
+    icon_url: './assets/Seamless@2x.png',
+    delivery_option_id: 6
+  },
+  {
+    name: 'UberEats',
+    icon_url: './assets/UberEats@2x.png',
+    delivery_option_id: 7
+  }
+].each do |attributes|
+  deliveryOption = DeliveryOption.find_by(id: attributes[:delivery_option_id])
+  DeliveryType.find_or_create_by(name: attributes[:name], delivery_option_id: deliveryOption.id).update!(attributes)
+end
+
+[
   {
     email: 'testytesterson@gmail.com',
     item_type: Item.donation,
