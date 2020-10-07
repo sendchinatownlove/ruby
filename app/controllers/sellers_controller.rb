@@ -14,6 +14,7 @@ class SellersController < ApplicationController
     @sellers = Seller.order("#{query.sort_key} #{query.sort_order}")
 
     sellers = @sellers.map do |seller|
+      p seller
       SellersHelper.generate_seller_json(
         seller: seller
       )

@@ -75,7 +75,7 @@ class Seller < ApplicationRecord
 
   # returns the total amount raised
   def amount_raised
-    gift_card_amount + donation_amount
+    gift_card_amount + donation_amount + gift_a_meal_amount
   end
 
   # calculates the amount raised from gift cards
@@ -99,6 +99,20 @@ class Seller < ApplicationRecord
                refunded: false
              })
       .sum(:amount)
+  end
+
+  def gift_a_meal_amount
+    p 'in gift a meal'
+    campaigns = Campaign
+      .joins(:item)
+      .where(items: {
+        seller_id: seller_id,
+        refunded: false
+      })
+    campaigns.each do |campaign|
+      p campaign
+    end
+    return campaigns
   end
 
   def num_contributions
