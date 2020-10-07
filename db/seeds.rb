@@ -65,29 +65,29 @@ end
 [
     {
         seller_id: 1,
-        open_time: '2000-01-01T07:00:00.000Z',
-        close_time: '2000-01-01T18:00:00.000Z',
+        open_time: '07:00:00AM',
+        close_time: '06:00:00PM',
         open_day: 'MON',
         close_day: 'MON'
     },
     {
         seller_id: 1,
-        open_time: '2000-01-01T07:00:00.000Z',
-        close_time: '2000-01-01T00:30:00.000Z',
+        open_time: '07:00:00AM',
+        close_time: '12:30:00AM',
         open_day: 'TUE',
         close_day: 'WED'
     },
     {
         seller_id: 1,
-        open_time: '2000-01-01T07:00:00.000Z',
-        close_time: '2000-01-01T18:00:00.000Z',
+        open_time: '07:00:00AM',
+        close_time: '06:00:00PM',
         open_day: 'THU',
         close_day: 'THU'
     },
     {
         seller_id: 1,
-        open_time: '2000-01-01T07:00:00.000Z',
-        close_time: '2000-01-01T18:00:00.000Z',
+        open_time: '07:00:00AM',
+        close_time: '06:00:00PM',
         open_day: 'SUN',
         close_day: 'SUN'
     }
