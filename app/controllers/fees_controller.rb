@@ -23,7 +23,6 @@ class FeesController < ApplicationController
   private
 
   def create_params
-    #params.require(:campaign_id)
     ret = params.permit(
       :active,
       :multiplier,
@@ -45,17 +44,8 @@ class FeesController < ApplicationController
       :description
     )
 
-    #if params[:seller_id].present?
-    #  set_seller
-    #  ret[:seller_id] = @seller.id
-    #end
-
     ret
   end
-
-  #def set_seller
-  #  @seller = Seller.find_by!(seller_id: params[:seller_id])
-  #end
 
   def set_fee
     @fee = Fee.find(params[:id])

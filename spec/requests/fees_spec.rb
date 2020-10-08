@@ -4,9 +4,8 @@ require 'rails_helper'
 
 RSpec.describe 'Fees', type: :request do
 
-let!(:fee) { create :fee }
-
-  context 'GET /fees' do
+  describe 'GET /fees' do
+    let!(:fee) { create :fee }
     before { get "/fees" }
     context 'with fees' do
 
@@ -23,24 +22,34 @@ let!(:fee) { create :fee }
 
   end
 
-  context 'POST /fees' do
+  describe 'POST /fees' do
     let!(:campaign) { create :campaign }
-    let(:response) { post :create, params: params, as: :json }
 
-    context 'with campaign_id' do
-      let(:params) do
+    before do
+      post(
+        '/fees',
+        params: attrs,
+        as: :json
+      )
+    end
+
+    context 'with only a description' do
+      let(:attrs) do
         {
+          description: 'test fee',
         }
       end
 
       it 'creates a fee with default values' do
-        response_body = JSON.parse(response.body)
-        expect(response_body).not_to be_nil
-
-        fee = Fee.find(response_body['id'])
+        fee = Fee.find(json['id'])
         fee.campaigns << campaign
+
+        expect(fee).to_not be_nil
+        expect(json).to eq(fee.as_json)
+        
         expect(fee).not_to be_nil
         expect(fee.campaigns.size).to eq 1
+        expect(campaign.fees.size).to eq 1
         expect(fee.multiplier).to eq 0.0
         expect(fee.flat_cost).to eq 0.0
         expect(fee.active).to eq true
@@ -52,7 +61,7 @@ let!(:fee) { create :fee }
     end
 
     context 'with all parameters' do
-      let(:params) do
+      let(:attrs) do
         {
           multiplier: 0.03,
           flat_cost: 0.30,
@@ -62,11 +71,12 @@ let!(:fee) { create :fee }
       end
 
       it 'creates a fee with provided parameters' do
-        response_body = JSON.parse(response.body)
-        expect(response_body).not_to be_nil
-
-        fee = Fee.find(response_body['id'])
+        fee = Fee.find(json['id'])
         fee.campaigns << campaign
+
+        expect(fee).to_not be_nil
+        expect(json).to eq(fee.as_json)
+
         expect(fee).not_to be_nil
         expect(fee.campaigns.size).to eq 1
         expect(fee.multiplier).to eq 0.03
@@ -80,7 +90,7 @@ let!(:fee) { create :fee }
     end
 
     context 'with extra parameters' do
-      let(:params) do
+      let(:attrs) do
         {
           multiplier: 0.03,
           flat_cost: 0.30,
@@ -91,11 +101,12 @@ let!(:fee) { create :fee }
       end
 
       it 'only creates with the provided parameters' do
-        response_body = JSON.parse(response.body)
-        expect(response_body).not_to be_nil
-
-        fee = Fee.find(response_body['id'])
+        fee = Fee.find(json['id'])
         fee.campaigns << campaign
+
+        expect(fee).to_not be_nil
+        expect(json).to eq(fee.as_json)
+
         expect(fee).not_to be_nil
         expect(fee.campaigns.size).to eq 1
         expect(fee.multiplier).to eq 0.03
@@ -109,8 +120,7 @@ let!(:fee) { create :fee }
     end
   end
 
-  context 'PUT /fees/:id' do
-    let!(:campaign) { create :campaign }
+  describe 'PUT /fees/:id' do
     let(:original_active) { true }
     let(:original_multiplier) { 0.03 }
     let(:original_flat_cost) {0.30}
@@ -118,62 +128,48 @@ let!(:fee) { create :fee }
     let!(:fee) do
       create :fee, multiplier: original_multiplier, active: original_active, flat_cost: original_flat_cost, description: original_description
     end
-    let(:response) { put :update, params: params, as: :json }
+    let(:id) { fee.id }
 
-    it 'creates fee' do
-      expect(fee.active).to eq original_active
-      expect(fee.multiplier).to eq original_multiplier
-      expect(fee.flat_cost).to eq original_flat_cost
-      expect(fee.description).to eq original_description
-      expect(fee.campaigns.size).to eq 0
-    end
-
-    context 'with invalid id' do
-      let(:params) do
-        {
-          id: -1
-        }
-      end
-
-      it 'returns 404' do
-        expect(response.response_code).to eq 404
-      end
+    before do
+      put(
+        "/fees/#{id}",
+        params: attrs,
+        as: :json
+      )
     end
 
     context 'with valid id' do
       let(:id) { fee.id }
 
       context 'with all parameters' do
-        let(:active) { false }
-        let(:params) do
+        let(:attrs) do
           {
             id: id,
-            active: active
+            active: false
           }
         end
 
         it 'updates the fee with provided parameters' do
           expect(response.response_code).to eq 200
           fee = Fee.find(id)
-          expect(fee.active).to eq active
+          expect(fee.active).to eq false
         end
       end
 
       context 'with multiplier' do
-        let(:active) { false }
-        let(:params) do
+        let(:attrs) do
           {
             id: id,
-            active: active
+            active: false,
+            multiplier: 0.01
           }
         end
-        let(:multiplier) { 0.1 }
         it 'ignores updates to multiplier' do
           expect(response.response_code).to eq 200
           fee = Fee.find(id)
           expect(fee.multiplier).to eq original_multiplier
           expect(fee.campaigns.size).to eq 0
-          expect(fee.active).to eq active
+          expect(fee.active).to eq false
         end
       end
     end
