@@ -75,7 +75,7 @@ class Seller < ApplicationRecord
 
   # returns the total amount raised
   def amount_raised
-    gift_card_amount + donation_amount + gift_a_meal_amount
+    gift_card_amount + donation_amount
   end
 
   # calculates the amount raised from gift cards
