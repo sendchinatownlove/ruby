@@ -101,6 +101,21 @@ class Seller < ApplicationRecord
       .sum(:amount)
   end
 
+  # Calculates the amount raised from gift a meal. Gift a meal donations come in as single-use gift cards.
+  def gift_a_meal_amount
+    GiftCardDetail
+      .where(
+        single_use: true,
+      )
+      .joins(:item)
+      .where(items: {
+              refunded: false,
+              seller_id: id,
+            })
+      .joins("join (#{GiftCardAmount.original_amounts_sql}) as la on la.gift_card_detail_id = gift_card_details.id")
+      .sum(:value)
+  end
+
   def num_contributions
     num_gift_cards + num_donations
   end
