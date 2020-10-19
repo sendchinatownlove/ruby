@@ -1,4 +1,12 @@
-# convert lanzhou's donations to gift cards
+=begin
+Convert lanzhou's donations to gift cards
+
+This was done when we found out that 88 Lanzhou was closing,
+we wanted to switch to a gift-a-meal campaign for them,
+and move all of our donations into GAM gift cards to kickstart the campaign.
+
+The new campaign was created through postman before running this
+=end
 
 Item.transaction do
   eightyeightlanzhou = Seller.find_by(seller_id: '88-lanzhou')

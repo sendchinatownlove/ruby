@@ -1,3 +1,10 @@
+=begin
+Break up a single $1000 gift card purchase into 100 $10 gift cards
+
+This was done due to one single large purchase that someone wanted to distribute
+the gift cards to members of their organization.
+=end
+
 Item.transaction do
     # a priori
     big_card_id = 9826
@@ -44,7 +51,7 @@ Item.transaction do
     end
 end
 
-#-- 
+#-- Forgot to update the payment intent, so did a second pass
 
 Item.transaction do
     original = Item.find(15170)
