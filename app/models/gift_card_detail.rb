@@ -43,13 +43,6 @@ class GiftCardDetail < ApplicationRecord
                   .value
   end
 
-  def last_updated
-    GiftCardAmount.where(gift_card_detail_id: id)
-                  .order(created_at: :desc)
-                  .first
-                  .created_at
-  end
-
   def seller_gift_card_id_is_unique_per_seller
     if seller_gift_card_id.present?
       seller_id = item.seller_id

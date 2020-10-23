@@ -69,7 +69,7 @@ RSpec.describe 'SellerGiftCards', type: :request do
           :gift_card_amount,
           value: expected_gift_card_latest_amount,
           gift_card_detail: gift_card_detail,
-          created_at: expected_gift_card_last_updated
+          updated_at: expected_gift_card_last_updated
         )
         create(
           :gift_card_amount,

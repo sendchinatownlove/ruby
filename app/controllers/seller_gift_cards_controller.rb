@@ -17,7 +17,7 @@ class SellerGiftCardsController < ApplicationController
               :updated_at,
               :expiration,
               :single_use,
-              'la.created_at as last_updated'
+              'la.updated_at as last_updated'
             )
             .joins(:item, :recipient)
             .where(
