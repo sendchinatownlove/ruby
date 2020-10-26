@@ -13,6 +13,7 @@ RSpec.describe 'Fees', type: :request do
         fees = JSON.parse(response.body)
         expect(fees.size).to eq 1
         expect(fees[0]['id']).to eq fee.id
+        expect(fees[0]['name']).to eq fee.name
       end
 
       it 'returns 200' do
@@ -33,15 +34,15 @@ RSpec.describe 'Fees', type: :request do
       )
     end
 
-    context 'with only a description' do
+    context 'with only a name' do
       let(:attrs) do
         {
-          description: 'test fee',
+          name: 'test fee',
         }
       end
 
       it 'creates a fee with default values' do
-        fee = Fee.find(json['id'])
+        fee = Fee.find_by(name: json['name'])
         fee.campaigns << campaign
 
         expect(fee).to_not be_nil
@@ -65,13 +66,13 @@ RSpec.describe 'Fees', type: :request do
         {
           multiplier: 0.03,
           flat_cost: 0.30,
-          description: 'square fee',
+          name: 'square fee',
           active: false
         }
       end
 
       it 'creates a fee with provided parameters' do
-        fee = Fee.find(json['id'])
+        fee = Fee.find_by(name: json['name'])
         fee.campaigns << campaign
 
         expect(fee).to_not be_nil
@@ -94,14 +95,14 @@ RSpec.describe 'Fees', type: :request do
         {
           multiplier: 0.03,
           flat_cost: 0.30,
-          description: 'square fee',
+          name: 'square fee',
           active: false,
-          name: 'no, this is patrick'
+          not_a_param: 'no, this is patrick'
         }
       end
 
       it 'only creates with the provided parameters' do
-        fee = Fee.find(json['id'])
+        fee = Fee.find_by(name: json['name'])
         fee.campaigns << campaign
 
         expect(fee).to_not be_nil
@@ -120,38 +121,38 @@ RSpec.describe 'Fees', type: :request do
     end
   end
 
-  describe 'PUT /fees/:id' do
+  describe 'PUT /fees/:name' do
     let(:original_active) { true }
     let(:original_multiplier) { 0.03 }
     let(:original_flat_cost) {0.30}
-    let(:original_description) { 'square fee'}
+    let(:original_name) { 'square_fee'}
     let!(:fee) do
-      create :fee, multiplier: original_multiplier, active: original_active, flat_cost: original_flat_cost, description: original_description
+      create :fee, multiplier: original_multiplier, active: original_active, flat_cost: original_flat_cost, name: original_name
     end
-    let(:id) { fee.id }
+    let(:name) { fee.name }
 
     before do
       put(
-        "/fees/#{id}",
+        "/fees/#{name}",
         params: attrs,
         as: :json
       )
     end
 
-    context 'with valid id' do
-      let(:id) { fee.id }
+    context 'with valid name' do
+      let(:name) { fee.name }
 
       context 'with all parameters' do
         let(:attrs) do
           {
-            id: id,
+            name: name,
             active: false
           }
         end
 
         it 'updates the fee with provided parameters' do
           expect(response.response_code).to eq 200
-          fee = Fee.find(id)
+          fee = Fee.find_by(name: name)
           expect(fee.active).to eq false
         end
       end
@@ -159,14 +160,14 @@ RSpec.describe 'Fees', type: :request do
       context 'with multiplier' do
         let(:attrs) do
           {
-            id: id,
+            name: name,
             active: false,
             multiplier: 0.01
           }
         end
         it 'ignores updates to multiplier' do
           expect(response.response_code).to eq 200
-          fee = Fee.find(id)
+          fee = Fee.find_by(name: name)
           expect(fee.multiplier).to eq original_multiplier
           expect(fee.campaigns.size).to eq 0
           expect(fee.active).to eq false

@@ -26,12 +26,8 @@ module WebhookManager
         # calculate amount per merchant
         # This will break if we ever have zero merchants but are still
         # accepting pool donations.
-        amount_after_fees = WebhookManager::FeeHandler.calculate_amount(
-          payment_intent,
-          amount
-        )
-        amount_per = (amount_after_fees.to_f / @donation_sellers.count.to_f).floor
-        remainder = amount_after_fees % @donation_sellers.count
+        amount_per = (amount.to_f / @donation_sellers.count.to_f).floor
+        remainder = amount % @donation_sellers.count
 
         donations = @donation_sellers.map do |seller|
           next if seller.seller_id.eql?(Seller::POOL_DONATION_SELLER_ID)

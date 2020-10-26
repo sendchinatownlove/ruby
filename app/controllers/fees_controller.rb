@@ -8,13 +8,18 @@ class FeesController < ApplicationController
     json_response(Fee.all)
   end
 
+    # GET /fees/:name
+    def show
+      json_response(Fee.find(params[:name]))
+    end
+
   # POST /fees
   def create
     fee = Fee.create!(create_params)
     json_response(fee, :created)
   end
 
-  # PUT /fees/:id
+  # PUT /fees/:name
   def update
     @fee.update(update_params)
     json_response(@fee)
@@ -27,7 +32,7 @@ class FeesController < ApplicationController
       :active,
       :multiplier,
       :flat_cost,
-      :description
+      :name
     )
   
     ret
@@ -41,13 +46,13 @@ class FeesController < ApplicationController
     # that are associated with payments that have already been taken.
     ret = params.permit(
       :active,
-      :description
+      :name
     )
 
     ret
   end
 
   def set_fee
-    @fee = Fee.find(params[:id])
+    @fee = Fee.find_by(name: params[:name])
   end
 end

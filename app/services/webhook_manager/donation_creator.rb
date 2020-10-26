@@ -3,7 +3,7 @@
 # Creates donation and item with the corresponding payload
 module WebhookManager
   class DonationCreator < BaseService
-    attr_reader :seller_id, :payment_intent, :amount
+    attr_reader :seller_id, :payment_intent, :amount, :line_item
 
     def initialize(params)
       @seller_id = params[:seller_id]
@@ -19,13 +19,9 @@ module WebhookManager
                                                   seller_id: seller_id,
                                                   payment_intent: payment_intent
                                                 })
-        amount_after_fees = WebhookManager::FeeHandler.calculate_amount(
-          payment_intent,
-          amount
-        )
         donation = DonationDetail.create!(
           item: item,
-          amount: amount_after_fees
+          amount: amount
         )
         payment_intent.successful = true
         payment_intent.save!

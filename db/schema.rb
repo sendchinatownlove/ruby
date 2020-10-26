@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_21_181028) do
+ActiveRecord::Schema.define(version: 2020_10_23_064416) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -94,7 +94,7 @@ ActiveRecord::Schema.define(version: 2020_09_21_181028) do
     t.boolean "active", default: true
     t.decimal "flat_cost", precision: 8, scale: 2, default: "0.0"
     t.boolean "covered_by_customer"
-    t.string "description"
+    t.string "name"
   end
 
   create_table "gift_card_amounts", force: :cascade do |t|

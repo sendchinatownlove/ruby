@@ -7,9 +7,9 @@
 #  id                  :bigint           not null, primary key
 #  active              :boolean          default(TRUE)
 #  covered_by_customer :boolean
-#  description         :string
 #  flat_cost           :decimal(8, 2)    default(0.0)
 #  multiplier          :decimal(6, 4)    default(0.0)
+#  name                :string
 #
 require 'rails_helper'
 

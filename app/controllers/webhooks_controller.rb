@@ -116,8 +116,8 @@ class WebhooksController < ApplicationController
     items = JSON.parse(payment_intent.line_items)
     recipient = payment_intent.recipient
     is_donation = false
-
-    items.each do |item_json|
+    items_without_fees = items.select { |item| item['type'] != 'fee' }
+    items_without_fees.each do |item_json|
       # TODO(jtmckibb): Add some tracking that tracks if it breaks somewhere
       # here
 
@@ -151,7 +151,7 @@ class WebhooksController < ApplicationController
             {
               seller_id: seller_id,
               payment_intent: payment_intent,
-              amount: amount
+              amount: amount,
             }
           )
         when 'gift_card'

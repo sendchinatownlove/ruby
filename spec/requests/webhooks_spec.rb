@@ -6,10 +6,6 @@ require 'rails_helper'
 RSpec.describe 'Webhooks API', type: :request do
   before { freeze_time }
 
-  def square_fee(amount)
-    ((amount * 0.9725) - 30).floor
-  end
-
   # Test suite for POST /webhooks
   describe 'POST /webhooks' do
     let(:line_items) do
@@ -76,7 +72,7 @@ RSpec.describe 'Webhooks API', type: :request do
 
       # Give seller2 the most donations
       item = create(:item, seller: seller2)
-      create(:donation_detail, item: item, amount: square_fee(10_00))
+      create(:donation_detail, item: item, amount: 10_00)
     end
 
     describe 'donations' do
@@ -99,8 +95,8 @@ RSpec.describe 'Webhooks API', type: :request do
           let(:item_type) { 'donation' }
 
           it 'creates pool donation' do
-            expect(seller1.donation_amount).to eq(square_fee(amount).floor/2 + square_fee(amount).floor%2)
-            expect(seller2.donation_amount).to eq(square_fee(10_00) + square_fee(amount)/2)
+            expect(seller1.donation_amount).to eq(amount.floor/2 + amount.floor%2)
+            expect(seller2.donation_amount).to eq(10_00 + amount/2)
           end
 
           it 'returns status code 200' do
@@ -114,9 +110,9 @@ RSpec.describe 'Webhooks API', type: :request do
           let(:item_type) { 'donation' }
 
           it 'creates pool donation and distributes the cents' do
-            expect(seller1.donation_amount).to eq(square_fee(amount)/2.floor + 1)
-            expect(seller2.donation_amount).to eq(square_fee(1000) + square_fee(amount)/2)
-            expect(square_fee(amount) + square_fee(1000)).to eq(seller1.donation_amount + seller2.donation_amount)
+            expect(seller1.donation_amount).to eq(amount/2.floor + 1)
+            expect(seller2.donation_amount).to eq(1000 + amount/2)
+            expect(amount + 1000).to eq(seller1.donation_amount + seller2.donation_amount)
           end
 
           it 'returns status code 200' do
@@ -131,13 +127,12 @@ RSpec.describe 'Webhooks API', type: :request do
 
           context 'with non-divisible number round' do
             let(:amount) { 335 }
-            # amount after square fees: 295
             let(:item_type) { 'donation' }
 
-            it 'creates pool donation and distrubutes the cents' do
-              expect(seller1.donation_amount).to eq(square_fee(3_35)/3.floor + 1)
-              expect(seller3.donation_amount).to eq(square_fee(3_35)/3.floor)
-              expect(seller2.donation_amount).to eq(square_fee(10_00) + square_fee(3_35)/3)
+            it 'creates pool donation and distributes the cents' do
+              expect(seller1.donation_amount).to eq(3_35/3.floor + 1)
+              expect(seller3.donation_amount).to eq(3_35/3.floor + 1)
+              expect(seller2.donation_amount).to eq(10_00 + 3_35/3)
             end
 
             it 'returns status code 200' do
@@ -169,7 +164,7 @@ RSpec.describe 'Webhooks API', type: :request do
         it 'creates a donation' do
           donation_detail = DonationDetail.last
           expect(donation_detail).not_to be_nil
-          expect(donation_detail['amount']).to eq(square_fee(50_00))
+          expect(donation_detail['amount']).to eq(50_00)
 
           item = Item.find(donation_detail['item_id'])
           expect(item).not_to be_nil
@@ -314,9 +309,9 @@ RSpec.describe 'Webhooks API', type: :request do
         gift_card_detail = item.gift_card_detail
         if payment_intent.campaign.present?
           fee = payment_intent.campaign.fees.first
-          expect(gift_card_detail.amount).to eq((((amount * (0.99)) - 30).floor))
+          expect(gift_card_detail.amount).to eq(amount)
         else
-          expect(gift_card_detail.amount).to eq(square_fee(amount))
+          expect(gift_card_detail.amount).to eq(amount)
         end
         expect(gift_card_detail).not_to be_nil
         expect(gift_card_detail.single_use).to eq(single_use)

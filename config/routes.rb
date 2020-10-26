@@ -80,6 +80,7 @@ Rails.application.routes.draw do
   post 'contacts/:contact_id/lyft_rewards/:token/redeem', to: 'contact_lyft_rewards#redeem'
 
   resources :campaigns do
+    resources :fees, controller: 'campaign_fees'
   end
   resources :contacts do
     resources :lyft_rewards, controller: 'contact_lyft_rewards', only: %i[index create]

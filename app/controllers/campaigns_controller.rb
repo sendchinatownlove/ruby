@@ -25,7 +25,6 @@ class CampaignsController < ApplicationController
     if params[:fee_id].present?
       @fee = Fee.find(params[:fee_id])
       @campaign.fees << @fee
-      @fee.campaigns << @campaign
     end
     json_response(campaign_json, :created)
   end
