@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_04_014328) do
+ActiveRecord::Schema.define(version: 2020_10_30_031517) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -115,7 +115,7 @@ ActiveRecord::Schema.define(version: 2020_10_04_014328) do
   end
 
   create_table "items", force: :cascade do |t|
-    t.bigint "seller_id", null: false
+    t.bigint "seller_id"
     t.integer "item_type"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -123,8 +123,10 @@ ActiveRecord::Schema.define(version: 2020_10_04_014328) do
     t.boolean "refunded", default: false
     t.bigint "purchaser_id"
     t.bigint "campaign_id"
+    t.bigint "project_id"
     t.index ["campaign_id"], name: "index_items_on_campaign_id"
     t.index ["payment_intent_id"], name: "index_items_on_payment_intent_id"
+    t.index ["project_id"], name: "index_items_on_project_id"
     t.index ["purchaser_id"], name: "index_items_on_purchaser_id"
     t.index ["seller_id"], name: "index_items_on_seller_id"
   end
@@ -213,6 +215,13 @@ ActiveRecord::Schema.define(version: 2020_10_04_014328) do
     t.index ["fee_id"], name: "index_payment_intents_on_fee_id"
     t.index ["purchaser_id"], name: "index_payment_intents_on_purchaser_id"
     t.index ["recipient_id"], name: "index_payment_intents_on_recipient_id"
+  end
+
+  create_table "projects", force: :cascade do |t|
+    t.string "name"
+    t.string "square_location_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "refunds", force: :cascade do |t|
