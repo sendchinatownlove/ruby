@@ -63,34 +63,34 @@
 end
 
 [
-    {
-        seller_id: 1,
-        open_time: '07:00:00AM',
-        close_time: '06:00:00PM',
-        open_day: 'MON',
-        close_day: 'MON'
-    },
-    {
-        seller_id: 1,
-        open_time: '07:00:00AM',
-        close_time: '12:30:00AM',
-        open_day: 'TUE',
-        close_day: 'WED'
-    },
-    {
-        seller_id: 1,
-        open_time: '07:00:00AM',
-        close_time: '06:00:00PM',
-        open_day: 'THU',
-        close_day: 'THU'
-    },
-    {
-        seller_id: 1,
-        open_time: '07:00:00AM',
-        close_time: '06:00:00PM',
-        open_day: 'SUN',
-        close_day: 'SUN'
-    }
+  {
+    seller_id: 1,
+    open_time: '07:00:00AM',
+    close_time: '06:00:00PM',
+    open_day: 'MON',
+    close_day: 'MON'
+  },
+  {
+    seller_id: 1,
+    open_time: '07:00:00AM',
+    close_time: '12:30:00AM',
+    open_day: 'TUE',
+    close_day: 'WED'
+  },
+  {
+    seller_id: 1,
+    open_time: '07:00:00AM',
+    close_time: '06:00:00PM',
+    open_day: 'THU',
+    close_day: 'THU'
+  },
+  {
+    seller_id: 1,
+    open_time: '07:00:00AM',
+    close_time: '06:00:00PM',
+    open_day: 'SUN',
+    close_day: 'SUN'
+  }
 ].each do |attributes|
   OpenHour.find_or_create_by(seller_id: attributes[:seller_id], open_day: attributes[:open_day]).update!(attributes)
 end
@@ -99,39 +99,39 @@ end
   {
     id: 1,
     seller_id: 1,
-    phone_number: '111-111-1111',
+    phone_number: '111-111-1111'
   },
   {
     id: 2,
     seller_id: 1,
-    url: 'http://caviar.com/restaurant/',
+    url: 'http://caviar.com/restaurant/'
   },
   {
     id: 3,
     seller_id: 1,
-    url: 'http://doordash.com/menu/',
+    url: 'http://doordash.com/menu/'
   },
   {
     id: 4,
     seller_id: 1,
-    url: 'http://grubhub.com/restaurant/',
+    url: 'http://grubhub.com/restaurant/'
   },
   {
     id: 5,
     seller_id: 2,
-    url: 'http://postmates.com/restaurant/',
+    url: 'http://postmates.com/restaurant/'
 
   },
   {
     id: 6,
     seller_id: 2,
-    url: 'http://seamless.com/menu/',
+    url: 'http://seamless.com/menu/'
   },
   {
     id: 7,
     seller_id: 2,
-    url: 'http://ubereats.com/new-york/food-delivery/',
-  },
+    url: 'http://ubereats.com/new-york/food-delivery/'
+  }
 ].each do |attributes|
   DeliveryOption.find_or_create_by(id: attributes[:id]).update!(attributes)
 end

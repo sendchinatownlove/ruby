@@ -77,7 +77,6 @@ RSpec.describe Item, type: :model do
     end
   end
 
-
   context 'when creating an item with neither a project nor a seller' do
     let(:item) do
       Item.create(project: nil, seller: nil)

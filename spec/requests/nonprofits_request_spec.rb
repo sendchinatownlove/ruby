@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-RSpec.describe "Nonprofits", type: :request do
-
+RSpec.describe 'Nonprofits', type: :request do
   describe 'GET /nonprofits/:id' do
     let!(:nonprofit) { create :nonprofit }
     before { get "/nonprofits/#{nonprofit_id}" }
@@ -34,5 +35,4 @@ RSpec.describe "Nonprofits", type: :request do
       end
     end
   end
-
 end
