@@ -7,6 +7,7 @@
 #  id                      :bigint           not null, primary key
 #  accept_donations        :boolean          default(TRUE), not null
 #  business_type           :string
+#  business_type           :string
 #  cost_per_meal           :integer
 #  cuisine_name            :string
 #  founded_year            :integer
@@ -105,13 +106,13 @@ class Seller < ApplicationRecord
   def gift_a_meal_amount
     GiftCardDetail
       .where(
-        single_use: true,
+        single_use: true
       )
       .joins(:item)
       .where(items: {
-              refunded: false,
-              seller_id: id,
-            })
+               refunded: false,
+               seller_id: id
+             })
       .joins("join (#{GiftCardAmount.original_amounts_sql}) as la on la.gift_card_detail_id = gift_card_details.id")
       .sum(:value)
   end

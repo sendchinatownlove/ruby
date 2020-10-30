@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class NonprofitsController < ApplicationController
-  before_action :set_nonprofit, only: [:show, :update, :destroy]
+  before_action :set_nonprofit, only: %i[show update destroy]
 
   # GET /nonprofits
   def index
@@ -39,13 +41,14 @@ class NonprofitsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_nonprofit
-      @nonprofit = Nonprofit.find(params[:id])
-    end
 
-    # Only allow a trusted parameter "white list" through.
-    def nonprofit_params
-      params.require(:nonprofit).permit(:name, :logo_image_url, :contact_id, :fee_id)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_nonprofit
+    @nonprofit = Nonprofit.find(params[:id])
+  end
+
+  # Only allow a trusted parameter "white list" through.
+  def nonprofit_params
+    params.require(:nonprofit).permit(:name, :logo_image_url, :contact_id, :fee_id)
+  end
 end

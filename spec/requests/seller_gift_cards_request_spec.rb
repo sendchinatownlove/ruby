@@ -91,7 +91,7 @@ RSpec.describe 'SellerGiftCards', type: :request do
           expiration: gift_card_detail.expiration,
           single_use: gift_card_detail.single_use,
           updated_at: gift_card_detail.updated_at.utc,
-          last_updated: expected_gift_card_last_updated,
+          last_updated: expected_gift_card_last_updated
         }.as_json
       end
 

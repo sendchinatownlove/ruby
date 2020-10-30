@@ -1,12 +1,12 @@
-=begin
-Convert lanzhou's donations to gift cards
+# frozen_string_literal: true
 
-This was done when we found out that 88 Lanzhou was closing,
-we wanted to switch to a gift-a-meal campaign for them,
-and move all of our donations into GAM gift cards to kickstart the campaign.
-
-The new campaign was created through postman before running this
-=end
+# Convert lanzhou's donations to gift cards
+#
+# This was done when we found out that 88 Lanzhou was closing,
+# we wanted to switch to a gift-a-meal campaign for them,
+# and move all of our donations into GAM gift cards to kickstart the campaign.
+#
+# The new campaign was created through postman before running this
 
 Item.transaction do
   eightyeightlanzhou = Seller.find_by(seller_id: '88-lanzhou')
@@ -14,17 +14,17 @@ Item.transaction do
   items = Item.where(seller: eightyeightlanzhou)
   campaign = Campaign.find(14)
   puts(items.length)
-  items = items.select {|item| item.donation_detail.present?}
+  items = items.select { |item| item.donation_detail.present? }
   puts(items.length)
   amount = items.map { |item| item.donation_detail.amount }.inject(0) { |sum, x| sum + x }
   cards_to_make = amount / campaign.price_per_meal
-  count = 0;
+  count = 0
   items.each { |item| item.update!(refunded: true) }
-  while amount > campaign.price_per_meal do
+  while amount > campaign.price_per_meal
     puts("creating gift card #{count} of #{cards_to_make}")
     item = Item.create!(
       seller: eightyeightlanzhou,
-      item_type: "gift_card",
+      item_type: 'gift_card',
       campaign_id: campaign.id,
       purchaser: scl_contact
     )
@@ -48,28 +48,23 @@ end
 # -----
 
 Item.transaction do
-    eightyeightlanzhou = Seller.find_by(seller_id: '88-lanzhou')
-    items = Item.where(seller: eightyeightlanzhou)
+  eightyeightlanzhou = Seller.find_by(seller_id: '88-lanzhou')
+  items = Item.where(seller: eightyeightlanzhou)
 
-    campaign = Campaign.last
-    puts(campaign)
-    items = items.select {|item| item.donation_detail.present?}
+  campaign = Campaign.last
+  puts(campaign)
+  items = items.select { |item| item.donation_detail.present? }
 
-
-    amount = items.map { |item| item.donation_detail.amount }.inject(0) { |sum, x| sum + x }
-    puts(amount)
+  amount = items.map { |item| item.donation_detail.amount }.inject(0) { |sum, x| sum + x }
+  puts(amount)
 end
-
-
 
 # ------
 
 Item.transaction do
-    eightyeightlanzhou = Seller.find_by(seller_id: '88-lanzhou')
-    items = Item.where(seller: eightyeightlanzhou)
-    items.each do |item|
-        if (item.donation_detail.blank?)
-            puts "item: #{item.id}"
-        end
-    end
+  eightyeightlanzhou = Seller.find_by(seller_id: '88-lanzhou')
+  items = Item.where(seller: eightyeightlanzhou)
+  items.each do |item|
+    puts "item: #{item.id}" if item.donation_detail.blank?
+  end
 end

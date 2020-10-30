@@ -109,9 +109,9 @@ RSpec.describe SellersHelper, type: :helper do
         create(
           :gift_card_amount,
           value: 10_00,
-          gift_card_detail: gift_card_detail3,
+          gift_card_detail: gift_card_detail3
         )
-        
+
         # Create a donation of $200
         item_donation1 = create(:item, seller: seller)
         create(:donation_detail, item: item_donation1, amount: 200_00)
