@@ -264,3 +264,88 @@ end
   updatedAttr[:seller_id] = seller[:id]
   OpenHour.find_or_create_by(id: attributes[:id]).update!(updatedAttr)
 end
+
+[
+  {
+    id: 1,
+    phone_number: '111-111-1111',
+    seller_id: 1,
+    delivery_type: {
+      id: 1,
+      name: 'Phone',
+      icon_url: './assets/Call@2x.png'
+    }
+  },
+  {
+    id: 2,
+    url: 'http://caviar.com/restaurant/',
+    seller_id: 1,
+    delivery_type: {
+      id: 2,
+      name: 'Caviar',
+      icon_url: './assets/Caviar@2x.png'
+    }
+  },
+  {
+    id: 3,
+    url: 'http://doordash.com/menu/',
+    seller_id: 1,
+    delivery_type: {
+      id: 3,
+      name: 'Door Dash',
+      icon_url: './assets/DoorDash@2x.png'
+    }
+  },
+  {
+    id: 4,
+    url: 'http://grubhub.com/restaurant/',
+    seller_id: 1,
+    delivery_type: {
+      id: 4,
+      name: 'Grubhub',
+      icon_url: './assets/Grubhub@2x.png'
+    }
+  },
+  {
+    id: 5,
+    url: 'http://postmates.com/restaurant/',
+    seller_id: 2,
+    delivery_type: {
+      id: 5,
+      name: 'Postmates',
+      icon_url: './assets/Postmates@2x.png'
+    }
+  },
+  {
+    id: 6,
+    url: 'http://seamless.com/menu/',
+    seller_id: 2,
+    delivery_type: {
+      id: 6,
+      name: 'Seamless',
+      icon_url: './assets/Seamless@2x.png'
+    }
+  },
+  {
+    id: 7,
+    url: 'http://ubereats.com/new-york/food-delivery/',
+    seller_id: 2,
+    delivery_type: {
+      id: 7,
+      name: 'Uber Eats',
+      icon_url: './assets/UberEats@2x.png'
+    }
+  },
+].each do | attr |
+  seller = Seller.find_by(id: attr[:seller_id])
+  deliveryOptionAttr = attr.except(:delivery_type, :seller_id)
+  deliveryTypeAttr = attr.fetch(:delivery_type)
+  # deliveryOptionAttr[:seller_id] = seller[:id]
+  # puts seller[:name]
+
+  deliveryOption = DeliveryOption.find_or_create_by!(id: attr[:id], seller_id: seller[:id])
+  deliveryOption.update!(deliveryOptionAttr)
+
+  deliveryTypeAttr[:delivery_option_id] = deliveryOption[:id]
+  DeliveryType.find_or_create_by!(id: deliveryTypeAttr[:id], delivery_option_id: deliveryTypeAttr[:delivery_option_id], name: deliveryTypeAttr[:name],icon_url: deliveryTypeAttr[:icon_url])
+end
