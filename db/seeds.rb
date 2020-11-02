@@ -343,3 +343,122 @@ end
     redeemed_at: redeemed_at
   )
 end
+
+[
+  {
+    id: 1,
+    open_time: '07:00:00',
+    close_time: '18:00:00',
+    open_day: 0,
+    close_day: 0,
+  },
+  {
+    id: 2,
+    open_time: '07:00:00',
+    close_time: '00:30:00',
+    open_day: 1,
+    close_day: 2,
+  },
+  {
+    id: 3,
+    open_time: '07:00:00',
+    close_time: '18:00:00',
+    open_day: 3,
+    close_day: 3,
+  },
+  {
+    id: 4,
+    open_time: '07:00:00',
+    close_time: '18:00:00',
+    open_day: 6,
+    close_day: 6,
+  },
+].each do |attributes|
+  seller = Seller.find_by(seller_id: 'shunfa-bakery')
+  updatedAttr = attributes
+  updatedAttr[:seller_id] = seller[:id]
+  OpenHour.find_or_create_by(id: attributes[:id]).update!(updatedAttr)
+end
+
+[
+  {
+    id: 1,
+    phone_number: '111-111-1111',
+    seller_id: 1,
+    delivery_type: {
+      id: 1,
+      name: 'Phone',
+      icon_url: './assets/Call@2x.png'
+    }
+  },
+  {
+    id: 2,
+    url: 'http://caviar.com/restaurant/',
+    seller_id: 1,
+    delivery_type: {
+      id: 2,
+      name: 'Caviar',
+      icon_url: './assets/Caviar@2x.png'
+    }
+  },
+  {
+    id: 3,
+    url: 'http://doordash.com/menu/',
+    seller_id: 1,
+    delivery_type: {
+      id: 3,
+      name: 'DoorDash',
+      icon_url: './assets/DoorDash@2x.png'
+    }
+  },
+  {
+    id: 4,
+    url: 'http://grubhub.com/restaurant/',
+    seller_id: 1,
+    delivery_type: {
+      id: 4,
+      name: 'Grubhub',
+      icon_url: './assets/Grubhub@2x.png'
+    }
+  },
+  {
+    id: 5,
+    url: 'http://postmates.com/restaurant/',
+    seller_id: 2,
+    delivery_type: {
+      id: 5,
+      name: 'Postmates',
+      icon_url: './assets/Postmates@2x.png'
+    }
+  },
+  {
+    id: 6,
+    url: 'http://seamless.com/menu/',
+    seller_id: 2,
+    delivery_type: {
+      id: 6,
+      name: 'Seamless',
+      icon_url: './assets/Seamless@2x.png'
+    }
+  },
+  {
+    id: 7,
+    url: 'http://ubereats.com/new-york/food-delivery/',
+    seller_id: 2,
+    delivery_type: {
+      id: 7,
+      name: 'Uber Eats',
+      icon_url: './assets/UberEats@2x.png'
+    }
+  },
+].each do | attr |
+  seller = Seller.find_by(id: attr[:seller_id])
+  deliveryOptionAttr = attr.except(:delivery_type, :seller_id)
+  delivTypeAttr = attr.fetch(:delivery_type)
+
+  deliveryOption = DeliveryOption.find_or_create_by!(id: attr[:id], seller_id: seller[:id])
+  deliveryOption.update!(deliveryOptionAttr)
+
+  delivTypeAttr[:delivery_option_id] = deliveryOption[:id]
+  DeliveryType.find_or_create_by!(id: delivTypeAttr[:id], delivery_option_id: delivTypeAttr[:delivery_option_id], name: delivTypeAttr[:name]).update(delivTypeAttr)
+end
