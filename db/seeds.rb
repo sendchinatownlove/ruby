@@ -339,13 +339,11 @@ end
 ].each do | attr |
   seller = Seller.find_by(id: attr[:seller_id])
   deliveryOptionAttr = attr.except(:delivery_type, :seller_id)
-  deliveryTypeAttr = attr.fetch(:delivery_type)
-  # deliveryOptionAttr[:seller_id] = seller[:id]
-  # puts seller[:name]
+  delivTypeAttr = attr.fetch(:delivery_type)
 
   deliveryOption = DeliveryOption.find_or_create_by!(id: attr[:id], seller_id: seller[:id])
   deliveryOption.update!(deliveryOptionAttr)
 
-  deliveryTypeAttr[:delivery_option_id] = deliveryOption[:id]
-  DeliveryType.find_or_create_by!(id: deliveryTypeAttr[:id], delivery_option_id: deliveryTypeAttr[:delivery_option_id], name: deliveryTypeAttr[:name],icon_url: deliveryTypeAttr[:icon_url])
+  delivTypeAttr[:delivery_option_id] = deliveryOption[:id]
+  DeliveryType.find_or_create_by!(id: delivTypeAttr[:id], delivery_option_id: delivTypeAttr[:delivery_option_id], name: delivTypeAttr[:name]).update(delivTypeAttr)
 end
