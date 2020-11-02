@@ -148,9 +148,9 @@ class ChargesController < ApplicationController
   )
     square_location_id = if gift_a_meal? && @seller.non_profit_location_id.present?
                            @seller.non_profit_location_id
-                          elsif @project.present? 
-                            @project.square_location_id
-                          else
+                         elsif @project.present?
+                           @project.square_location_id
+                         else
                            @seller.square_location_id
                          end
 
