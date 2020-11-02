@@ -14,8 +14,6 @@ module WebhookManager
 
     def call
       seller = Seller.find_by(seller_id: seller_id)
-      project = Project.find(project_id)
-
       if seller.present?
         Item.create!(
           seller: seller,
@@ -25,6 +23,7 @@ module WebhookManager
           campaign_id: payment_intent.campaign_id
         )
       else
+        project = Project.find(project_id)
         Item.create!(
           project: project,
           purchaser: payment_intent.purchaser,
