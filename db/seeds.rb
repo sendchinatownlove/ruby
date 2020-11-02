@@ -228,3 +228,39 @@ end
     redeemed_at: redeemed_at
   )
 end
+
+[
+  {
+    id: 1,
+    open_time: '07:00:00',
+    close_time: '18:00:00',
+    open_day: 0,
+    close_day: 0,
+  },
+  {
+    id: 2,
+    open_time: '07:00:00',
+    close_time: '00:30:00',
+    open_day: 1,
+    close_day: 2,
+  },
+  {
+    id: 3,
+    open_time: '07:00:00',
+    close_time: '18:00:00',
+    open_day: 3,
+    close_day: 3,
+  },
+  {
+    id: 4,
+    open_time: '07:00:00',
+    close_time: '18:00:00',
+    open_day: 6,
+    close_day: 6,
+  },
+].each do |attributes|
+  seller = Seller.find_by(seller_id: 'shunfa-bakery')
+  updatedAttr = attributes
+  updatedAttr[:seller_id] = seller[:id]
+  OpenHour.find_or_create_by(id: attributes[:id]).update!(updatedAttr)
+end
