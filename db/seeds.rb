@@ -292,7 +292,7 @@ end
     seller_id: 1,
     delivery_type: {
       id: 3,
-      name: 'Door Dash',
+      name: 'DoorDash',
       icon_url: './assets/DoorDash@2x.png'
     }
   },
