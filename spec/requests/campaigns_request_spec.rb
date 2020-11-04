@@ -34,39 +34,6 @@ RSpec.describe 'Campaigns API', type: :request do
         expect(response).to have_http_status(200)
       end
     end
-
-    context 'Fetching active campaigns' do
-      before { get '/campaigns?active=true' }
-
-      it 'Returns active campaigns' do
-        expect(json).not_to be_empty
-        expect(json.size).to eq(1)
-        expect(json[0]['id']).to eq(@campaign.id)
-
-        # Has original fields
-        expect(json[0]['amount_raised']).to eq 0
-        expect(json[0]['last_contribution']).to eq nil
-        expect(json[0]['seller_id']).to eq @seller.seller_id
-      end
-
-      it 'Returns 200' do
-        expect(response).to have_http_status(200)
-      end
-    end
-
-    context 'Fetching inactive campaigns' do
-      before { get '/campaigns?active=false' }
-
-      it 'Returns inactive campaigns' do
-        expect(json).not_to be_empty
-        expect(json.size).to eq(1)
-        expect(json[0]['id']).to eq(@inactive_campaign.id)
-      end
-
-      it 'Returns 200' do
-        expect(response).to have_http_status(200)
-      end
-    end
   end
 
   context 'GET /campaigns/:id' do
