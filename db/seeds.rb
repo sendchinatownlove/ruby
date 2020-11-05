@@ -343,3 +343,13 @@ end
     redeemed_at: redeemed_at
   )
 end
+
+# Project
+[
+  {
+    name: 'Light Up Chinatown',
+    square_location_id: 'YXD42YNEPXWPF'
+  },
+].each do |attributes|
+  Project.find_or_create_by(name: attributes[:name]).update!(attributes)
+end
