@@ -461,3 +461,13 @@ end
   delivTypeAttr[:delivery_option_id] = deliveryOption[:id]
   DeliveryType.find_or_create_by!(id: delivTypeAttr[:id], delivery_option_id: delivTypeAttr[:delivery_option_id], name: delivTypeAttr[:name]).update(delivTypeAttr)
 end
+
+# Project
+[
+  {
+    name: 'Light Up Chinatown',
+    square_location_id: 'YXD42YNEPXWPF'
+  },
+].each do |attributes|
+  Project.find_or_create_by(name: attributes[:name]).update!(attributes)
+end
