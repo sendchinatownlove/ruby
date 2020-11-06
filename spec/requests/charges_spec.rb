@@ -328,7 +328,7 @@ RSpec.describe 'Charges API', type: :request do
 
     context 'with charge with missing seller_id' do
       let(:line_items) do
-        [{ amount: 50, currency: 'usd', item_type: 'gift_card', quantity: 1 }]
+        [{ amount: 50, currency: 'usd', item_type: 'gift_card', quantity: 1}]
       end
 
       before do
@@ -511,7 +511,7 @@ RSpec.describe 'Charges API', type: :request do
 
       it 'returns a validation failure message' do
         expect(response.body).to match(
-          /param is missing or the value is empty: seller_id/
+          /param is missing or the value is empty: line_items/
         )
       end
     end
