@@ -349,29 +349,29 @@ end
     open_time: '07:00:00',
     close_time: '18:00:00',
     open_day: 0,
-    close_day: 0,
+    close_day: 0
   },
   {
     id: 2,
     open_time: '07:00:00',
     close_time: '00:30:00',
     open_day: 1,
-    close_day: 2,
+    close_day: 2
   },
   {
     id: 3,
     open_time: '07:00:00',
     close_time: '18:00:00',
     open_day: 3,
-    close_day: 3,
+    close_day: 3
   },
   {
     id: 4,
     open_time: '07:00:00',
     close_time: '18:00:00',
     open_day: 6,
-    close_day: 6,
-  },
+    close_day: 6
+  }
 ].each do |attributes|
   seller = Seller.find_by(seller_id: 'shunfa-bakery')
   updatedAttr = attributes
@@ -449,8 +449,8 @@ end
       name: 'Uber Eats',
       icon_url: './assets/UberEats@2x.png'
     }
-  },
-].each do | attr |
+  }
+].each do |attr|
   seller = Seller.find_by(id: attr[:seller_id])
   deliveryOptionAttr = attr.except(:delivery_type, :seller_id)
   delivTypeAttr = attr.fetch(:delivery_type)

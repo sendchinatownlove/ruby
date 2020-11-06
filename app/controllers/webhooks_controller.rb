@@ -212,16 +212,16 @@ class WebhooksController < ApplicationController
       # Send separate email for each seller.
       grouped_items = items.group_by { |li| li['seller_id'] }
       grouped_items.each_key do |sid|
-        if sid.present?
-          EmailManager::DonationReceiptSender.call(
-            {
-              payment_intent: payment_intent,
-              amount: grouped_items[sid].map { |li| li['amount'].to_f }.sum,
-              merchant: Seller.find_by(seller_id: sid).name,
-              email: payment_intent.purchaser.email
-            }
-          )
-        end
+        next unless sid.present?
+
+        EmailManager::DonationReceiptSender.call(
+          {
+            payment_intent: payment_intent,
+            amount: grouped_items[sid].map { |li| li['amount'].to_f }.sum,
+            merchant: Seller.find_by(seller_id: sid).name,
+            email: payment_intent.purchaser.email
+          }
+        )
       end
     end
   end
