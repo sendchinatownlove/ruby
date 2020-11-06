@@ -14,9 +14,11 @@ class ChargesController < ApplicationController
     line_items = charge_params[:line_items].map(&:to_h)
 
     seller_id = charge_params[:seller_id]
+    project_id = charge_params[:project_id]
 
     validate(
       seller_id: seller_id,
+      project_id: project_id,
       line_items: line_items,
       is_distribution: charge_params[:is_distribution]
     )
@@ -25,7 +27,8 @@ class ChargesController < ApplicationController
     item_types = Set.new
     line_items.each do |item|
       item_types.add item['item_type']
-      item[:seller_id] = seller_id
+      item[:seller_id] = seller_id if seller_id.present?
+      item[:project_id] = project_id if project_id.present?
     end
 
     # Total all Items
@@ -53,7 +56,6 @@ class ChargesController < ApplicationController
   private
 
   def charge_params
-    params.require(:seller_id)
     params.require(:line_items)
     params.require(:email)
     params.require(:is_square)
@@ -67,6 +69,7 @@ class ChargesController < ApplicationController
       :is_square,
       :name,
       :seller_id,
+      :project_id,
       :idempotency_key,
       :is_subscribed,
       :campaign_id,
@@ -76,10 +79,13 @@ class ChargesController < ApplicationController
     )
   end
 
-  def validate(seller_id:, line_items:, is_distribution:)
+  def validate(seller_id:, project_id:, line_items:, is_distribution:)
     @seller = Seller.find_by(seller_id: seller_id)
-    unless @seller.present?
-      raise InvalidLineItem, "Seller does not exist: #{seller_id}"
+    if(project_id)
+      @project = Project.find(project_id)
+    end
+    unless @seller.present? ^ @project.present?
+      raise InvalidLineItem, "Project or Seller must exist, but not both. seller id: #{seller_id}, project_id: #{project_id}"
     end
 
     line_items.each do |line_item|
@@ -144,6 +150,8 @@ class ChargesController < ApplicationController
   )
     square_location_id = if gift_a_meal? && @seller.non_profit_location_id.present?
                            @seller.non_profit_location_id
+                         elsif @project.present?
+                           @project.square_location_id
                          else
                            @seller.square_location_id
                          end

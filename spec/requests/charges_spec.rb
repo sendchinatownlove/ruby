@@ -10,6 +10,7 @@ RSpec.describe 'Charges API', type: :request do
     let(:is_square) { true }
     let(:name) { 'Squarepants, Spongebob' }
     let(:seller_id) { 'shunfa-bakery' }
+    let(:project) { create(:project, name: 'Light Up Chinatown', square_location_id: 'YXD42YNEPXWPF') }
     let(:idempotency_key) { '123' }
     let(:is_subscribed) { 'true' }
     let(:is_distribution) { false }
@@ -190,6 +191,57 @@ RSpec.describe 'Charges API', type: :request do
         end
       end
 
+      context 'with a project_id' do
+        let(:line_items) do
+          [
+            {
+              amount: 5000,
+              currency: 'usd',
+              item_type: 'donation',
+              quantity: 1,
+              project_id: project.id,
+              is_distribution: is_distribution
+            }
+          ]
+        end
+
+        let(:params) do
+          {
+            email: email,
+            is_square: is_square,
+            nonce: nonce,
+            line_items: line_items,
+            project_id: project.id,
+            name: name,
+            idempotency_key: idempotency_key,
+            is_subscribed: is_subscribed,
+            is_distribution: is_distribution
+          }
+        end
+
+        before { post '/charges', params: params, as: :json }
+
+        it 'returns status code 200' do
+          expect(response).to have_http_status(200)
+        end
+
+        it 'returns Square Payment' do
+          payment = json['data']['payment']
+          expect(payment['id']).not_to be_empty
+          expect(payment['amount_money']['amount']).to eq(5000)
+          expect(payment['amount_money']['currency']).to eq('USD')
+          expect(payment['buyer_email_address']).to eq(email)
+
+          contact = Contact.find_by(email: email, name: name)
+
+          expect(contact).not_to be_nil
+          expect(
+            PaymentIntent.find_by(recipient: contact, line_items: expected_line_items.to_json)
+          ).not_to be_nil
+        end
+
+      end
+
       context 'with gift card donation for distribution' do
         let(:line_items) do
           [
@@ -326,14 +378,14 @@ RSpec.describe 'Charges API', type: :request do
       end
     end
 
-    context 'with charge with missing seller_id' do
+    context 'with charge with missing seller_id and project_id' do
       let(:line_items) do
-        [{ amount: 50, currency: 'usd', item_type: 'gift_card', quantity: 1 }]
+        [{ amount: 50, currency: 'usd', item_type: 'gift_card', quantity: 1}]
       end
 
       before do
         post '/charges',
-             params: { email: 'Foobar@foo.com', line_items: line_items },
+             params: { email: 'Foobar@foo.com', line_items: line_items, is_square: is_square, nonce: nonce, name: name, idempotency_key: idempotency_key, is_subscribed: is_subscribed },
              as: :json
       end
 
@@ -343,7 +395,7 @@ RSpec.describe 'Charges API', type: :request do
 
       it 'returns a validation failure message' do
         expect(response.body).to match(
-          /param is missing or the value is empty: seller_id/
+          /Project or Seller must exist, but not both. seller id: , project_id:/
         )
       end
     end
@@ -511,7 +563,7 @@ RSpec.describe 'Charges API', type: :request do
 
       it 'returns a validation failure message' do
         expect(response.body).to match(
-          /param is missing or the value is empty: seller_id/
+          /param is missing or the value is empty: line_items/
         )
       end
     end
