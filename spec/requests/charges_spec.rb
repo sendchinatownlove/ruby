@@ -239,7 +239,6 @@ RSpec.describe 'Charges API', type: :request do
             PaymentIntent.find_by(recipient: contact, line_items: expected_line_items.to_json)
           ).not_to be_nil
         end
-
       end
 
       context 'with gift card donation for distribution' do
@@ -380,7 +379,7 @@ RSpec.describe 'Charges API', type: :request do
 
     context 'with charge with missing seller_id and project_id' do
       let(:line_items) do
-        [{ amount: 50, currency: 'usd', item_type: 'gift_card', quantity: 1}]
+        [{ amount: 50, currency: 'usd', item_type: 'gift_card', quantity: 1 }]
       end
 
       before do

@@ -81,9 +81,7 @@ class ChargesController < ApplicationController
 
   def validate(seller_id:, project_id:, line_items:, is_distribution:)
     @seller = Seller.find_by(seller_id: seller_id)
-    if(project_id)
-      @project = Project.find(project_id)
-    end
+    @project = Project.find(project_id) if project_id
     unless @seller.present? ^ @project.present?
       raise InvalidLineItem, "Project or Seller must exist, but not both. seller id: #{seller_id}, project_id: #{project_id}"
     end
