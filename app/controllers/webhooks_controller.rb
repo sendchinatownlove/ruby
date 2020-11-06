@@ -123,7 +123,8 @@ class WebhooksController < ApplicationController
 
       amount = item_json['amount']
       seller_id = item_json['seller_id']
-      if seller_id.eql?(Seller::POOL_DONATION_SELLER_ID)
+      project_id = item_json['project_id']
+      if seller_id.present? && seller_id.eql?(Seller::POOL_DONATION_SELLER_ID)
         PoolDonationValidator.call({ type: item_json['item_type'] })
 
         WebhookManager::PoolDonationCreator.call(
@@ -138,6 +139,24 @@ class WebhooksController < ApplicationController
           {
             payment_intent: payment_intent,
             amount: amount,
+            email: payment_intent.purchaser.email
+          }
+        )
+      elsif project_id.present?
+        WebhookManager::DonationCreator.call(
+          {
+            seller_id: seller_id,
+            project_id: project_id,
+            payment_intent: payment_intent,
+            amount: amount
+          }
+        )
+
+        EmailManager::DonationReceiptSender.call(
+          {
+            payment_intent: payment_intent,
+            amount: amount,
+            merchant: Project.find(project_id).name,
             email: payment_intent.purchaser.email
           }
         )
@@ -193,14 +212,16 @@ class WebhooksController < ApplicationController
       # Send separate email for each seller.
       grouped_items = items.group_by { |li| li['seller_id'] }
       grouped_items.each_key do |sid|
-        EmailManager::DonationReceiptSender.call(
-          {
-            payment_intent: payment_intent,
-            amount: grouped_items[sid].map { |li| li['amount'].to_f }.sum,
-            merchant: Seller.find_by(seller_id: sid).name,
-            email: payment_intent.purchaser.email
-          }
-        )
+        if sid.present?
+          EmailManager::DonationReceiptSender.call(
+            {
+              payment_intent: payment_intent,
+              amount: grouped_items[sid].map { |li| li['amount'].to_f }.sum,
+              merchant: Seller.find_by(seller_id: sid).name,
+              email: payment_intent.purchaser.email
+            }
+          )
+        end
       end
     end
   end
