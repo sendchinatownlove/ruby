@@ -343,7 +343,6 @@ end
     redeemed_at: redeemed_at
   )
 end
-
 [
   {
     id: 1,
