@@ -10,7 +10,7 @@ RSpec.describe 'Charges API', type: :request do
     let(:is_square) { true }
     let(:name) { 'Squarepants, Spongebob' }
     let(:seller_id) { 'shunfa-bakery' }
-    let(:project) { create(:project, name: 'Light Up Chinatown', square_location_id: 'YXD42YNEPXWPF') }
+    let(:project) { create(:project, name: 'Light Up Chinatown', square_location_id: ENV['SQUARE_LOCATION_ID']) }
     let(:idempotency_key) { '123' }
     let(:is_subscribed) { 'true' }
     let(:is_distribution) { false }
@@ -238,6 +238,49 @@ RSpec.describe 'Charges API', type: :request do
           expect(
             PaymentIntent.find_by(recipient: contact, line_items: expected_line_items.to_json)
           ).not_to be_nil
+        end
+      end
+
+      context 'with both a project_id and seller_id' do
+        let(:line_items) do
+          [
+            {
+              amount: 6000,
+              currency: 'usd',
+              item_type: 'donation',
+              quantity: 1,
+              project_id: project.id,
+              seller_id: seller_id,
+              is_distribution: is_distribution
+            }
+          ]
+        end
+
+        let(:params) do
+          {
+            email: email,
+            is_square: is_square,
+            nonce: nonce,
+            line_items: line_items,
+            project_id: project.id,
+            seller_id: seller_id,
+            name: name,
+            idempotency_key: idempotency_key,
+            is_subscribed: is_subscribed,
+            is_distribution: is_distribution
+          }
+        end
+
+        before { post '/charges', params: params, as: :json }
+
+        it 'returns status code 422' do
+          expect(response).to have_http_status(422)
+        end
+
+        it 'returns a validation failure message' do
+          expect(response.body).to match(
+            /Project or Seller must exist, but not both. seller id: #{seller_id}, project_id: #{project.id}/
+          )
         end
       end
 
