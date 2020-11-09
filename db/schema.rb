@@ -69,6 +69,9 @@ ActiveRecord::Schema.define(version: 2020_10_30_031517) do
     t.bigint "contact_id"
     t.string "name"
     t.index ["contact_id"], name: "index_distributors_on_contact_id"
+    t.string "gift_card_login_token"
+    t.datetime "gift_card_login_expires_at"
+    t.string "gift_card_login_state", default: "new", null: false
   end
 
   create_table "donation_details", force: :cascade do |t|
