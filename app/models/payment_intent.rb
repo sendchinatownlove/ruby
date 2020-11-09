@@ -7,7 +7,6 @@
 #  id                 :bigint           not null, primary key
 #  line_items         :text
 #  lock_version       :integer
-#  metadata           :text
 #  receipt_url        :string
 #  successful         :boolean          default(FALSE)
 #  created_at         :datetime         not null
