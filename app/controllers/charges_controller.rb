@@ -42,7 +42,8 @@ class ChargesController < ApplicationController
                                             amount: amount,
                                             email: email,
                                             name: charge_params[:name],
-                                            line_items: line_items)
+                                            line_items: line_items,
+                                            metadata: charge_params[:metadata])
 
     # Save the contact information only if the charge is succesful
     # Use a job to avoid blocking the request
@@ -75,6 +76,7 @@ class ChargesController < ApplicationController
       :campaign_id,
       # TODO(justintmckibben): Deprecate this boolean in favor of campaign_id
       :is_distribution,
+      :metadata,
       line_items: [%i[amount currency item_type quantity]]
     )
   end
@@ -144,7 +146,8 @@ class ChargesController < ApplicationController
     amount:,
     email:,
     name:,
-    line_items:
+    line_items:,
+    metadata:
   )
     square_location_id = if gift_a_meal? && @seller.non_profit_location_id.present?
                            @seller.non_profit_location_id
@@ -192,7 +195,8 @@ class ChargesController < ApplicationController
       receipt_url: receipt_url,
       purchaser: purchaser,
       recipient: recipient,
-      campaign: @campaign
+      campaign: @campaign,
+      metadata: metadata
     )
 
     api_response
