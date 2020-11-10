@@ -13,6 +13,7 @@ RSpec.describe 'Charges API', type: :request do
     let(:idempotency_key) { '123' }
     let(:is_subscribed) { 'true' }
     let(:is_distribution) { false }
+    let(:metadata) { '' }
     let(:params) do
       {
         email: email,
@@ -23,7 +24,8 @@ RSpec.describe 'Charges API', type: :request do
         name: name,
         idempotency_key: idempotency_key,
         is_subscribed: is_subscribed,
-        is_distribution: is_distribution
+        is_distribution: is_distribution,
+        metadata: metadata
       }
     end
     let!(:seller) do
@@ -277,6 +279,54 @@ RSpec.describe 'Charges API', type: :request do
           expect(payment_intent.recipient).not_to eq(contact)
           expect(payment_intent.recipient).to eq(seller.campaigns.first.distributor.contact)
           expect(payment_intent.recipient).not_to eq(payment_intent.purchaser)
+        end
+
+        it 'returns status code 200' do
+          expect(response).to have_http_status(200)
+        end
+      end
+
+      context 'with some metadata' do
+        let(:line_items) do
+          [
+            {
+              amount: 3000,
+              currency: 'usd',
+              item_type: 'gift_card',
+              quantity: 1,
+              seller_id: seller_id,
+              is_distribution: is_distribution
+            }
+          ]
+        end
+
+        let(:raw_metadata) do
+          {
+            recipient_name: 'Someone S. Special',
+            recipient_address: '123 Main Street, New York, NY 10001',
+            test_field: 'value'
+          }
+        end
+
+        let(:metadata) do
+          raw_metadata.to_json
+        end
+
+        before { post '/charges', params: params, as: :json }
+
+        it 'has metadata on the payment intent' do
+          contact = Contact.find_by(email: email, name: name)
+          payment_intent = PaymentIntent.find_by(
+            purchaser: contact,
+            line_items: expected_line_items.to_json
+          )
+
+          expect(contact).not_to be_nil
+          expect(payment_intent).not_to be_nil
+          expect(payment_intent.metadata).not_to be_nil
+
+          recieved_metadata = JSON.parse(payment_intent.metadata, { symbolize_names: true })
+          expect(recieved_metadata).to eql raw_metadata
         end
 
         it 'returns status code 200' do

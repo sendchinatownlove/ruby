@@ -76,8 +76,8 @@ class ChargesController < ApplicationController
       :campaign_id,
       # TODO(justintmckibben): Deprecate this boolean in favor of campaign_id
       :is_distribution,
-      line_items: [%i[amount currency item_type quantity]],
-      :metadata
+      :metadata,
+      line_items: [%i[amount currency item_type quantity]]
     )
   end
 
