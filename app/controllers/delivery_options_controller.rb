@@ -23,7 +23,7 @@ class DeliveryOptionsController < ApplicationController
 
   # PUT /sellers/:seller_id/delivery_options/:id
   def update
-    @delivery_option.update(update_delivery_option_params)
+    @delivery_option.update(update_params)
     json_response(@delivery_option)
   end
 
@@ -38,12 +38,7 @@ class DeliveryOptionsController < ApplicationController
 
   def create_delivery_option_params
     params.require(:seller_id)
-    update_params
-  end
-
-  def update_delivery_option_params
-    params.require(:seller_id)
-    params.require(:id)
+    params.require(:delivery_type_id)
     update_params
   end
 
