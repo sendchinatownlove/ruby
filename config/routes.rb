@@ -80,7 +80,6 @@ Rails.application.routes.draw do
   post 'contacts/:contact_id/lyft_rewards/:token/redeem', to: 'contact_lyft_rewards#redeem'
 
   resources :campaigns do
-    resources :fees, controller: 'campaign_fees'
   end
   resources :contacts do
     resources :lyft_rewards, controller: 'contact_lyft_rewards', only: %i[index create]
@@ -91,7 +90,7 @@ Rails.application.routes.draw do
   end
   resources :distributors do
   end
-  resources :fees do
+  resources :fees, param: :name do
   end
   resources :gift_cards do
   end

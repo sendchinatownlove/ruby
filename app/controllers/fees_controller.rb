@@ -10,7 +10,7 @@ class FeesController < ApplicationController
 
     # GET /fees/:name
     def show
-      json_response(Fee.find(params[:name]))
+      json_response(Fee.find_by(name: params[:name]))
     end
 
   # POST /fees

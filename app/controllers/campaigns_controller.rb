@@ -5,12 +5,7 @@ class CampaignsController < ApplicationController
 
   # GET /campaigns
   def index
-    @campaigns = if params[:active].present?
-                   valid_campaigns.order(:end_date).active(params[:active])
-                 else
-                   valid_campaigns.order(:end_date).all
-    end
-
+    @campaigns = valid_campaigns.order(:end_date).all
     json_response(campaigns_json)
   end
 
@@ -22,10 +17,6 @@ class CampaignsController < ApplicationController
   # POST /campaigns
   def create
     @campaign = Campaign.create!(create_params)
-    if params[:fee_id].present?
-      @fee = Fee.find(params[:fee_id])
-      @campaign.fees << @fee
-    end
     json_response(campaign_json, :created)
   end
 
@@ -49,12 +40,14 @@ class CampaignsController < ApplicationController
       :end_date,
       :price_per_meal,
       :target_amount,
+      :nonprofit_id,
       gallery_image_urls: []
     )
 
     set_location
     set_seller
     set_distributor
+
     ret[:location_id] = @location.id
     ret[:seller_id] = @seller.id
     ret[:distributor_id] = @distributor.id
@@ -68,6 +61,7 @@ class CampaignsController < ApplicationController
       :description,
       :valid,
       :price_per_meal,
+      :nonprofit_id,
       gallery_image_urls: []
     )
   end

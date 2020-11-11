@@ -106,7 +106,6 @@ RSpec.describe 'Webhooks API', type: :request do
 
         context 'with non-divisible number round' do
           let(:amount) { 1007 }
-          # amount after square fees: 949
           let(:item_type) { 'donation' }
 
           it 'creates pool donation and distributes the cents' do
@@ -307,12 +306,7 @@ RSpec.describe 'Webhooks API', type: :request do
       def verify_gift_card(item:, single_use:, amount:)
         expect(item).not_to be_nil
         gift_card_detail = item.gift_card_detail
-        if payment_intent.campaign.present?
-          fee = payment_intent.campaign.fees.first
-          expect(gift_card_detail.amount).to eq(amount)
-        else
-          expect(gift_card_detail.amount).to eq(amount)
-        end
+        expect(gift_card_detail.amount).to eq(amount)
         expect(gift_card_detail).not_to be_nil
         expect(gift_card_detail.single_use).to eq(single_use)
         expect(gift_card_detail.expiration).to eq(Date.today + 1.year)
@@ -327,9 +321,6 @@ RSpec.describe 'Webhooks API', type: :request do
       let(:amount) { 5000 }
       let(:item_type) { 'gift_card' }
       let(:seller_id) { seller1.seller_id }
-      let(:fee1) do
-        create :fee, multiplier: 0.01, flat_cost: 0.30
-      end
 
       context 'with campaign' do
         let(:payment_intent) do
@@ -345,7 +336,6 @@ RSpec.describe 'Webhooks API', type: :request do
         end
 
         before do
-          payment_intent.campaign.fees << fee1
           expect(EmailManager::DonationReceiptSender).to receive(:call).once
           post(
             '/webhooks',
@@ -446,7 +436,6 @@ RSpec.describe 'Webhooks API', type: :request do
         let(:seller_id) { seller1.seller_id }
 
         before do
-          payment_intent.campaign.fees << fee1
           # Sends only one email, even though two gift cards were created
           expect(EmailManager::DonationReceiptSender).to receive(:call)
             .once
