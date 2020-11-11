@@ -4,10 +4,10 @@ require 'rails_helper'
 
 RSpec.describe 'ContactLyftRewards', type: :request do
   let!(:contact) { create :contact }
-  let(:redeemed_at) do
+  let(:associated_with_contact_at) do
     Faker::Date.between(
-      from: Date.today - 30.days,
-      to: Date.today - 1.days
+      from: Date.new(2020, 9, 18),
+      to: Date.new(2020, 9, 18) + 10.days
     )
   end
   let!(:participating_seller) do
@@ -21,7 +21,7 @@ RSpec.describe 'ContactLyftRewards', type: :request do
       :ticket,
       contact: contact,
       participating_seller: participating_seller,
-      redeemed_at: redeemed_at
+      associated_with_contact_at: associated_with_contact_at
     )
   end
   let!(:lyft_reward) { create :lyft_reward }

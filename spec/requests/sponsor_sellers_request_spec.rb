@@ -7,7 +7,7 @@ RSpec.describe 'SponsorSellers', type: :request do
   describe 'GET /sponsor_sellers' do
     let!(:sponsor_seller1) { create :sponsor_seller }
     let!(:sponsor_seller2) { create :sponsor_seller }
-    let!(:sponsor_seller_inactive) { create :sponsor_seller, active: false}
+    let!(:sponsor_seller_inactive) { create :sponsor_seller, active: false }
     before { get '/sponsor_sellers' }
 
     it 'returns only active sponsor sellers' do

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_11_012706) do
+ActiveRecord::Schema.define(version: 2020_11_09_044231) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -29,8 +29,10 @@ ActiveRecord::Schema.define(version: 2020_11_11_012706) do
     t.integer "target_amount", default: 100000, null: false
     t.integer "price_per_meal", default: 500, null: false
     t.integer "fee_id"
+    t.bigint "nonprofit_id"
     t.index ["distributor_id"], name: "index_campaigns_on_distributor_id"
     t.index ["location_id"], name: "index_campaigns_on_location_id"
+    t.index ["nonprofit_id"], name: "index_campaigns_on_nonprofit_id"
     t.index ["seller_id"], name: "index_campaigns_on_seller_id"
   end
 
@@ -119,7 +121,7 @@ ActiveRecord::Schema.define(version: 2020_11_11_012706) do
   end
 
   create_table "items", force: :cascade do |t|
-    t.bigint "seller_id", null: false
+    t.bigint "seller_id"
     t.integer "item_type"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -127,8 +129,10 @@ ActiveRecord::Schema.define(version: 2020_11_11_012706) do
     t.boolean "refunded", default: false
     t.bigint "purchaser_id"
     t.bigint "campaign_id"
+    t.bigint "project_id"
     t.index ["campaign_id"], name: "index_items_on_campaign_id"
     t.index ["payment_intent_id"], name: "index_items_on_payment_intent_id"
+    t.index ["project_id"], name: "index_items_on_project_id"
     t.index ["purchaser_id"], name: "index_items_on_purchaser_id"
     t.index ["seller_id"], name: "index_items_on_seller_id"
   end
@@ -170,6 +174,15 @@ ActiveRecord::Schema.define(version: 2020_11_11_012706) do
     t.index ["seller_id"], name: "index_menu_items_on_seller_id"
   end
 
+  create_table "nonprofits", force: :cascade do |t|
+    t.string "name"
+    t.string "logo_image_url"
+    t.integer "contact_id"
+    t.integer "fee_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "open_hours", force: :cascade do |t|
     t.bigint "seller_id", null: false
     t.time "open_time"
@@ -204,10 +217,18 @@ ActiveRecord::Schema.define(version: 2020_11_11_012706) do
     t.integer "lock_version"
     t.bigint "fee_id"
     t.bigint "campaign_id"
+    t.text "metadata"
     t.index ["campaign_id"], name: "index_payment_intents_on_campaign_id"
     t.index ["fee_id"], name: "index_payment_intents_on_fee_id"
     t.index ["purchaser_id"], name: "index_payment_intents_on_purchaser_id"
     t.index ["recipient_id"], name: "index_payment_intents_on_recipient_id"
+  end
+
+  create_table "projects", force: :cascade do |t|
+    t.string "name"
+    t.string "square_location_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "refunds", force: :cascade do |t|

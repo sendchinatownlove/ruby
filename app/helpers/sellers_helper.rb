@@ -16,6 +16,7 @@ module SellersHelper
     json['cost_per_meal'] = seller.cost_per_meal
 
     json['donation_amount'] = seller.donation_amount
+    json['gift_a_meal_amount'] = seller.gift_a_meal_amount
     json['gift_card_amount'] = seller.gift_card_amount
     json['amount_raised'] = json['donation_amount'] + json['gift_card_amount']
 

@@ -52,8 +52,7 @@ If you get a migration error like `PG::UndefinedTable: ERROR:` or `PG::NotNullVi
 
   [source](https://stackoverflow.com/questions/52862529/no-such-file-or-directory-rb-sysopen-tmp-pids-puma-pid)
 
-- Run the server on port 3001: `heroku local web -p 3001`
-You'll need to do this if you're getting cors errors from the frontend. Stop your frontend server, start the rails server on 3001, then start the local server again from port 3000 using `yarn start`
+- Run the server on port 5000: `heroku local web -p 5000`
 - Run all tests: `heroku local:run bundle exec rspec`
 - Run specific tests: `heroku local:run bundle exec rspec -e "<insert string from test description>"`
 - Run console: `heroku local:run rails console`
@@ -109,23 +108,24 @@ https://docs.google.com/document/d/1UPNCwjWS_T7XT5AXsewphu6NvNdV7TQLSJub-RBRAG0/
 Anytime a new migration is created, you'll have to run `rails db:migrate` for your local dev environment, and `rails db:migrate RAILS_ENV=test` for your local test environment
 
 ## containerized
-requires
-- docker
-- docker-compose
+Running a containerized version of the app requires Docker and Docker Compose. In addition, some updates will be required to the `config/database.yml` file for the app to work within Docker. You may also need to enable Square webhooks, so reference the [Enabling Webhooks](##Enabling-Webhooks-locally) section.
 
 ```
 docker volume create --name=postgres-data-volume
-cd api && docker-compose up
-# navigate to localhost:3000
+cd <local repo directory name> && docker-compose up
 ```
 accessing rail CLI after `docker-compose` is running.
 
 ```
-docker exec -it api_web_1 bash
-# now inside docker container example of commands that can be run
+# check what containers are being run by Docker Compose
+cd <local repo directory name> && docker-compose ps
+docker exec -it <name of the container with "web_1" in it> bash
 
+# now inside docker container example of commands that can be run
 bundle exec rake db:create
 bundle exec rake db:migrate
+
+bundle exec rake db:seed
 
 bundle exec rails g model Todo title:string created_by:string
 ```

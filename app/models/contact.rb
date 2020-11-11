@@ -24,7 +24,7 @@ class Contact < ApplicationRecord
   validates :is_subscribed, inclusion: { in: [true, false] }
 
   def is_eligible_for_lyft_reward
-    unless !has_redeemed_lyft_reward && has_redeemed_lyft_sponsored_ticket
+    unless !has_claimed_or_redeemed_lyft_reward && has_redeemed_lyft_sponsored_ticket
       return false
     end
 
@@ -43,7 +43,22 @@ class Contact < ApplicationRecord
 
   private
 
+  def has_claimed_or_redeemed_lyft_reward
+    return true if has_redeemed_lyft_reward
+
+    rel = LyftReward.arel_table
+
+    LyftReward
+      .where(
+        rel[:contact_id].eq(id)
+          .and(
+            rel[:state].eq('delivered').and(rel[:expires_at].gteq(Date.today))
+          )
+      ).count > 0
+  end
+
   def has_redeemed_lyft_sponsored_ticket
+    lyft_rewards_launch_date = Date.new(2020, 9, 18)
     Ticket
       .joins(:participating_seller)
       .where(
@@ -54,11 +69,7 @@ class Contact < ApplicationRecord
           is_lyft_sponsored: true
         }
       )
-      .where.not(
-        tickets: {
-          redeemed_at: nil
-        }
-      )
+      .where('tickets.associated_with_contact_at >= ?', lyft_rewards_launch_date)
       .count > 0
   end
 end

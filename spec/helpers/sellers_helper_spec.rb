@@ -38,6 +38,7 @@ RSpec.describe SellersHelper, type: :helper do
         'amount_raised': 0,
         'donation_amount': 0,
         'gift_card_amount': 0,
+        'gift_a_meal_amount': 0,
         'num_contributions': 0,
         'num_gift_cards': 0,
         'num_donations': 0
@@ -90,6 +91,15 @@ RSpec.describe SellersHelper, type: :helper do
           created_at: Time.current + 1.day
         )
 
+        # Create gift-a-meal gift card of $10.
+        gift_a_meal1 = create(:item, seller: seller)
+        gift_card_detail3 = create(:gift_card_detail, item: item_gift_card1, single_use: true)
+        create(
+          :gift_card_amount,
+          value: 10_00,
+          gift_card_detail: gift_card_detail3
+        )
+
         # Create a donation of $200
         item_donation1 = create(:item, seller: seller)
         create(:donation_detail, item: item_donation1, amount: 200_00)
@@ -99,10 +109,11 @@ RSpec.describe SellersHelper, type: :helper do
         create(:donation_detail, item: item_donation2, amount: 10_00)
 
         expected_seller['donation_amount'] = 210_00
-        expected_seller['amount_raised'] = 310_00
-        expected_seller['gift_card_amount'] = 100_00
-        expected_seller['num_contributions'] = 4
-        expected_seller['num_gift_cards'] = 2
+        expected_seller['amount_raised'] = 320_00
+        expected_seller['gift_card_amount'] = 110_00
+        expected_seller['gift_a_meal_amount'] = 10_00
+        expected_seller['num_contributions'] = 5
+        expected_seller['num_gift_cards'] = 3
         expected_seller['num_donations'] = 2
       end
 

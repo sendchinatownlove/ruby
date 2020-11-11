@@ -7,6 +7,7 @@ class SellerGiftCardsController < ApplicationController
   def show
     query = GiftCardDetail
             .select(
+              :gift_card_id,
               :seller_gift_card_id,
               'la.value as latest_value',
               'og.value as original_value',
@@ -15,7 +16,8 @@ class SellerGiftCardsController < ApplicationController
               :created_at,
               :updated_at,
               :expiration,
-              :single_use
+              :single_use,
+              'la.updated_at as last_updated'
             )
             .joins(:item, :recipient)
             .where(

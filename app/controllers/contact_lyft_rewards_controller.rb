@@ -41,6 +41,7 @@ class ContactLyftRewardsController < ApplicationController
         state: 'delivered',
         token: token
       )
+      json_response({})
     end
   end
 

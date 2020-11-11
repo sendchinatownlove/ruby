@@ -102,10 +102,10 @@ RSpec.describe Contact, type: :model do
     end
 
     context 'when the contact has redeemed a ticket from a lyft sponsored participating seller' do
-      let(:redeemed_at) do
+      let(:associated_with_contact_at) do
         Faker::Date.between(
-          from: Date.today - 30.days,
-          to: Date.today - 1.days
+          from: Date.new(2020, 9, 18),
+          to: Date.new(2020, 9, 18) + 30.days
         )
       end
 
@@ -118,12 +118,17 @@ RSpec.describe Contact, type: :model do
           :ticket,
           contact: @contact,
           participating_seller: participating_seller,
-          redeemed_at: redeemed_at
+          associated_with_contact_at: associated_with_contact_at
         )
       end
 
-      context 'when the ticket has not been redeemed' do
-        let(:redeemed_at) { nil }
+      context 'when the ticket was not associated on or after the launch date' do
+        let(:associated_with_contact_at) do
+          Faker::Date.between(
+            from: Date.new(2020, 9, 18) - 30.days,
+            to: Date.new(2020, 9, 18) - 1.days
+          )
+        end
 
         it 'should return false' do
           expect(@contact.is_eligible_for_lyft_reward).to eq(false)
@@ -152,8 +157,9 @@ RSpec.describe Contact, type: :model do
         context 'when the reward has expired' do
           before do
             @lyft_reward.update(
-              expires_at: Date.today - 1.days
+              expires_at: Time.now - 1.days
             )
+            new_lyft_reward = create :lyft_reward
           end
 
           it 'should return true' do
@@ -164,7 +170,7 @@ RSpec.describe Contact, type: :model do
         context 'when the reward has not expired' do
           before do
             @lyft_reward.update(
-              expires_at: Date.today + 1.days
+              expires_at: Time.now + 1.days
             )
           end
 
