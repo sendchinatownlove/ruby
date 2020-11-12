@@ -117,6 +117,7 @@ class CampaignsController < ApplicationController
     ret['amount_raised'] = campaign.amount_raised
     ret['last_contribution'] = campaign.last_contribution
     ret['seller_id'] = campaign.seller.seller_id
+    ret['seller_distributor_pairs'] = campaign.seller_distributor_pairs
     ret
   end
 
