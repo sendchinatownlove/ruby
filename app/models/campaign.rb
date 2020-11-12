@@ -18,7 +18,7 @@
 #  distributor_id     :bigint
 #  location_id        :bigint           not null
 #  nonprofit_id       :bigint
-#  seller_id          :bigint           not null
+#  seller_id          :bigint
 #
 # Indexes
 #
