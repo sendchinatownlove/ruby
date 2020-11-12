@@ -9,6 +9,11 @@
 #  lock_version       :integer
 #  metadata           :text
 #  receipt_url        :string
+#  successful represents whether a payment has been received and processed by
+#  our system. For pooled donations and normal GAM campaigns, this means that
+#  we've created a PooledDonation, Donation, or GiftCard using the payment
+#  from Square. For Mega GAM campaigns, this means that we've received some
+#  sort of ack from Square.
 #  successful         :boolean          default(FALSE)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
