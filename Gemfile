@@ -50,6 +50,11 @@ gem 'rack-cors'
 
 gem 'rest-client'
 
+# faker is a requirement for our db seeds and many parts of our test process
+group :development, :test, :staging do
+    gem 'faker'
+end
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
