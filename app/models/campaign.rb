@@ -55,6 +55,46 @@ class Campaign < ApplicationRecord
     ).order(created_at: :desc).first&.created_at
   end
 
+  def seller_distributor_pairs
+    pairs = []
+
+    csd_pairings = CampaignsSellersDistributor
+      .joins(:campaign)
+      .where(campaigns: {
+        id: id
+      })
+
+    seller_ids = csd_pairings.map {|pairing| pairing.seller_id}
+    sellers = Seller.where(:id => seller_ids)
+    seller_id_to_seller = {}
+    sellers.each do |seller|
+      seller_id_to_seller[seller.id] = seller
+    end
+
+    distributor_ids = csd_pairings.map {|pairing| pairing.distributor_id}
+    distributors = Distributor.where(:id => distributor_ids)
+    distributor_id_to_distributor = {}
+    distributors.each do |distributor|
+      distributor_id_to_distributor[distributor.id] = distributor
+    end
+
+    csd_pairings.each do |pairing|
+      seller = seller_id_to_seller[pairing.seller_id]
+      distributor = distributor_id_to_distributor[pairing.distributor_id]
+      pair = {
+        'distributor_id' => distributor.id,
+        'distributor_image_url' => distributor.image_url,
+        'distributor_name' => distributor.name,
+        'seller_id' => seller.id,
+        'seller_image_url' => seller.hero_image_url,
+        'seller_name' => seller.name,
+      }
+      pairs.append(pair)
+    end
+
+    pairs
+  end
+
   private
 
   # calculates the amount raised from gift cards
