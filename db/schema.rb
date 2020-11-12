@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_12_030205) do
+ActiveRecord::Schema.define(version: 2020_11_12_064909) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -41,6 +41,7 @@ ActiveRecord::Schema.define(version: 2020_11_12_030205) do
     t.bigint "distributor_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["campaign_id", "distributor_id", "seller_id"], name: "campaigns_sellers_distributors_unique", unique: true
     t.index ["campaign_id"], name: "index_campaigns_sellers_distributors_on_campaign_id"
     t.index ["distributor_id"], name: "index_campaigns_sellers_distributors_on_distributor_id"
     t.index ["seller_id"], name: "index_campaigns_sellers_distributors_on_seller_id"
