@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_09_044231) do
+ActiveRecord::Schema.define(version: 2020_11_12_024335) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -33,6 +33,17 @@ ActiveRecord::Schema.define(version: 2020_11_09_044231) do
     t.index ["location_id"], name: "index_campaigns_on_location_id"
     t.index ["nonprofit_id"], name: "index_campaigns_on_nonprofit_id"
     t.index ["seller_id"], name: "index_campaigns_on_seller_id"
+  end
+
+  create_table "campaigns_sellers_distributors", force: :cascade do |t|
+    t.bigint "campaign_id", null: false
+    t.bigint "seller_id", null: false
+    t.bigint "distributor_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["campaign_id"], name: "index_campaigns_sellers_distributors_on_campaign_id"
+    t.index ["distributor_id"], name: "index_campaigns_sellers_distributors_on_distributor_id"
+    t.index ["seller_id"], name: "index_campaigns_sellers_distributors_on_seller_id"
   end
 
   create_table "contacts", force: :cascade do |t|
@@ -304,6 +315,9 @@ ActiveRecord::Schema.define(version: 2020_11_09_044231) do
 
   add_foreign_key "campaigns", "locations"
   add_foreign_key "campaigns", "sellers"
+  add_foreign_key "campaigns_sellers_distributors", "campaigns"
+  add_foreign_key "campaigns_sellers_distributors", "distributors"
+  add_foreign_key "campaigns_sellers_distributors", "sellers"
   add_foreign_key "delivery_options", "sellers"
   add_foreign_key "delivery_types", "delivery_options"
   add_foreign_key "donation_details", "items"
