@@ -9,7 +9,7 @@
 #  description        :string
 #  end_date           :datetime         not null
 #  gallery_image_urls :string           is an Array
-#  price_per_meal     :integer          default(500), not null
+#  price_per_meal     :integer          default(500)
 #  target_amount      :integer          default(100000), not null
 #  valid              :boolean          default(TRUE)
 #  created_at         :datetime         not null
