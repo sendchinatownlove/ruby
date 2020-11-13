@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateCampaignsSellersDistributors < ActiveRecord::Migration[6.0]
   def change
     create_table :campaigns_sellers_distributors do |t|
