@@ -112,18 +112,17 @@ class Campaign < ApplicationRecord
   private
 
   def mega_gam?
-    project_id != nil
+    project.present?
   end
 
   # Calculates the amount raised in the payment intent table.
   def payment_intent_amount
-    # TODO CHECK SYNTAX
     PaymentIntent
       .joins(:campaign)
       .where(campaigns: {
         campaign_id: id
       })
-      .map {$.amount}
+      .map { |payment_intent| payment_intent.amount }
       .sum
   end
 
