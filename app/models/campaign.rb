@@ -10,6 +10,7 @@
 #  end_date           :datetime         not null
 #  gallery_image_urls :string           is an Array
 #  price_per_meal     :integer          default(500)
+#  start_date         :datetime
 #  target_amount      :integer          default(100000), not null
 #  valid              :boolean          default(TRUE)
 #  created_at         :datetime         not null
@@ -72,20 +73,20 @@ class Campaign < ApplicationRecord
     pairs = []
 
     csd_pairings = CampaignsSellersDistributor
-      .joins(:campaign)
-      .where(campaigns: {
-        id: id
-      })
+                   .joins(:campaign)
+                   .where(campaigns: {
+                            id: id
+                          })
 
-    seller_ids = csd_pairings.map {|pairing| pairing.seller_id}
-    sellers = Seller.where(:id => seller_ids)
+    seller_ids = csd_pairings.map(&:seller_id)
+    sellers = Seller.where(id: seller_ids)
     seller_id_to_seller = {}
     sellers.each do |seller|
       seller_id_to_seller[seller.id] = seller
     end
 
-    distributor_ids = csd_pairings.map {|pairing| pairing.distributor_id}
-    distributors = Distributor.where(:id => distributor_ids)
+    distributor_ids = csd_pairings.map(&:distributor_id)
+    distributors = Distributor.where(id: distributor_ids)
     distributor_id_to_distributor = {}
     distributors.each do |distributor|
       distributor_id_to_distributor[distributor.id] = distributor
@@ -100,7 +101,7 @@ class Campaign < ApplicationRecord
         'distributor_name' => distributor.name,
         'seller_id' => seller.id,
         'seller_image_url' => seller.hero_image_url,
-        'seller_name' => seller.name,
+        'seller_name' => seller.name
       }
       pairs.append(pair)
     end

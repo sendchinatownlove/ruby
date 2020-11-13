@@ -12,12 +12,6 @@ RSpec.describe 'Campaigns API', type: :request do
       seller_id: @seller.id,
       location_id: @location.id
     )
-    @inactive_campaign = create(
-      :campaign,
-      active: false,
-      seller_id: @seller.id,
-      location_id: @location.id
-    )
   end
   let(:distributor) { create :distributor }
 
@@ -27,7 +21,7 @@ RSpec.describe 'Campaigns API', type: :request do
 
       it 'Returns campaigns' do
         expect(json).not_to be_empty
-        expect(json.size).to eq(2)
+        expect(json.size).to eq(1)
       end
 
       it 'Returns 200' do

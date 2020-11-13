@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_12_064909) do
+ActiveRecord::Schema.define(version: 2020_11_12_172846) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -29,6 +29,7 @@ ActiveRecord::Schema.define(version: 2020_11_12_064909) do
     t.integer "target_amount", default: 100000, null: false
     t.integer "price_per_meal", default: 500
     t.bigint "nonprofit_id"
+    t.datetime "start_date"
     t.index ["distributor_id"], name: "index_campaigns_on_distributor_id"
     t.index ["location_id"], name: "index_campaigns_on_location_id"
     t.index ["nonprofit_id"], name: "index_campaigns_on_nonprofit_id"
@@ -224,8 +225,10 @@ ActiveRecord::Schema.define(version: 2020_11_12_064909) do
     t.bigint "fee_id"
     t.bigint "campaign_id"
     t.text "metadata"
+    t.bigint "project_id"
     t.index ["campaign_id"], name: "index_payment_intents_on_campaign_id"
     t.index ["fee_id"], name: "index_payment_intents_on_fee_id"
+    t.index ["project_id"], name: "index_payment_intents_on_project_id"
     t.index ["purchaser_id"], name: "index_payment_intents_on_purchaser_id"
     t.index ["recipient_id"], name: "index_payment_intents_on_recipient_id"
   end
@@ -336,6 +339,7 @@ ActiveRecord::Schema.define(version: 2020_11_12_064909) do
   add_foreign_key "payment_intents", "campaigns"
   add_foreign_key "payment_intents", "contacts", column: "purchaser_id"
   add_foreign_key "payment_intents", "contacts", column: "recipient_id"
+  add_foreign_key "payment_intents", "projects"
   add_foreign_key "refunds", "payment_intents"
   add_foreign_key "tickets", "contacts"
   add_foreign_key "tickets", "participating_sellers"
