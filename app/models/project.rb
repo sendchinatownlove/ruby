@@ -12,4 +12,8 @@
 #
 class Project < ApplicationRecord
   validates_presence_of :square_location_id
+
+  def amount_raised
+    PaymentIntent.where(project_id: id, successful: true).map { |pi| pi.amount }.sum
+  end
 end
