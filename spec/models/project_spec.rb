@@ -19,20 +19,6 @@ RSpec.describe Project, type: :model do
     create(:project)
   end
 
-  let(:line_items) do
-    [
-      {
-        amount: 6000,
-        currency: 'usd',
-        item_type: 'donation',
-        quantity: 1,
-        project_id: project.id,
-        seller_id: seller_id,
-        is_distribution: is_distribution
-      }
-    ]
-  end
-
   describe '#amount_raised' do
     before do
         create(:payment_intent, :with_project, :with_line_items, successful: true)
