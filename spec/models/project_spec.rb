@@ -21,10 +21,10 @@ RSpec.describe Project, type: :model do
 
   describe '#amount_raised' do
     before do
-        create(:payment_intent, :with_project, :with_line_items, successful: true)
-        create(:payment_intent, :with_project, :with_line_items, successful: true)
-        create(:payment_intent, :with_project, :with_line_items, successful: false)
-        create(:payment_intent, :with_line_items, successful: true)
+      create(:payment_intent, :with_project, :with_line_items, successful: true)
+      create(:payment_intent, :with_project, :with_line_items, successful: true)
+      create(:payment_intent, :with_project, :with_line_items, successful: false)
+      create(:payment_intent, :with_line_items, successful: true)
     end
 
     context 'with no payment intents' do

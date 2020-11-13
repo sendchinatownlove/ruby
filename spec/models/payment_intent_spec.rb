@@ -65,7 +65,7 @@ RSpec.describe PaymentIntent, type: :model do
           :payment_intent,
           :with_line_items,
           square_payment_id: 'square-id',
-          square_location_id: square_location_id,
+          square_location_id: square_location_id
         )
       end
 
@@ -78,7 +78,6 @@ RSpec.describe PaymentIntent, type: :model do
       expect(payment_intent.amount).to eq(0)
     end
   end
-
 
   context 'without square_location_id' do
     let(:square_location_id) { nil }

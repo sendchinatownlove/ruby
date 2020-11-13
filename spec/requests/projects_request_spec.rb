@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-RSpec.describe "Projects", type: :request do
-
+RSpec.describe 'Projects', type: :request do
   describe 'GET /projects/:id' do
     let!(:project) { create :project }
     let(:id) { project.id }

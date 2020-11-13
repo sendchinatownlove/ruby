@@ -78,7 +78,7 @@ class CampaignsController < ApplicationController
 
     ret = params.permit(
       :distributor_id,
-      :seller_id,
+      :seller_id
     )
 
     set_campaign

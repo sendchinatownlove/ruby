@@ -46,6 +46,7 @@ class PaymentIntent < ApplicationRecord
 
   def amount
     return 0 if line_items.nil?
+
     line_items_json = JSON.parse(line_items)
     line_items_json.map { |li| li['amount'].to_i }.sum
   end
