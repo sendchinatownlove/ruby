@@ -36,7 +36,8 @@ require 'rails_helper'
 
 RSpec.describe Campaign, type: :model do
   it { should belong_to(:location) }
-  it { should belong_to(:seller) }
+  it { should belong_to(:seller).optional }
+  it { should belong_to(:project).optional }
   it { should belong_to(:distributor) }
 
   before { freeze_time }

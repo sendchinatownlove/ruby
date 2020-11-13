@@ -35,8 +35,10 @@
 class Campaign < ApplicationRecord
   # TODO(justintmckibben): Make the default value of valid = true
   belongs_to :location
-  belongs_to :seller
+  belongs_to :seller, optional: true
+  belongs_to :project, optional: true
   belongs_to :distributor
+  validate :has_project_xor_seller?
 
   scope :active, ->(active) { where(active: active) }
 
@@ -108,5 +110,12 @@ class Campaign < ApplicationRecord
              })
       .joins("join (#{GiftCardAmount.original_amounts_sql}) as la on la.gift_card_detail_id = gift_card_details.id")
       .sum(:value)
+  end
+
+  def has_project_xor_seller?
+    unless project.present? ^ seller.present?
+      errors.add(:project, 'Project or Seller must exist, but not both')
+      errors.add(:seller, 'Project or Seller must exist, but not both')
+    end
   end
 end
