@@ -120,9 +120,10 @@ class Campaign < ApplicationRecord
     PaymentIntent
       .joins(:campaign)
       .where(campaigns: {
-        id: id
+        campaign_id: id
       })
-      .sum(:line_items.value)
+      .map {$.amount}
+      .sum
   end
 
   # calculates the amount raised from gift cards
