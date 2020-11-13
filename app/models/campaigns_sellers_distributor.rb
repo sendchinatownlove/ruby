@@ -11,6 +11,7 @@
 #
 # Indexes
 #
+#  campaigns_sellers_distributors_unique                   (campaign_id,distributor_id,seller_id) UNIQUE
 #  index_campaigns_sellers_distributors_on_campaign_id     (campaign_id)
 #  index_campaigns_sellers_distributors_on_distributor_id  (distributor_id)
 #  index_campaigns_sellers_distributors_on_seller_id       (seller_id)

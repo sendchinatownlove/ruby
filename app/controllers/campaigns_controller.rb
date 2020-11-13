@@ -26,6 +26,12 @@ class CampaignsController < ApplicationController
     json_response(campaign_json)
   end
 
+  # POST /campaigns/:id/seller_distributor
+  def associate_seller_distributor
+    CampaignsSellersDistributor.create!(associate_seller_distributor_params)
+    json_response(campaign_json)
+  end
+
   private
 
   def create_params
@@ -66,6 +72,26 @@ class CampaignsController < ApplicationController
     )
   end
 
+  def associate_seller_distributor_params
+    params.require(:distributor_id)
+    params.require(:seller_id)
+
+    ret = params.permit(
+      :distributor_id,
+      :seller_id,
+    )
+
+    set_campaign
+    set_distributor
+    @seller = Seller.find(params[:seller_id])
+
+    ret[:campaign_id] = @campaign.id
+    ret[:distributor_id] = @distributor.id
+    ret[:seller_id] = @seller.id
+
+    ret
+  end
+
   def set_campaign
     @campaign = Campaign.find(params[:id])
   end
@@ -91,6 +117,7 @@ class CampaignsController < ApplicationController
     ret['amount_raised'] = campaign.amount_raised
     ret['last_contribution'] = campaign.last_contribution
     ret['seller_id'] = campaign.seller.seller_id
+    ret['seller_distributor_pairs'] = campaign.seller_distributor_pairs
     ret
   end
 
