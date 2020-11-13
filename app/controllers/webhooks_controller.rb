@@ -115,7 +115,7 @@ class WebhooksController < ApplicationController
 
     items = JSON.parse(payment_intent.line_items)
     recipient = payment_intent.recipient
-    is_donation = false
+    donation? = false
 
     items.each do |item_json|
       # TODO(jtmckibb): Add some tracking that tracks if it breaks somewhere
@@ -164,7 +164,7 @@ class WebhooksController < ApplicationController
         merchant_name = Seller.find_by(seller_id: seller_id).name
         case item_json['item_type']
         when 'donation'
-          is_donation ||= true
+          donation? ||= true
 
           WebhookManager::DonationCreator.call(
             {
@@ -174,13 +174,14 @@ class WebhooksController < ApplicationController
             }
           )
         when 'gift_card'
-          gift_a_meal = payment_intent.campaign.present?
-          is_mega_gam = gift_a_meal.project_id != nil
+          mega_gam? = payment_intent.campaign.project.present?
 
-          if is_mega_gam
+          if mega_gam?
             payment_intent.successful = true
             payment_intent.save!
           else
+            gift_a_meal = payment_intent.campaign.present?
+
             # TODO(justintmckibben): Relate the gift cards to the campaign
             gift_card_detail = WebhookManager::GiftCardCreator.call(
               {
@@ -192,7 +193,7 @@ class WebhooksController < ApplicationController
             )
             # Gift a meal purchases are technically donations to the purchaser
             if gift_a_meal
-              is_donation ||= true
+              donation? ||= true
             else
               EmailManager::GiftCardReceiptSender.call(
                 {
@@ -214,7 +215,7 @@ class WebhooksController < ApplicationController
       end
     end
 
-    if is_donation
+    if donation?
       # Send separate email for each seller.
       grouped_items = items.group_by { |li| li['seller_id'] }
       grouped_items.each_key do |sid|
