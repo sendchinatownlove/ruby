@@ -14,10 +14,6 @@ FactoryBot.define do
     association :campaign
   end
 
-  trait :with_project do
-    association :project
-  end
-
   trait :with_line_items do
     line_items do
       %(

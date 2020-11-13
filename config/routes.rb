@@ -101,8 +101,6 @@ Rails.application.routes.draw do
   resources :participating_sellers do
     resources :tickets, controller: 'participating_seller_tickets'
   end
-  resources :projects do
-  end
   resources :sellers do
     resources :menu_items, :items, :open_hour, :delivery_options
     resources :locations, controller: 'seller_locations'
