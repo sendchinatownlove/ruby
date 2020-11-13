@@ -175,29 +175,35 @@ class WebhooksController < ApplicationController
           )
         when 'gift_card'
           gift_a_meal = payment_intent.campaign.present?
+          is_mega_gam = gift_a_meal.project_id != nil
 
-          # TODO(justintmckibben): Relate the gift cards to the campaign
-          gift_card_detail = WebhookManager::GiftCardCreator.call(
-            {
-              amount: amount,
-              seller_id: seller_id,
-              payment_intent: payment_intent,
-              single_use: gift_a_meal
-            }
-          )
-          # Gift a meal purchases are technically donations to the purchaser
-          if gift_a_meal
-            is_donation ||= true
+          if is_mega_gam
+            payment_intent.successful = true
+            payment_intent.save!
           else
-            EmailManager::GiftCardReceiptSender.call(
+            # TODO(justintmckibben): Relate the gift cards to the campaign
+            gift_card_detail = WebhookManager::GiftCardCreator.call(
               {
-                payment_intent: payment_intent,
                 amount: amount,
-                merchant: merchant_name,
-                gift_card_detail: gift_card_detail,
-                email: payment_intent.recipient.email
+                seller_id: seller_id,
+                payment_intent: payment_intent,
+                single_use: gift_a_meal
               }
             )
+            # Gift a meal purchases are technically donations to the purchaser
+            if gift_a_meal
+              is_donation ||= true
+            else
+              EmailManager::GiftCardReceiptSender.call(
+                {
+                  payment_intent: payment_intent,
+                  amount: amount,
+                  merchant: merchant_name,
+                  gift_card_detail: gift_card_detail,
+                  email: payment_intent.recipient.email
+                }
+              )
+            end
           end
         else
           raise(
