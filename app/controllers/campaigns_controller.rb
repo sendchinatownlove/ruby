@@ -115,6 +115,7 @@ class CampaignsController < ApplicationController
   def campaign_json(campaign: @campaign)
     ret = campaign.as_json
     ret['amount_raised'] = campaign.amount_raised
+    ret['amount_allocated'] = campaign.amount_allocated
     ret['last_contribution'] = campaign.last_contribution
     ret['seller_id'] = campaign.seller.seller_id
     ret['seller_distributor_pairs'] = campaign.seller_distributor_pairs
