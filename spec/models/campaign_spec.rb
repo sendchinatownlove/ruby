@@ -18,6 +18,7 @@
 #  distributor_id     :bigint
 #  location_id        :bigint           not null
 #  nonprofit_id       :bigint
+#  project_id         :bigint
 #  seller_id          :bigint
 #
 # Indexes
@@ -25,11 +26,13 @@
 #  index_campaigns_on_distributor_id  (distributor_id)
 #  index_campaigns_on_location_id     (location_id)
 #  index_campaigns_on_nonprofit_id    (nonprofit_id)
+#  index_campaigns_on_project_id      (project_id)
 #  index_campaigns_on_seller_id       (seller_id)
 #
 # Foreign Keys
 #
 #  fk_rails_...  (location_id => locations.id)
+#  fk_rails_...  (project_id => projects.id)
 #  fk_rails_...  (seller_id => sellers.id)
 #
 require 'rails_helper'
