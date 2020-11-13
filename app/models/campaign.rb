@@ -40,10 +40,23 @@ class Campaign < ApplicationRecord
   scope :active, ->(active) { where(active: active) }
 
   def amount_raised
-    # NB(justintmckibben): Currently campaigns are designed only for GAM and
-    # therefore only create gift cards. For campaigns where we don't need the
-    # gift cards aka we distribute hot meals, we *could* create donations
-    # instead of gift cards
+    if mega_gam?
+      # For Mega GAM campaigns, we don't generate items right away, so we rely
+      # on the payment_intents table to determine the total amount raised.
+      payment_intent_amount
+    else
+      # NB(justintmckibben): Currently campaigns are designed only for GAM and
+      # therefore only create gift cards. For campaigns where we don't need the
+      # gift cards aka we distribute hot meals, we *could* create donations
+      # instead of gift cards
+      gift_card_amount
+    end
+  end
+
+  def amount_allocated
+    # Amount allocated is always equal to the gift card amount. We allocate
+    # payments immediately for regular GAM. For Mega GAM, we allocate after
+    # the campaign is over.
     gift_card_amount
   end
 
@@ -96,6 +109,21 @@ class Campaign < ApplicationRecord
   end
 
   private
+
+  def mega_gam?
+    project_id != nil
+  end
+
+  # Calculates the amount raised in the payment intent table.
+  def payment_intent_amount
+    # TODO CHECK SYNTAX
+    PaymentIntent
+      .joins(:campaign)
+      .where(campaigns: {
+        id: id
+      })
+      .sum(:line_items.value)
+  end
 
   # calculates the amount raised from gift cards
   def gift_card_amount
