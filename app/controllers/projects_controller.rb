@@ -3,6 +3,10 @@
 class ProjectsController < ApplicationController
   before_action :set_project, only: %i[show update]
 
+  def index
+    json_response( Project.all )
+  end
+
   # GET /projects/:id
   def show
     json_response(project_json)

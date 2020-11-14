@@ -459,7 +459,7 @@ end
   deliveryOption.update!(deliveryOptionAttr)
 
   delivTypeAttr[:delivery_option_id] = deliveryOption[:id]
-  DeliveryType.find_or_create_by!(id: delivTypeAttr[:id], delivery_option_id: delivTypeAttr[:delivery_option_id], name: delivTypeAttr[:name]).update(delivTypeAttr)
+  # DeliveryType.find_or_create_by!(id: delivTypeAttr[:id], delivery_option_id: delivTypeAttr[:delivery_option_id], name: delivTypeAttr[:name]).update(delivTypeAttr)
 end
 
 # Project
