@@ -7,4 +7,3 @@ FactoryBot.define do
       association :seller
     end
   end
-  

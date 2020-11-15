@@ -18,25 +18,27 @@
 #  distributor_id     :bigint
 #  location_id        :bigint           not null
 #  nonprofit_id       :bigint
-#  seller_id          :bigint           not null
+#  project_id         :bigint
+#  seller_id          :bigint
 #
 # Indexes
 #
 #  index_campaigns_on_distributor_id  (distributor_id)
 #  index_campaigns_on_location_id     (location_id)
 #  index_campaigns_on_nonprofit_id    (nonprofit_id)
+#  index_campaigns_on_project_id      (project_id)
 #  index_campaigns_on_seller_id       (seller_id)
 #
 # Foreign Keys
 #
 #  fk_rails_...  (location_id => locations.id)
+#  fk_rails_...  (project_id => projects.id)
 #  fk_rails_...  (seller_id => sellers.id)
 #
 require 'rails_helper'
 
 RSpec.describe Campaign, type: :model do
   it { should belong_to(:location) }
-  it { should belong_to(:seller) }
   it { should belong_to(:distributor) }
 
   before { freeze_time }
@@ -140,6 +142,65 @@ RSpec.describe Campaign, type: :model do
       end
 
       expect(campaign.seller_distributor_pairs).to eq(pairs)
+    end
+  end
+
+  let(:project) do
+    create :project
+  end
+
+  let(:seller) do
+    create :seller
+  end
+
+  context 'when creating a campaign with only a project' do
+    let(:campaign) do
+      create(:campaign, seller: nil, project: project)
+    end
+
+    it 'is successful' do
+      campaign
+    end
+  end
+
+  context 'when creating a campaign with only a seller' do
+    let(:campaign) do
+      # factory associates a seller by default
+      create :campaign
+    end
+
+    it 'is successful' do
+      campaign
+    end
+  end
+
+  context 'when creating a campaign with a project and seller' do
+    let(:campaign) do
+      Campaign.create(project: project, seller: seller)
+    end
+
+    subject { campaign }
+
+    it 'throws an error' do
+      expect(subject).to_not be_valid
+
+      expect(subject.errors[:seller]).to include('Project or Seller must exist, but not both')
+      expect(subject.errors[:project]).to include('Project or Seller must exist, but not both')
+    end
+  end
+
+  context 'when creating an campaign with neither a project nor a seller' do
+    let(:campaign) do
+      Campaign.create(project: nil, seller: nil)
+    end
+
+    subject { campaign }
+
+    it 'throws an error' do
+      expect(subject).to_not be_valid
+
+      expect(subject.errors[:project]).to include('Project or Seller must exist, but not both')
+      expect(subject.errors[:seller]).to include('Project or Seller must exist, but not both')
     end
   end
 end
