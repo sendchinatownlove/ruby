@@ -42,6 +42,7 @@ class Campaign < ApplicationRecord
   belongs_to :project, optional: true
   belongs_to :distributor
   has_many :campaigns_sellers_distributors
+  has_many :payment_intent
   validate :has_project_xor_seller?
 
   scope :active, ->(active) { where(active: active) }
@@ -125,9 +126,7 @@ class Campaign < ApplicationRecord
   def payment_intent_amount
     PaymentIntent
       .joins(:campaign)
-      .where(campaigns: {
-        campaign_id: id
-      })
+      .where('campaigns.id=? AND successful=true', id)
       .map { |payment_intent| payment_intent.amount }
       .sum
   end
