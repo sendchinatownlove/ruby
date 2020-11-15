@@ -7,7 +7,11 @@ RSpec.describe 'Campaigns API', type: :request do
     @seller = create :seller
     @project = create :project
     @location = create(:location, seller_id: @seller.id)
-    @campaign = create(
+  end
+
+  let!(:distributor) { create :distributor }
+  let!(:campaign) do
+    create(
       :campaign,
       active: true,
       seller_id: @seller.id,
@@ -15,40 +19,43 @@ RSpec.describe 'Campaigns API', type: :request do
       location_id: @location.id
     )
   end
-  let(:distributor) { create :distributor }
 
   context 'GET /campaigns' do
     context 'Fetching all campaigns' do
-      before { get '/campaigns' }
+      subject { get '/campaigns' }
 
       it 'Returns campaigns' do
+        subject
         expect(json).not_to be_empty
         expect(json.size).to eq(1)
       end
 
       it 'Returns 200' do
+        subject
         expect(response).to have_http_status(200)
       end
     end
   end
 
   context 'GET /campaigns/:id' do
-    before { get "/campaigns/#{campaign_id}" }
+    subject { get "/campaigns/#{campaign_id}" }
 
     context 'With a missing id' do
       let(:campaign_id) { 'missing_id' }
 
       it 'Returns 404' do
+        subject
         expect(response).to have_http_status(404)
       end
     end
 
     context 'With valid id' do
-      let(:campaign_id) { @campaign.id }
+      let(:campaign_id) { campaign.id }
 
       it 'Returns the campaign' do
+        subject
         expect(json).not_to be_empty
-        expect(json['id']).to eq(@campaign.id)
+        expect(json['id']).to eq(campaign.id)
 
         # Has original fields
         expect(json['amount_raised']).to eq 0
@@ -57,7 +64,30 @@ RSpec.describe 'Campaigns API', type: :request do
       end
 
       it 'Returns 200' do
+        subject
         expect(response).to have_http_status(200)
+      end
+    end
+
+    context 'With multiple sellers and distributors' do
+      let!(:campaign) do
+        create(
+          :campaign,
+          :with_sellers_distributors,
+          active: true,
+          location_id: @location.id,
+        )
+      end
+
+      let(:campaign_id) { campaign.id }
+
+      it 'Returns the campaign with the correct number of seller_distributor_pairs' do
+        subject
+        expect(json).not_to be_empty
+        expect(json['id']).to eq(campaign.id)
+
+        expect(json['seller_distributor_pairs']).not_to be_nil
+        expect(json['seller_distributor_pairs'].size).to eq 2
       end
     end
   end
@@ -243,7 +273,7 @@ RSpec.describe 'Campaigns API', type: :request do
     end
 
     context 'With a valid id' do
-      let(:campaign_id) { @campaign.id }
+      let(:campaign_id) { campaign.id }
       let(:body) do
         {
           description: 'Campaign description',
@@ -266,10 +296,43 @@ RSpec.describe 'Campaigns API', type: :request do
       end
 
       it 'Updates the fields in the record' do
-        updated_campaign = Campaign.find(@campaign.id)
+        updated_campaign = Campaign.find(campaign.id)
         expect(updated_campaign.description).to eq(body[:description])
         expect(updated_campaign.gallery_image_urls).to eq(body[:gallery_image_urls])
       end
+    end
+  end
+
+  context 'POST /campaigns/:id/seller_distributor' do
+    let!(:distributor) { create :distributor }
+    let!(:seller) { create :seller }
+
+    subject do
+      post(
+        "/campaigns/#{campaign.id}/seller_distributor",
+        params: {
+          distributor_id: distributor.id,
+          seller_id: seller.id,
+        },
+        as: :json
+      )
+    end
+
+    it 'Creates seller and distributor pair' do
+      subject
+      expect(json['seller_distributor_pairs']).to eq [{
+        'distributor_id' => distributor.id,
+        'distributor_image_url' => distributor.image_url,
+        'distributor_name' => distributor.name,
+        'seller_id' => seller.id,
+        'seller_image_url' => seller.hero_image_url,
+        'seller_name' => seller.name
+      }]
+    end
+
+    it 'Returns status code 200' do
+      subject
+      expect(response).to have_http_status(200)
     end
   end
 end

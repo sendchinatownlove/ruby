@@ -41,6 +41,7 @@ class Campaign < ApplicationRecord
   belongs_to :seller, optional: true
   belongs_to :project, optional: true
   belongs_to :distributor
+  has_many :campaigns_sellers_distributors
   validate :has_project_xor_seller?
 
   scope :active, ->(active) { where(active: active) }

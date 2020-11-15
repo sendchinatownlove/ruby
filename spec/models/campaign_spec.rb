@@ -123,6 +123,28 @@ RSpec.describe Campaign, type: :model do
     end
   end
 
+  context 'with seller distributor pairs' do
+    let!(:campaign) do
+      create(:campaign, :with_sellers_distributors)
+    end
+
+    it 'gets seller distributor pairs' do
+      csds = campaign.campaigns_sellers_distributors
+      pairs = csds.map do |csd|
+        {
+          'distributor_id' => csd.distributor.id,
+          'distributor_image_url' => csd.distributor.image_url,
+          'distributor_name' => csd.distributor.name,
+          'seller_id' => csd.seller.id,
+          'seller_image_url' => csd.seller.hero_image_url,
+          'seller_name' => csd.seller.name
+        }
+      end
+
+      expect(campaign.seller_distributor_pairs).to eq(pairs)
+    end
+  end
+
   let(:project) do
     create :project
   end
