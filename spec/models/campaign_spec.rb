@@ -129,8 +129,6 @@ RSpec.describe Campaign, type: :model do
     it 'gets seller distributor pairs' do
       csds = campaign.campaigns_sellers_distributors
       pairs = csds.map do |csd|
-        distributor = csd.distributor
-        seller = csd.seller
         {
           'distributor_id' => csd.distributor.id,
           'distributor_image_url' => csd.distributor.image_url,
