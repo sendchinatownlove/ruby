@@ -153,6 +153,17 @@ RSpec.describe 'Campaigns API', type: :request do
           end
         end
 
+        context 'missing both seller and project ids' do
+          let(:location_id) { @location.id }
+          let(:seller_id) { @seller.seller_id }
+          let(:project_id) { @project.id }
+          let(:distributor_id) { distributor.id }
+
+          it 'returns status code 422' do
+            expect(response).to have_http_status(422)
+          end
+        end
+
         context 'with valid parameters and seller_id' do
           let(:location_id) { @location.id }
           let(:seller_id) { @seller.seller_id }
@@ -177,8 +188,8 @@ RSpec.describe 'Campaigns API', type: :request do
             expect(campaign.amount_raised).to eq 0
             expect(campaign.price_per_meal).to eq 500
 
-            expect(campaign.active).to eq false
-            expect(campaign.valid).to eq true
+            expect(campaign.active).to be false
+            expect(campaign.valid).to be true
           end
         end
 
@@ -206,8 +217,8 @@ RSpec.describe 'Campaigns API', type: :request do
             expect(campaign.amount_raised).to eq 0
             expect(campaign.price_per_meal).to eq 500
 
-            expect(campaign.active).to eq false
-            expect(campaign.valid).to eq true
+            expect(campaign.active).to be false
+            expect(campaign.valid).to be true
           end
         end
       end
