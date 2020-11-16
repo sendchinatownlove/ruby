@@ -183,7 +183,7 @@ RSpec.describe 'Campaigns API', type: :request do
           end
         end
 
-        context 'missing both seller and project ids' do
+        context 'with both seller and project ids' do
           let(:location_id) { @location.id }
           let(:seller_id) { @seller.seller_id }
           let(:project_id) { @project.id }
