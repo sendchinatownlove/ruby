@@ -4,11 +4,14 @@
 #
 # Table name: distributors
 #
-#  id          :bigint           not null, primary key
-#  image_url   :string
-#  name        :string
-#  website_url :string
-#  contact_id  :bigint
+#  id                         :bigint           not null, primary key
+#  gift_card_login_expires_at :datetime
+#  gift_card_login_state      :string           default("new"), not null
+#  gift_card_login_token      :string
+#  image_url                  :string
+#  name                       :string
+#  website_url                :string
+#  contact_id                 :bigint
 #
 # Indexes
 #

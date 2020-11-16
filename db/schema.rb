@@ -83,6 +83,9 @@ ActiveRecord::Schema.define(version: 2020_11_13_001940) do
     t.string "image_url"
     t.bigint "contact_id"
     t.string "name"
+    t.string "gift_card_login_token"
+    t.datetime "gift_card_login_expires_at"
+    t.string "gift_card_login_state", default: "new", null: false
     t.index ["contact_id"], name: "index_distributors_on_contact_id"
   end
 
