@@ -27,6 +27,7 @@ ActiveRecord::Schema.define(version: 2020_11_13_001940) do
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "distributor_id"
     t.integer "target_amount", default: 100000, null: false
+    t.integer "fee_id"
     t.integer "price_per_meal", default: 500
     t.bigint "nonprofit_id"
     t.datetime "start_date"
@@ -101,10 +102,10 @@ ActiveRecord::Schema.define(version: 2020_11_13_001940) do
   end
 
   create_table "fees", force: :cascade do |t|
-    t.decimal "multiplier", default: "0.0"
+    t.decimal "multiplier", precision: 6, scale: 4, default: "0.0"
     t.boolean "active", default: true
-    t.bigint "seller_id", null: false
-    t.index ["seller_id"], name: "index_fees_on_seller_id"
+    t.decimal "flat_cost", precision: 8, scale: 2, default: "0.0"
+    t.string "name"
   end
 
   create_table "gift_card_amounts", force: :cascade do |t|

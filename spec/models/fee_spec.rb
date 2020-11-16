@@ -4,18 +4,16 @@
 #
 # Table name: fees
 #
-#  id         :bigint           not null, primary key
-#  active     :boolean          default(TRUE)
-#  multiplier :decimal(, )      default(0.0)
-#  seller_id  :bigint           not null
-#
-# Indexes
-#
-#  index_fees_on_seller_id  (seller_id)
+#  id                  :bigint           not null, primary key
+#  active              :boolean          default(TRUE)
+#  covered_by_customer :boolean
+#  flat_cost           :decimal(8, 2)    default(0.0)
+#  multiplier          :decimal(6, 4)    default(0.0)
+#  name                :string
 #
 require 'rails_helper'
 
 RSpec.describe Fee, type: :model do
   # Association test
-  it { should belong_to(:seller) }
+  it { should have_and_belong_to_many(:campaigns) }
 end

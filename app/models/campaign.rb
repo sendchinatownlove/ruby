@@ -16,6 +16,7 @@
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  distributor_id     :bigint
+#  fee_id             :integer
 #  location_id        :bigint           not null
 #  nonprofit_id       :bigint
 #  project_id         :bigint
@@ -41,6 +42,7 @@ class Campaign < ApplicationRecord
   belongs_to :seller, optional: true
   belongs_to :project, optional: true
   belongs_to :distributor
+  has_and_belongs_to_many :fees
   has_many :campaigns_sellers_distributors
   validate :has_project_xor_seller?
 

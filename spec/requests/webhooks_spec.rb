@@ -2,6 +2,7 @@
 
 require 'rails_helper'
 
+
 RSpec.describe 'Webhooks API', type: :request do
   before { freeze_time }
 
@@ -94,8 +95,8 @@ RSpec.describe 'Webhooks API', type: :request do
           let(:item_type) { 'donation' }
 
           it 'creates pool donation' do
-            expect(seller1.donation_amount).to eq(25_00)
-            expect(seller2.donation_amount).to eq(35_00)
+            expect(seller1.donation_amount).to eq(amount.floor/2 + amount.floor%2)
+            expect(seller2.donation_amount).to eq(10_00 + amount/2)
           end
 
           it 'returns status code 200' do
@@ -104,12 +105,13 @@ RSpec.describe 'Webhooks API', type: :request do
         end
 
         context 'with non-divisible number round' do
-          let(:amount) { 3 }
+          let(:amount) { 1007 }
           let(:item_type) { 'donation' }
 
-          it 'creates pool donation and distrubutes the cents' do
-            expect(seller1.donation_amount).to eq(2)
-            expect(seller2.donation_amount).to eq(10_01)
+          it 'creates pool donation and distributes the cents' do
+            expect(seller1.donation_amount).to eq(amount/2.floor + 1)
+            expect(seller2.donation_amount).to eq(1000 + amount/2)
+            expect(amount + 1000).to eq(seller1.donation_amount + seller2.donation_amount)
           end
 
           it 'returns status code 200' do
@@ -126,10 +128,10 @@ RSpec.describe 'Webhooks API', type: :request do
             let(:amount) { 335 }
             let(:item_type) { 'donation' }
 
-            it 'creates pool donation and distrubutes the cents' do
-              expect(seller1.donation_amount).to eq(1_12)
-              expect(seller3.donation_amount).to eq(1_12)
-              expect(seller2.donation_amount).to eq(11_11)
+            it 'creates pool donation and distributes the cents' do
+              expect(seller1.donation_amount).to eq(3_35/3.floor + 1)
+              expect(seller3.donation_amount).to eq(3_35/3.floor + 1)
+              expect(seller2.donation_amount).to eq(10_00 + 3_35/3)
             end
 
             it 'returns status code 200' do
@@ -161,7 +163,7 @@ RSpec.describe 'Webhooks API', type: :request do
         it 'creates a donation' do
           donation_detail = DonationDetail.last
           expect(donation_detail).not_to be_nil
-          expect(donation_detail['amount']).to eq(5000)
+          expect(donation_detail['amount']).to eq(50_00)
 
           item = Item.find(donation_detail['item_id'])
           expect(item).not_to be_nil
@@ -303,12 +305,11 @@ RSpec.describe 'Webhooks API', type: :request do
     describe 'gift cards' do
       def verify_gift_card(item:, single_use:, amount:)
         expect(item).not_to be_nil
-
         gift_card_detail = item.gift_card_detail
+        expect(gift_card_detail.amount).to eq(amount)
         expect(gift_card_detail).not_to be_nil
         expect(gift_card_detail.single_use).to eq(single_use)
         expect(gift_card_detail.expiration).to eq(Date.today + 1.year)
-        expect(gift_card_detail.amount).to eq(amount)
 
         payment_intent = item.payment_intent
         expect(payment_intent.successful).to be true

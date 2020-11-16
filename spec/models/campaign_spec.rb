@@ -16,6 +16,7 @@
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  distributor_id     :bigint
+#  fee_id             :integer
 #  location_id        :bigint           not null
 #  nonprofit_id       :bigint
 #  project_id         :bigint
