@@ -43,7 +43,8 @@ class ChargesController < ApplicationController
                                             email: email,
                                             name: charge_params[:name],
                                             line_items: line_items,
-                                            metadata: charge_params[:metadata])
+                                            metadata: charge_params[:metadata],
+                                            project_id: project_id)
 
     # Save the contact information only if the charge is succesful
     # Use a job to avoid blocking the request
@@ -147,7 +148,8 @@ class ChargesController < ApplicationController
     email:,
     name:,
     line_items:,
-    metadata:
+    metadata:,
+    project_id:
   )
     square_location_id = if gift_a_meal? && @seller.non_profit_location_id.present?
                            @seller.non_profit_location_id
@@ -196,7 +198,8 @@ class ChargesController < ApplicationController
       purchaser: purchaser,
       recipient: recipient,
       campaign: @campaign,
-      metadata: metadata
+      metadata: metadata,
+      project: Project.find_by(id: project_id)
     )
 
     api_response

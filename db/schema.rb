@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_09_044231) do
+ActiveRecord::Schema.define(version: 2020_11_13_001940) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -22,23 +22,33 @@ ActiveRecord::Schema.define(version: 2020_11_09_044231) do
     t.string "description"
     t.string "gallery_image_urls", array: true
     t.bigint "location_id", null: false
-    t.bigint "seller_id", null: false
+    t.bigint "seller_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "distributor_id"
     t.integer "target_amount", default: 100000, null: false
-    t.integer "price_per_meal", default: 500, null: false
     t.integer "fee_id"
+    t.integer "price_per_meal", default: 500
     t.bigint "nonprofit_id"
+    t.datetime "start_date"
+    t.bigint "project_id"
     t.index ["distributor_id"], name: "index_campaigns_on_distributor_id"
     t.index ["location_id"], name: "index_campaigns_on_location_id"
     t.index ["nonprofit_id"], name: "index_campaigns_on_nonprofit_id"
+    t.index ["project_id"], name: "index_campaigns_on_project_id"
     t.index ["seller_id"], name: "index_campaigns_on_seller_id"
   end
 
-  create_table "campaigns_fees", id: false, force: :cascade do |t|
+  create_table "campaigns_sellers_distributors", force: :cascade do |t|
     t.bigint "campaign_id", null: false
-    t.bigint "fee_id", null: false
+    t.bigint "seller_id", null: false
+    t.bigint "distributor_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["campaign_id", "distributor_id", "seller_id"], name: "campaigns_sellers_distributors_unique", unique: true
+    t.index ["campaign_id"], name: "index_campaigns_sellers_distributors_on_campaign_id"
+    t.index ["distributor_id"], name: "index_campaigns_sellers_distributors_on_distributor_id"
+    t.index ["seller_id"], name: "index_campaigns_sellers_distributors_on_seller_id"
   end
 
   create_table "contacts", force: :cascade do |t|
@@ -218,8 +228,10 @@ ActiveRecord::Schema.define(version: 2020_11_09_044231) do
     t.bigint "fee_id"
     t.bigint "campaign_id"
     t.text "metadata"
+    t.bigint "project_id"
     t.index ["campaign_id"], name: "index_payment_intents_on_campaign_id"
     t.index ["fee_id"], name: "index_payment_intents_on_fee_id"
+    t.index ["project_id"], name: "index_payment_intents_on_project_id"
     t.index ["purchaser_id"], name: "index_payment_intents_on_purchaser_id"
     t.index ["recipient_id"], name: "index_payment_intents_on_recipient_id"
   end
@@ -309,7 +321,11 @@ ActiveRecord::Schema.define(version: 2020_11_09_044231) do
   end
 
   add_foreign_key "campaigns", "locations"
+  add_foreign_key "campaigns", "projects"
   add_foreign_key "campaigns", "sellers"
+  add_foreign_key "campaigns_sellers_distributors", "campaigns"
+  add_foreign_key "campaigns_sellers_distributors", "distributors"
+  add_foreign_key "campaigns_sellers_distributors", "sellers"
   add_foreign_key "delivery_options", "sellers"
   add_foreign_key "delivery_types", "delivery_options"
   add_foreign_key "donation_details", "items"
@@ -327,6 +343,7 @@ ActiveRecord::Schema.define(version: 2020_11_09_044231) do
   add_foreign_key "payment_intents", "campaigns"
   add_foreign_key "payment_intents", "contacts", column: "purchaser_id"
   add_foreign_key "payment_intents", "contacts", column: "recipient_id"
+  add_foreign_key "payment_intents", "projects"
   add_foreign_key "refunds", "payment_intents"
   add_foreign_key "tickets", "contacts"
   add_foreign_key "tickets", "participating_sellers"

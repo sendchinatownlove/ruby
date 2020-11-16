@@ -9,7 +9,8 @@
 #  description        :string
 #  end_date           :datetime         not null
 #  gallery_image_urls :string           is an Array
-#  price_per_meal     :integer          default(500), not null
+#  price_per_meal     :integer          default(500)
+#  start_date         :datetime
 #  target_amount      :integer          default(100000), not null
 #  valid              :boolean          default(TRUE)
 #  created_at         :datetime         not null
@@ -18,25 +19,27 @@
 #  fee_id             :integer
 #  location_id        :bigint           not null
 #  nonprofit_id       :bigint
-#  seller_id          :bigint           not null
+#  project_id         :bigint
+#  seller_id          :bigint
 #
 # Indexes
 #
 #  index_campaigns_on_distributor_id  (distributor_id)
 #  index_campaigns_on_location_id     (location_id)
 #  index_campaigns_on_nonprofit_id    (nonprofit_id)
+#  index_campaigns_on_project_id      (project_id)
 #  index_campaigns_on_seller_id       (seller_id)
 #
 # Foreign Keys
 #
 #  fk_rails_...  (location_id => locations.id)
+#  fk_rails_...  (project_id => projects.id)
 #  fk_rails_...  (seller_id => sellers.id)
 #
 require 'rails_helper'
 
 RSpec.describe Campaign, type: :model do
   it { should belong_to(:location) }
-  it { should belong_to(:seller) }
   it { should belong_to(:distributor) }
 
   before { freeze_time }
@@ -118,6 +121,87 @@ RSpec.describe Campaign, type: :model do
     it 'returns gift card amounts' do
       expect(campaign.amount_raised).to eq(100_00)
       expect(campaign.last_contribution).to eq(Time.current + 1.day)
+    end
+  end
+
+  context 'with seller distributor pairs' do
+    let!(:campaign) do
+      create(:campaign, :with_sellers_distributors)
+    end
+
+    it 'gets seller distributor pairs' do
+      csds = campaign.campaigns_sellers_distributors
+      pairs = csds.map do |csd|
+        {
+          'distributor_id' => csd.distributor.id,
+          'distributor_image_url' => csd.distributor.image_url,
+          'distributor_name' => csd.distributor.name,
+          'seller_id' => csd.seller.id,
+          'seller_image_url' => csd.seller.hero_image_url,
+          'seller_name' => csd.seller.name
+        }
+      end
+
+      expect(campaign.seller_distributor_pairs).to eq(pairs)
+    end
+  end
+
+  let(:project) do
+    create :project
+  end
+
+  let(:seller) do
+    create :seller
+  end
+
+  context 'when creating a campaign with only a project' do
+    let(:campaign) do
+      create(:campaign, seller: nil, project: project)
+    end
+
+    it 'is successful' do
+      campaign
+    end
+  end
+
+  context 'when creating a campaign with only a seller' do
+    let(:campaign) do
+      # factory associates a seller by default
+      create :campaign
+    end
+
+    it 'is successful' do
+      campaign
+    end
+  end
+
+  context 'when creating a campaign with a project and seller' do
+    let(:campaign) do
+      Campaign.create(project: project, seller: seller)
+    end
+
+    subject { campaign }
+
+    it 'throws an error' do
+      expect(subject).to_not be_valid
+
+      expect(subject.errors[:seller]).to include('Project or Seller must exist, but not both')
+      expect(subject.errors[:project]).to include('Project or Seller must exist, but not both')
+    end
+  end
+
+  context 'when creating an campaign with neither a project nor a seller' do
+    let(:campaign) do
+      Campaign.create(project: nil, seller: nil)
+    end
+
+    subject { campaign }
+
+    it 'throws an error' do
+      expect(subject).to_not be_valid
+
+      expect(subject.errors[:project]).to include('Project or Seller must exist, but not both')
+      expect(subject.errors[:seller]).to include('Project or Seller must exist, but not both')
     end
   end
 end
