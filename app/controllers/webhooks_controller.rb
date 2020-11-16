@@ -115,7 +115,7 @@ class WebhooksController < ApplicationController
 
     items = JSON.parse(payment_intent.line_items)
     recipient = payment_intent.recipient
-    donation? = false
+    is_donation = false
 
     items.each do |item_json|
       # TODO(jtmckibb): Add some tracking that tracks if it breaks somewhere
@@ -160,11 +160,14 @@ class WebhooksController < ApplicationController
             email: payment_intent.purchaser.email
           }
         )
+      elsif payment_intent.campaign.present? && payment_intent.campaign.mega_gam?
+        payment_intent.successful = true
+        payment_intent.save!
       else
         merchant_name = Seller.find_by(seller_id: seller_id).name
         case item_json['item_type']
         when 'donation'
-          donation? ||= true
+          is_donation ||= true
 
           WebhookManager::DonationCreator.call(
             {
@@ -174,37 +177,30 @@ class WebhooksController < ApplicationController
             }
           )
         when 'gift_card'
-          mega_gam? = payment_intent.campaign.project.present?
+          gift_a_meal = payment_intent.campaign.present?
 
-          if mega_gam?
-            payment_intent.successful = true
-            payment_intent.save!
+          # TODO(justintmckibben): Relate the gift cards to the campaign
+          gift_card_detail = WebhookManager::GiftCardCreator.call(
+            {
+              amount: amount,
+              seller_id: seller_id,
+              payment_intent: payment_intent,
+              single_use: gift_a_meal
+            }
+          )
+          # Gift a meal purchases are technically donations to the purchaser
+          if gift_a_meal
+            is_donation ||= true
           else
-            gift_a_meal = payment_intent.campaign.present?
-
-            # TODO(justintmckibben): Relate the gift cards to the campaign
-            gift_card_detail = WebhookManager::GiftCardCreator.call(
+            EmailManager::GiftCardReceiptSender.call(
               {
-                amount: amount,
-                seller_id: seller_id,
                 payment_intent: payment_intent,
-                single_use: gift_a_meal
+                amount: amount,
+                merchant: merchant_name,
+                gift_card_detail: gift_card_detail,
+                email: payment_intent.recipient.email
               }
             )
-            # Gift a meal purchases are technically donations to the purchaser
-            if gift_a_meal
-              donation? ||= true
-            else
-              EmailManager::GiftCardReceiptSender.call(
-                {
-                  payment_intent: payment_intent,
-                  amount: amount,
-                  merchant: merchant_name,
-                  gift_card_detail: gift_card_detail,
-                  email: payment_intent.recipient.email
-                }
-              )
-            end
           end
         else
           raise(
@@ -215,7 +211,7 @@ class WebhooksController < ApplicationController
       end
     end
 
-    if donation?
+    if is_donation
       # Send separate email for each seller.
       grouped_items = items.group_by { |li| li['seller_id'] }
       grouped_items.each_key do |sid|

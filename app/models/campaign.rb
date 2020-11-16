@@ -102,6 +102,10 @@ class Campaign < ApplicationRecord
     pairs
   end
 
+  def mega_gam?
+    project.present?
+  end
+
   private
 
   # calculates the amount raised from gift cards

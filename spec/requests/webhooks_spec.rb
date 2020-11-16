@@ -471,5 +471,62 @@ RSpec.describe 'Webhooks API', type: :request do
         end
       end
     end
+
+    describe 'mega gam campaign payments' do
+      context 'with mega gam' do
+        let!(:amount) { 5000 }
+        let!(:item_type) { nil }
+        let!(:seller_id) { nil }
+  
+        let!(:campaign) { create(:campaign, :with_project, seller: nil) }
+        
+        let!(:payment_intent) do
+          create(
+            :payment_intent,
+            square_payment_id: SecureRandom.uuid,
+            square_location_id: SecureRandom.uuid,
+            campaign: campaign,
+            recipient: recipient,
+            purchaser: purchaser,
+            line_items: line_items
+          )
+        end
+  
+        subject do
+          post(
+            '/webhooks',
+            headers: { 'HTTP_X_SQUARE_SIGNATURE' => 'www.squareup.com' },
+            params: {
+              'event_id': 'abcd-1234',
+              'type': 'payment.updated',
+              'data': {
+                'object': {
+                  'payment': {
+                    'id': payment_intent.square_payment_id,
+                    'location_id': payment_intent.square_location_id,
+                    'receipt_email': payment_intent.recipient.email,
+                    'status': 'COMPLETED'
+                  }
+                }
+              }
+            }.to_json
+          )
+        end
+          
+        it 'should mark payment intent as successful' do
+          subject
+          payment_intent_row = PaymentIntent.find(payment_intent.id)
+          expect(payment_intent_row.successful).to be true
+        end
+  
+        it 'should not create gift card' do
+          subject
+          expect(WebhookManager::GiftCardCreator).not_to receive(:call)
+          expect(EmailManager::GiftCardReceiptSender).not_to receive(:call)
+          expect(WebhookManager::DonationCreator).not_to receive(:call)
+          expect(EmailManager::DonationReceiptSender).not_to receive(:call)
+        end
+      end
+    end
   end
 end

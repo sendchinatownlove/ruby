@@ -15,5 +15,9 @@ FactoryBot.define do
         FactoryBot.create :campaigns_sellers_distributor, campaign_id: campaign.id
       end
     end
+
+    trait :with_project do
+      association :project
+    end
   end
 end
