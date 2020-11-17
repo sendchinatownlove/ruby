@@ -45,9 +45,11 @@ class DeliveryOptionsController < ApplicationController
   def update_params
     params.permit(
       :phone_number,
-      :url
+      :url,
+      :seller_id,
+      :delivery_type_id
     )
-    end
+  end
 
   def set_seller
     @seller = Seller.find_by!(seller_id: params[:seller_id])
