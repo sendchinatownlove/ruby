@@ -145,7 +145,7 @@ class WebhooksController < ApplicationController
         )
       elsif payment_intent.campaign.present? && payment_intent.campaign.mega_gam?
         save_payment_intent = true
-
+        
         EmailManager::MegaGamReceiptSender.call(
           {
             amount: amount,

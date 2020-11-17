@@ -526,7 +526,7 @@ RSpec.describe 'Webhooks API', type: :request do
             },
           }
         end
-  
+
         subject do
           post(
             '/webhooks',
@@ -542,7 +542,6 @@ RSpec.describe 'Webhooks API', type: :request do
         end
   
         it 'should send email' do
-          subject
           expect(EmailManager::MegaGamReceiptSender).to receive(:call)
             .once
             .with({
@@ -550,6 +549,7 @@ RSpec.describe 'Webhooks API', type: :request do
               campaign_name: campaign.project.name,
               payment_intent: payment_intent,
             })
+          subject
         end
 
         it 'should not create gift card or donation' do
