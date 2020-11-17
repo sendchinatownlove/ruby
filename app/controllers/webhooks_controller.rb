@@ -143,6 +143,16 @@ class WebhooksController < ApplicationController
             email: payment_intent.purchaser.email
           }
         )
+      elsif payment_intent.campaign.present? && payment_intent.campaign.mega_gam?
+        save_payment_intent = true
+        
+        EmailManager::MegaGamReceiptSender.call(
+          {
+            amount: amount,
+            campaign_name: Project.find(project_id).name,
+            payment_intent: payment_intent,
+          }
+        )
       elsif project_id.present?
         WebhookManager::DonationCreator.call(
           {
@@ -162,8 +172,6 @@ class WebhooksController < ApplicationController
             email: payment_intent.purchaser.email
           }
         )
-      elsif payment_intent.campaign.present? && payment_intent.campaign.mega_gam?
-        save_payment_intent = true
       else
         merchant_name = Seller.find_by(seller_id: seller_id).name
         case item_json['item_type']
