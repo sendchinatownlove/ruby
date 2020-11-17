@@ -79,6 +79,7 @@
 Rails.application.routes.draw do
   resources :nonprofits
   post 'contacts/:contact_id/lyft_rewards/:token/redeem', to: 'contact_lyft_rewards#redeem'
+  post 'campaigns/:id/seller_distributor', action: :associate_seller_distributor, controller: 'campaigns'
 
   resources :campaigns do
   end
@@ -91,7 +92,7 @@ Rails.application.routes.draw do
   end
   resources :distributors do
   end
-  resources :fees do
+  resources :fees, param: :name do
   end
   resources :gift_cards do
   end
@@ -99,6 +100,8 @@ Rails.application.routes.draw do
   end
   resources :participating_sellers do
     resources :tickets, controller: 'participating_seller_tickets'
+  end
+  resources :projects do
   end
   resources :sellers do
     resources :menu_items, :items, :open_hour, :delivery_options

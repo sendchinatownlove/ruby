@@ -30,8 +30,6 @@ module WebhookManager
           single_use: single_use
         )
         GiftCardAmount.create!(value: amount, gift_card_detail: gift_card_detail)
-        payment_intent.successful = true
-        payment_intent.save!
 
         gift_card_detail
       end

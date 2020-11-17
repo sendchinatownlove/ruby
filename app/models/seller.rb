@@ -7,7 +7,6 @@
 #  id                      :bigint           not null, primary key
 #  accept_donations        :boolean          default(TRUE), not null
 #  business_type           :string
-#  business_type           :string
 #  cost_per_meal           :integer
 #  cuisine_name            :string
 #  founded_year            :integer
@@ -60,7 +59,6 @@ class Seller < ApplicationRecord
   has_many :delivery_options, dependent: :destroy
   has_many :open_hour, dependent: :destroy
   has_many :items, dependent: :destroy
-  has_many :fees, dependent: :destroy
   has_many :campaigns, dependent: :destroy
 
   validates_presence_of :seller_id

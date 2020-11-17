@@ -48,9 +48,6 @@ module WebhookManager
           donation
         end
 
-        payment_intent.successful = true
-        payment_intent.save!
-
         donations
       end
     end

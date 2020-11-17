@@ -54,7 +54,7 @@ If you get a migration error like `PG::UndefinedTable: ERROR:` or `PG::NotNullVi
 
 - Run the server on port 5000: `heroku local web -p 5000`
 - Run all tests: `heroku local:run bundle exec rspec`
-- Run specific tests: `heroku local:run bundle exec rspec -e "<insert string from test description>"`
+- Run specific tests: `heroku local:run bundle exec "rspec -e '<insert string from test description>'"`
 - Run console: `heroku local:run rails console`
 - Run local migrations in prod `heroku run rake db:migrate` (do this after submitting a change with a local migration)
 - Install annotate [`gem install annotate`](https://github.com/ctran/annotate_models)

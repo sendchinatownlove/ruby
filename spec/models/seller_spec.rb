@@ -7,7 +7,6 @@
 #  id                      :bigint           not null, primary key
 #  accept_donations        :boolean          default(TRUE), not null
 #  business_type           :string
-#  business_type           :string
 #  cost_per_meal           :integer
 #  cuisine_name            :string
 #  founded_year            :integer
@@ -44,7 +43,6 @@ RSpec.describe Seller, type: :model do
   # ensure Seller model has a 1:m relationship with the MenuItem model
   it { should have_many(:menu_items).dependent(:destroy) }
   it { should have_many(:delivery_options).dependent(:destroy) }
-  it { should have_many(:fees).dependent(:destroy) }
 
   # Validation tests
 

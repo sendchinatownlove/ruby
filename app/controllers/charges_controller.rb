@@ -14,9 +14,11 @@ class ChargesController < ApplicationController
     line_items = charge_params[:line_items].map(&:to_h)
 
     seller_id = charge_params[:seller_id]
+    project_id = charge_params[:project_id]
 
     validate(
       seller_id: seller_id,
+      project_id: project_id,
       line_items: line_items,
       is_distribution: charge_params[:is_distribution]
     )
@@ -25,7 +27,8 @@ class ChargesController < ApplicationController
     item_types = Set.new
     line_items.each do |item|
       item_types.add item['item_type']
-      item[:seller_id] = seller_id
+      item[:seller_id] = seller_id if seller_id.present?
+      item[:project_id] = project_id if project_id.present?
     end
 
     # Total all Items
@@ -39,7 +42,9 @@ class ChargesController < ApplicationController
                                             amount: amount,
                                             email: email,
                                             name: charge_params[:name],
-                                            line_items: line_items)
+                                            line_items: line_items,
+                                            metadata: charge_params[:metadata],
+                                            project_id: project_id)
 
     # Save the contact information only if the charge is succesful
     # Use a job to avoid blocking the request
@@ -53,7 +58,6 @@ class ChargesController < ApplicationController
   private
 
   def charge_params
-    params.require(:seller_id)
     params.require(:line_items)
     params.require(:email)
     params.require(:is_square)
@@ -67,19 +71,22 @@ class ChargesController < ApplicationController
       :is_square,
       :name,
       :seller_id,
+      :project_id,
       :idempotency_key,
       :is_subscribed,
       :campaign_id,
       # TODO(justintmckibben): Deprecate this boolean in favor of campaign_id
       :is_distribution,
+      :metadata,
       line_items: [%i[amount currency item_type quantity]]
     )
   end
 
-  def validate(seller_id:, line_items:, is_distribution:)
+  def validate(seller_id:, project_id:, line_items:, is_distribution:)
     @seller = Seller.find_by(seller_id: seller_id)
-    unless @seller.present?
-      raise InvalidLineItem, "Seller does not exist: #{seller_id}"
+    @project = Project.find_by(id: project_id)
+    unless @seller.present? ^ @project.present?
+      raise InvalidLineItem, "Project or Seller must exist, but not both. seller id: #{seller_id}, project_id: #{project_id}"
     end
 
     line_items.each do |line_item|
@@ -140,10 +147,14 @@ class ChargesController < ApplicationController
     amount:,
     email:,
     name:,
-    line_items:
+    line_items:,
+    metadata:,
+    project_id:
   )
     square_location_id = if gift_a_meal? && @seller.non_profit_location_id.present?
                            @seller.non_profit_location_id
+                         elsif @project.present?
+                           @project.square_location_id
                          else
                            @seller.square_location_id
                          end
@@ -186,7 +197,9 @@ class ChargesController < ApplicationController
       receipt_url: receipt_url,
       purchaser: purchaser,
       recipient: recipient,
-      campaign: @campaign
+      campaign: @campaign,
+      metadata: metadata,
+      project: Project.find_by(id: project_id)
     )
 
     api_response

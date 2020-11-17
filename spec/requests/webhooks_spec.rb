@@ -2,6 +2,7 @@
 
 require 'rails_helper'
 
+
 RSpec.describe 'Webhooks API', type: :request do
   before { freeze_time }
 
@@ -94,8 +95,11 @@ RSpec.describe 'Webhooks API', type: :request do
           let(:item_type) { 'donation' }
 
           it 'creates pool donation' do
-            expect(seller1.donation_amount).to eq(25_00)
-            expect(seller2.donation_amount).to eq(35_00)
+            expect(seller1.donation_amount).to eq(amount.floor/2 + amount.floor%2)
+            expect(seller2.donation_amount).to eq(10_00 + amount/2)
+
+            payment_intent_row = PaymentIntent.find(payment_intent.id)
+            expect(payment_intent_row.successful).to be true
           end
 
           it 'returns status code 200' do
@@ -104,12 +108,13 @@ RSpec.describe 'Webhooks API', type: :request do
         end
 
         context 'with non-divisible number round' do
-          let(:amount) { 3 }
+          let(:amount) { 1007 }
           let(:item_type) { 'donation' }
 
-          it 'creates pool donation and distrubutes the cents' do
-            expect(seller1.donation_amount).to eq(2)
-            expect(seller2.donation_amount).to eq(10_01)
+          it 'creates pool donation and distributes the cents' do
+            expect(seller1.donation_amount).to eq(amount/2.floor + 1)
+            expect(seller2.donation_amount).to eq(1000 + amount/2)
+            expect(amount + 1000).to eq(seller1.donation_amount + seller2.donation_amount)
           end
 
           it 'returns status code 200' do
@@ -126,10 +131,10 @@ RSpec.describe 'Webhooks API', type: :request do
             let(:amount) { 335 }
             let(:item_type) { 'donation' }
 
-            it 'creates pool donation and distrubutes the cents' do
-              expect(seller1.donation_amount).to eq(1_12)
-              expect(seller3.donation_amount).to eq(1_12)
-              expect(seller2.donation_amount).to eq(11_11)
+            it 'creates pool donation and distributes the cents' do
+              expect(seller1.donation_amount).to eq(3_35/3.floor + 1)
+              expect(seller3.donation_amount).to eq(3_35/3.floor + 1)
+              expect(seller2.donation_amount).to eq(10_00 + 3_35/3)
             end
 
             it 'returns status code 200' do
@@ -161,7 +166,7 @@ RSpec.describe 'Webhooks API', type: :request do
         it 'creates a donation' do
           donation_detail = DonationDetail.last
           expect(donation_detail).not_to be_nil
-          expect(donation_detail['amount']).to eq(5000)
+          expect(donation_detail['amount']).to eq(50_00)
 
           item = Item.find(donation_detail['item_id'])
           expect(item).not_to be_nil
@@ -303,12 +308,11 @@ RSpec.describe 'Webhooks API', type: :request do
     describe 'gift cards' do
       def verify_gift_card(item:, single_use:, amount:)
         expect(item).not_to be_nil
-
         gift_card_detail = item.gift_card_detail
+        expect(gift_card_detail.amount).to eq(amount)
         expect(gift_card_detail).not_to be_nil
         expect(gift_card_detail.single_use).to eq(single_use)
         expect(gift_card_detail.expiration).to eq(Date.today + 1.year)
-        expect(gift_card_detail.amount).to eq(amount)
 
         payment_intent = item.payment_intent
         expect(payment_intent.successful).to be true
@@ -468,6 +472,90 @@ RSpec.describe 'Webhooks API', type: :request do
 
         it 'returns status code 200' do
           expect(response).to have_http_status(200)
+        end
+      end
+    end
+
+    describe 'mega gam campaign payments' do
+      context 'with mega gam' do
+        let!(:amount) { 5000 }
+        let!(:item_type) { nil }
+        let!(:seller_id) { nil }
+  
+        let!(:campaign) { create(:campaign, :with_project, seller: nil) }
+
+        let!(:line_items) do
+          [{
+            'amount': amount,
+            'currency': 'usd',
+            'item_type': item_type,
+            'project_id': campaign.project.id,
+            'quantity': 1,
+          }].to_json
+        end
+
+        let!(:payment_intent) do
+          create(
+            :payment_intent,
+            square_payment_id: SecureRandom.uuid,
+            square_location_id: SecureRandom.uuid,
+            campaign: campaign,
+            recipient: recipient,
+            purchaser: purchaser,
+            line_items: line_items,
+          )
+        end
+
+        let!(:payment_intent_response) do
+          {
+            'payment': {
+              'id': payment_intent.square_payment_id,
+              'location_id': payment_intent.square_location_id,
+              'receipt_email': payment_intent.recipient.email,
+              'status': 'COMPLETED',
+            }
+          }
+        end
+
+        let!(:payload) do
+          {
+            'event_id': 'abcd-1234',
+            'type': 'payment.updated',
+            'data': {
+              'object': payment_intent_response,
+            },
+          }
+        end
+
+        subject do
+          post(
+            '/webhooks',
+            headers: { 'HTTP_X_SQUARE_SIGNATURE' => 'www.squareup.com' },
+            params: payload.to_json
+          )
+        end
+          
+        it 'should mark payment intent as successful' do
+          subject
+          payment_intent_row = PaymentIntent.find(payment_intent.id)
+          expect(payment_intent_row.successful).to be true
+        end
+  
+        it 'should send email' do
+          expect(EmailManager::MegaGamReceiptSender).to receive(:call)
+            .once
+            .with({
+              amount: 5000,
+              campaign_name: campaign.project.name,
+              payment_intent: payment_intent,
+            })
+          subject
+        end
+
+        it 'should not create gift card or donation' do
+          subject
+          expect(WebhookManager::GiftCardCreator).not_to receive(:call)
+          expect(WebhookManager::DonationCreator).not_to receive(:call)
         end
       end
     end

@@ -5,96 +5,89 @@ require 'rails_helper'
 RSpec.describe 'Campaigns API', type: :request do
   before do
     @seller = create :seller
+    @project = create :project
     @location = create(:location, seller_id: @seller.id)
-    @campaign = create(
+  end
+
+  let!(:distributor) { create :distributor }
+  let!(:campaign) do
+    create(
       :campaign,
       active: true,
       seller_id: @seller.id,
-      location_id: @location.id
-    )
-    @inactive_campaign = create(
-      :campaign,
-      active: false,
-      seller_id: @seller.id,
+      project_id: nil,
       location_id: @location.id
     )
   end
-  let(:distributor) { create :distributor }
 
   context 'GET /campaigns' do
     context 'Fetching all campaigns' do
-      before { get '/campaigns' }
+      subject { get '/campaigns' }
 
       it 'Returns campaigns' do
-        expect(json).not_to be_empty
-        expect(json.size).to eq(2)
-      end
-
-      it 'Returns 200' do
-        expect(response).to have_http_status(200)
-      end
-    end
-
-    context 'Fetching active campaigns' do
-      before { get '/campaigns?active=true' }
-
-      it 'Returns active campaigns' do
+        subject
         expect(json).not_to be_empty
         expect(json.size).to eq(1)
-        expect(json[0]['id']).to eq(@campaign.id)
-
-        # Has original fields
-        expect(json[0]['amount_raised']).to eq 0
-        expect(json[0]['last_contribution']).to eq nil
-        expect(json[0]['seller_id']).to eq @seller.seller_id
       end
 
       it 'Returns 200' do
-        expect(response).to have_http_status(200)
-      end
-    end
-
-    context 'Fetching inactive campaigns' do
-      before { get '/campaigns?active=false' }
-
-      it 'Returns inactive campaigns' do
-        expect(json).not_to be_empty
-        expect(json.size).to eq(1)
-        expect(json[0]['id']).to eq(@inactive_campaign.id)
-      end
-
-      it 'Returns 200' do
+        subject
         expect(response).to have_http_status(200)
       end
     end
   end
 
   context 'GET /campaigns/:id' do
-    before { get "/campaigns/#{campaign_id}" }
+    subject { get "/campaigns/#{campaign_id}" }
 
     context 'With a missing id' do
       let(:campaign_id) { 'missing_id' }
 
       it 'Returns 404' do
+        subject
         expect(response).to have_http_status(404)
       end
     end
 
     context 'With valid id' do
-      let(:campaign_id) { @campaign.id }
+      let(:campaign_id) { campaign.id }
 
       it 'Returns the campaign' do
+        subject
         expect(json).not_to be_empty
-        expect(json['id']).to eq(@campaign.id)
+        expect(json['id']).to eq(campaign.id)
 
         # Has original fields
         expect(json['amount_raised']).to eq 0
         expect(json['last_contribution']).to eq nil
-        expect(json['seller_id']).to eq @seller.seller_id
+        expect(json['seller_id']).to eq @seller.id
       end
 
       it 'Returns 200' do
+        subject
         expect(response).to have_http_status(200)
+      end
+    end
+
+    context 'With multiple sellers and distributors' do
+      let!(:campaign) do
+        create(
+          :campaign,
+          :with_sellers_distributors,
+          active: true,
+          location_id: @location.id,
+        )
+      end
+
+      let(:campaign_id) { campaign.id }
+
+      it 'Returns the campaign with the correct number of seller_distributor_pairs' do
+        subject
+        expect(json).not_to be_empty
+        expect(json['id']).to eq(campaign.id)
+
+        expect(json['seller_distributor_pairs']).not_to be_nil
+        expect(json['seller_distributor_pairs'].size).to eq 2
       end
     end
   end
@@ -117,6 +110,7 @@ RSpec.describe 'Campaigns API', type: :request do
               end_date: Date.tomorrow,
               location_id: location_id,
               seller_id: seller_id,
+              project_id: project_id,
               distributor_id: distributor_id
             },
             as: :json
@@ -126,6 +120,7 @@ RSpec.describe 'Campaigns API', type: :request do
         context 'all missing ids' do
           let(:location_id) { 'missing-location-id' }
           let(:seller_id) { 'missing-seller-id' }
+          let(:project_id) { 'missing-project-id' }
           let(:distributor_id) { 'missing-distributor-id' }
 
           it 'Returns status code 404' do
@@ -136,6 +131,7 @@ RSpec.describe 'Campaigns API', type: :request do
         context 'missing location and seller id' do
           let(:location_id) { 'missing-location-id' }
           let(:seller_id) { 'missing-seller-id' }
+          let(:project_id) { 'missing-project-id' }
           let(:distributor_id) { distributor.id }
 
           it 'returns status code 404' do
@@ -146,6 +142,7 @@ RSpec.describe 'Campaigns API', type: :request do
         context 'missing location and distributor ids' do
           let(:location_id) { 'missing-location-id' }
           let(:seller_id) { @seller.seller_id }
+          let(:project_id) { 'missing-project-id' }
           let(:distributor_id) { 'missing-distributor-id' }
 
           it 'returns status code 404' do
@@ -153,9 +150,10 @@ RSpec.describe 'Campaigns API', type: :request do
           end
         end
 
-        context 'missing locattion id' do
+        context 'missing location id' do
           let(:location_id) { 'missing-location-id' }
           let(:seller_id) { @seller.seller_id }
+          let(:project_id) { 'missing-project-id' }
           let(:distributor_id) { distributor.id }
 
           it 'returns status code 404' do
@@ -166,6 +164,7 @@ RSpec.describe 'Campaigns API', type: :request do
         context 'missing seller and distributor ids' do
           let(:location_id) { @location.id }
           let(:seller_id) { 'missing-seller-id' }
+          let(:project_id) { 'missing-project-id' }
           let(:distributor_id) { 'missing-distributor-id' }
 
           it 'returns status code 404' do
@@ -173,19 +172,32 @@ RSpec.describe 'Campaigns API', type: :request do
           end
         end
 
-        context 'missing seller id' do
+        context 'missing both seller and project ids' do
           let(:location_id) { @location.id }
           let(:seller_id) { 'missing-seller-id' }
+          let(:project_id) { 'missing-project-id' }
           let(:distributor_id) { distributor.id }
 
-          it 'returns status code 404' do
-            expect(response).to have_http_status(404)
+          it 'returns status code 422' do
+            expect(response).to have_http_status(422)
           end
         end
 
-        context 'with valid parameters' do
+        context 'with both seller and project ids' do
           let(:location_id) { @location.id }
           let(:seller_id) { @seller.seller_id }
+          let(:project_id) { @project.id }
+          let(:distributor_id) { distributor.id }
+
+          it 'returns status code 422' do
+            expect(response).to have_http_status(422)
+          end
+        end
+
+        context 'with valid parameters and seller_id' do
+          let(:location_id) { @location.id }
+          let(:seller_id) { @seller.seller_id }
+          let(:project_id) { nil }
           let(:distributor_id) { distributor.id }
 
           it 'returns status code 201' do
@@ -206,8 +218,37 @@ RSpec.describe 'Campaigns API', type: :request do
             expect(campaign.amount_raised).to eq 0
             expect(campaign.price_per_meal).to eq 500
 
-            expect(campaign.active).to eq false
-            expect(campaign.valid).to eq true
+            expect(campaign.active).to be false
+            expect(campaign.valid).to be true
+          end
+        end
+
+        context 'with valid parameters and project_id' do
+          let(:location_id) { @location.id }
+          let(:seller_id) { nil }
+          let(:project_id) { @project.id }
+          let(:distributor_id) { distributor.id }
+
+          it 'returns status code 201' do
+            expect(response).to have_http_status(201)
+          end
+
+          it 'creates a Campaign with default values and matching attributes' do
+            response_body = JSON.parse(response.body)
+            expect(response_body).not_to be_nil
+            expect(json['amount_raised']).to eq 0
+            expect(json['last_contribution']).to eq nil
+
+            campaign = Campaign.find(response_body['id'])
+            expect(campaign).not_to be_nil
+            expect(campaign.location).to eq @location
+            expect(campaign.project).to eq @project
+            expect(campaign.target_amount).to eq 100_000
+            expect(campaign.amount_raised).to eq 0
+            expect(campaign.price_per_meal).to eq 500
+
+            expect(campaign.active).to be false
+            expect(campaign.valid).to be true
           end
         end
       end
@@ -232,7 +273,7 @@ RSpec.describe 'Campaigns API', type: :request do
     end
 
     context 'With a valid id' do
-      let(:campaign_id) { @campaign.id }
+      let(:campaign_id) { campaign.id }
       let(:body) do
         {
           description: 'Campaign description',
@@ -251,14 +292,47 @@ RSpec.describe 'Campaigns API', type: :request do
         # Has original fields
         expect(json['amount_raised']).to eq 0
         expect(json['last_contribution']).to eq nil
-        expect(json['seller_id']).to eq @seller.seller_id
+        expect(json['seller_id']).to eq @seller.id
       end
 
       it 'Updates the fields in the record' do
-        updated_campaign = Campaign.find(@campaign.id)
+        updated_campaign = Campaign.find(campaign.id)
         expect(updated_campaign.description).to eq(body[:description])
         expect(updated_campaign.gallery_image_urls).to eq(body[:gallery_image_urls])
       end
+    end
+  end
+
+  context 'POST /campaigns/:id/seller_distributor' do
+    let!(:distributor) { create :distributor }
+    let!(:seller) { create :seller }
+
+    subject do
+      post(
+        "/campaigns/#{campaign.id}/seller_distributor",
+        params: {
+          distributor_id: distributor.id,
+          seller_id: seller.id,
+        },
+        as: :json
+      )
+    end
+
+    it 'Creates seller and distributor pair' do
+      subject
+      expect(json['seller_distributor_pairs']).to eq [{
+        'distributor_id' => distributor.id,
+        'distributor_image_url' => distributor.image_url,
+        'distributor_name' => distributor.name,
+        'seller_id' => seller.id,
+        'seller_image_url' => seller.hero_image_url,
+        'seller_name' => seller.name
+      }]
+    end
+
+    it 'Returns status code 200' do
+      subject
+      expect(response).to have_http_status(200)
     end
   end
 end

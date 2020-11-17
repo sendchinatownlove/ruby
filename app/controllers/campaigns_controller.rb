@@ -5,12 +5,7 @@ class CampaignsController < ApplicationController
 
   # GET /campaigns
   def index
-    @campaigns = if params[:active].present?
-                   valid_campaigns.order(:end_date).active(params[:active])
-                 else
-                   valid_campaigns.order(:end_date).all
-    end
-
+    @campaigns = valid_campaigns.order(:end_date).all
     json_response(campaigns_json)
   end
 
@@ -22,6 +17,9 @@ class CampaignsController < ApplicationController
   # POST /campaigns
   def create
     @campaign = Campaign.create!(create_params)
+    unless @seller.present? ^ @project.present?
+      raise InvalidLineItem, "Project or Seller must exist, but not both. seller id: #{seller_id}, project_id: #{project_id}"
+    end
     json_response(campaign_json, :created)
   end
 
@@ -31,12 +29,17 @@ class CampaignsController < ApplicationController
     json_response(campaign_json)
   end
 
+  # POST /campaigns/:id/seller_distributor
+  def associate_seller_distributor
+    CampaignsSellersDistributor.create!(associate_seller_distributor_params)
+    json_response(campaign_json)
+  end
+
   private
 
   def create_params
     params.require(:end_date)
     params.require(:location_id)
-    params.require(:seller_id)
     params.require(:distributor_id)
 
     ret = params.permit(
@@ -46,15 +49,20 @@ class CampaignsController < ApplicationController
       :price_per_meal,
       :target_amount,
       :nonprofit_id,
+      :seller_id,
+      :project_id,
       gallery_image_urls: []
     )
 
     set_location
     set_seller
+    set_project
     set_distributor
 
     ret[:location_id] = @location.id
-    ret[:seller_id] = @seller.id
+    if @seller.present?
+      ret[:seller_id] = @seller.id
+    end
     ret[:distributor_id] = @distributor.id
 
     ret
@@ -71,6 +79,26 @@ class CampaignsController < ApplicationController
     )
   end
 
+  def associate_seller_distributor_params
+    params.require(:distributor_id)
+    params.require(:seller_id)
+
+    ret = params.permit(
+      :distributor_id,
+      :seller_id
+    )
+
+    set_campaign
+    set_distributor
+    @seller = Seller.find(params[:seller_id])
+
+    ret[:campaign_id] = @campaign.id
+    ret[:distributor_id] = @distributor.id
+    ret[:seller_id] = @seller.id
+
+    ret
+  end
+
   def set_campaign
     @campaign = Campaign.find(params[:id])
   end
@@ -80,7 +108,11 @@ class CampaignsController < ApplicationController
   end
 
   def set_seller
-    @seller = Seller.find_by!(seller_id: params[:seller_id])
+    @seller = Seller.find_by(seller_id: params[:seller_id])
+  end
+
+  def set_project
+    @project = Project.find_by(id: params[:project_id])
   end
 
   def set_distributor
@@ -94,12 +126,15 @@ class CampaignsController < ApplicationController
   def campaign_json(campaign: @campaign)
     ret = campaign.as_json
     ret['amount_raised'] = campaign.amount_raised
+    ret['amount_allocated'] = campaign.amount_allocated
     ret['last_contribution'] = campaign.last_contribution
-    ret['seller_id'] = campaign.seller.seller_id
+    ret['seller_distributor_pairs'] = campaign.seller_distributor_pairs
     ret
   end
 
   def valid_campaigns
     Campaign.where(valid: true)
   end
+
+  
 end

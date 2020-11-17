@@ -116,14 +116,15 @@ class WebhooksController < ApplicationController
     items = JSON.parse(payment_intent.line_items)
     recipient = payment_intent.recipient
     is_donation = false
-
+    save_payment_intent = false
+    items = items.select { |item| item['type'] != 'fee' }
     items.each do |item_json|
       # TODO(jtmckibb): Add some tracking that tracks if it breaks somewhere
       # here
-
       amount = item_json['amount']
       seller_id = item_json['seller_id']
-      if seller_id.eql?(Seller::POOL_DONATION_SELLER_ID)
+      project_id = item_json['project_id']
+      if seller_id.present? && seller_id.eql?(Seller::POOL_DONATION_SELLER_ID)
         PoolDonationValidator.call({ type: item_json['item_type'] })
 
         WebhookManager::PoolDonationCreator.call(
@@ -133,11 +134,41 @@ class WebhooksController < ApplicationController
             amount: amount
           }
         )
+        save_payment_intent = true
 
         EmailManager::PoolDonationReceiptSender.call(
           {
             payment_intent: payment_intent,
             amount: amount,
+            email: payment_intent.purchaser.email
+          }
+        )
+      elsif payment_intent.campaign.present? && payment_intent.campaign.mega_gam?
+        save_payment_intent = true
+        
+        EmailManager::MegaGamReceiptSender.call(
+          {
+            amount: amount,
+            campaign_name: Project.find(project_id).name,
+            payment_intent: payment_intent,
+          }
+        )
+      elsif project_id.present?
+        WebhookManager::DonationCreator.call(
+          {
+            seller_id: seller_id,
+            project_id: project_id,
+            payment_intent: payment_intent,
+            amount: amount
+          }
+        )
+        save_payment_intent = true
+
+        EmailManager::DonationReceiptSender.call(
+          {
+            payment_intent: payment_intent,
+            amount: amount,
+            merchant: Project.find(project_id).name,
             email: payment_intent.purchaser.email
           }
         )
@@ -151,9 +182,10 @@ class WebhooksController < ApplicationController
             {
               seller_id: seller_id,
               payment_intent: payment_intent,
-              amount: amount
+              amount: amount,
             }
           )
+          save_payment_intent = true
         when 'gift_card'
           gift_a_meal = payment_intent.campaign.present?
 
@@ -166,6 +198,7 @@ class WebhooksController < ApplicationController
               single_use: gift_a_meal
             }
           )
+          save_payment_intent = true
           # Gift a meal purchases are technically donations to the purchaser
           if gift_a_meal
             is_donation ||= true
@@ -189,10 +222,17 @@ class WebhooksController < ApplicationController
       end
     end
 
+    if save_payment_intent
+      payment_intent.successful = true
+      payment_intent.save!
+    end
+
     if is_donation
       # Send separate email for each seller.
       grouped_items = items.group_by { |li| li['seller_id'] }
       grouped_items.each_key do |sid|
+        next unless sid.present?
+
         EmailManager::DonationReceiptSender.call(
           {
             payment_intent: payment_intent,
