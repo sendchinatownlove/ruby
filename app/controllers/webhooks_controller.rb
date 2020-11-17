@@ -116,11 +116,11 @@ class WebhooksController < ApplicationController
     items = JSON.parse(payment_intent.line_items)
     recipient = payment_intent.recipient
     is_donation = false
+    save_payment_intent = false
     items = items.select { |item| item['type'] != 'fee' }
     items.each do |item_json|
       # TODO(jtmckibb): Add some tracking that tracks if it breaks somewhere
       # here
-
       amount = item_json['amount']
       seller_id = item_json['seller_id']
       project_id = item_json['project_id']
@@ -134,6 +134,7 @@ class WebhooksController < ApplicationController
             amount: amount
           }
         )
+        save_payment_intent = true
 
         EmailManager::PoolDonationReceiptSender.call(
           {
@@ -151,6 +152,7 @@ class WebhooksController < ApplicationController
             amount: amount
           }
         )
+        save_payment_intent = true
 
         EmailManager::DonationReceiptSender.call(
           {
@@ -160,6 +162,8 @@ class WebhooksController < ApplicationController
             email: payment_intent.purchaser.email
           }
         )
+      elsif payment_intent.campaign.present? && payment_intent.campaign.mega_gam?
+        save_payment_intent = true
       else
         merchant_name = Seller.find_by(seller_id: seller_id).name
         case item_json['item_type']
@@ -173,6 +177,7 @@ class WebhooksController < ApplicationController
               amount: amount,
             }
           )
+          save_payment_intent = true
         when 'gift_card'
           gift_a_meal = payment_intent.campaign.present?
 
@@ -185,6 +190,7 @@ class WebhooksController < ApplicationController
               single_use: gift_a_meal
             }
           )
+          save_payment_intent = true
           # Gift a meal purchases are technically donations to the purchaser
           if gift_a_meal
             is_donation ||= true
@@ -206,6 +212,11 @@ class WebhooksController < ApplicationController
           )
         end
       end
+    end
+
+    if save_payment_intent
+      payment_intent.successful = true
+      payment_intent.save!
     end
 
     if is_donation

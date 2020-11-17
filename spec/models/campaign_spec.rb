@@ -122,7 +122,25 @@ RSpec.describe Campaign, type: :model do
       expect(campaign.last_contribution).to eq(Time.current + 1.day)
     end
   end
+
+  context 'with .mega_gam?' do
+    context 'with mega gam campaign' do
+      let!(:campaign) { create(:campaign, :with_project, seller: nil) }
+
+      it 'returns the correct value' do
+        expect(campaign.mega_gam?).to be true
+      end
+    end
+
+    context 'with regular gam campaign' do
+      let!(:campaign) { create(:campaign) }
   
+      it 'returns the correct value' do
+        expect(campaign.mega_gam?).to be false
+      end
+    end
+  end
+
   context 'with amount raised for mega gam campaigns' do
     let!(:campaign) { create(:campaign, :with_sellers_distributors, :with_project, seller: nil) }
     subject do 
