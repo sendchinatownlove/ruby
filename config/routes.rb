@@ -92,7 +92,7 @@ Rails.application.routes.draw do
   end
   resources :distributors do
   end
-  resources :fees do
+  resources :fees, param: :name do
   end
   resources :gift_cards do
   end

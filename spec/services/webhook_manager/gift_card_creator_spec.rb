@@ -55,7 +55,7 @@ describe WebhookManager::GiftCardCreator, '#call' do
     {
       seller_id: seller.seller_id,
       payment_intent: payment_intent,
-      amount: 50,
+      amount: 500,
       single_use: true
     }
   end

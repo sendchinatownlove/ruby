@@ -16,6 +16,7 @@
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  distributor_id     :bigint
+#  fee_id             :integer
 #  location_id        :bigint           not null
 #  nonprofit_id       :bigint
 #  project_id         :bigint
@@ -44,14 +45,15 @@ RSpec.describe Campaign, type: :model do
   before { freeze_time }
 
   let!(:campaign) { create :campaign }
+  let!(:project) { create :project }
 
   it 'should have default values' do
     expect(campaign.amount_raised).to eq(0)
     expect(campaign.last_contribution).to be_nil
   end
 
-  context 'with gift cards' do
-    before do
+  context 'with amount raised for regular gam campaigns' do
+    it 'returns gift card amounts' do
       # Create $50 gift card
       item_gift_card1 = create(
         :item,
@@ -115,18 +117,30 @@ RSpec.describe Campaign, type: :model do
         value: 100_00,
         gift_card_detail: gift_card_detail3
       )
-    end
 
-    it 'returns gift card amounts' do
       expect(campaign.amount_raised).to eq(100_00)
       expect(campaign.last_contribution).to eq(Time.current + 1.day)
     end
   end
+  
+  context 'with amount raised for mega gam campaigns' do
+    let!(:campaign) { create(:campaign, :with_sellers_distributors, :with_project, seller: nil) }
+    subject do 
+      # Expect these 2 to be counted. :with_line_items adds line items of value 600.
+      payment_intent_1 = create(:payment_intent, :with_line_items, campaign: campaign, successful: true)
+      payment_intent_2 = create(:payment_intent, :with_line_items, campaign: campaign, successful: true)
+      # Do not expect this one to be counted since it's not successful.
+      payment_intent_3 = create(:payment_intent, :with_line_items, campaign: campaign, successful: false)
+    end
+
+    it 'returns payment intent amounts' do
+      subject 
+      expect(campaign.amount_raised).to eq 1200
+    end
+  end
 
   context 'with seller distributor pairs' do
-    let!(:campaign) do
-      create(:campaign, :with_sellers_distributors)
-    end
+    let!(:campaign) { create(:campaign, :with_sellers_distributors) }
 
     it 'gets seller distributor pairs' do
       csds = campaign.campaigns_sellers_distributors
@@ -143,10 +157,6 @@ RSpec.describe Campaign, type: :model do
 
       expect(campaign.seller_distributor_pairs).to eq(pairs)
     end
-  end
-
-  let(:project) do
-    create :project
   end
 
   let(:seller) do

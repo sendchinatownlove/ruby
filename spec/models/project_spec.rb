@@ -34,12 +34,27 @@ RSpec.describe Project, type: :model do
     end
 
     context 'with successful payment intents' do
-      before do
-        create(:payment_intent, :with_line_items, project: project, successful: true)
+      let!(:payment_intent) do
         create(:payment_intent, :with_line_items, project: project, successful: true)
       end
+
+      before do
+        create(:payment_intent, :with_line_items, project: project, successful: true)
+      end
+
       it 'should return amount' do
         expect(project.amount_raised).to eq 1200
+      end
+
+      context 'with refunded payments' do
+        before do
+          create(:refund, status: :COMPLETED, payment_intent: payment_intent)
+          create(:refund, status: :COMPLETED)
+        end
+
+        it 'should return amount excluding refunded' do
+          expect(project.amount_raised).to eq 600
+        end
       end
     end
 
