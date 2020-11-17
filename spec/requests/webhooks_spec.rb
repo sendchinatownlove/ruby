@@ -483,7 +483,17 @@ RSpec.describe 'Webhooks API', type: :request do
         let!(:seller_id) { nil }
   
         let!(:campaign) { create(:campaign, :with_project, seller: nil) }
-        
+
+        let!(:line_items) do
+          [{
+            'amount': amount,
+            'currency': 'usd',
+            'item_type': item_type,
+            'project_id': campaign.project.id,
+            'quantity': 1,
+          }].to_json
+        end
+
         let!(:payment_intent) do
           create(
             :payment_intent,
@@ -492,28 +502,36 @@ RSpec.describe 'Webhooks API', type: :request do
             campaign: campaign,
             recipient: recipient,
             purchaser: purchaser,
-            line_items: line_items
+            line_items: line_items,
           )
+        end
+
+        let!(:payment_intent_response) do
+          {
+            'payment': {
+              'id': payment_intent.square_payment_id,
+              'location_id': payment_intent.square_location_id,
+              'receipt_email': payment_intent.recipient.email,
+              'status': 'COMPLETED',
+            }
+          }
+        end
+
+        let!(:payload) do
+          {
+            'event_id': 'abcd-1234',
+            'type': 'payment.updated',
+            'data': {
+              'object': payment_intent_response,
+            },
+          }
         end
   
         subject do
           post(
             '/webhooks',
             headers: { 'HTTP_X_SQUARE_SIGNATURE' => 'www.squareup.com' },
-            params: {
-              'event_id': 'abcd-1234',
-              'type': 'payment.updated',
-              'data': {
-                'object': {
-                  'payment': {
-                    'id': payment_intent.square_payment_id,
-                    'location_id': payment_intent.square_location_id,
-                    'receipt_email': payment_intent.recipient.email,
-                    'status': 'COMPLETED'
-                  }
-                }
-              }
-            }.to_json
+            params: payload.to_json
           )
         end
           
@@ -523,12 +541,21 @@ RSpec.describe 'Webhooks API', type: :request do
           expect(payment_intent_row.successful).to be true
         end
   
-        it 'should not create gift card' do
+        it 'should send email' do
+          subject
+          expect(EmailManager::MegaGamReceiptSender).to receive(:call)
+            .once
+            .with({
+              amount: 5000,
+              campaign_name: campaign.project.name,
+              payment_intent: payment_intent,
+            })
+        end
+
+        it 'should not create gift card or donation' do
           subject
           expect(WebhookManager::GiftCardCreator).not_to receive(:call)
-          expect(EmailManager::GiftCardReceiptSender).not_to receive(:call)
           expect(WebhookManager::DonationCreator).not_to receive(:call)
-          expect(EmailManager::DonationReceiptSender).not_to receive(:call)
         end
       end
     end
