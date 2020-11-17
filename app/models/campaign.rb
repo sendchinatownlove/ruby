@@ -126,7 +126,10 @@ class Campaign < ApplicationRecord
   def payment_intent_amount
     PaymentIntent
       .joins(:campaign)
-      .where('campaigns.id=? AND successful=true', id)
+      .where(campaigns: {
+        id: id,
+      })
+      .where(successful: true)
       .map { |payment_intent| payment_intent.amount }
       .sum
   end
