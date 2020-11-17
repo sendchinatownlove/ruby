@@ -124,10 +124,6 @@ class Campaign < ApplicationRecord
 
   private
 
-  def mega_gam?
-    project.present?
-  end
-
   # Calculates the amount raised in the payment intent table.
   def payment_intent_amount
     PaymentIntent
