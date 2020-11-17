@@ -129,7 +129,16 @@ bundle exec rake db:seed
 
 bundle exec rails g model Todo title:string created_by:string
 ```
+## testing :microscope:
+Tests can be run locally with:
+```
+  RAILS_ENV=test bundle exec rspec
+```
 
+Or you can run a specific test with:
+```
+  RAILS_ENV=test bundle exec rspec path/to/specific/test-file
+```
 
 ## deployment 🚀
 
