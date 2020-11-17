@@ -27,16 +27,21 @@ ActiveRecord::Schema.define(version: 2020_11_13_001940) do
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "distributor_id"
     t.integer "target_amount", default: 100000, null: false
-    t.integer "fee_id"
     t.integer "price_per_meal", default: 500
     t.bigint "nonprofit_id"
     t.datetime "start_date"
+    t.integer "fee_id"
     t.bigint "project_id"
     t.index ["distributor_id"], name: "index_campaigns_on_distributor_id"
     t.index ["location_id"], name: "index_campaigns_on_location_id"
     t.index ["nonprofit_id"], name: "index_campaigns_on_nonprofit_id"
     t.index ["project_id"], name: "index_campaigns_on_project_id"
     t.index ["seller_id"], name: "index_campaigns_on_seller_id"
+  end
+
+  create_table "campaigns_fees", id: false, force: :cascade do |t|
+    t.bigint "campaign_id", null: false
+    t.bigint "fee_id", null: false
   end
 
   create_table "campaigns_sellers_distributors", force: :cascade do |t|

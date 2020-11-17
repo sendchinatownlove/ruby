@@ -97,6 +97,9 @@ RSpec.describe 'Webhooks API', type: :request do
           it 'creates pool donation' do
             expect(seller1.donation_amount).to eq(amount.floor/2 + amount.floor%2)
             expect(seller2.donation_amount).to eq(10_00 + amount/2)
+
+            payment_intent_row = PaymentIntent.find(payment_intent.id)
+            expect(payment_intent_row.successful).to be true
           end
 
           it 'returns status code 200' do
