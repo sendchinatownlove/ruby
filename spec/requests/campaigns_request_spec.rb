@@ -319,7 +319,7 @@ RSpec.describe 'Campaigns API', type: :request do
         "/campaigns/#{campaign.id}/seller_distributor",
         params: {
           distributor_id: distributor.id,
-          seller_id: seller.id,
+          seller_id: seller.id
         },
         as: :json
       )
@@ -329,25 +329,25 @@ RSpec.describe 'Campaigns API', type: :request do
       subject
 
       expect(json['seller_distributor_pairs']).to eq([
-        # Directly related seller/dist
-        {
-          'distributor_id' => campaign.distributor.id,
-          'distributor_image_url' => campaign.distributor.image_url,
-          'distributor_name' => campaign.distributor.name,
-          'seller_id' => campaign.seller.seller_id,
-          'seller_image_url' => campaign.seller.hero_image_url,
-          'seller_name' => campaign.seller.name
-        },
-        # Seller/dist pair
-        {
-          'distributor_id' => distributor.id,
-          'distributor_image_url' => distributor.image_url,
-          'distributor_name' => distributor.name,
-          'seller_id' => seller.seller_id,
-          'seller_image_url' => seller.hero_image_url,
-          'seller_name' => seller.name
-        }
-      ])
+                                                       # Directly related seller/dist
+                                                       {
+                                                         'distributor_id' => campaign.distributor.id,
+                                                         'distributor_image_url' => campaign.distributor.image_url,
+                                                         'distributor_name' => campaign.distributor.name,
+                                                         'seller_id' => campaign.seller.seller_id,
+                                                         'seller_image_url' => campaign.seller.hero_image_url,
+                                                         'seller_name' => campaign.seller.name
+                                                       },
+                                                       # Seller/dist pair
+                                                       {
+                                                         'distributor_id' => distributor.id,
+                                                         'distributor_image_url' => distributor.image_url,
+                                                         'distributor_name' => distributor.name,
+                                                         'seller_id' => seller.seller_id,
+                                                         'seller_image_url' => seller.hero_image_url,
+                                                         'seller_name' => seller.name
+                                                       }
+                                                     ])
     end
 
     it 'Returns status code 200' do

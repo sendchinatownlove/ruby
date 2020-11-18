@@ -20,6 +20,7 @@ class CampaignsController < ApplicationController
     unless @seller.present? ^ @project.present?
       raise InvalidLineItem, "Project or Seller must exist, but not both. seller id: #{seller_id}, project_id: #{project_id}"
     end
+
     json_response(campaign_json, :created)
   end
 
@@ -60,9 +61,7 @@ class CampaignsController < ApplicationController
     set_distributor
 
     ret[:location_id] = @location.id
-    if @seller.present?
-      ret[:seller_id] = @seller.id
-    end
+    ret[:seller_id] = @seller.id if @seller.present?
     ret[:distributor_id] = @distributor.id
 
     ret

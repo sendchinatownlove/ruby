@@ -2,7 +2,6 @@
 
 require 'rails_helper'
 
-
 RSpec.describe 'Webhooks API', type: :request do
   before { freeze_time }
 
@@ -95,8 +94,8 @@ RSpec.describe 'Webhooks API', type: :request do
           let(:item_type) { 'donation' }
 
           it 'creates pool donation' do
-            expect(seller1.donation_amount).to eq(amount.floor/2 + amount.floor%2)
-            expect(seller2.donation_amount).to eq(10_00 + amount/2)
+            expect(seller1.donation_amount).to eq(amount.floor / 2 + amount.floor % 2)
+            expect(seller2.donation_amount).to eq(10_00 + amount / 2)
 
             payment_intent_row = PaymentIntent.find(payment_intent.id)
             expect(payment_intent_row.successful).to be true
@@ -112,8 +111,8 @@ RSpec.describe 'Webhooks API', type: :request do
           let(:item_type) { 'donation' }
 
           it 'creates pool donation and distributes the cents' do
-            expect(seller1.donation_amount).to eq(amount/2.floor + 1)
-            expect(seller2.donation_amount).to eq(1000 + amount/2)
+            expect(seller1.donation_amount).to eq(amount / 2.floor + 1)
+            expect(seller2.donation_amount).to eq(1000 + amount / 2)
             expect(amount + 1000).to eq(seller1.donation_amount + seller2.donation_amount)
           end
 
@@ -132,9 +131,9 @@ RSpec.describe 'Webhooks API', type: :request do
             let(:item_type) { 'donation' }
 
             it 'creates pool donation and distributes the cents' do
-              expect(seller1.donation_amount).to eq(3_35/3.floor + 1)
-              expect(seller3.donation_amount).to eq(3_35/3.floor + 1)
-              expect(seller2.donation_amount).to eq(10_00 + 3_35/3)
+              expect(seller1.donation_amount).to eq(3_35 / 3.floor + 1)
+              expect(seller3.donation_amount).to eq(3_35 / 3.floor + 1)
+              expect(seller2.donation_amount).to eq(10_00 + 3_35 / 3)
             end
 
             it 'returns status code 200' do
@@ -481,7 +480,7 @@ RSpec.describe 'Webhooks API', type: :request do
         let!(:amount) { 5000 }
         let!(:item_type) { nil }
         let!(:seller_id) { nil }
-  
+
         let!(:campaign) { create(:campaign, :with_project, seller: nil) }
 
         let!(:line_items) do
@@ -490,7 +489,7 @@ RSpec.describe 'Webhooks API', type: :request do
             'currency': 'usd',
             'item_type': item_type,
             'project_id': campaign.project.id,
-            'quantity': 1,
+            'quantity': 1
           }].to_json
         end
 
@@ -502,7 +501,7 @@ RSpec.describe 'Webhooks API', type: :request do
             campaign: campaign,
             recipient: recipient,
             purchaser: purchaser,
-            line_items: line_items,
+            line_items: line_items
           )
         end
 
@@ -512,7 +511,7 @@ RSpec.describe 'Webhooks API', type: :request do
               'id': payment_intent.square_payment_id,
               'location_id': payment_intent.square_location_id,
               'receipt_email': payment_intent.recipient.email,
-              'status': 'COMPLETED',
+              'status': 'COMPLETED'
             }
           }
         end
@@ -522,8 +521,8 @@ RSpec.describe 'Webhooks API', type: :request do
             'event_id': 'abcd-1234',
             'type': 'payment.updated',
             'data': {
-              'object': payment_intent_response,
-            },
+              'object': payment_intent_response
+            }
           }
         end
 
@@ -534,21 +533,21 @@ RSpec.describe 'Webhooks API', type: :request do
             params: payload.to_json
           )
         end
-          
+
         it 'should mark payment intent as successful' do
           subject
           payment_intent_row = PaymentIntent.find(payment_intent.id)
           expect(payment_intent_row.successful).to be true
         end
-  
+
         it 'should send email' do
           expect(EmailManager::MegaGamReceiptSender).to receive(:call)
             .once
             .with({
-              amount: 5000,
-              campaign_name: campaign.project.name,
-              payment_intent: payment_intent,
-            })
+                    amount: 5000,
+                    campaign_name: campaign.project.name,
+                    payment_intent: payment_intent
+                  })
           subject
         end
 

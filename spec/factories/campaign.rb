@@ -10,7 +10,7 @@ FactoryBot.define do
     association :distributor
 
     trait :with_sellers_distributors do
-      after(:create) do |campaign, index|
+      after(:create) do |campaign, _index|
         FactoryBot.create :campaigns_sellers_distributor, campaign_id: campaign.id
         FactoryBot.create :campaigns_sellers_distributor, campaign_id: campaign.id
       end

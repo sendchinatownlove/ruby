@@ -8,10 +8,10 @@ class FeesController < ApplicationController
     json_response(Fee.all)
   end
 
-    # GET /fees/:name
-    def show
-      json_response(Fee.find_by(name: params[:name]))
-    end
+  # GET /fees/:name
+  def show
+    json_response(Fee.find_by(name: params[:name]))
+  end
 
   # POST /fees
   def create
@@ -34,7 +34,7 @@ class FeesController < ApplicationController
       :flat_cost,
       :name
     )
-  
+
     ret
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateJoinTableCampaignsFees < ActiveRecord::Migration[6.0]
   def change
     create_join_table :campaigns, :fees do |t|

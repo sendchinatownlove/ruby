@@ -6,7 +6,7 @@ describe EmailManager::MegaGamReceiptSender, '#call' do
     {
       amount: 5000,
       campaign_name: 'December Mega GAM',
-      payment_intent: payment_intent,
+      payment_intent: payment_intent
     }
   end
 
