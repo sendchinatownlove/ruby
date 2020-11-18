@@ -8,7 +8,9 @@ RSpec.describe 'DeliveryOptions', type: :request do
   let(:current_time) { Time.current.utc.iso8601(3).to_s }
   let!(:seller) { create(:seller) }
   let(:seller_id) { seller.seller_id }
-  let!(:delivery_options) { create_list(:delivery_option, 20, :with_delivery_type, seller_id: seller.id) }
+  let(:delivery_type) { create(:delivery_type) }
+  let(:delivery_type_id) { delivery_type.id }
+  let!(:delivery_options) { create_list(:delivery_option, 20, delivery_type_id: delivery_type_id, seller_id: seller.id) }
   let(:id) { delivery_options.first.id }
 
   # Test suite for GET /sellers/:seller_id/delivery_options
@@ -40,10 +42,11 @@ RSpec.describe 'DeliveryOptions', type: :request do
   end
 
   # Test suite for POST /sellers/:seller_id/menu_items
-  describe 'POST /sellers/:seller_id/menu_items' do
+  describe 'POST /sellers/:seller_id/delivery_options' do
     let(:valid_attributes) do
       {
-        url: 'www.grubhub.com'
+        url: 'www.grubhub.com',
+        delivery_type_id: delivery_type_id
       }
     end
 
@@ -64,6 +67,7 @@ RSpec.describe 'DeliveryOptions', type: :request do
         expected_json['url'] = 'www.grubhub.com'
         expected_json['phone_number'] = nil
         expected_json['seller_id'] = seller.id
+        expected_json['delivery_type_id'] = delivery_type_id
         expect(actual_json).to eq(expected_json.with_indifferent_access)
       end
 
@@ -75,22 +79,8 @@ RSpec.describe 'DeliveryOptions', type: :request do
     context 'when request attributes are invalid' do
       before { post "/sellers/#{seller_id}/delivery_options", params: invalid_attributes, as: :json }
 
-      it 'creates a delivery_option' do
-        actual_json = json.except('id')
-        expected_json = valid_attributes.except('id')
-        expected_json['created_at'] = current_time
-        expected_json['updated_at'] = current_time
-        expected_json['phone_number'] = nil
-        expected_json['url'] = nil
-        expected_json['seller_id'] = seller.id
-        expect(actual_json).to eq(expected_json.with_indifferent_access)
-
-        expected_delivery_option = DeliveryOption.find(json['id'])
-        expect(expected_delivery_option).not_to be_nil
-      end
-
-      it 'returns status code 201' do
-        expect(response).to have_http_status(201)
+      it 'returns status code 422' do
+        expect(response).to have_http_status(422)
       end
     end
   end
@@ -100,7 +90,6 @@ RSpec.describe 'DeliveryOptions', type: :request do
     let(:valid_attributes) { { url: 'www.givemefood.com' } }
 
     before { put "/sellers/#{seller_id}/delivery_options/#{id}", params: valid_attributes, as: :json }
-
     context 'when delivery_option exists' do
       it 'returns status code 200' do
         expect(response).to have_http_status(200)
