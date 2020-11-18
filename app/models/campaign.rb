@@ -41,7 +41,7 @@ class Campaign < ApplicationRecord
   belongs_to :location
   belongs_to :seller, optional: true
   belongs_to :project, optional: true
-  belongs_to :distributor
+  belongs_to :distributor, optional: true
   has_and_belongs_to_many :fees
   has_many :campaigns_sellers_distributors
   has_many :payment_intent
@@ -81,38 +81,27 @@ class Campaign < ApplicationRecord
   def seller_distributor_pairs
     pairs = []
 
+    # TODO(justintmckibben): Remove this once we migrate seller and distributor
+    # off of the campaign directly and to use CampaignsSellersDistributor
+    # instead
+    if seller.present? && distributor.present?
+      pairs << seller_distributor_pair(
+        seller: seller,
+        distributor: distributor
+      )
+    end
+
     csd_pairings = CampaignsSellersDistributor
                    .joins(:campaign)
                    .where(campaigns: {
                             id: id
                           })
 
-    seller_ids = csd_pairings.map(&:seller_id)
-    sellers = Seller.where(id: seller_ids)
-    seller_id_to_seller = {}
-    sellers.each do |seller|
-      seller_id_to_seller[seller.id] = seller
-    end
-
-    distributor_ids = csd_pairings.map(&:distributor_id)
-    distributors = Distributor.where(id: distributor_ids)
-    distributor_id_to_distributor = {}
-    distributors.each do |distributor|
-      distributor_id_to_distributor[distributor.id] = distributor
-    end
-
     csd_pairings.each do |pairing|
-      seller = seller_id_to_seller[pairing.seller_id]
-      distributor = distributor_id_to_distributor[pairing.distributor_id]
-      pair = {
-        'distributor_id' => distributor.id,
-        'distributor_image_url' => distributor.image_url,
-        'distributor_name' => distributor.name,
-        'seller_id' => seller.id,
-        'seller_image_url' => seller.hero_image_url,
-        'seller_name' => seller.name
-      }
-      pairs.append(pair)
+      pairs << seller_distributor_pair(
+        seller: pairing.seller,
+        distributor: pairing.distributor
+      )
     end
 
     pairs
@@ -124,15 +113,26 @@ class Campaign < ApplicationRecord
 
   private
 
+  def seller_distributor_pair(seller:, distributor:)
+    {
+      'distributor_id' => distributor.id,
+      'distributor_image_url' => distributor.image_url,
+      'distributor_name' => distributor.name,
+      'seller_id' => seller.seller_id,
+      'seller_image_url' => seller.hero_image_url,
+      'seller_name' => seller.name
+    }
+  end
+
   # Calculates the amount raised in the payment intent table.
   def payment_intent_amount
     PaymentIntent
       .joins(:campaign)
       .where(campaigns: {
-        id: id,
-      })
+               id: id
+             })
       .where(successful: true)
-      .map { |payment_intent| payment_intent.amount }
+      .map(&:amount)
       .sum
   end
 

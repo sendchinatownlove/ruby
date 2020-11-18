@@ -135,6 +135,4 @@ class CampaignsController < ApplicationController
   def valid_campaigns
     Campaign.where(valid: true)
   end
-
-  
 end

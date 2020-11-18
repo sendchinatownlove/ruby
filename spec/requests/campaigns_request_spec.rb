@@ -61,6 +61,10 @@ RSpec.describe 'Campaigns API', type: :request do
         expect(json['amount_raised']).to eq 0
         expect(json['last_contribution']).to eq nil
         expect(json['seller_id']).to eq @seller.id
+
+        # Has the directly related seller/dist created in the factory
+        expect(json['seller_distributor_pairs']).not_to be_nil
+        expect(json['seller_distributor_pairs'].size).to eq 1
       end
 
       it 'Returns 200' do
@@ -69,13 +73,16 @@ RSpec.describe 'Campaigns API', type: :request do
       end
     end
 
-    context 'With multiple sellers and distributors' do
+    context 'with project with multiple sellers and distributors' do
       let!(:campaign) do
         create(
           :campaign,
           :with_sellers_distributors,
+          :with_project,
           active: true,
           location_id: @location.id,
+          seller: nil,
+          distributor: nil
         )
       end
 
@@ -320,14 +327,27 @@ RSpec.describe 'Campaigns API', type: :request do
 
     it 'Creates seller and distributor pair' do
       subject
-      expect(json['seller_distributor_pairs']).to eq [{
-        'distributor_id' => distributor.id,
-        'distributor_image_url' => distributor.image_url,
-        'distributor_name' => distributor.name,
-        'seller_id' => seller.id,
-        'seller_image_url' => seller.hero_image_url,
-        'seller_name' => seller.name
-      }]
+
+      expect(json['seller_distributor_pairs']).to eq([
+        # Directly related seller/dist
+        {
+          'distributor_id' => campaign.distributor.id,
+          'distributor_image_url' => campaign.distributor.image_url,
+          'distributor_name' => campaign.distributor.name,
+          'seller_id' => campaign.seller.seller_id,
+          'seller_image_url' => campaign.seller.hero_image_url,
+          'seller_name' => campaign.seller.name
+        },
+        # Seller/dist pair
+        {
+          'distributor_id' => distributor.id,
+          'distributor_image_url' => distributor.image_url,
+          'distributor_name' => distributor.name,
+          'seller_id' => seller.seller_id,
+          'seller_image_url' => seller.hero_image_url,
+          'seller_name' => seller.name
+        }
+      ])
     end
 
     it 'Returns status code 200' do
