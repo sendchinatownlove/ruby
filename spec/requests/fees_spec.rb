@@ -3,12 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe 'Fees', type: :request do
-
   describe 'GET /fees' do
     let!(:fee) { create :fee }
-    before { get "/fees" }
+    before { get '/fees' }
     context 'with fees' do
-
       it 'returns fees' do
         fees = JSON.parse(response.body)
         expect(fees.size).to eq 1
@@ -20,7 +18,6 @@ RSpec.describe 'Fees', type: :request do
         expect(response.response_code).to eq 200
       end
     end
-
   end
 
   describe 'POST /fees' do
@@ -37,7 +34,7 @@ RSpec.describe 'Fees', type: :request do
     context 'with only a name' do
       let(:attrs) do
         {
-          name: 'test fee',
+          name: 'test fee'
         }
       end
 
@@ -47,7 +44,7 @@ RSpec.describe 'Fees', type: :request do
 
         expect(fee).to_not be_nil
         expect(json).to eq(fee.as_json)
-        
+
         expect(fee).not_to be_nil
         expect(fee.campaigns.size).to eq 1
         expect(campaign.fees.size).to eq 1
@@ -124,8 +121,8 @@ RSpec.describe 'Fees', type: :request do
   describe 'PUT /fees/:name' do
     let(:original_active) { true }
     let(:original_multiplier) { 0.03 }
-    let(:original_flat_cost) {0.30}
-    let(:original_name) { 'square_fee'}
+    let(:original_flat_cost) { 0.30 }
+    let(:original_name) { 'square_fee' }
     let!(:fee) do
       create :fee, multiplier: original_multiplier, active: original_active, flat_cost: original_flat_cost, name: original_name
     end

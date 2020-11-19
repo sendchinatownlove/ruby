@@ -15,9 +15,9 @@ class Project < ApplicationRecord
 
   def amount_raised
     refunded_payment_intent_ids = Refund.where(status: :COMPLETED)
-      .map(&:payment_intent_id)
+                                        .map(&:payment_intent_id)
     PaymentIntent.where(project_id: id, successful: true)
-      .where.not(id: refunded_payment_intent_ids)
-      .map(&:amount).sum
+                 .where.not(id: refunded_payment_intent_ids)
+                 .map(&:amount).sum
   end
 end

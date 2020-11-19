@@ -40,7 +40,7 @@ require 'rails_helper'
 
 RSpec.describe Campaign, type: :model do
   it { should belong_to(:location) }
-  it { should belong_to(:distributor) }
+  it { should belong_to(:distributor).optional }
 
   before { freeze_time }
 
@@ -134,7 +134,7 @@ RSpec.describe Campaign, type: :model do
 
     context 'with regular gam campaign' do
       let!(:campaign) { create(:campaign) }
-  
+
       it 'returns the correct value' do
         expect(campaign.mega_gam?).to be false
       end
@@ -143,7 +143,7 @@ RSpec.describe Campaign, type: :model do
 
   context 'with amount raised for mega gam campaigns' do
     let!(:campaign) { create(:campaign, :with_sellers_distributors, :with_project, seller: nil) }
-    subject do 
+    subject do
       # Expect these 2 to be counted. :with_line_items adds line items of value 600.
       payment_intent_1 = create(:payment_intent, :with_line_items, campaign: campaign, successful: true)
       payment_intent_2 = create(:payment_intent, :with_line_items, campaign: campaign, successful: true)
@@ -152,7 +152,7 @@ RSpec.describe Campaign, type: :model do
     end
 
     it 'returns payment intent amounts' do
-      subject 
+      subject
       expect(campaign.amount_raised).to eq 1200
     end
   end
@@ -162,12 +162,23 @@ RSpec.describe Campaign, type: :model do
 
     it 'gets seller distributor pairs' do
       csds = campaign.campaigns_sellers_distributors
-      pairs = csds.map do |csd|
-        {
+      # Inserts the directly related campaign/seller
+      pairs = [{
+        'distributor_id' => campaign.distributor.id,
+        'distributor_image_url' => campaign.distributor.image_url,
+        'distributor_name' => campaign.distributor.name,
+        'seller_id' => campaign.seller.seller_id,
+        'seller_image_url' => campaign.seller.hero_image_url,
+        'seller_name' => campaign.seller.name
+      }]
+
+      # Inserts seller/dist pairs
+      csds.each do |csd|
+        pairs << {
           'distributor_id' => csd.distributor.id,
           'distributor_image_url' => csd.distributor.image_url,
           'distributor_name' => csd.distributor.name,
-          'seller_id' => csd.seller.id,
+          'seller_id' => csd.seller.seller_id,
           'seller_image_url' => csd.seller.hero_image_url,
           'seller_name' => csd.seller.name
         }
