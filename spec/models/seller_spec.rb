@@ -7,6 +7,7 @@
 #  id                      :bigint           not null, primary key
 #  accept_donations        :boolean          default(TRUE), not null
 #  business_type           :string
+#  business_type           :string
 #  cost_per_meal           :integer
 #  cuisine_name            :string
 #  founded_year            :integer
