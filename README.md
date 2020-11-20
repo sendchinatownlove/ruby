@@ -34,7 +34,7 @@ https://docs.google.com/document/d/1UPNCwjWS_T7XT5AXsewphu6NvNdV7TQLSJub-RBRAG0/
 
 ### Create and migrate database
 - Run the server (see below) and create and migrate your DB:
-`rails db:create && rails db:migrate`
+`rails db:create && rails db:migrate && rails db:seed`
 If you see an error like
 `Couldn't create 'myapp_development' database. Please check your configuration.
 rails aborted!
