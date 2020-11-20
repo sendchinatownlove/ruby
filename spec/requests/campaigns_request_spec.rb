@@ -224,7 +224,7 @@ RSpec.describe 'Campaigns API', type: :request do
             expect(campaign.target_amount).to eq 100_000
             expect(campaign.amount_raised).to eq 0
             expect(campaign.price_per_meal).to eq 500
-            expect(campaign.name).to eq @seller.name
+            expect(campaign.display_name).to eq @seller.name + ' x ' + distributor.name
 
             expect(campaign.active).to be false
             expect(campaign.valid).to be true
@@ -254,7 +254,7 @@ RSpec.describe 'Campaigns API', type: :request do
             expect(campaign.target_amount).to eq 100_000
             expect(campaign.amount_raised).to eq 0
             expect(campaign.price_per_meal).to eq 500
-            expect(campaign.name).to eq @project.name
+            expect(campaign.display_name).to eq @project.name
 
             expect(campaign.active).to be false
             expect(campaign.valid).to be true
