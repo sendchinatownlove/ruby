@@ -107,6 +107,21 @@ class Campaign < ApplicationRecord
     pairs
   end
 
+  def display_name
+    # Right now, we require campaigns to have a project or seller assocated
+    # with them. we default to the corresponding project/seller name for the
+    # campaign name.
+    if project.present?
+      project.name
+    else
+      # If there's no project, there will be a single seller/distributor
+      # associated with the campaign.
+      seller = Seller.find_by(seller_id: seller_distributor_pairs[0]['seller_id'])
+      distributor = Distributor.find(seller_distributor_pairs[0]['distributor_id'])
+      seller.name + ' x ' + distributor.name
+    end
+  end
+
   def mega_gam?
     project.present?
   end
