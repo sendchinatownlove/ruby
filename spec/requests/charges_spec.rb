@@ -595,7 +595,7 @@ RSpec.describe 'Charges API', type: :request do
 
       it 'returns a validation failure message' do
         expect(response.body).to match(
-          /line_item must be named `gift_card` or `donation`/
+          /line_item must be named `gift_card`, `donation`, or `transaction_fee`/
         )
       end
     end
