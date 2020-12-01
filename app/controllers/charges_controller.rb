@@ -97,9 +97,9 @@ class ChargesController < ApplicationController
         end
       end
 
-      unless %w[gift_card donation].include? line_item['item_type']
+      unless %w[gift_card donation transaction_fee].include? line_item['item_type']
         raise InvalidLineItem,
-              'line_item must be named `gift_card` or `donation`'
+              'line_item must be named `gift_card`, `donation`, or `transaction_fee`'
       end
 
       unless line_item['amount'].is_a? Integer
