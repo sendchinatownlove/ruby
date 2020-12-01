@@ -626,7 +626,7 @@ RSpec.describe 'Charges API', type: :request do
       end
     end
 
-    context 'with total amount too small' do
+    context 'with total amount below minimum' do
       let(:line_items) do
         [
           {
