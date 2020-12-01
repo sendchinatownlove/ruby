@@ -85,6 +85,7 @@ class ChargesController < ApplicationController
   def validate(seller_id:, project_id:, line_items:, is_distribution:)
     @seller = Seller.find_by(seller_id: seller_id)
     @project = Project.find_by(id: project_id)
+
     unless @seller.present? ^ @project.present?
       raise InvalidLineItem, "Project or Seller must exist, but not both. seller id: #{seller_id}, project_id: #{project_id}"
     end
@@ -110,11 +111,6 @@ class ChargesController < ApplicationController
         raise InvalidLineItem, 'line_item.quantity must be an Integer'
       end
 
-      amount = line_item['amount']
-      unless amount >= 50
-        raise InvalidLineItem, 'Amount must be at least $0.50 usd'
-      end
-
       @campaign = if is_distribution.present?
                     # TODO(justintmckibben): Delete this case when we start using campaign_id
                     #                        in the frontend
@@ -130,7 +126,9 @@ class ChargesController < ApplicationController
                     campaign
                   elsif charge_params[:campaign_id].present?
                     Campaign.find_by(campaign_id: campaign_id)
-      end
+                  end
+
+      amount = line_item['amount']
 
       unless gift_a_meal? && @seller.cost_per_meal.present? && amount % @seller.cost_per_meal != 0
         next
@@ -139,6 +137,12 @@ class ChargesController < ApplicationController
       raise InvalidGiftAMealAmountError,
             "Gift A Meal amount '#{amount}' must be divisible by seller's "\
             "cost per meal '#{@seller.cost_per_meal}'."
+    end
+
+    total_amount = line_items.sum { |li| li['amount'].to_i }
+
+    unless total_amount >= 50
+      raise InvalidLineItem, 'Amount must be at least $0.50 usd'
     end
   end
 
