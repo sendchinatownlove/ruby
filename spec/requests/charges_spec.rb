@@ -626,13 +626,20 @@ RSpec.describe 'Charges API', type: :request do
       end
     end
 
-    context 'with $.49 in the amount' do
+    context 'with total amount below minimum' do
       let(:line_items) do
         [
           {
-            amount: 49,
+            amount: 39,
             currency: 'usd',
             item_type: 'gift_card',
+            quantity: 1,
+            seller_id: seller_id
+          },
+          {
+            amount: 10,
+            currency: 'usd',
+            item_type: 'transaction_fee',
             quantity: 1,
             seller_id: seller_id
           }
