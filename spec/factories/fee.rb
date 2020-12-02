@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :fee do
     multiplier { Faker::Number.positive(from: 0.01, to: 0.10) }
-    flat_cost { Faker::Number.positive(from: 0.10, to: 0.90) }
+    flat_cost { Faker::Number.positive(from: 10, to: 90) }
     name { Faker::Bank.name }
     active { true }
   end

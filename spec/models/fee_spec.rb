@@ -6,7 +6,7 @@
 #
 #  id         :bigint           not null, primary key
 #  active     :boolean          default(TRUE)
-#  flat_cost  :decimal(8, 2)    default(0.0)
+#  flat_cost  :integer          default(0)
 #  multiplier :decimal(6, 4)    default(0.0)
 #  name       :string
 #

@@ -49,7 +49,7 @@ RSpec.describe 'Fees', type: :request do
         expect(fee.campaigns.size).to eq 1
         expect(campaign.fees.size).to eq 1
         expect(fee.multiplier).to eq 0.0
-        expect(fee.flat_cost).to eq 0.0
+        expect(fee.flat_cost).to eq 0
         expect(fee.active).to eq true
       end
 
@@ -62,7 +62,7 @@ RSpec.describe 'Fees', type: :request do
       let(:attrs) do
         {
           multiplier: 0.03,
-          flat_cost: 0.30,
+          flat_cost: 30,
           name: 'square fee',
           active: false
         }
@@ -78,7 +78,7 @@ RSpec.describe 'Fees', type: :request do
         expect(fee).not_to be_nil
         expect(fee.campaigns.size).to eq 1
         expect(fee.multiplier).to eq 0.03
-        expect(fee.flat_cost).to eq 0.30
+        expect(fee.flat_cost).to eq 30
         expect(fee.active).to eq false
       end
 
@@ -91,7 +91,7 @@ RSpec.describe 'Fees', type: :request do
       let(:attrs) do
         {
           multiplier: 0.03,
-          flat_cost: 0.30,
+          flat_cost: 30,
           name: 'square fee',
           active: false,
           not_a_param: 'no, this is patrick'
@@ -108,7 +108,7 @@ RSpec.describe 'Fees', type: :request do
         expect(fee).not_to be_nil
         expect(fee.campaigns.size).to eq 1
         expect(fee.multiplier).to eq 0.03
-        expect(fee.flat_cost).to eq 0.30
+        expect(fee.flat_cost).to eq 30
         expect(fee.active).to eq false
       end
 
@@ -121,7 +121,7 @@ RSpec.describe 'Fees', type: :request do
   describe 'PUT /fees/:name' do
     let(:original_active) { true }
     let(:original_multiplier) { 0.03 }
-    let(:original_flat_cost) { 0.30 }
+    let(:original_flat_cost) { 30 }
     let(:original_name) { 'square_fee' }
     let!(:fee) do
       create :fee, multiplier: original_multiplier, active: original_active, flat_cost: original_flat_cost, name: original_name
