@@ -109,7 +109,7 @@ ActiveRecord::Schema.define(version: 2020_11_13_001940) do
   create_table "fees", force: :cascade do |t|
     t.decimal "multiplier", precision: 6, scale: 4, default: "0.0"
     t.boolean "active", default: true
-    t.decimal "flat_cost", precision: 8, scale: 2, default: "0.0"
+    t.integer "flat_cost", default: 0
     t.string "name"
   end
 
