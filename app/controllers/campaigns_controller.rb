@@ -7,17 +7,20 @@ class CampaignsController < ApplicationController
 
   # GET /campaigns
   def index
-    @campaigns = valid_campaigns.order(:end_date).all
-    json_response(campaigns_json)
-  end
+    # @NOTE(wilson) check to see if querying for inactive campaigns
+    # otherwise return active campaigns by default
+    inactive = params[:inactive]
+    if inactive == 'true'
+      query = past_campaigns.order(:end_date).all
 
-  # GET /campaigns/inactive
-  def index_past_campaigns
-    query = past_campaigns.order(:end_date).all
+      @pagy, @records = pagy(query)
 
-    @pagy, @records = pagy(query)
+      json_response(@records)
+    else
+      @campaigns = valid_campaigns.order(:end_date).all
 
-    json_response(@records)
+      json_response(campaigns_json)
+    end
   end
 
   # GET /campaigns/:id
@@ -144,7 +147,7 @@ class CampaignsController < ApplicationController
   end
 
   def valid_campaigns
-    Campaign.where(valid: true)
+    Campaign.where({valid: true, active: true})
   end
 
   def past_campaigns

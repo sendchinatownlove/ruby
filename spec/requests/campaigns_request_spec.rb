@@ -19,9 +19,19 @@ RSpec.describe 'Campaigns API', type: :request do
       location_id: @location.id
     )
   end
+  let!(:inactive_campaign) do
+    create_list(
+      :campaign,
+      2,
+      seller_id: @seller.id,
+      project_id: nil,
+      location_id: @location.id,
+      active: false
+    )
+  end
 
   context 'GET /campaigns' do
-    context 'Fetching all campaigns' do
+    context 'Fetching all active campaigns' do
       subject { get '/campaigns' }
 
       it 'Returns campaigns' do
@@ -35,23 +45,9 @@ RSpec.describe 'Campaigns API', type: :request do
         expect(response).to have_http_status(200)
       end
     end
-  end
-
-  context 'GET /campaigns/inactive' do
-    # @NOTE(wilson)Test setup for inactive campaigns route
-    let!(:inactive_campaign) do
-      create_list(
-        :campaign,
-        2,
-        seller_id: @seller.id,
-        project_id: nil,
-        location_id: @location.id,
-        active: false
-      )
-    end
 
     context 'with some basic pagination' do
-      subject { get '/campaigns/inactive'}
+      subject { get '/campaigns/?inactive=true'}
       it 'returns 2 records with default pagination' do
         subject
         expect(json).not_to be_empty
@@ -59,7 +55,7 @@ RSpec.describe 'Campaigns API', type: :request do
       end
 
       it 'returns 1 record and the first page when querying for one page' do
-        get '/campaigns/inactive/?items=1'
+        get '/campaigns/?inactive=true&items=1'
         expect(json).not_to be_empty
         expect(json.size).to eq 1
 
@@ -69,7 +65,7 @@ RSpec.describe 'Campaigns API', type: :request do
       end
 
       it 'returns 1 record and two pages when querying for page 2' do
-        get '/campaigns/inactive/?page=2&items=1'
+        get '/campaigns/?inactive=true&page=2&items=1'
         expect(json).not_to be_empty
         expect(json.size).to eq 1
 
