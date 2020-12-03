@@ -37,6 +37,49 @@ RSpec.describe 'Campaigns API', type: :request do
     end
   end
 
+  context 'GET /campaigns/inactive' do
+    # @NOTE(wilson)Test setup for inactive campaigns route
+    let!(:inactive_campaign) do
+      create_list(
+        :campaign,
+        2,
+        seller_id: @seller.id,
+        project_id: nil,
+        location_id: @location.id,
+        active: false
+      )
+    end
+
+    context 'with some basic pagination' do
+      subject { get '/campaigns/inactive'}
+      it 'returns 2 records with default pagination' do
+        subject
+        expect(json).not_to be_empty
+        expect(json.size).to eq 2
+      end
+
+      it 'returns 1 record and the first page when querying for one page' do
+        get '/campaigns/inactive/?items=1'
+        expect(json).not_to be_empty
+        expect(json.size).to eq 1
+
+        expect(response.headers['Current-Page'].to_i).to eq 1
+        expect(response.headers['Total-Pages'].to_i).to eq 2
+        expect(response.headers['Total-Count'].to_i).to eq 2
+      end
+
+      it 'returns 1 record and two pages when querying for page 2' do
+        get '/campaigns/inactive/?page=2&items=1'
+        expect(json).not_to be_empty
+        expect(json.size).to eq 1
+
+        expect(response.headers['Current-Page'].to_i).to eq 2
+        expect(response.headers['Total-Pages'].to_i).to eq 2
+        expect(response.headers['Total-Count'].to_i).to eq 2
+      end
+    end
+  end
+
   context 'GET /campaigns/:id' do
     subject { get "/campaigns/#{campaign_id}" }
 
