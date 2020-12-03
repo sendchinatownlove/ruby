@@ -11,17 +11,15 @@ class CampaignsController < ApplicationController
     # otherwise return active campaigns by default
     inactive = params[:inactive]
     if inactive == 'true'
-      query = past_campaigns.order(:end_date).all
+      @campaigns = past_campaigns.order('end_date desc').all
 
-      @pagy, @records = pagy(query)
-
-      json_response(@records)
+      @pagy, @records = pagy(@campaigns)
+      json_response(campaigns_records_json)
     else
-      query = valid_campaigns.order(:end_date).all
+      @campaigns = valid_campaigns.order(:end_date).all
 
-      @pagy, @records = pagy(query)
-
-      json_response(@records)
+      @pagy, @records = pagy(@campaigns)
+      json_response(campaigns_records_json)
     end
   end
 
@@ -138,6 +136,10 @@ class CampaignsController < ApplicationController
     @campaigns.map { |c| campaign_json campaign: c }
   end
 
+  def campaigns_records_json(record: @records)
+    record.map { |c| campaign_json campaign: c }
+  end
+
   def campaign_json(campaign: @campaign)
     ret = campaign.as_json
     ret['amount_raised'] = campaign.amount_raised
@@ -149,10 +151,10 @@ class CampaignsController < ApplicationController
   end
 
   def valid_campaigns
-    Campaign.where({valid: true, active: true})
+    Campaign.where(valid: true)
   end
 
   def past_campaigns
-    Campaign.where({valid: true, active: false})
+    Campaign.where(valid: true, active: false)
   end
 end
