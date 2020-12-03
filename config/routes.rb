@@ -80,6 +80,7 @@ Rails.application.routes.draw do
   resources :nonprofits
   post 'contacts/:contact_id/lyft_rewards/:token/redeem', to: 'contact_lyft_rewards#redeem'
   post 'campaigns/:id/seller_distributor', action: :associate_seller_distributor, controller: 'campaigns'
+  get 'campaigns/inactive', to: 'campaigns#index_past_campaigns'
 
   resources :campaigns do
   end

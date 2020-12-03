@@ -1,12 +1,23 @@
 # frozen_string_literal: true
+include Pagy::Backend
 
 class CampaignsController < ApplicationController
   before_action :set_campaign, only: %i[show update]
+  after_action { pagy_headers_merge(@pagy) if @pagy }
 
   # GET /campaigns
   def index
     @campaigns = valid_campaigns.order(:end_date).all
     json_response(campaigns_json)
+  end
+
+  # GET /campaigns/inactive
+  def index_past_campaigns
+    query = past_campaigns.order(:end_date).all
+
+    @pagy, @records = pagy(query)
+
+    json_response(@records)
   end
 
   # GET /campaigns/:id
@@ -134,5 +145,9 @@ class CampaignsController < ApplicationController
 
   def valid_campaigns
     Campaign.where(valid: true)
+  end
+
+  def past_campaigns
+    Campaign.where({valid: true, active: false})
   end
 end
