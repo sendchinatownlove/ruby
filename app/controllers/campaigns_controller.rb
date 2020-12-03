@@ -14,12 +14,12 @@ class CampaignsController < ApplicationController
       @campaigns = past_campaigns.order('end_date desc').all
 
       @pagy, @records = pagy(@campaigns)
-      json_response(campaigns_records_json)
+      json_response(campaigns_json(@records))
     else
       @campaigns = valid_campaigns.order(:end_date).all
 
       @pagy, @records = pagy(@campaigns)
-      json_response(campaigns_records_json)
+      json_response(campaigns_json(@records))
     end
   end
 
@@ -132,12 +132,8 @@ class CampaignsController < ApplicationController
     @distributor = Distributor.find(params[:distributor_id])
   end
 
-  def campaigns_json
-    @campaigns.map { |c| campaign_json campaign: c }
-  end
-
-  def campaigns_records_json(record: @records)
-    record.map { |c| campaign_json campaign: c }
+  def campaigns_json(campaigns =  @campaigns)
+    campaigns.map { |c| campaign_json campaign: c }
   end
 
   def campaign_json(campaign: @campaign)
@@ -151,7 +147,7 @@ class CampaignsController < ApplicationController
   end
 
   def valid_campaigns
-    Campaign.where(valid: true)
+    Campaign.where(valid: true, active: true)
   end
 
   def past_campaigns
