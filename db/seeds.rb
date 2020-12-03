@@ -217,13 +217,31 @@ seller = Seller.find_by(seller_id: 'shunfa-bakery')
 contact = Contact.find_or_create_by!(name: 'Apex for Youth', email: 'distributor@apexforyouth.com')
 distributor = Distributor.create contact: contact, image_url: 'apexforyouth.com', website_url: 'apexforyouth.com', name: 'Apex for Youth'
 location = Location.create(address1: '123 Mott St.', city: 'Zoo York', neighborhood: 'Chinatown', state: 'NY', zip_code: '12345')
+(0..20).each do |i|
+  if i == 0
 Campaign.create(
   seller_id: seller.id,
   distributor: distributor,
   location: location,
   active: true,
-  end_date: Time.now + 30.days
-)
+      end_date: Time.now + 30.days,
+      gallery_image_urls: [
+        "https://storage.googleapis.com/sendchinatownlove-assets/public/assets/general/campaign-default.png"
+      ]
+    )
+  else
+    Campaign.create(
+      seller_id: seller.id,
+      distributor: distributor,
+      location: location,
+      active: false,
+      end_date: Time.now - 30.days,
+      gallery_image_urls: [
+        "https://storage.googleapis.com/sendchinatownlove-assets/public/assets/general/campaign-default.png"
+      ]
+    )
+  end
+end
 
 [
   {
