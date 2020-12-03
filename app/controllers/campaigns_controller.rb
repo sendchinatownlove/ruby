@@ -17,9 +17,11 @@ class CampaignsController < ApplicationController
 
       json_response(@records)
     else
-      @campaigns = valid_campaigns.order(:end_date).all
+      query = valid_campaigns.order(:end_date).all
 
-      json_response(campaigns_json)
+      @pagy, @records = pagy(query)
+
+      json_response(@records)
     end
   end
 
