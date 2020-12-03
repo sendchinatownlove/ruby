@@ -233,7 +233,7 @@ location = Location.create(address1: '123 Mott St.', city: 'Zoo York', neighborh
       distributor: distributor,
       location: location,
       active: false,
-      end_date: Time.now - 30.days,
+      end_date: Time.now - 30.days - i.days,
       gallery_image_urls: [
         "https://storage.googleapis.com/sendchinatownlove-assets/public/assets/general/campaign-default.png"
       ]
