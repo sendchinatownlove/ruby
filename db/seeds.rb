@@ -192,24 +192,22 @@ end
 
 [
   {
+    name: 'Fee 1',
     active: true,
     multiplier: 0.1,
-    seller_id: '46-mott'
   },
   {
+    name: 'Fee 2',
     active: true,
     multiplier: 0.1,
-    seller_id: '46-mott'
   },
   {
+    name: 'Fee 3',
     active: false,
     multiplier: 0.1,
-    seller_id: 'shunfa-bakery'
   }
 ].each do |attributes|
-  seller = Seller.find_by(seller_id: attributes[:seller_id])
   fee_attributes = attributes.except(:seller_id)
-  fee_attributes[:seller_id] = seller.id
   Fee.create!(fee_attributes)
 end
 
@@ -219,11 +217,11 @@ distributor = Distributor.create contact: contact, image_url: 'apexforyouth.com'
 location = Location.create(address1: '123 Mott St.', city: 'Zoo York', neighborhood: 'Chinatown', state: 'NY', zip_code: '12345')
 (0..20).each do |i|
   if i == 0
-Campaign.create(
-  seller_id: seller.id,
-  distributor: distributor,
-  location: location,
-  active: true,
+    Campaign.create(
+      seller_id: seller.id,
+      distributor: distributor,
+      location: location,
+      active: true,
       end_date: Time.now + 30.days,
       gallery_image_urls: [
         "https://storage.googleapis.com/sendchinatownlove-assets/public/assets/general/campaign-default.png"
