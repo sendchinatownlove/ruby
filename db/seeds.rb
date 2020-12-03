@@ -213,7 +213,7 @@ end
 
 seller = Seller.find_by(seller_id: 'shunfa-bakery')
 contact = Contact.find_or_create_by!(name: 'Apex for Youth', email: 'distributor@apexforyouth.com')
-distributor = Distributor.create contact: contact, image_url: 'apexforyouth.com', website_url: 'apexforyouth.com', name: 'Apex for Youth'
+distributor = Distributor.create contact: contact, image_url: 'https://storage.googleapis.com/sendchinatownlove-assets/public/assets/apex-for-youth/apex-for-youth-logo.png', website_url: 'apexforyouth.com', name: 'Apex for Youth'
 location = Location.create(address1: '123 Mott St.', city: 'Zoo York', neighborhood: 'Chinatown', state: 'NY', zip_code: '12345')
 (0..20).each do |i|
   if i == 0
@@ -225,7 +225,8 @@ location = Location.create(address1: '123 Mott St.', city: 'Zoo York', neighborh
       end_date: Time.now + 30.days,
       gallery_image_urls: [
         "https://storage.googleapis.com/sendchinatownlove-assets/public/assets/general/campaign-default.png"
-      ]
+      ],
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc orci nisi, commodo vitae egestas a, laoreet sit amet elit. Sed enim ligula, ultricies a lectus a, faucibus scelerisque nisl. In at magna volutpat, auctor libero nec, sagittis nibh. Quisque vitae convallis elit. Curabitur facilisis auctor libero at accumsan. Morbi a nisi urna. Pellentesque augue nibh, ultricies a feugiat quis, fermentum nec orci. Vestibulum libero sem, vulputate id ligula eget, auctor lobortis diam. Etiam ullamcorper ex eu condimentum sodales. Fusce vel semper augue. Etiam placerat luctus ex, nec ultrices enim ornare id. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Donec iaculis est purus, non pellentesque erat suscipit vitae.'
     )
   else
     Campaign.create(
