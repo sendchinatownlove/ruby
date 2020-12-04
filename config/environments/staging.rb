@@ -23,6 +23,10 @@ Rails.application.configure do
               'https://staging-scl.netlify.app',
               'https://www.staging-scl.netlify.app'
 
+      resource '/campaigns',
+        methods: [:get],
+        headers: :any,
+        expose: ['Total-Count', 'Total-Pages', 'Page-Items', 'Current-Page']
       resource '*', headers: :any, methods: :any
     end
   end
