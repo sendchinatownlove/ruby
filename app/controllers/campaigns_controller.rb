@@ -9,8 +9,8 @@ class CampaignsController < ApplicationController
   def index
     # @NOTE(wilson) check to see if querying for inactive campaigns
     # otherwise return active campaigns by default
-    inactive = params[:inactive]
-    if inactive == 'true'
+    inactive = ActiveModel::Type::Boolean.new.cast(params[:inactive])
+    if inactive == true
       @campaigns = past_campaigns.order('end_date desc').all
 
       @pagy, @records = pagy(@campaigns)
