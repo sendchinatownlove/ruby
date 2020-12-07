@@ -78,6 +78,9 @@
 
 Rails.application.routes.draw do
   resources :nonprofits
+  get 'auth/google', to: 'authorization#google'
+  post 'auth/passwordless', to: 'authorization#passwordless'
+  get 'auth/callback', to: 'authorization#callback'
   post 'contacts/:contact_id/lyft_rewards/:token/redeem', to: 'contact_lyft_rewards#redeem'
 
   resources :campaigns do
