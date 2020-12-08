@@ -40,5 +40,12 @@ FactoryBot.define do
         campaign = FactoryBot.create :campaign, seller_id: s.id, distributor: distributor, active: true
       end
     end
+
+    # Factory for has_many association for sellers with locations
+    factory :seller_with_location do
+      after(:create) do |seller|
+        create_list(:location, 1, seller_id: seller.id)
+      end
+    end
   end
 end

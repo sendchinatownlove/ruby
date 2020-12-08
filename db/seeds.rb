@@ -192,38 +192,55 @@ end
 
 [
   {
+    name: 'Fee 1',
     active: true,
     multiplier: 0.1,
-    seller_id: '46-mott'
   },
   {
+    name: 'Fee 2',
     active: true,
     multiplier: 0.1,
-    seller_id: '46-mott'
   },
   {
+    name: 'Fee 3',
     active: false,
     multiplier: 0.1,
-    seller_id: 'shunfa-bakery'
   }
 ].each do |attributes|
-  seller = Seller.find_by(seller_id: attributes[:seller_id])
   fee_attributes = attributes.except(:seller_id)
-  fee_attributes[:seller_id] = seller.id
   Fee.create!(fee_attributes)
 end
 
 seller = Seller.find_by(seller_id: 'shunfa-bakery')
 contact = Contact.find_or_create_by!(name: 'Apex for Youth', email: 'distributor@apexforyouth.com')
-distributor = Distributor.create contact: contact, image_url: 'apexforyouth.com', website_url: 'apexforyouth.com', name: 'Apex for Youth'
+distributor = Distributor.create contact: contact, image_url: 'https://storage.googleapis.com/sendchinatownlove-assets/public/assets/apex-for-youth/apex-for-youth-logo.png', website_url: 'apexforyouth.com', name: 'Apex for Youth'
 location = Location.create(address1: '123 Mott St.', city: 'Zoo York', neighborhood: 'Chinatown', state: 'NY', zip_code: '12345')
-Campaign.create(
-  seller_id: seller.id,
-  distributor: distributor,
-  location: location,
-  active: true,
-  end_date: Time.now + 30.days
-)
+(0..20).each do |i|
+  if i == 0
+    Campaign.create(
+      seller_id: seller.id,
+      distributor: distributor,
+      location: location,
+      active: true,
+      end_date: Time.now + 30.days,
+      gallery_image_urls: [
+        "https://storage.googleapis.com/sendchinatownlove-assets/public/assets/general/campaign-default.png"
+      ],
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc orci nisi, commodo vitae egestas a, laoreet sit amet elit. Sed enim ligula, ultricies a lectus a, faucibus scelerisque nisl. In at magna volutpat, auctor libero nec, sagittis nibh. Quisque vitae convallis elit. Curabitur facilisis auctor libero at accumsan. Morbi a nisi urna. Pellentesque augue nibh, ultricies a feugiat quis, fermentum nec orci. Vestibulum libero sem, vulputate id ligula eget, auctor lobortis diam. Etiam ullamcorper ex eu condimentum sodales. Fusce vel semper augue. Etiam placerat luctus ex, nec ultrices enim ornare id. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Donec iaculis est purus, non pellentesque erat suscipit vitae.'
+    )
+  else
+    Campaign.create(
+      seller_id: seller.id,
+      distributor: distributor,
+      location: location,
+      active: false,
+      end_date: Time.now - 30.days - i.days,
+      gallery_image_urls: [
+        "https://storage.googleapis.com/sendchinatownlove-assets/public/assets/general/campaign-default.png"
+      ]
+    )
+  end
+end
 
 [
   {

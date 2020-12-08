@@ -166,21 +166,26 @@ RSpec.describe Campaign, type: :model do
       pairs = [{
         'distributor_id' => campaign.distributor.id,
         'distributor_image_url' => campaign.distributor.image_url,
+        'distributor_website_url' => campaign.distributor.website_url,
         'distributor_name' => campaign.distributor.name,
         'seller_id' => campaign.seller.seller_id,
+        'seller_non_profit_location_id' => campaign.seller.non_profit_location_id,
         'seller_image_url' => campaign.seller.hero_image_url,
-        'seller_name' => campaign.seller.name
+        'seller_name' => campaign.seller.name,
+        'seller_city' => campaign.seller.locations.first.city
       }]
-
       # Inserts seller/dist pairs
       csds.each do |csd|
         pairs << {
           'distributor_id' => csd.distributor.id,
           'distributor_image_url' => csd.distributor.image_url,
+          'distributor_website_url' => csd.distributor.website_url,
           'distributor_name' => csd.distributor.name,
           'seller_id' => csd.seller.seller_id,
+          'seller_non_profit_location_id' => csd.seller.non_profit_location_id,
           'seller_image_url' => csd.seller.hero_image_url,
-          'seller_name' => csd.seller.name
+          'seller_name' => csd.seller.name,
+          'seller_city' => csd.seller.locations.first.city
         }
       end
 

@@ -132,10 +132,13 @@ class Campaign < ApplicationRecord
     {
       'distributor_id' => distributor.id,
       'distributor_image_url' => distributor.image_url,
+      'distributor_website_url' => distributor.website_url,
       'distributor_name' => distributor.name,
       'seller_id' => seller.seller_id,
+      'seller_non_profit_location_id' => seller.non_profit_location_id,
       'seller_image_url' => seller.hero_image_url,
-      'seller_name' => seller.name
+      'seller_name' => seller.name,
+      'seller_city' => seller.locations.size > 0 ? seller.locations.first.city : nil
     }
   end
 

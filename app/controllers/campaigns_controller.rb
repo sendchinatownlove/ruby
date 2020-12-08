@@ -1,12 +1,26 @@
 # frozen_string_literal: true
+include Pagy::Backend
 
 class CampaignsController < ApplicationController
   before_action :set_campaign, only: %i[show update]
+  after_action { pagy_headers_merge(@pagy) if @pagy }
 
   # GET /campaigns
   def index
-    @campaigns = valid_campaigns.order(:end_date).all
-    json_response(campaigns_json)
+    # @NOTE(wilson) check to see if querying for inactive campaigns
+    # otherwise return active campaigns by default
+    inactive = ActiveModel::Type::Boolean.new.cast(params[:inactive])
+    if inactive == true
+      @campaigns = past_campaigns.order('end_date desc').all
+
+      @pagy, @records = pagy(@campaigns)
+      json_response(campaigns_json(@records))
+    else
+      @campaigns = valid_campaigns.order(:end_date).all
+
+      @pagy, @records = pagy(@campaigns)
+      json_response(campaigns_json(@records))
+    end
   end
 
   # GET /campaigns/:id
@@ -118,8 +132,8 @@ class CampaignsController < ApplicationController
     @distributor = Distributor.find(params[:distributor_id])
   end
 
-  def campaigns_json
-    @campaigns.map { |c| campaign_json campaign: c }
+  def campaigns_json(campaigns =  @campaigns)
+    campaigns.map { |c| campaign_json campaign: c }
   end
 
   def campaign_json(campaign: @campaign)
@@ -133,6 +147,10 @@ class CampaignsController < ApplicationController
   end
 
   def valid_campaigns
-    Campaign.where(valid: true)
+    Campaign.where(valid: true, active: true)
+  end
+
+  def past_campaigns
+    Campaign.where(valid: true, active: false)
   end
 end

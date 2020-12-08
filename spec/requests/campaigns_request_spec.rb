@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Campaigns API', type: :request do
   before do
-    @seller = create :seller
+    @seller = create :seller_with_location
     @project = create :project
     @location = create(:location, seller_id: @seller.id)
   end
@@ -19,9 +19,19 @@ RSpec.describe 'Campaigns API', type: :request do
       location_id: @location.id
     )
   end
+  let!(:inactive_campaign) do
+    create_list(
+      :campaign,
+      2,
+      seller_id: @seller.id,
+      project_id: nil,
+      location_id: @location.id,
+      active: false
+    )
+  end
 
   context 'GET /campaigns' do
-    context 'Fetching all campaigns' do
+    context 'Fetching all active campaigns' do
       subject { get '/campaigns' }
 
       it 'Returns campaigns' do
@@ -33,6 +43,35 @@ RSpec.describe 'Campaigns API', type: :request do
       it 'Returns 200' do
         subject
         expect(response).to have_http_status(200)
+      end
+    end
+
+    context 'with some basic pagination' do
+      subject { get '/campaigns/?inactive=true'}
+      it 'returns 2 records with default pagination' do
+        subject
+        expect(json).not_to be_empty
+        expect(json.size).to eq 2
+      end
+
+      it 'returns 1 record and the first page when querying for one page' do
+        get '/campaigns/?inactive=true&items=1'
+        expect(json).not_to be_empty
+        expect(json.size).to eq 1
+
+        expect(response.headers['Current-Page'].to_i).to eq 1
+        expect(response.headers['Total-Pages'].to_i).to eq 2
+        expect(response.headers['Total-Count'].to_i).to eq 2
+      end
+
+      it 'returns 1 record and two pages when querying for page 2' do
+        get '/campaigns/?inactive=true&page=2&items=1'
+        expect(json).not_to be_empty
+        expect(json.size).to eq 1
+
+        expect(response.headers['Current-Page'].to_i).to eq 2
+        expect(response.headers['Total-Pages'].to_i).to eq 2
+        expect(response.headers['Total-Count'].to_i).to eq 2
       end
     end
   end
@@ -314,7 +353,6 @@ RSpec.describe 'Campaigns API', type: :request do
 
   context 'POST /campaigns/:id/seller_distributor' do
     let!(:distributor) { create :distributor }
-    let!(:seller) { create :seller }
 
     subject do
       post(
@@ -327,34 +365,100 @@ RSpec.describe 'Campaigns API', type: :request do
       )
     end
 
-    it 'Creates seller and distributor pair' do
-      subject
+    context 'Without a seller locaiton' do
+      let!(:seller) { create :seller }
+      let!(:campaign) do
+        create(
+          :campaign,
+          active: true,
+          seller_id: seller.id,
+          project_id: nil,
+          location_id: @location.id
+        )
+      end
 
-      expect(json['seller_distributor_pairs']).to eq([
-                                                       # Directly related seller/dist
-                                                       {
-                                                         'distributor_id' => campaign.distributor.id,
-                                                         'distributor_image_url' => campaign.distributor.image_url,
-                                                         'distributor_name' => campaign.distributor.name,
-                                                         'seller_id' => campaign.seller.seller_id,
-                                                         'seller_image_url' => campaign.seller.hero_image_url,
-                                                         'seller_name' => campaign.seller.name
-                                                       },
-                                                       # Seller/dist pair
-                                                       {
-                                                         'distributor_id' => distributor.id,
-                                                         'distributor_image_url' => distributor.image_url,
-                                                         'distributor_name' => distributor.name,
-                                                         'seller_id' => seller.seller_id,
-                                                         'seller_image_url' => seller.hero_image_url,
-                                                         'seller_name' => seller.name
-                                                       }
-                                                     ])
+      it 'Creates seller and distributor pair' do
+        subject
+        expect(json['seller_distributor_pairs']).to eq([
+          # Directly related seller/dist
+          {
+            'distributor_id' => campaign.distributor.id,
+            'distributor_image_url' => campaign.distributor.image_url,
+            'distributor_website_url' => campaign.distributor.website_url,
+            'distributor_name' => campaign.distributor.name,
+            'seller_id' => campaign.seller.seller_id,
+            'seller_image_url' => campaign.seller.hero_image_url,
+            'seller_name' => campaign.seller.name,
+            'seller_non_profit_location_id' => campaign.seller.non_profit_location_id,
+            'seller_city' => nil
+          },
+          # Seller/dist pair
+          {
+            'distributor_id' => distributor.id,
+            'distributor_image_url' => distributor.image_url,
+            'distributor_website_url' => distributor.website_url,
+            'distributor_name' => distributor.name,
+            'seller_id' => seller.seller_id,
+            'seller_image_url' => seller.hero_image_url,
+            'seller_name' => seller.name,
+            'seller_non_profit_location_id' => seller.non_profit_location_id,
+            'seller_city' => nil
+          }
+        ])
+      end
+
+      it 'Returns status code 200' do
+        subject
+        expect(response).to have_http_status(200)
+      end
     end
 
-    it 'Returns status code 200' do
-      subject
-      expect(response).to have_http_status(200)
+    context 'With seller location' do
+      let!(:seller) { create :seller_with_location }
+      let!(:campaign) do
+        create(
+          :campaign,
+          active: true,
+          seller_id: seller.id,
+          project_id: nil,
+          location_id: @location.id
+        )
+      end
+
+      it 'Creates seller and distributor pair' do
+        subject
+        expect(json['seller_distributor_pairs']).to eq([
+          # Directly related seller/dist
+          {
+            'distributor_id' => campaign.distributor.id,
+            'distributor_image_url' => campaign.distributor.image_url,
+            'distributor_website_url' => campaign.distributor.website_url,
+            'distributor_name' => campaign.distributor.name,
+            'seller_id' => campaign.seller.seller_id,
+            'seller_image_url' => campaign.seller.hero_image_url,
+            'seller_name' => campaign.seller.name,
+            'seller_non_profit_location_id' => campaign.seller.non_profit_location_id,
+            'seller_city' => campaign.seller.locations.first.city
+          },
+          # Seller/dist pair
+          {
+            'distributor_id' => distributor.id,
+            'distributor_image_url' => distributor.image_url,
+            'distributor_website_url' => distributor.website_url,
+            'distributor_name' => distributor.name,
+            'seller_id' => seller.seller_id,
+            'seller_image_url' => seller.hero_image_url,
+            'seller_name' => seller.name,
+            'seller_non_profit_location_id' => seller.non_profit_location_id,
+            'seller_city' => seller.locations.first.city
+          }
+        ])
+      end
+
+      it 'Returns status code 200' do
+        subject
+        expect(response).to have_http_status(200)
+      end
     end
   end
 end
