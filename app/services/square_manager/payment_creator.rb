@@ -37,6 +37,8 @@ module SquareManager
       case location_id
       when ENV['THINK_CHINATOWN_LOCATION_ID']
         ENV['THINK_CHINATOWN_ACCESS_TOKEN']
+      when ENV['APEX_LOCATION_ID']
+        ENV['APEX_ACCESS_TOKEN']
       else
         ENV['SQUARE_ACCESS_TOKEN']
       end

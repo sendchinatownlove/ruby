@@ -34,6 +34,15 @@ module SquareManager
         )
       )
 
+      # we also have webhooks request that could come from the Apex account
+      think_chinatown_signature = Base64.strict_encode64(
+        OpenSSL::HMAC.digest(
+          'sha1',
+          ENV['APEX_WEBHOOK_SIGNATURE_KEY'],
+          string_to_sign
+        )
+      )
+
       # Hash the signatures a second time (to protect against timing attacks)
       # and compare them
       unless [Digest::SHA1.base64digest(string_signature), Digest::SHA1.base64digest(think_chinatown_signature)].include?(Digest::SHA1.base64digest(callback_signature))
