@@ -22,14 +22,16 @@ module EmailManager
            '</head>' \
            '<body>' \
            '<h1>Thank you for your purchase from ' + merchant + '!</h1>' \
-           '<p> View your gift card <b> <a href="' + gift_card_url + '">here</a></b></p>' \
-           '<p> Gift card balance: <b>$' + amount_string + '</b></p>' \
-           '<p> Square receipt: ' + payment_intent.receipt_url + '</p>' \
-           "<p> We'll be in touch when " + merchant + ' opens back up with details' \
-           '  on how to use your gift card. Sending thanks from us and from Chinatown for' \
-           '  your support! </p>' \
-           '<p> Love,<p>' \
-           '<p> the Send Chinatown Love team</p>' \
+           '<p> We truly appreciate your donation to ' + merchant + '! While this year has been' \
+           ' trying for Asian-owned small businesses, donors like you have stepped up to support our' \
+           ' community in their time of need — resulting in $125,000 raised to date. </p>' \
+           '<p> Please use the voucher linked below when making your purchase at this merchant.' \
+           ' Thanks again for support. </p>' \
+           '<p> With gratitude,<br>' \
+           ' The Send Chinatown Love team</p>' \
+           '<p><a href="' + gift_card_url + '"> Access Your Voucher</a><br>' \
+           ' Voucher Balance: <b>$' + amount_string + '</b><br>' \
+           '<a href="' + payment_intent.receipt_url + '"> View Your Square Receipt </a></p>' \
            '</body>' \
            '</html>'
       EmailManager::Sender.send_receipt(to: payment_intent.recipient.email, html: html)
