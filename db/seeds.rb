@@ -417,3 +417,16 @@ end
 ].each do |attributes|
   Project.find_or_create_by(name: attributes[:name]).update!(attributes)
 end
+
+# Create a mega gam campaign
+megagam_project = Project.create!(name: 'mega gam', square_location_id: ENV['SQUARE_LOCATION_ID']);
+Campaign.create(
+  project_id: megagam_project[:id],
+  distributor: distributor,
+  gallery_image_urls: [
+    "https://storage.googleapis.com/sendchinatownlove-assets/public/assets/general/campaign-default.png"
+  ],
+  location: location,
+  active: true,
+  end_date: Time.now + 30.days
+)
