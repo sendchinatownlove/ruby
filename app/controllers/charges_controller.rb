@@ -19,7 +19,8 @@ class ChargesController < ApplicationController
     validate(
       seller_id: seller_id,
       project_id: project_id,
-      line_items: line_items
+      line_items: line_items,
+      is_distribution: charge_params[:is_distribution]
     )
 
     # Validate each Item and get all ItemTypes
@@ -74,12 +75,14 @@ class ChargesController < ApplicationController
       :idempotency_key,
       :is_subscribed,
       :campaign_id,
+      # TODO(justintmckibben): Deprecate this boolean in favor of campaign_id
+      :is_distribution,
       :metadata,
       line_items: [%i[amount currency item_type quantity]]
     )
   end
 
-  def validate(seller_id:, project_id:, line_items:)
+  def validate(seller_id:, project_id:, line_items:, is_distribution:)
     @seller = Seller.find_by(seller_id: seller_id)
     @project = Project.find_by(id: project_id)
 
@@ -108,9 +111,9 @@ class ChargesController < ApplicationController
         raise InvalidLineItem, 'line_item.quantity must be an Integer'
       end
 
-      @campaign = if charge_params[:campaign_id].present? && !project_id.present?
-                    # TODO(billyyuan): Replace !project_id.present? once a mega gam is defined by having multi-sellers
-                    #                  Currently, a mega gam is defined by whether a campaign_id and project_id exists
+      @campaign = if is_distribution.present?
+                    # TODO(justintmckibben): Delete this case when we start using campaign_id
+                    #                        in the frontend
                     campaign = Campaign.find_by(
                       seller_id: @seller.id,
                       active: true,
@@ -122,7 +125,7 @@ class ChargesController < ApplicationController
 
                     campaign
                   elsif charge_params[:campaign_id].present?
-                    Campaign.find_by(id: charge_params[:campaign_id])
+                    Campaign.find(charge_params[:campaign_id])
                   end
 
       amount = line_item['amount']
@@ -152,10 +155,10 @@ class ChargesController < ApplicationController
     metadata:,
     project_id:
   )
-    square_location_id = if @project.present?
-                           @project.square_location_id
-                         elsif gift_a_meal? && @seller.non_profit_location_id.present?
+    square_location_id = if gift_a_meal? && @seller.present? && @seller.non_profit_location_id.present?
                            @seller.non_profit_location_id
+                         elsif @project.present?
+                           @project.square_location_id
                          else
                            @seller.square_location_id
                          end
