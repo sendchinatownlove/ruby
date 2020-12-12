@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-
+# billy-yuan test diff
 require 'securerandom'
 
 class ChargesController < ApplicationController
