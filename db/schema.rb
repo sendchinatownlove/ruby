@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_13_001940) do
+ActiveRecord::Schema.define(version: 2020_12_13_190758) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -21,7 +21,7 @@ ActiveRecord::Schema.define(version: 2020_11_13_001940) do
     t.datetime "end_date", null: false
     t.string "description"
     t.string "gallery_image_urls", array: true
-    t.bigint "location_id", null: false
+    t.bigint "location_id"
     t.bigint "seller_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -32,6 +32,7 @@ ActiveRecord::Schema.define(version: 2020_11_13_001940) do
     t.bigint "nonprofit_id"
     t.datetime "start_date"
     t.bigint "project_id"
+    t.string "neighborhood"
     t.index ["distributor_id"], name: "index_campaigns_on_distributor_id"
     t.index ["location_id"], name: "index_campaigns_on_location_id"
     t.index ["nonprofit_id"], name: "index_campaigns_on_nonprofit_id"
