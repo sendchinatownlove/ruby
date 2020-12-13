@@ -9,6 +9,7 @@
 #  description        :string
 #  end_date           :datetime         not null
 #  gallery_image_urls :string           is an Array
+#  neighborhood       :string
 #  price_per_meal     :integer          default(500)
 #  start_date         :datetime
 #  target_amount      :integer          default(100000), not null
@@ -17,7 +18,7 @@
 #  updated_at         :datetime         not null
 #  distributor_id     :bigint
 #  fee_id             :integer
-#  location_id        :bigint           not null
+#  location_id        :bigint
 #  nonprofit_id       :bigint
 #  project_id         :bigint
 #  seller_id          :bigint
