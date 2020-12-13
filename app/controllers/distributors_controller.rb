@@ -3,6 +3,11 @@
 class DistributorsController < ApplicationController
   before_action :set_distributor, only: %i[show update]
 
+  # GET /distributors
+  def index
+    json_response(Distributor.all)
+  end
+
   # POST /distributors
   def create
     json_response(Distributor.create!(create_params), :created)
