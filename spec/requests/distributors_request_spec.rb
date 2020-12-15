@@ -3,6 +3,23 @@
 require 'rails_helper'
 
 RSpec.describe 'Distributors', type: :request do
+
+  describe 'GET /distributors' do
+    let!(:distributors) do
+      (1..10).map { create :distributor }
+    end
+
+    before { get "/distributors" }
+
+    it 'returns the distributor' do
+      expect(json.size).to eq distributors.size
+    end
+
+    it 'returns status code 200' do
+      expect(response).to have_http_status(200)
+    end
+  end
+
   describe 'GET /distributors/:id' do
     let!(:distributor) { create :distributor }
     before { get "/distributors/#{distributor_id}" }
