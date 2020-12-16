@@ -30,6 +30,25 @@ RSpec.describe WebhooksController, type: :controller do
         post :create, body: request_body
       end
     end
+
+    context 'when transaction fee is present' do
+      let!(:payment_intent) do
+        create :payment_intent, :with_transaction_fee, square_payment_id: 'square-id', square_location_id: ENV['SQUARE_LOCATION_ID']
+      end
+
+      it 'only sends email for non-transaction fee line items' do
+        line_items = JSON.parse payment_intent.line_items
+        donation_line_item = line_items.find { |item| item['item_type'] == 'donation' }
+
+        expected_args = {
+          amount: donation_line_item['amount']
+        }
+
+        post :create, body: request_body
+
+        expect(EmailManager::DonationReceiptSender).to have_received(:call).once.with(hash_including(expected_args))
+      end
+    end
   end
 
   ### HELPERS ###
