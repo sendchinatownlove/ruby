@@ -29,4 +29,15 @@ FactoryBot.define do
       )
     end
   end
+
+  trait :with_transaction_fee do
+    line_items do
+      %(
+        [
+          {"amount": 1000, "seller_id": "43", "item_type": "donation"},
+          {"amount": 314, "seller_id": "43", "item_type": "transaction_fee"}
+        ]
+      )
+    end
+  end
 end
