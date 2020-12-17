@@ -114,10 +114,11 @@ class WebhooksController < ApplicationController
     end
 
     items = JSON.parse(payment_intent.line_items)
-    recipient = payment_intent.recipient
     is_donation = false
     save_payment_intent = false
-    items = items.reject { |item| item['type'] == 'fee' }
+
+    items.reject! { |item| item['item_type'] == 'transaction_fee' }
+
     items.each do |item_json|
       # TODO(jtmckibb): Add some tracking that tracks if it breaks somewhere
       # here

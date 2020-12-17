@@ -17,6 +17,8 @@ https://gorails.com/setup/ubuntu/19.10
 1. heroku local web -> localhost:5000
 1. test: heroku local:run bundle exec rspec
 
+**NOTE:** Please clone and create your branches in the main repo, PR's from forked repos will have tests fail due to missing CI environmental variables
+
 ## on machine
 
 ### Installation
