@@ -19,10 +19,12 @@ module SquareManager
       # signature key
       accounts = %w[square think_chinatown apex]
       signatures = accounts.map do |account_name|
+        key = ENV["#{account_name.upcase}_WEBHOOK_SIGNATURE_KEY"]
+
         Base64.strict_encode64(
           OpenSSL::HMAC.digest(
             'sha1',
-            ENV["#{account_name.upcase}_WEBHOOK_SIGNATURE_KEY"],
+            key,
             string_to_sign
           )
         )
@@ -30,9 +32,10 @@ module SquareManager
 
       # Hash the signatures a second time (to protect against timing attacks)
       # and compare them
-      hashed_signatures = signatures.map { |signature| Digest::SHA1.base64digest(signature) }
+      hashed_account_signatures = signatures.map { |signature| Digest::SHA1.base64digest(signature) }
+      hashed_callback_signature = Digest::SHA1.base64digest(callback_signature)
 
-      unless hashed_signatures.include?(Digest::SHA1.base64digest(callback_signature))
+      unless hashed_account_signatures.include?(hashed_callback_signature)
         raise ExceptionHandler::InvalidSquareSignature
       end
     end
