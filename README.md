@@ -76,6 +76,7 @@ This also enables you to share your local environment in pull requests for addit
 
 1. Setup localhost.run or ngrok or any derivatives to forward your localhost port to the web.
 1. Make the port forwarder point to your local port. localhost.run cmd: `ssh -R 80:localhost:5000 ssh.localhost.run`
+1. Make sure to append `/webhooks` to the forwarding URL so you're hitting the correct route
 1. Go to: https://developer.squareup.com/apps
 1. Go to the webhooks pane and create a sandbox api to point to domain created above.
 1. Enable the following events:
