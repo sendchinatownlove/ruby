@@ -203,12 +203,21 @@ class ChargesController < ApplicationController
       recipient: recipient,
       campaign: @campaign,
       metadata: metadata,
-      project: Project.find_by(id: project_id)
+      project: Project.find_by(id: project_id),
+      fee_id: get_nonprofit_fee_id
     )
 
     api_response
   end
 
+  # Get the fee
+  def get_nonprofit_fee_id
+    nonprofit_id = @campaign[:nonprofit_id] if @campaign
+    nonprofit_fee_id = Nonprofit.find(nonprofit_id)[:fee_id] if nonprofit_id
+
+    nonprofit_fee_id
+  end
+  
   def gift_a_meal?
     @campaign.present?
   end
