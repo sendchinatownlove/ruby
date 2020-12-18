@@ -49,21 +49,27 @@ describe SquareManager::PaymentCreator do
       # Arrange
       tc_lid = 'tc_lid'
       tc_at = 'tc_at'
+      apex_lid = 'apex_lid'
+      apex_at = 'apex_at'
       our_at = 'our_at'
 
       allow(ENV).to receive(:[]).with('THINK_CHINATOWN_LOCATION_ID').and_return(tc_lid)
       allow(ENV).to receive(:[]).with('THINK_CHINATOWN_ACCESS_TOKEN').and_return(tc_at)
+      allow(ENV).to receive(:[]).with('APEX_LOCATION_ID').and_return(apex_lid)
+      allow(ENV).to receive(:[]).with('APEX_ACCESS_TOKEN').and_return(apex_at)
       allow(ENV).to receive(:[]).with('SQUARE_ACCESS_TOKEN').and_return(our_at)
 
       pc = SquareManager::PaymentCreator.new(init_data)
 
       # Act
       access_token = pc.send('access_token_from_location_id', location_id: tc_lid)
-      access_token2 = pc.send('access_token_from_location_id', location_id: 'anything else')
+      access_token2 = pc.send('access_token_from_location_id', location_id: apex_lid)
+      access_token3 = pc.send('access_token_from_location_id', location_id: 'anything else')
 
       # Assert
       expect(access_token).to equal(tc_at)
-      expect(access_token2).to equal(our_at)
+      expect(access_token2).to equal(apex_at)
+      expect(access_token3).to equal(our_at)
     end
   end
 end
