@@ -194,12 +194,6 @@ class ChargesController < ApplicationController
 
     # Creates a pending PaymentIntent. See webhooks_controller to see what
     # happens when the PaymentIntent is successful.
-    
-    # Check for whether a campaign exits. If a campaign exists, then check whether the campaign has a non-profit associated with it. 
-    # If a non-profit exists, then check whether the non-profit has a fee ID. If so, then set fee ID equal to fee_id
-    fee_id = if @campaign && @campaign[:nonprofit_id] && Nonprofit.find_by(id: @campaign[:nonprofit_id])[:fee_id]
-              Fee.find_by(id: Nonprofit.find_by(id: @campaign[:nonprofit_id])[:fee_id])[:id]
-             end
 
     PaymentIntent.create!(
       square_location_id: square_location_id,
@@ -211,10 +205,18 @@ class ChargesController < ApplicationController
       campaign: @campaign,
       metadata: metadata,
       project: Project.find_by(id: project_id),
-      fee_id: fee_id
+      fee_id: get_nonprofit_fee_id
     )
 
     api_response
+  end
+
+  # Get the fee
+  def get_nonprofit_fee_id
+    nonprofit_id = @campaign[:nonprofit_id] if @campaign
+    nonprofit_fee_id = Nonprofit.find(nonprofit_id)[:fee_id] if nonprofit_id
+    
+    nonprofit_fee_id
   end
 
   def gift_a_meal?
