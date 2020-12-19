@@ -81,7 +81,12 @@ RSpec.describe ChargesController, type: :controller do
           .with(payment_params)
           .and_return(mock_response)
 
-        cparams = create_charge_params(seller: @seller, is_square: true, campaign: @campaign, is_distribution: false)
+        cparams = create_charge_params(
+                    seller: @seller, 
+                    is_square: true, 
+                    campaign: @campaign, 
+                    is_distribution: false
+                  )
         response = post :create, params: cparams, as: :json
         payment_intent = PaymentIntent.find_by(campaign_id: campaign_id, fee_id: fee_id)
         expect(payment_intent).to_not eq nil
@@ -121,7 +126,11 @@ RSpec.describe ChargesController, type: :controller do
 
         cparams = create_charge_params(is_square: true, campaign: @campaign, is_distribution: false)
         response = post :create, params: cparams, as: :json
-        payment_intent = PaymentIntent.find_by(campaign_id: campaign_id, project_id: project_id, fee_id: fee_id)
+        payment_intent = PaymentIntent.find_by(
+                          campaign_id: campaign_id, 
+                          project_id: project_id, 
+                          fee_id: fee_id
+                         ) 
         expect(payment_intent).to_not eq nil
         expect(response.status).to eq 200
       end
