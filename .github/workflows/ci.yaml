@@ -20,7 +20,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-        
+
 
     steps:
     - uses: actions/checkout@v2
@@ -40,6 +40,7 @@ jobs:
         RAILS_WEBHOOK_URL: http://localhost:3000/webhooks
         THINK_CHINATOWN_LOCATION_ID: ${{ secrets.THINK_CHINATOWN_LOCATION_ID }}
         THINK_CHINATOWN_WEBHOOK_SIGNATURE_KEY: ${{ secrets.THINK_CHINATOWN_WEBHOOK_SIGNATURE_KEY }}
+        APEX_WEBHOOK_SIGNATURE_KEY: asdf
       run: |
         sudo apt-get -yqq install libpq-dev
         gem install bundler
