@@ -9,11 +9,11 @@ describe SquareManager::WebhookValidator, '#call' do
 
     expect(Base64).to receive(:strict_encode64).with(any_args).and_return(
       string_signature
-    ).twice
+    ).exactly(3).times
 
     expect(Digest::SHA1).to receive(:base64digest).with(
       string_signature
-    ).twice.and_return(true)
+    ).exactly(3).times.and_return(true)
 
     expect(Digest::SHA1).to receive(:base64digest).with(
       callback_signature
