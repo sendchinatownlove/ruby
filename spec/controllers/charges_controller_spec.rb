@@ -50,31 +50,31 @@ RSpec.describe ChargesController, type: :controller do
 
     context 'when campaign has a nonprofit with a fee_id' do
       it 'should create a payment_intent that has the campaign_id and fee_id' do
-        @seller = create(
+        seller = create(
           :seller,
           id: seller_id,
           square_location_id: square_location_id
         )
-        @fee = create(
+        fee = create(
           :fee, 
           id: fee_id,
           active: true, 
           multiplier: 0.1
         )
-        @nonprofit = create(
+        nonprofit = create(
           :nonprofit,
           id: nonprofit_id,
-          fee_id: @fee.id
+          fee_id: fee.id
         )
-        @campaign = create(
+        campaign = create(
           :campaign,
           id: campaign_id,
           active: true,
           seller_id: seller_id,
-          nonprofit_id: @nonprofit.id
+          nonprofit_id: nonprofit.id
         )
 
-        payment_params = create_payment_params(seller: @seller, campaign: @campaign)
+        payment_params = create_payment_params(seller: seller, campaign: campaign)
         
         allow(SquareManager::PaymentCreator)
           .to receive(:call)
@@ -82,9 +82,9 @@ RSpec.describe ChargesController, type: :controller do
           .and_return(mock_response)
 
         cparams = create_charge_params(
-                    seller: @seller, 
+                    seller: seller, 
                     is_square: true, 
-                    campaign: @campaign, 
+                    campaign: campaign, 
                     is_distribution: false
                   )
         response = post :create, params: cparams, as: :json
@@ -96,35 +96,35 @@ RSpec.describe ChargesController, type: :controller do
 
     context 'when campaign has a project_id and a nonprofit with a fee_id' do
       it 'should create a payment_intent that has the project_id, campaign_id and fee_id' do
-        @project = create(:project, id: project_id, square_location_id: square_location_id)
-        @fee = create(
+        project = create(:project, id: project_id, square_location_id: square_location_id)
+        fee = create(
           :fee, 
           id: fee_id,
           active: true, 
           multiplier: 0.1
         )
-        @nonprofit = create(
+        nonprofit = create(
           :nonprofit,
           id: nonprofit_id,
-          fee_id: @fee.id
+          fee_id: fee.id
         )
-        @campaign = create(
+        campaign = create(
           :campaign,
           id: campaign_id,
           active: true,
           seller_id: nil,
-          project_id: @project.id,
-          nonprofit_id: @nonprofit.id
+          project_id: project.id,
+          nonprofit_id: nonprofit.id
         )
 
-        payment_params = create_payment_params(campaign: @campaign, project: @project)
+        payment_params = create_payment_params(campaign: campaign, project: project)
 
         allow(SquareManager::PaymentCreator)
           .to receive(:call)
           .with(payment_params)
           .and_return(mock_response)
 
-        cparams = create_charge_params(is_square: true, campaign: @campaign, is_distribution: false)
+        cparams = create_charge_params(is_square: true, campaign: campaign, is_distribution: false)
         response = post :create, params: cparams, as: :json
         payment_intent = PaymentIntent.find_by(
                           campaign_id: campaign_id, 
