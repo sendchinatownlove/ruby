@@ -215,6 +215,8 @@ seller = Seller.find_by(seller_id: 'shunfa-bakery')
 contact = Contact.find_or_create_by!(name: 'Apex for Youth', email: 'distributor@apexforyouth.com')
 distributor = Distributor.create contact: contact, image_url: 'https://storage.googleapis.com/sendchinatownlove-assets/public/assets/apex-for-youth/apex-for-youth-logo.png', website_url: 'apexforyouth.com', name: 'Apex for Youth'
 location = Location.create(address1: '123 Mott St.', city: 'Zoo York', neighborhood: 'Chinatown', state: 'NY', zip_code: '12345')
+nonprofit = Nonprofit.create(name: 'Non Profit', fee_id: Fee.first[:id])
+
 (0..20).each do |i|
   if i == 0
     Campaign.create(
@@ -223,6 +225,7 @@ location = Location.create(address1: '123 Mott St.', city: 'Zoo York', neighborh
       location: location,
       active: true,
       end_date: Time.now + 30.days,
+      nonprofit_id: nonprofit.id,
       gallery_image_urls: [
         "https://storage.googleapis.com/sendchinatownlove-assets/public/assets/general/campaign-default.png"
       ],

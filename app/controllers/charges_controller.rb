@@ -125,12 +125,12 @@ class ChargesController < ApplicationController
 
                     campaign
                   elsif charge_params[:campaign_id].present?
-                    Campaign.find_by(campaign_id: campaign_id)
+                    Campaign.find_by(id: charge_params[:campaign_id])
                   end
 
       amount = line_item['amount']
 
-      unless gift_a_meal? && @seller.cost_per_meal.present? && amount % @seller.cost_per_meal != 0
+      unless gift_a_meal? && @seller.present? && @seller.cost_per_meal.present? && amount % @seller.cost_per_meal != 0
         next
       end
 
@@ -155,7 +155,7 @@ class ChargesController < ApplicationController
     metadata:,
     project_id:
   )
-    square_location_id = if gift_a_meal? && @seller.non_profit_location_id.present?
+    square_location_id = if gift_a_meal? && @seller.present? && @seller.non_profit_location_id.present?
                            @seller.non_profit_location_id
                          elsif @project.present?
                            @project.square_location_id
@@ -203,10 +203,19 @@ class ChargesController < ApplicationController
       recipient: recipient,
       campaign: @campaign,
       metadata: metadata,
-      project: Project.find_by(id: project_id)
+      project: Project.find_by(id: project_id),
+      fee_id: get_nonprofit_fee_id
     )
 
     api_response
+  end
+
+  # Get the fee
+  def get_nonprofit_fee_id
+    nonprofit_id = @campaign[:nonprofit_id] if @campaign
+    nonprofit_fee_id = Nonprofit.find(nonprofit_id)[:fee_id] if nonprofit_id
+
+    nonprofit_fee_id
   end
 
   def gift_a_meal?
