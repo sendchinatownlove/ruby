@@ -145,14 +145,25 @@ class Campaign < ApplicationRecord
 
   # Calculates the amount raised in the payment intent table.
   def payment_intent_amount
-    PaymentIntent
+    payment_intents = PaymentIntent
       .joins(:campaign)
       .where(campaigns: {
                id: id
              })
       .where(successful: true)
-      .map(&:amount)
-      .sum
+      .as_json
+
+    # Ignore transaction fees when calculating the total amount raised
+    total_amount_raised = 0
+    payment_intents.each do |payment|
+      line_items = JSON.parse(payment["line_items"])
+      amount = line_items
+        .select{ |line_item| line_item["item_type"] == "donation" }
+        .map{ |donation_line_item| donation_line_item["amount"] }
+        .sum
+      total_amount_raised += amount
+    end
+    total_amount_raised
   end
 
   # calculates the amount raised from gift cards
