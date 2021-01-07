@@ -158,6 +158,22 @@ RSpec.describe Campaign, type: :model do
     end
   end
 
+  context 'with amount raised for mega gam campaigns with transaction fees' do
+    let!(:campaign) { create(:campaign, :with_sellers_distributors, :with_project, seller: nil) }
+    subject do
+      # Expect these 2 to be counted. :with_line_items adds line items of value 600.
+      payment_intent_1 = create(:payment_intent, :with_line_items, :with_transaction_fee_project, campaign: campaign, successful: true)
+      payment_intent_2 = create(:payment_intent, :with_line_items, :with_transaction_fee_project, campaign: campaign, successful: true)
+      # Do not expect this one to be counted since it's not successful.
+      payment_intent_3 = create(:payment_intent, :with_line_items, :with_transaction_fee_project, campaign: campaign, successful: false)
+    end
+      
+    it 'returns payment intent amounts' do
+      subject
+      expect(campaign.amount_raised).to eq 2000
+    end
+  end
+
   context 'with seller distributor pairs' do
     let!(:campaign) { create(:campaign, :with_sellers_distributors) }
 
