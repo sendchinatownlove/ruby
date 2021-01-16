@@ -44,10 +44,23 @@ class PaymentIntent < ApplicationRecord
   belongs_to :campaign, optional: true
   belongs_to :project, optional: true
 
+  after_create :make_campaign_inactive_if_met_goal
+
   def amount
     return 0 if line_items.nil?
 
     line_items_json = JSON.parse(line_items)
     line_items_json.map { |li| li['amount'].to_i }.sum
+  end
+
+  # After a payment intent is created, check if the campaign reached its goal.
+  # If so, make the campaign inactive
+  def make_campaign_inactive_if_met_goal
+    campaign = Campaign.find_by(id: self.campaign_id)
+
+    if campaign && campaign.amount_raised >= campaign.target_amount
+      campaign.active = false
+      campaign.save
+    end
   end
 end
