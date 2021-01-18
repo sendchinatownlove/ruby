@@ -16,7 +16,9 @@
 #  fk_rails_...  (contact_id => contacts.id)
 #  fk_rails_...  (reward_id => rewards.id)
 #
-class Redemption < ApplicationRecord
-    belongs_to :reward
-    belongs_to :contact
+require 'rails_helper'
+
+RSpec.describe Redemption, type: :model do
+  it { should belong_to(:contact) }
+  it { should belong_to(:reward) }
 end
