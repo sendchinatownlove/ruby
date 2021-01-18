@@ -115,4 +115,6 @@ Rails.application.routes.draw do
   end
   resources :webhooks do
   end
+  resources :gcs do
+  end
 end
