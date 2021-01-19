@@ -19,7 +19,7 @@ module WebhookManager
       ActiveRecord::Base.transaction do
         seller = Seller.find_by(seller_id: seller_id)
         distributor = Distributor.find(distributor_id)
-        contact = Contact.find(distributor.contact_id)
+        distributor_contact = Contact.find(distributor.contact_id)
         item = WebhookManager::ItemCreator.call({
                                                   item_type: :gift_card,
                                                   seller_id: seller_id,
@@ -33,7 +33,7 @@ module WebhookManager
           item: item,
           gift_card_id: GiftCardIdGenerator.generate_gift_card_id,
           seller_gift_card_id: GiftCardIdGenerator.generate_seller_gift_card_id(seller_id: seller_id),
-          recipient: payment_intent ? payment_intent.recipient : contact,
+          recipient: payment_intent ? payment_intent.recipient : distributor_contact,
           single_use: single_use
         )
         GiftCardAmount.create!(value: amount, gift_card_detail: gift_card_detail)
