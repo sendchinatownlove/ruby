@@ -33,7 +33,7 @@
 class Item < ApplicationRecord
   belongs_to :campaign, optional: true
   belongs_to :payment_intent, optional: true
-  belongs_to :purchaser, class_name: 'Contact'
+  belongs_to :purchaser, class_name: 'Contact', optional: true
 
   # Must have seller or project, but not both
   belongs_to :seller, optional: true

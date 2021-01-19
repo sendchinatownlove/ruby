@@ -28,9 +28,9 @@ ActiveRecord::Schema.define(version: 2020_12_13_190758) do
     t.bigint "distributor_id"
     t.integer "target_amount", default: 100000, null: false
     t.integer "price_per_meal", default: 500
-    t.integer "fee_id"
     t.bigint "nonprofit_id"
     t.datetime "start_date"
+    t.integer "fee_id"
     t.bigint "project_id"
     t.string "neighborhood"
     t.index ["distributor_id"], name: "index_campaigns_on_distributor_id"

@@ -50,6 +50,29 @@ class CampaignsController < ApplicationController
     json_response(campaign_json)
   end
 
+  # POST /campaigns/:id/gift_card
+  def generate_campaign_gift_cards
+    request_params = generate_campaign_gift_cards_params
+    if @campaign.amount_raised > @campaign.amount_allocated + request_params['gift_card_amount_cents']
+      raise InvalidLineItem, "Request amount exceeds unallocated amount in campaign. Unallocated amount: #{
+        @campaign.amount_raised - @campaign.amount_allocated
+      }"
+    end
+
+    WebhookManager::GiftCardCreator.call(
+      {
+        amount: request_params['gift_card_amount_cents'],
+        single_use: true,
+        project_id: @campaign.project_id,
+        campaign_id: @campaign.id,
+      }
+    )
+
+    json_response({
+      'unallocated': @campaign.amount_raised - @campaign.amount_allocated
+    })
+  end
+
   private
 
   def create_params
@@ -99,6 +122,24 @@ class CampaignsController < ApplicationController
     ret = params.permit(
       :distributor_id,
       :seller_id
+    )
+
+    set_campaign
+    set_distributor
+    @seller = Seller.find(params[:seller_id])
+
+    ret
+  end
+
+  def generate_campaign_gift_cards_params
+    params.require(:distributor_id)
+    params.require(:gift_card_amount_cents)
+    params.require(:seller_id)
+
+    ret = params.permit(
+      :distributor_id,
+      :gift_card_amount_cents,
+      :seller_id,
     )
 
     set_campaign

@@ -3,13 +3,16 @@
 # Creates donation and item with the corresponding payload
 module WebhookManager
   class GiftCardCreator < BaseService
-    attr_reader :seller_id, :payment_intent, :amount, :single_use
+    attr_reader :seller_id, :payment_intent, :amount, :single_use, :project_id, :campaign_id, :distributor_id
 
     def initialize(params)
       @seller_id = params[:seller_id]
       @payment_intent = params[:payment_intent]
       @amount = params[:amount]
       @single_use = params[:single_use]
+      @project_id = params[:project_id]
+      @campaign_id = params[:campaign_id]
+      @distributor_id = params[:distributor_id]
     end
 
     def call
@@ -18,7 +21,9 @@ module WebhookManager
         item = WebhookManager::ItemCreator.call({
                                                   item_type: :gift_card,
                                                   seller_id: seller_id,
-                                                  payment_intent: payment_intent
+                                                  payment_intent: payment_intent,
+                                                  project_id: project_id,
+                                                  campaign_id: campaign_id,
                                                 })
 
         gift_card_detail = GiftCardDetail.create!(
@@ -26,7 +31,7 @@ module WebhookManager
           item: item,
           gift_card_id: GiftCardIdGenerator.generate_gift_card_id,
           seller_gift_card_id: GiftCardIdGenerator.generate_seller_gift_card_id(seller_id: seller_id),
-          recipient: payment_intent.recipient,
+          recipient: payment_intent ? payment_intent.recipient : distributor_id,
           single_use: single_use
         )
         GiftCardAmount.create!(value: amount, gift_card_detail: gift_card_detail)

@@ -31,7 +31,7 @@ class GiftCardDetail < ApplicationRecord
   validate :seller_gift_card_id_is_unique_per_seller, on: :create
 
   belongs_to :item
-  belongs_to :recipient, class_name: 'Contact'
+  belongs_to :recipient, class_name: 'Contact', optional: true
   has_many :gift_card_amount
 
   # TODO(jmckibben): Being used in sellers_helper N times. Ideally we'd combine
