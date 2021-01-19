@@ -53,7 +53,7 @@ class CampaignsController < ApplicationController
   # POST /campaigns/:id/gift_card
   def generate_campaign_gift_cards
     request_params = generate_campaign_gift_cards_params
-    if @campaign.amount_raised > @campaign.amount_allocated + request_params['gift_card_amount_cents']
+    unless @campaign.amount_raised > @campaign.amount_allocated + request_params['gift_card_amount_cents']
       raise InvalidLineItem, "Request amount exceeds unallocated amount in campaign. Unallocated amount: #{
         @campaign.amount_raised - @campaign.amount_allocated
       }"
@@ -65,11 +65,12 @@ class CampaignsController < ApplicationController
         single_use: true,
         project_id: @campaign.project_id,
         campaign_id: @campaign.id,
+        distributor_id: @distributor.id,
       }
     )
 
     json_response({
-      'unallocated': @campaign.amount_raised - @campaign.amount_allocated
+      'amount_left_to_allocate': @campaign.amount_raised - @campaign.amount_allocated
     })
   end
 
