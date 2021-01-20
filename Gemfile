@@ -88,3 +88,5 @@ gem 'ulid'
 
 # pagination gem
 gem 'pagy', '~> 3.8'
+
+gem 'workos'
