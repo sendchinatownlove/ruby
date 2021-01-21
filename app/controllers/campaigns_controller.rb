@@ -138,9 +138,9 @@ class CampaignsController < ApplicationController
     set_distributor
     @seller = Seller.find(params[:seller_id])
 
-    ret[:campaign_id] = @campaign.id	
-    ret[:distributor_id] = @distributor.id	
-    ret[:seller_id] = @seller.id	
+    ret[:campaign_id] = @campaign.id
+    ret[:distributor_id] = @distributor.id
+    ret[:seller_id] = @seller.id
 
     ret
   end
