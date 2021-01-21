@@ -365,7 +365,7 @@ RSpec.describe 'Campaigns API', type: :request do
       )
     end
 
-    context 'Without a seller locaiton' do
+    context 'Without a seller location' do
       let!(:seller) { create :seller }
       let!(:campaign) do
         create(

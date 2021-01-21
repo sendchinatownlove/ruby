@@ -18,8 +18,12 @@ module WebhookManager
     def call
       ActiveRecord::Base.transaction do
         seller = Seller.find_by(seller_id: seller_id)
-        distributor = Distributor.find(distributor_id)
-        distributor_contact = Contact.find(distributor.contact_id)
+        distributor = Distributor.find_by(id: distributor_id)
+        distributor_contact = nil
+        if distributor
+          distributor_contact = Contact.find_by(id: distributor.contact_id)
+        end
+
         item = WebhookManager::ItemCreator.call({
                                                   item_type: :gift_card,
                                                   seller_id: seller_id,

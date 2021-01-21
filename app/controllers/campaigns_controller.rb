@@ -52,26 +52,35 @@ class CampaignsController < ApplicationController
 
   # POST /campaigns/:id/gift_card
   def generate_campaign_gift_cards
-    request_params = generate_campaign_gift_cards_params
-    unless @campaign.amount_raised > @campaign.amount_allocated + request_params['gift_card_amount_cents']
+    request_params = params.permit(:gift_cards => [:distributor_id, :gift_card_amount, :seller_id])
+    gift_cards = request_params['gift_cards']
+    set_campaign
+
+    total_amount_to_allocate = 0
+    gift_cards.each do |gift_card|
+      total_amount_to_allocate = total_amount_to_allocate + gift_card['gift_card_amount']
+    end
+
+    unless @campaign.amount_unallocated > total_amount_to_allocate
       raise InvalidLineItem, "Request amount exceeds unallocated amount in campaign. Unallocated amount: #{
-        @campaign.amount_raised - @campaign.amount_allocated
+        @campaign.amount_unallocated
       }"
     end
 
-    WebhookManager::GiftCardCreator.call(
-      {
-        amount: request_params['gift_card_amount_cents'],
-        single_use: true,
-        project_id: @campaign.project_id,
-        campaign_id: @campaign.id,
-        distributor_id: @distributor.id,
-      }
-    )
+    gift_cards.each do |gift_card|
+      WebhookManager::GiftCardCreator.call(
+        {
+          amount: gift_card['gift_card_amount'],
+          single_use: true,
+          project_id: @campaign.project_id,
+          campaign_id: @campaign.id,
+          distributor_id: gift_card['distributor_id'],
+          seller_id: gift_card['seller_id'],
+        }
+      )
+    end
 
-    json_response({
-      'amount_left_to_allocate': @campaign.amount_raised - @campaign.amount_allocated
-    })
+    json_response({'unallocated_amount': @campaign.amount_unallocated})
   end
 
   private
@@ -128,28 +137,6 @@ class CampaignsController < ApplicationController
     set_campaign
     set_distributor
     @seller = Seller.find(params[:seller_id])
-
-    ret
-  end
-
-  def generate_campaign_gift_cards_params
-    params.require(:distributor_id)
-    params.require(:gift_card_amount_cents)
-    params.require(:seller_id)
-
-    ret = params.permit(
-      :distributor_id,
-      :gift_card_amount_cents,
-      :seller_id,
-    )
-
-    set_campaign
-    set_distributor
-    @seller = Seller.find(params[:seller_id])
-
-    ret[:campaign_id] = @campaign.id
-    ret[:distributor_id] = @distributor.id
-    ret[:seller_id] = @seller.id
 
     ret
   end

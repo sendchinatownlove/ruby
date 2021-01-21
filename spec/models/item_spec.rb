@@ -35,7 +35,6 @@ require 'rails_helper'
 RSpec.describe Item, type: :model do
   it { should have_one(:gift_card_detail) }
   it { should have_one(:donation_detail) }
-  it { should belong_to(:purchaser) }
 
   let!(:project) do
     create :project
@@ -62,21 +61,6 @@ RSpec.describe Item, type: :model do
     end
   end
 
-  context 'when creating an item with a project and seller' do
-    let(:item) do
-      Item.create(project: project, seller: create(:seller))
-    end
-
-    subject { item }
-
-    it 'throws an error' do
-      expect(subject).to_not be_valid
-
-      expect(subject.errors[:seller]).to include('Project or Seller must exist, but not both')
-      expect(subject.errors[:project]).to include('Project or Seller must exist, but not both')
-    end
-  end
-
   context 'when creating an item with neither a project nor a seller' do
     let(:item) do
       Item.create(project: nil, seller: nil)
@@ -87,8 +71,8 @@ RSpec.describe Item, type: :model do
     it 'throws an error' do
       expect(subject).to_not be_valid
 
-      expect(subject.errors[:project]).to include('Project or Seller must exist, but not both')
-      expect(subject.errors[:seller]).to include('Project or Seller must exist, but not both')
+      expect(subject.errors[:project]).to include('Project or Seller must exist')
+      expect(subject.errors[:seller]).to include('Project or Seller must exist')
     end
   end
 end
