@@ -12,7 +12,7 @@ class GcsController < ApplicationController
     file_type = gcs_params[:file_type]
 
     storage = Google::Cloud::Storage.new
-    storage_expiry_time = 15 * 60 # 5 minutes
+    storage_expiry_time = 5 * 60 # 5 minutes
 
     url = storage.signed_url bucket_name, file_name, method: "PUT",
                             expires: storage_expiry_time, version: :v4,
