@@ -77,6 +77,7 @@
 #                  rails_direct_uploads POST   /rails/active_storage/direct_uploads(.:format)                                           active_storage/direct_uploads#create
 
 Rails.application.routes.draw do
+  resources :rewards, only: [:index]
   resources :nonprofits
   get 'auth/google', to: 'authorization#google'
   post 'auth/passwordless', to: 'authorization#passwordless'
