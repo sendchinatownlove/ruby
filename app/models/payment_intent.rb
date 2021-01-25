@@ -41,7 +41,7 @@ class PaymentIntent < ApplicationRecord
     SQUARE = 'square'.freeze
   ].freeze
 
-  validates_presence_of :square_payment_id, :square_location_id, if: -> { origin == ORIGIN_TYPES::SQUARE }
+  validates_presence_of :square_payment_id, :square_location_id, if: -> { origin == SQUARE }
   validates_uniqueness_of :square_payment_id, allow_nil: true
   has_many :items
   belongs_to :purchaser, class_name: 'Contact'
