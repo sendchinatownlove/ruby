@@ -36,7 +36,12 @@
 #  fk_rails_...  (recipient_id => contacts.id)
 #
 class PaymentIntent < ApplicationRecord
-  validates_presence_of :square_payment_id, :square_location_id, if: -> { origin == 'square' }
+  ORIGIN_TYPES = [
+    CUSTOM = 'custom'.freeze,
+    SQUARE = 'square'.freeze
+  ].freeze
+
+  validates_presence_of :square_payment_id, :square_location_id, if: -> { origin == ORIGIN_TYPES::SQUARE }
   validates_uniqueness_of :square_payment_id, allow_nil: true
   has_many :items
   belongs_to :purchaser, class_name: 'Contact'
