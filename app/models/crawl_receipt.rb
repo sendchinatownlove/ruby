@@ -41,4 +41,10 @@ class CrawlReceipt < ApplicationRecord
             errors.add('Participating Seller or Payment Intent must exist, but not both')
         end
     end
+
+    def amount_greater_than_10_00
+        unless amount >= 10_00
+            errors.add('Amount must be greater or equal to $10')
+        end
+    end
 end

@@ -117,5 +117,30 @@ RSpec.describe 'CrawlReceipts', type: :request do
       end
     end
 
+    context 'when the amount is less than $10' do
+
+      let(:attributes_small_amount) do
+        {
+          payment_intent_id: payment_intent.id,
+          participating_seller_id: participating_seller.id,
+          contact_id: contact.id,
+          amount: 500,
+          receipt_url: receipt_url
+        }
+      end
+
+      before do
+        post(
+          "/crawl_receipts",
+          params: attributes_small_amount,
+          as: :json
+        )
+      end
+
+      it 'returns status code 422' do
+        expect(response).to have_http_status(422)
+      end
+    end
+
   end
 end
