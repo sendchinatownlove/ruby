@@ -90,6 +90,7 @@ Rails.application.routes.draw do
     resources :lyft_rewards, controller: 'contact_lyft_rewards', only: %i[index create]
     resources :rewards, controller: 'contact_rewards', only: [:create]
     resources :tickets, controller: 'contact_tickets'
+    resources :crawl_receipts, controller: 'contact_crawl_receipts', only: %i[index]
   end
   resources :charges do
   end
