@@ -13,14 +13,14 @@ class CrawlReceiptsController < ApplicationController
 
   private
 
-  def crawl_receipt_json(crawl_receipt: crawl_receipt)
-    ret = crawl_receipt.as_json
-    ret['participating_seller_id'] = crawl_receipt.participating_seller_id
-    ret['payment_intent_id'] = crawl_receipt.payment_intent_id
-    ret['contact_id'] = crawl_receipt.contact_id
-    ret['amount'] = crawl_receipt.amount
-    ret['redemption_id'] = crawl_receipt.redemption_id
-    ret['receipt_url'] = crawl_receipt.receipt_url
+  def crawl_receipt_json
+    ret = @crawl_receipt.as_json
+    ret['participating_seller_id'] = @crawl_receipt.participating_seller_id
+    ret['payment_intent_id'] = @crawl_receipt.payment_intent_id
+    ret['contact_id'] = @crawl_receipt.contact_id
+    ret['amount'] = @crawl_receipt.amount
+    ret['redemption_id'] = @crawl_receipt.redemption_id
+    ret['receipt_url'] = @crawl_receipt.receipt_url
     ret
   end
 
@@ -35,22 +35,25 @@ class CrawlReceiptsController < ApplicationController
       :receipt_url,
       :redemption_id,
     )
-
     set_contact
     set_participating_seller
     set_payment_intent
 
-    ret[participating_seller_id] = @participating_seller.id if @participating_seller.present?
-    ret[payment_intent_id] = @payment_intent.id if @payment_intent.present?
-  end
+    ret[:participating_seller_id] = @participating_seller.id if @participating_seller.present?
+    ret[:payment_intent_id] = @payment_intent.id if @payment_intent.present?
+    ret
   end
 
   def set_participating_seller
-    @participating_seller = ParticipatingSeller.find(params[:participating_seller_id])
+    if params[:participating_seller_id].present?
+      @participating_seller = ParticipatingSeller.find(params[:participating_seller_id])
+    end
   end
 
   def set_payment_intent
-    @payment_intent = PaymentIntent.find(params[:payment_intent_id])
+    if params[:payment_intent_id].present?
+      @payment_intent = PaymentIntent.find(params[:payment_intent_id])
+    end
   end
 
   def set_contact
