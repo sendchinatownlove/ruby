@@ -91,6 +91,8 @@ Rails.application.routes.draw do
     resources :rewards, controller: 'contact_rewards', only: [:create]
     resources :tickets, controller: 'contact_tickets'
   end
+  resources :crawl_receipts do
+  end
   resources :charges do
   end
   resources :distributors do
