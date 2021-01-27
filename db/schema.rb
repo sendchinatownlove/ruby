@@ -28,9 +28,9 @@ ActiveRecord::Schema.define(version: 2021_01_09_000432) do
     t.bigint "distributor_id"
     t.integer "target_amount", default: 100000, null: false
     t.integer "price_per_meal", default: 500
-    t.integer "fee_id"
     t.bigint "nonprofit_id"
     t.datetime "start_date"
+    t.integer "fee_id"
     t.bigint "project_id"
     t.string "neighborhood"
     t.index ["distributor_id"], name: "index_campaigns_on_distributor_id"
@@ -71,8 +71,8 @@ ActiveRecord::Schema.define(version: 2021_01_09_000432) do
     t.bigint "participating_seller_id"
     t.bigint "payment_intent_id"
     t.bigint "contact_id", null: false
-    t.integer "amount"
-    t.string "receipt_url"
+    t.integer "amount", null: false
+    t.string "receipt_url", null: false
     t.bigint "redemption_id"
     t.index ["contact_id"], name: "index_crawl_receipts_on_contact_id"
     t.index ["participating_seller_id"], name: "index_crawl_receipts_on_participating_seller_id"

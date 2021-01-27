@@ -3,8 +3,8 @@
 # Table name: crawl_receipts
 #
 #  id                      :bigint           not null, primary key
-#  amount                  :integer
-#  receipt_url             :string
+#  amount                  :integer          not null
+#  receipt_url             :string           not null
 #  contact_id              :bigint           not null
 #  participating_seller_id :bigint
 #  payment_intent_id       :bigint

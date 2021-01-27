@@ -89,4 +89,7 @@ gem 'ulid'
 # pagination gem
 gem 'pagy', '~> 3.8'
 
+# GCS gem
+gem 'google-cloud-storage'
+
 gem 'workos'
