@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: crawl_receipts
@@ -25,26 +27,23 @@
 #  fk_rails_...  (redemption_id => redemptions.id)
 #
 class CrawlReceipt < ApplicationRecord
+  belongs_to :participating_seller, optional: true
+  belongs_to :payment_intent, optional: true
+  validate :has_participating_seller_xor_payment_indent?
+  belongs_to :contact
+  belongs_to :redemption, optional: true
+  validates_presence_of :amount
+  belongs_to :participating_seller, optional: true
+  belongs_to :payment_intent, optional: true
+  validates_presence_of :receipt_url
 
-    belongs_to :participating_seller, optional: true
-    belongs_to :payment_intent, optional: true
-    validate :has_participating_seller_xor_payment_indent?
-    belongs_to :contact
-    belongs_to :redemption, optional: true
-    validates_presence_of :amount
-    belongs_to :participating_seller, optional: true
-    belongs_to :payment_intent, optional: true
-    validates_presence_of :receipt_url
-
-    def has_participating_seller_xor_payment_indent?
-        unless participating_seller.present? ^ payment_intent.present?
-            errors.add('Participating Seller or Payment Intent must exist, but not both')
-        end
+  def has_participating_seller_xor_payment_indent?
+    unless participating_seller.present? ^ payment_intent.present?
+      errors.add('Participating Seller or Payment Intent must exist, but not both')
     end
+  end
 
-    def amount_greater_than_10_00
-        unless amount >= 10_00
-            errors.add('Amount must be greater or equal to $10')
-        end
-    end
+  def amount_greater_than_10_00
+    errors.add('Amount must be greater or equal to $10') unless amount >= 10_00
+  end
 end

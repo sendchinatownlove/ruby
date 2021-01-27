@@ -100,9 +100,9 @@ RSpec.describe PaymentIntent, type: :model do
   end
 
   context 'turn off campaign if goal is reached' do
-    it "turns the campaign inactive if the campaign is associated with a project " do
+    it 'turns the campaign inactive if the campaign is associated with a project ' do
       project = create(:project)
-      campaign = create(:campaign, active: true, project_id: project.id, target_amount: 10000, seller_id: nil)
+      campaign = create(:campaign, active: true, project_id: project.id, target_amount: 10_000, seller_id: nil)
       expect(campaign.active).to eq(true)
 
       line_items =  '[
@@ -110,7 +110,7 @@ RSpec.describe PaymentIntent, type: :model do
         { "amount": 314, "project_id": 1, "item_type": "transaction_fee" }
       ]'
       payment_intent = create(:payment_intent, line_items: line_items, campaign_id: campaign.id, project_id: project.id, successful: true)
-      
+
       expect(Campaign.find(campaign.id).active).to eq(false)
     end
   end

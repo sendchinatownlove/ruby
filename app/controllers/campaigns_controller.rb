@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 include Pagy::Backend
 
 class CampaignsController < ApplicationController
@@ -132,7 +133,7 @@ class CampaignsController < ApplicationController
     @distributor = Distributor.find(params[:distributor_id])
   end
 
-  def campaigns_json(campaigns =  @campaigns)
+  def campaigns_json(campaigns = @campaigns)
     campaigns.map { |c| campaign_json campaign: c }
   end
 

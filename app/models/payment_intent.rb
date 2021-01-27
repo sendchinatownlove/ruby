@@ -56,7 +56,7 @@ class PaymentIntent < ApplicationRecord
   # After a payment intent is created, check if the campaign reached its goal.
   # If so, make the campaign inactive
   def make_campaign_inactive_if_met_goal
-    campaign = Campaign.find_by(id: self.campaign_id)
+    campaign = Campaign.find_by(id: campaign_id)
 
     if campaign && campaign.amount_raised >= campaign.target_amount
       campaign.active = false

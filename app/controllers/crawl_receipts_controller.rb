@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 class CrawlReceiptsController < ApplicationController
-
   # POST /crawl_receipts
   def create
     @crawl_receipt = CrawlReceipt.create!(create_params)
     unless @participating_seller.present? ^ @payment_intent.present?
       raise ArgumentError, "Participating Seller or Payment Intent must exist, but not both. participating_seller_id: #{@participating_seller.id}, payment_intent_id: #{@payment_intent.id}"
     end
+
     json_response(crawl_receipt_json, :created)
   end
 
@@ -33,13 +33,15 @@ class CrawlReceiptsController < ApplicationController
       :contact_id,
       :amount,
       :receipt_url,
-      :redemption_id,
+      :redemption_id
     )
     set_contact
     set_participating_seller
     set_payment_intent
 
-    ret[:participating_seller_id] = @participating_seller.id if @participating_seller.present?
+    if @participating_seller.present?
+      ret[:participating_seller_id] = @participating_seller.id
+    end
     ret[:payment_intent_id] = @payment_intent.id if @payment_intent.present?
     ret
   end

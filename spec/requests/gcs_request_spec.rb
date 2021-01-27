@@ -11,7 +11,7 @@ RSpec.describe 'GCS', type: :request do
   end
 
   describe 'POST /gcs' do
-    it 'returns http success', :skip => "Skipping test which calls Google Cloud, change code to run manually" do
+    it 'returns http success', skip: 'Skipping test which calls Google Cloud, change code to run manually' do
       post '/gcs', params: sample_request, as: :json
       expect(response).to have_http_status(:success)
       expect(response.body.to_json).to match(a_string_including(sample_request[:file_name]))

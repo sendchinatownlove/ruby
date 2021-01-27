@@ -194,17 +194,17 @@ end
   {
     name: 'Fee 1',
     active: true,
-    multiplier: 0.1,
+    multiplier: 0.1
   },
   {
     name: 'Fee 2',
     active: true,
-    multiplier: 0.1,
+    multiplier: 0.1
   },
   {
     name: 'Fee 3',
     active: false,
-    multiplier: 0.1,
+    multiplier: 0.1
   }
 ].each do |attributes|
   fee_attributes = attributes.except(:seller_id)
@@ -227,7 +227,7 @@ nonprofit = Nonprofit.create(name: 'Non Profit', fee_id: Fee.first[:id])
       end_date: Time.now + 30.days,
       nonprofit_id: nonprofit.id,
       gallery_image_urls: [
-        "https://storage.googleapis.com/sendchinatownlove-assets/public/assets/general/campaign-default.png"
+        'https://storage.googleapis.com/sendchinatownlove-assets/public/assets/general/campaign-default.png'
       ],
       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc orci nisi, commodo vitae egestas a, laoreet sit amet elit. Sed enim ligula, ultricies a lectus a, faucibus scelerisque nisl. In at magna volutpat, auctor libero nec, sagittis nibh. Quisque vitae convallis elit. Curabitur facilisis auctor libero at accumsan. Morbi a nisi urna. Pellentesque augue nibh, ultricies a feugiat quis, fermentum nec orci. Vestibulum libero sem, vulputate id ligula eget, auctor lobortis diam. Etiam ullamcorper ex eu condimentum sodales. Fusce vel semper augue. Etiam placerat luctus ex, nec ultrices enim ornare id. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Donec iaculis est purus, non pellentesque erat suscipit vitae.'
     )
@@ -239,7 +239,7 @@ nonprofit = Nonprofit.create(name: 'Non Profit', fee_id: Fee.first[:id])
       active: false,
       end_date: Time.now - 30.days - i.days,
       gallery_image_urls: [
-        "https://storage.googleapis.com/sendchinatownlove-assets/public/assets/general/campaign-default.png"
+        'https://storage.googleapis.com/sendchinatownlove-assets/public/assets/general/campaign-default.png'
       ]
     )
   end
@@ -317,7 +317,6 @@ end
   OpenHour.find_or_create_by(id: attributes[:id]).update!(updatedAttr)
 end
 
-
 # Delivery Options and Types
 [
   {
@@ -355,10 +354,9 @@ end
     name: 'Uber Eats',
     icon_url: './assets/UberEats@2x.png'
   }
-].each do | attr |
+].each do |attr|
   DeliveryType.find_or_create_by!(attr)
 end
-
 
 [
   {
@@ -403,8 +401,8 @@ end
     url: 'http://ubereats.com/new-york/food-delivery/',
     seller_id: 2,
     delivery_type_id: 7
-  },
-].each do | attr |
+  }
+].each do |attr|
   seller = Seller.find_by(id: attr[:seller_id])
   deliveryOptionAttr = attr.except(:seller_id)
 
