@@ -101,6 +101,10 @@ RSpec.describe 'Webhooks API', type: :request do
             expect(payment_intent_row.successful).to be true
           end
 
+          it 'creates a crawl receipt' do
+            expect(CrawlReceipt.where(contact_id: payment_intent.purchaser.id).count).to_not be(0)
+           end
+
           it 'returns status code 200' do
             expect(response).to have_http_status(200)
           end
@@ -175,6 +179,10 @@ RSpec.describe 'Webhooks API', type: :request do
 
           payment_intent = PaymentIntent.find(item['payment_intent_id'])
           expect(payment_intent.successful).to be true
+        end
+
+        it 'creates a crawl receipt' do
+         expect(CrawlReceipt.where(contact_id: payment_intent.purchaser.id).count).to_not be(0)
         end
 
         it 'returns status code 200' do
@@ -376,6 +384,10 @@ RSpec.describe 'Webhooks API', type: :request do
           ).first
           verify_gift_card(item: item, single_use: false, amount: amount)
         end
+
+        it 'creates a crawl receipt' do
+          expect(CrawlReceipt.where(contact_id: payment_intent.purchaser.id).count).to_not be(0)
+         end
 
         it 'returns status code 200' do
           expect(response).to have_http_status(200)
