@@ -136,6 +136,10 @@ class WebhooksController < ApplicationController
           }
         )
         save_payment_intent = true
+        WebhookManager::CrawlReceiptCreator.call(
+          payment_intent: payment_intent,
+          amount: amount,
+        )
 
         EmailManager::PoolDonationReceiptSender.call(
           {
@@ -187,6 +191,10 @@ class WebhooksController < ApplicationController
             }
           )
           save_payment_intent = true
+          WebhookManager::CrawlReceiptCreator.call(
+            payment_intent: payment_intent,
+            amount: amount,
+          )
         when 'gift_card'
           gift_a_meal = payment_intent.campaign.present?
 
@@ -200,6 +208,10 @@ class WebhooksController < ApplicationController
             }
           )
           save_payment_intent = true
+          WebhookManager::CrawlReceiptCreator.call(
+            payment_intent: payment_intent,
+            amount: amount,
+          )
           # Gift a meal purchases are technically donations to the purchaser
           if gift_a_meal
             is_donation ||= true
