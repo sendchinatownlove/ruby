@@ -11,7 +11,7 @@ module WebhookManager
     end
 
     def call
-      CrawlReceipt.create!(amount: amount, payment_intent_id: payment_intent_id, contact_id: contact_id, receipt_url: nil)
+      CrawlReceipt.create!(amount: amount, payment_intent_id: payment_intent_id, contact_id: contact_id, receipt_url: ' ')
     end
   end
 end
