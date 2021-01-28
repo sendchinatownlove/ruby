@@ -3,7 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe 'ContactCrawlReceipts', type: :request do
-
   context 'GET /contacts/:contact_id/crawl_receipts' do
     subject do
       get "/contacts/#{contact.id}/crawl_receipts"

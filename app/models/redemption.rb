@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: redemptions
@@ -17,6 +19,6 @@
 #  fk_rails_...  (reward_id => rewards.id)
 #
 class Redemption < ApplicationRecord
-    belongs_to :reward
-    belongs_to :contact
+  belongs_to :reward
+  belongs_to :contact
 end

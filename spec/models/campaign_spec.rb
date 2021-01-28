@@ -167,7 +167,7 @@ RSpec.describe Campaign, type: :model do
       # Do not expect this one to be counted since it's not successful.
       payment_intent_3 = create(:payment_intent, :with_line_items, :with_transaction_fee_project, campaign: campaign, successful: false)
     end
-      
+
     it 'returns payment intent amounts' do
       subject
       expect(campaign.amount_raised).to eq 2000

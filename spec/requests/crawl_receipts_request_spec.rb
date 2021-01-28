@@ -8,11 +8,10 @@ RSpec.describe 'CrawlReceipts', type: :request do
   let!(:payment_intent) { create(:payment_intent) }
   let(:contact) { create(:contact) }
   let(:amount) { 1000 }
-  let(:receipt_url) { 'receipturl.com'}
+  let(:receipt_url) { 'receipturl.com' }
 
   # Test suite for POST /crawl_receipts
   describe 'POST /crawl_receipts' do
-
     context 'when request attributes are valid' do
       let(:valid_attributes) do
         {
@@ -25,7 +24,7 @@ RSpec.describe 'CrawlReceipts', type: :request do
 
       before do
         post(
-          "/crawl_receipts",
+          '/crawl_receipts',
           params: valid_attributes,
           as: :json
         )
@@ -47,16 +46,15 @@ RSpec.describe 'CrawlReceipts', type: :request do
     end
 
     context 'when request attributes are invalid' do
-
-    let(:invalid_attributes) do
-      {
-        invalid: 'yellow'
-      }
-    end
+      let(:invalid_attributes) do
+        {
+          invalid: 'yellow'
+        }
+      end
 
       before do
         post(
-          "/crawl_receipts",
+          '/crawl_receipts',
           params: invalid_attributes,
           as: :json
         )
@@ -78,10 +76,10 @@ RSpec.describe 'CrawlReceipts', type: :request do
           receipt_url: receipt_url
         }
       end
-    
+
       before do
         post(
-          "/crawl_receipts",
+          '/crawl_receipts',
           params: attributes_with_payment_intent,
           as: :json
         )
@@ -93,7 +91,6 @@ RSpec.describe 'CrawlReceipts', type: :request do
     end
 
     context 'when there is both a participating_seller and payment_intent' do
-
       let(:attributes_with_both_participating_seller_and_payment_intent) do
         {
           payment_intent_id: payment_intent.id,
@@ -103,10 +100,10 @@ RSpec.describe 'CrawlReceipts', type: :request do
           receipt_url: receipt_url
         }
       end
-    
+
       before do
         post(
-          "/crawl_receipts",
+          '/crawl_receipts',
           params: attributes_with_both_participating_seller_and_payment_intent,
           as: :json
         )
@@ -118,7 +115,6 @@ RSpec.describe 'CrawlReceipts', type: :request do
     end
 
     context 'when the amount is less than $10' do
-
       let(:attributes_small_amount) do
         {
           payment_intent_id: payment_intent.id,
@@ -131,7 +127,7 @@ RSpec.describe 'CrawlReceipts', type: :request do
 
       before do
         post(
-          "/crawl_receipts",
+          '/crawl_receipts',
           params: attributes_small_amount,
           as: :json
         )
@@ -141,6 +137,5 @@ RSpec.describe 'CrawlReceipts', type: :request do
         expect(response).to have_http_status(422)
       end
     end
-
   end
 end

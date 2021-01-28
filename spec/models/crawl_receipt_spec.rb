@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: crawl_receipts
@@ -28,46 +30,45 @@
 require 'rails_helper'
 
 RSpec.describe CrawlReceipt, type: :model do
-    it { should belong_to(:contact) }
-    it { should validate_presence_of(:amount) }
-    it { should validate_presence_of(:receipt_url) }
+  it { should belong_to(:contact) }
+  it { should validate_presence_of(:amount) }
+  it { should validate_presence_of(:receipt_url) }
 
-    context 'when creating a crawl receipt with only a participating seller' do
-        let(:crawl_receipt) do
-            create(:crawl_receipt, :with_participating_seller)
-        end
-
-        it 'is successful' do
-            crawl_receipt
-        end
+  context 'when creating a crawl receipt with only a participating seller' do
+    let(:crawl_receipt) do
+      create(:crawl_receipt, :with_participating_seller)
     end
 
-    context 'when creating a crawl receipt with only a payment intent' do
-        let(:crawl_receipt) do
-            create(:crawl_receipt, :with_payment_intent)
-        end
+    it 'is successful' do
+      crawl_receipt
+    end
+  end
 
-        it 'is successful' do
-            crawl_receipt
-        end
+  context 'when creating a crawl receipt with only a payment intent' do
+    let(:crawl_receipt) do
+      create(:crawl_receipt, :with_payment_intent)
     end
 
-    context 'when creating a crawl receipt with both a participating seller and a payment intent' do
-        let(:participating_seller) { create(:participating_seller) }
-        let(:payment_intent) { create(:payment_intent) }
-        subject { CrawlReceipt.create(participating_seller: participating_seller, payment_intent: payment_intent) }
-
-        it 'throws an error' do
-            expect(subject).to_not be_valid
-        end
+    it 'is successful' do
+      crawl_receipt
     end
+  end
 
-    context 'when creating a crawl receipt with neither a participating seller and a payment intent' do
+  context 'when creating a crawl receipt with both a participating seller and a payment intent' do
+    let(:participating_seller) { create(:participating_seller) }
+    let(:payment_intent) { create(:payment_intent) }
+    subject { CrawlReceipt.create(participating_seller: participating_seller, payment_intent: payment_intent) }
 
-        subject { CrawlReceipt.create }
-
-        it 'throws an error' do
-            expect(subject).to_not be_valid
-        end
+    it 'throws an error' do
+      expect(subject).to_not be_valid
     end
+  end
+
+  context 'when creating a crawl receipt with neither a participating seller and a payment intent' do
+    subject { CrawlReceipt.create }
+
+    it 'throws an error' do
+      expect(subject).to_not be_valid
+    end
+  end
 end

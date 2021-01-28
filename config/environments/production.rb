@@ -23,10 +23,11 @@ Rails.application.configure do
         'https://www.sendchinatownlove.github.io'
       )
       resource '/campaigns',
-        methods: [:get],
-        headers: :any,
-        expose: ['Total-Count', 'Total-Pages', 'Page-Items', 'Current-Page']
-      resource '*', headers: :any, methods: :any    end
+               methods: [:get],
+               headers: :any,
+               expose: %w[Total-Count Total-Pages Page-Items Current-Page]
+      resource '*', headers: :any, methods: :any
+    end
   end
 
   # Full error reports are disabled and caching is turned on.

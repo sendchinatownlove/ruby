@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: rewards
@@ -8,7 +10,7 @@
 #  total_value :integer
 #
 class Reward < ApplicationRecord
-    validates_presence_of :total_value
-    validates_presence_of :name
-    validates_presence_of :image_url
+  validates_presence_of :total_value
+  validates_presence_of :name
+  validates_presence_of :image_url
 end
