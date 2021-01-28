@@ -11,7 +11,9 @@ module WebhookManager
     end
 
     def call
-      CrawlReceipt.create!(amount: amount, payment_intent_id: payment_intent_id, contact_id: contact_id, receipt_url: ' ')
+      if Date.today.month == 2
+        CrawlReceipt.create!(amount: amount, payment_intent_id: payment_intent_id, contact_id: contact_id, receipt_url: ' ')
+      end
     end
   end
 end
