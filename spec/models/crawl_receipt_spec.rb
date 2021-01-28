@@ -30,9 +30,8 @@
 require 'rails_helper'
 
 RSpec.describe CrawlReceipt, type: :model do
-  it { should belong_to(:contact) }
-  it { should validate_presence_of(:amount) }
-  it { should validate_presence_of(:receipt_url) }
+    it { should belong_to(:contact) }
+    it { should validate_presence_of(:amount) }
 
   context 'when creating a crawl receipt with only a participating seller' do
     let(:crawl_receipt) do
