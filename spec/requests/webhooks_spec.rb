@@ -3,7 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe 'Webhooks API', type: :request do
-  before { freeze_time }
+  before do
+    Timecop.freeze(Date.new(2021, 2, 15))
+  end
 
   # Test suite for POST /webhooks
   describe 'POST /webhooks' do
@@ -74,6 +76,28 @@ RSpec.describe 'Webhooks API', type: :request do
       create(:donation_detail, item: item, amount: 10_00)
     end
 
+    describe 'crawl receipts for donations outside february/lny crawl' do
+      let(:amount) { 5000 }
+      let(:item_type) { 'donation' }
+      let(:seller_id) { seller1.seller_id }
+
+      before do
+        Timecop.freeze(Date.new(2021, 3, 15))
+        allow(SecureRandom).to receive(:uuid)
+          .and_return('aweofijn-3n3400-oawjiefwef-0iawef-0i')
+        post(
+          '/webhooks',
+          headers: { 'HTTP_X_SQUARE_SIGNATURE' => 'www.squareup.com' },
+          params: payload.to_json
+        )
+      end
+
+      it 'does not create a crawl receipt' do
+        expect(CrawlReceipt.where(contact_id: payment_intent.purchaser.id).count).to be(0)
+      end
+    end
+
+
     describe 'donations' do
       before do
         # Add stub for header verification
@@ -102,7 +126,7 @@ RSpec.describe 'Webhooks API', type: :request do
           end
 
           it 'creates a crawl receipt' do
-            expect(CrawlReceipt.where(contact_id: payment_intent.purchaser.id).count).to_not be(0)
+            expect(CrawlReceipt.where(contact_id: payment_intent.purchaser.id).count).to be(1)
            end
 
           it 'returns status code 200' do
@@ -161,6 +185,16 @@ RSpec.describe 'Webhooks API', type: :request do
         end
       end
 
+      context 'with too small of a donation' do
+        let(:amount) { 500 }
+        let(:item_type) { 'donation' }
+        let(:seller_id) { seller1.seller_id }
+
+        it 'does not create a crawl receipt' do
+          expect(CrawlReceipt.where(contact_id: payment_intent.purchaser.id).count).to be(0)
+         end
+      end
+
       context 'with donation' do
         let(:amount) { 5000 }
         let(:item_type) { 'donation' }
@@ -182,7 +216,7 @@ RSpec.describe 'Webhooks API', type: :request do
         end
 
         it 'creates a crawl receipt' do
-         expect(CrawlReceipt.where(contact_id: payment_intent.purchaser.id).count).to_not be(0)
+         expect(CrawlReceipt.where(contact_id: payment_intent.purchaser.id).count).to be(1)
         end
 
         it 'returns status code 200' do
@@ -386,7 +420,7 @@ RSpec.describe 'Webhooks API', type: :request do
         end
 
         it 'creates a crawl receipt' do
-          expect(CrawlReceipt.where(contact_id: payment_intent.purchaser.id).count).to_not be(0)
+          expect(CrawlReceipt.where(contact_id: payment_intent.purchaser.id).count).to be(1)
          end
 
         it 'returns status code 200' do
