@@ -123,4 +123,6 @@ Rails.application.routes.draw do
   end
   resources :gcs do
   end
+  resources :redemptions do
+  end
 end
