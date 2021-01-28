@@ -11,7 +11,7 @@ module WebhookManager
     end
 
     def call
-      if Date.today.month == 2
+      if Date.today.month == 2 && @amount >= 1000
         CrawlReceipt.create!(amount: amount, payment_intent_id: payment_intent_id, contact_id: contact_id, receipt_url: ' ')
       end
     end
