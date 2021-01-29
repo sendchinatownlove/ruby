@@ -35,7 +35,8 @@ class CrawlReceipt < ApplicationRecord
   validates_presence_of :amount
   belongs_to :participating_seller, optional: true
   belongs_to :payment_intent, optional: true
-  validates_presence_of :receipt_url
+
+  CRAWL_RECEIPT_MIN_AMOUNT = 10_00
 
   def has_participating_seller_xor_payment_indent?
     unless participating_seller.present? ^ payment_intent.present?
