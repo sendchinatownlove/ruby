@@ -6,13 +6,22 @@ class RedemptionsController < ApplicationController
 
   # POST /redemptions
   def create
-    if CrawlReceipt.where(contact: @contact).size < 3
-      raise TicketRedemptionError, 'Contact is trying to redeem with less than 3 receipts'
+    ActiveRecord::Base.transaction do
+      receipts_to_redeem = CrawlReceipt.where(contact: @contact, redemption: nil)
+
+      if receipts_to_redeem.size < 3
+        raise TicketRedemptionError, 'Contact is trying to redeem with less than 3 redeemable receipts'
+      end
+
+      @redemption = Redemption.create!(create_params)
+
+      # associate the first 3 redeemable receipts with this redemption
+      (0..2).each do |i|
+        receipts_to_redeem[i].update!(redemption: @redemption)
+      end
+
+      json_response(@redemption, :created)
     end
-
-    @redemption = Redemption.create!(create_params)
-
-    json_response(@redemption, :created)
   end
 
   private
