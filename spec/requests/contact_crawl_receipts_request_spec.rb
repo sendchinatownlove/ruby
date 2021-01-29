@@ -19,7 +19,6 @@ RSpec.describe 'ContactCrawlReceipts', type: :request do
       it 'Returns the crawl_receipts' do
         subject
         expect(json).not_to be_empty
-        binding.pry
       end
     end
 
