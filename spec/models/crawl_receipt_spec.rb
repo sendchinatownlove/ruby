@@ -7,6 +7,8 @@
 #  id                      :bigint           not null, primary key
 #  amount                  :integer          not null
 #  receipt_url             :string           not null
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
 #  contact_id              :bigint           not null
 #  participating_seller_id :bigint
 #  payment_intent_id       :bigint

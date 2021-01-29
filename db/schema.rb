@@ -74,6 +74,8 @@ ActiveRecord::Schema.define(version: 2021_01_29_044547) do
     t.integer "amount", null: false
     t.string "receipt_url", null: false
     t.bigint "redemption_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
     t.index ["contact_id"], name: "index_crawl_receipts_on_contact_id"
     t.index ["participating_seller_id"], name: "index_crawl_receipts_on_participating_seller_id"
     t.index ["payment_intent_id"], name: "index_crawl_receipts_on_payment_intent_id"
