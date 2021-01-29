@@ -418,3 +418,64 @@ end
 ].each do |attributes|
   Project.find_or_create_by(name: attributes[:name]).update!(attributes)
 end
+
+# LNY Crawl
+
+# Rewards
+[
+  {
+    name: 'The Grand Prize Package',
+    total_value: 10000,
+    image_url: 'https://images.ctfassets.net/4w8qvp17lo47/1fnONK6KJf37PPkkZqlreq/412c146662ed3c46fce3ba72ab715074/Rewarding_yourself_is_important_when_it_comes_to_diabetes_management_prediabetes_type_2_diabetes.jpg'
+  },
+  {
+    name: 'Rabbit/Longevity',
+    total_value: 80000,
+    image_url: 'https://static.independent.co.uk/s3fs-public/thumbnails/image/2019/01/07/11/bunny-rabbit.jpg'
+  }
+].each do |attributes|
+  Reward.find_or_create_by(attributes)
+end
+
+# Crawl Receipts
+lny_contact1 = Contact.create(email: 'testemail1@gmail.com')
+lny_contact2 = Contact.create(email: 'testemail2@gmail.com')
+lny_merchant = ParticipatingSeller.first
+[
+  {
+    contact_id: lny_contact1.id,
+    participating_seller_id: lny_merchant.id,
+    amount: 1200,
+    receipt_url: 'receipt-url.com'
+  },
+  {
+    contact_id: lny_contact1.id,
+    participating_seller_id: lny_merchant.id,
+    amount: 1500,
+    receipt_url: 'receipt-url.com'
+  },
+  {
+    contact_id: lny_contact1.id,
+    participating_seller_id: lny_merchant.id,
+    amount: 1100,
+    receipt_url: 'receipt-url.com'
+  },
+  {
+    contact_id: lny_contact2.id,
+    participating_seller_id: lny_merchant.id,
+    amount: 1800,
+    receipt_url: 'receipt-url.com'
+  },
+].each do |attributes|
+  CrawlReceipt.find_or_create_by(attributes)
+end
+
+# Redemptions
+[
+  {
+    contact_id: lny_contact1.id,
+    reward_id: Reward.first.id
+  }
+].each do |attributes|
+  Redemption.find_or_create_by(attributes)
+end
