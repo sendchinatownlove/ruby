@@ -5,6 +5,6 @@ class RewardsController < ApplicationController
   def index
     @rewards = Reward.all
 
-    render json: @rewards
+    json_response(@rewards)
   end
 end
