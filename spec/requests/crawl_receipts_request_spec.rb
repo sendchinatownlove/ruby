@@ -3,6 +3,11 @@
 require 'rails_helper'
 
 RSpec.describe 'CrawlReceipts', type: :request do
+
+  before do
+    Timecop.freeze(Time.find_zone('EST').local(2021,2,15))
+  end
+
   # Initialize the test data
   let!(:participating_seller) { create(:participating_seller) }
   let!(:payment_intent) { create(:payment_intent) }
@@ -12,6 +17,7 @@ RSpec.describe 'CrawlReceipts', type: :request do
 
   # Test suite for POST /crawl_receipts
   describe 'POST /crawl_receipts' do
+    let(:current_time) { Time.current.utc.iso8601(3).to_s }
     context 'when request attributes are valid' do
       let(:valid_attributes) do
         {
@@ -37,6 +43,8 @@ RSpec.describe 'CrawlReceipts', type: :request do
         expected_json['receipt_url'] = receipt_url
         expected_json['payment_intent_id'] = nil
         expected_json['redemption_id'] = nil
+        expected_json['created_at'] = current_time
+        expected_json['updated_at'] = current_time
         expect(actual_json).to eq(expected_json.with_indifferent_access)
       end
 
