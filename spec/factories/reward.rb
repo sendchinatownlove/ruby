@@ -2,8 +2,8 @@
 
 FactoryBot.define do
   factory :reward do
-    total_value { 1000 }
-    image_url { 'www.testimageurl.com' }
-    name { 'reward' }
+    image_url { Faker::Internet.url }
+    name { Faker::Movies::StarWars.planet }
+    total_value { Faker::Number.number(digits: 5) }
   end
 end

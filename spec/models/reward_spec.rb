@@ -8,6 +8,8 @@
 #  image_url   :string
 #  name        :string
 #  total_value :integer
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
 #
 require 'rails_helper'
 
