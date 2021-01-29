@@ -8,6 +8,10 @@ RSpec.describe 'CrawlReceipts', type: :request do
     Timecop.freeze(Time.find_zone('EST').local(2021,2,15))
   end
 
+  after do
+    Timecop.return
+  end
+
   # Initialize the test data
   let!(:participating_seller) { create(:participating_seller) }
   let!(:payment_intent) { create(:payment_intent) }
