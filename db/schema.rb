@@ -241,8 +241,8 @@ ActiveRecord::Schema.define(version: 2021_01_29_084819) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "successful", default: false
-    t.string "square_payment_id", null: false
-    t.string "square_location_id", null: false
+    t.string "square_payment_id"
+    t.string "square_location_id"
     t.string "receipt_url"
     t.bigint "purchaser_id"
     t.bigint "recipient_id"
@@ -251,6 +251,7 @@ ActiveRecord::Schema.define(version: 2021_01_29_084819) do
     t.bigint "campaign_id"
     t.text "metadata"
     t.bigint "project_id"
+    t.string "origin", default: "square", null: false
     t.index ["campaign_id"], name: "index_payment_intents_on_campaign_id"
     t.index ["fee_id"], name: "index_payment_intents_on_fee_id"
     t.index ["project_id"], name: "index_payment_intents_on_project_id"

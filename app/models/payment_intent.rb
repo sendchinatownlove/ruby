@@ -8,6 +8,7 @@
 #  line_items         :text
 #  lock_version       :integer
 #  metadata           :text
+#  origin             :string           default("square"), not null
 #  receipt_url        :string
 #  successful         :boolean          default(FALSE)
 #  created_at         :datetime         not null
@@ -17,8 +18,8 @@
 #  project_id         :bigint
 #  purchaser_id       :bigint
 #  recipient_id       :bigint
-#  square_location_id :string           not null
-#  square_payment_id  :string           not null
+#  square_location_id :string
+#  square_payment_id  :string
 #
 # Indexes
 #
@@ -37,10 +38,11 @@
 #
 class PaymentIntent < ApplicationRecord
   ORIGIN_TYPES = [
-    CUSTOM = 'custom'.freeze,
-    SQUARE = 'square'.freeze
+    CUSTOM = 'custom',
+    SQUARE = 'square'
   ].freeze
 
+  validates_presence_of :origin
   validates_presence_of :square_payment_id, :square_location_id, if: -> { origin == SQUARE }
   validates_uniqueness_of :square_payment_id, allow_nil: true
   has_many :items
