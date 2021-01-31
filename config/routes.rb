@@ -92,6 +92,7 @@ Rails.application.routes.draw do
     resources :rewards, controller: 'contact_rewards', only: [:create]
     resources :tickets, controller: 'contact_tickets'
     resources :crawl_receipts, controller: 'contact_crawl_receipts', only: %i[index]
+    resources :redemptions, controller: 'contact_redemptions'
   end
   resources :crawl_receipts do
   end
