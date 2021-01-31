@@ -31,7 +31,8 @@ class ParticipatingSellersController < ApplicationController
     params.permit(
       :name,
       :seller_id,
-      :stamp_url
+      :stamp_url,
+      :active
     )
   end
 
