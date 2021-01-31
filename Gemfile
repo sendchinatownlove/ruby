@@ -75,6 +75,7 @@ group :test do
   gem 'factory_bot_rails', '~> 4.0'
   gem 'shoulda-matchers', '~> 4.3'
   gem 'database_cleaner'
+  gem 'timecop', '~> 0.8.1'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
@@ -88,5 +89,8 @@ gem 'ulid'
 
 # pagination gem
 gem 'pagy', '~> 3.8'
+
+# GCS gem
+gem 'google-cloud-storage'
 
 gem 'workos'

@@ -155,15 +155,15 @@ class ChargesController < ApplicationController
     metadata:,
     project_id:
   )
-    Rails.logger.info "create_square_payment_request called"
+    Rails.logger.info 'create_square_payment_request called'
     square_location_id = if gift_a_meal? && @seller.present? && @seller.non_profit_location_id.present?
-                           Rails.logger.info "GAM, Seller and Nonprofit is present"
+                           Rails.logger.info 'GAM, Seller and Nonprofit is present'
                            @seller.non_profit_location_id
                          elsif @project.present?
-                           Rails.logger.info "Project is present"
+                           Rails.logger.info 'Project is present'
                            @project.square_location_id
                          else
-                           Rails.logger.info "Seller is present"
+                           Rails.logger.info 'Seller is present'
                            @seller.square_location_id
                          end
     Rails.logger.info "Square Location ID: #{square_location_id}"

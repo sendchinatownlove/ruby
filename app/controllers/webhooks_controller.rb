@@ -200,6 +200,7 @@ class WebhooksController < ApplicationController
             }
           )
           save_payment_intent = true
+
           # Gift a meal purchases are technically donations to the purchaser
           if gift_a_meal
             is_donation ||= true
@@ -224,6 +225,10 @@ class WebhooksController < ApplicationController
     end
 
     if save_payment_intent
+      WebhookManager::CrawlReceiptCreator.call(
+        payment_intent: payment_intent,
+        amount: items.map { |li| li['amount'].to_f }.sum
+      )
       payment_intent.successful = true
       payment_intent.save!
     end

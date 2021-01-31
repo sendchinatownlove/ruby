@@ -23,9 +23,9 @@ Rails.application.configure do
       origins 'localhost:3000', '127.0.0.1:3000',
               'localhost:4000', '127.0.0.1:4000'
       resource '/campaigns',
-        methods: [:get],
-        headers: :any,
-        expose: ['Total-Count', 'Total-Pages', 'Page-Items', 'Current-Page']
+               methods: [:get],
+               headers: :any,
+               expose: %w[Total-Count Total-Pages Page-Items Current-Page]
       resource '*', headers: :any, methods: :any
     end
   end

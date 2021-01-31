@@ -139,28 +139,28 @@ class Campaign < ApplicationRecord
       'seller_non_profit_location_id' => seller.non_profit_location_id,
       'seller_image_url' => seller.hero_image_url,
       'seller_name' => seller.name,
-      'seller_city' => seller.locations.size > 0 ? seller.locations.first.city : nil
+      'seller_city' => !seller.locations.empty? ? seller.locations.first.city : nil
     }
   end
 
   # Calculates the amount raised in the payment intent table.
   def payment_intent_amount
     payment_intents = PaymentIntent
-      .joins(:campaign)
-      .where(campaigns: {
-               id: id
-             })
-      .where(successful: true)
-      .as_json
+                      .joins(:campaign)
+                      .where(campaigns: {
+                               id: id
+                             })
+                      .where(successful: true)
+                      .as_json
 
     # Ignore transaction fees when calculating the total amount raised
     total_amount_raised = 0
     payment_intents.each do |payment|
-      line_items = JSON.parse(payment["line_items"])
+      line_items = JSON.parse(payment['line_items'])
       amount = line_items
-        .select{ |line_item| line_item["item_type"] == "donation" }
-        .map{ |donation_line_item| donation_line_item["amount"] }
-        .sum
+               .select { |line_item| line_item['item_type'] == 'donation' }
+               .map { |donation_line_item| donation_line_item['amount'] }
+               .sum
       total_amount_raised += amount
     end
     total_amount_raised

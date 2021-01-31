@@ -24,9 +24,9 @@ Rails.application.configure do
               'https://www.staging-scl.netlify.app'
 
       resource '/campaigns',
-        methods: [:get],
-        headers: :any,
-        expose: ['Total-Count', 'Total-Pages', 'Page-Items', 'Current-Page']
+               methods: [:get],
+               headers: :any,
+               expose: %w[Total-Count Total-Pages Page-Items Current-Page]
       resource '*', headers: :any, methods: :any
     end
   end

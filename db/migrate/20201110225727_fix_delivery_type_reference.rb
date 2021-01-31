@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class FixDeliveryTypeReference < ActiveRecord::Migration[6.0]
   def change
     remove_reference :delivery_types, :delivery_option, index: true, foreign_key: true
