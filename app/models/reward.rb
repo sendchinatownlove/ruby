@@ -15,4 +15,6 @@ class Reward < ApplicationRecord
   validates_presence_of :image_url
   validates_presence_of :name
   validates_presence_of :total_value
+
+  has_many :redemptions, dependent: :destroy
 end
