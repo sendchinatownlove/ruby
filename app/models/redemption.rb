@@ -19,6 +19,18 @@
 #  fk_rails_...  (reward_id => rewards.id)
 #
 class Redemption < ApplicationRecord
+  before_destroy :unredeem_receipts
   belongs_to :reward
   belongs_to :contact
+
+  has_many :crawl_receipts
+
+  private
+
+  def unredeem_receipts
+    CrawlReceipt.where(redemption_id: self.id).each do |receipt|
+      receipt.update_attribute(:redemption_id, nil)
+      receipt.save!
+    end
+  end
 end
