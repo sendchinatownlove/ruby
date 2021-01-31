@@ -4,7 +4,7 @@ class ParticipatingSellersController < ApplicationController
   before_action :set_participating_seller, only: %i[show update]
 
   def index
-    @participating_sellers = ParticipatingSeller.all
+    @participating_sellers = ParticipatingSeller.where(active: true)
     json_response(participating_sellers_json)
   end
 
@@ -31,7 +31,8 @@ class ParticipatingSellersController < ApplicationController
     params.permit(
       :name,
       :seller_id,
-      :stamp_url
+      :stamp_url,
+      :active
     )
   end
 
