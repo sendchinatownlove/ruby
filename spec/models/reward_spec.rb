@@ -17,4 +17,5 @@ RSpec.describe Reward, type: :model do
   it { should validate_presence_of(:total_value) }
   it { should validate_presence_of(:name) }
   it { should validate_presence_of(:image_url) }
+  it { should have_many(:redemptions) }
 end
