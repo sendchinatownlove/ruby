@@ -21,7 +21,7 @@ module EmailManager
             <p>
               You requested a Magic Link to sign into Send Chinatown Love.
               Click the link below to sign in!
-              <a href="#{magic_link_url}" target="_blank">
+              <a href="#{magic_link_url}" target="_blank" rel="noopener norefferrer">
                 Send Chinatown Love
               </a>
             </p>
