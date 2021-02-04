@@ -30,7 +30,8 @@ RSpec.describe 'Contacts', type: :request do
           instagram: false,
           unique_seller_tickets: 0,
           weekly_giveaway_entries: 0,
-          is_eligible_for_lyft_reward: false
+          is_eligible_for_lyft_reward: false,
+          lny_redepmtions: 0,
         }.as_json)
       end
 
@@ -49,7 +50,8 @@ RSpec.describe 'Contacts', type: :request do
             instagram: true,
             unique_seller_tickets: 0,
             weekly_giveaway_entries: 0,
-            is_eligible_for_lyft_reward: false
+            is_eligible_for_lyft_reward: false,
+            lny_redepmtions: 0,
           }.as_json)
         end
       end
@@ -66,7 +68,8 @@ RSpec.describe 'Contacts', type: :request do
             instagram: false,
             unique_seller_tickets: 0,
             weekly_giveaway_entries: 0,
-            is_eligible_for_lyft_reward: true
+            is_eligible_for_lyft_reward: true,
+            lny_redepmtions: 0,
           }.as_json)
         end
       end
@@ -134,7 +137,8 @@ RSpec.describe 'Contacts', type: :request do
             instagram: true,
             unique_seller_tickets: 0,
             weekly_giveaway_entries: 0,
-            is_eligible_for_lyft_reward: false
+            is_eligible_for_lyft_reward: false,
+            lny_redepmtions: 0,
           }.as_json)
         end
       end
@@ -226,7 +230,8 @@ RSpec.describe 'Contacts', type: :request do
           instagram: false,
           unique_seller_tickets: 0,
           weekly_giveaway_entries: 0,
-          is_eligible_for_lyft_reward: false
+          is_eligible_for_lyft_reward: false,
+          lny_redepmtions: 0,
         }.as_json)
       end
 
@@ -243,7 +248,8 @@ RSpec.describe 'Contacts', type: :request do
             instagram: true,
             unique_seller_tickets: 0,
             weekly_giveaway_entries: 0,
-            is_eligible_for_lyft_reward: false
+            is_eligible_for_lyft_reward: false,
+            lny_redepmtions: 0,
           }.as_json)
         end
       end

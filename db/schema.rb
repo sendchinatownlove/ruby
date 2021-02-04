@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_13_190758) do
+ActiveRecord::Schema.define(version: 2021_01_29_084819) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -65,6 +65,21 @@ ActiveRecord::Schema.define(version: 2020_12_13_190758) do
     t.string "rewards_redemption_access_token"
     t.datetime "expires_at"
     t.index ["email"], name: "index_contacts_on_email", unique: true
+  end
+
+  create_table "crawl_receipts", force: :cascade do |t|
+    t.bigint "participating_seller_id"
+    t.bigint "payment_intent_id"
+    t.bigint "contact_id", null: false
+    t.integer "amount", null: false
+    t.string "receipt_url", null: false
+    t.bigint "redemption_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["contact_id"], name: "index_crawl_receipts_on_contact_id"
+    t.index ["participating_seller_id"], name: "index_crawl_receipts_on_participating_seller_id"
+    t.index ["payment_intent_id"], name: "index_crawl_receipts_on_payment_intent_id"
+    t.index ["redemption_id"], name: "index_crawl_receipts_on_redemption_id"
   end
 
   create_table "delivery_options", force: :cascade do |t|
@@ -218,6 +233,7 @@ ActiveRecord::Schema.define(version: 2020_12_13_190758) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "is_lyft_sponsored", default: false
+    t.boolean "active"
   end
 
   create_table "payment_intents", force: :cascade do |t|
@@ -225,8 +241,8 @@ ActiveRecord::Schema.define(version: 2020_12_13_190758) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "successful", default: false
-    t.string "square_payment_id", null: false
-    t.string "square_location_id", null: false
+    t.string "square_payment_id"
+    t.string "square_location_id"
     t.string "receipt_url"
     t.bigint "purchaser_id"
     t.bigint "recipient_id"
@@ -235,6 +251,7 @@ ActiveRecord::Schema.define(version: 2020_12_13_190758) do
     t.bigint "campaign_id"
     t.text "metadata"
     t.bigint "project_id"
+    t.string "origin", default: "square", null: false
     t.index ["campaign_id"], name: "index_payment_intents_on_campaign_id"
     t.index ["fee_id"], name: "index_payment_intents_on_fee_id"
     t.index ["project_id"], name: "index_payment_intents_on_project_id"
@@ -249,6 +266,13 @@ ActiveRecord::Schema.define(version: 2020_12_13_190758) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "redemptions", force: :cascade do |t|
+    t.bigint "reward_id", null: false
+    t.bigint "contact_id", null: false
+    t.index ["contact_id"], name: "index_redemptions_on_contact_id"
+    t.index ["reward_id"], name: "index_redemptions_on_reward_id"
+  end
+
   create_table "refunds", force: :cascade do |t|
     t.string "square_refund_id"
     t.string "status"
@@ -256,6 +280,14 @@ ActiveRecord::Schema.define(version: 2020_12_13_190758) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["payment_intent_id"], name: "index_refunds_on_payment_intent_id"
+  end
+
+  create_table "rewards", force: :cascade do |t|
+    t.integer "total_value"
+    t.string "name"
+    t.string "image_url"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "seller_translations", force: :cascade do |t|
@@ -332,6 +364,10 @@ ActiveRecord::Schema.define(version: 2020_12_13_190758) do
   add_foreign_key "campaigns_sellers_distributors", "campaigns"
   add_foreign_key "campaigns_sellers_distributors", "distributors"
   add_foreign_key "campaigns_sellers_distributors", "sellers"
+  add_foreign_key "crawl_receipts", "contacts"
+  add_foreign_key "crawl_receipts", "participating_sellers"
+  add_foreign_key "crawl_receipts", "payment_intents"
+  add_foreign_key "crawl_receipts", "redemptions"
   add_foreign_key "delivery_options", "delivery_types"
   add_foreign_key "delivery_options", "sellers"
   add_foreign_key "donation_details", "items"
@@ -350,6 +386,8 @@ ActiveRecord::Schema.define(version: 2020_12_13_190758) do
   add_foreign_key "payment_intents", "contacts", column: "purchaser_id"
   add_foreign_key "payment_intents", "contacts", column: "recipient_id"
   add_foreign_key "payment_intents", "projects"
+  add_foreign_key "redemptions", "contacts"
+  add_foreign_key "redemptions", "rewards"
   add_foreign_key "refunds", "payment_intents"
   add_foreign_key "tickets", "contacts"
   add_foreign_key "tickets", "participating_sellers"

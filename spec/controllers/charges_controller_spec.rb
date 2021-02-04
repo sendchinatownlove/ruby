@@ -1,4 +1,3 @@
-
 # frozen_string_literal: true
 
 require 'rails_helper'
@@ -39,7 +38,7 @@ RSpec.describe ChargesController, type: :controller do
     end
   end
 
-  describe 'POST create with nonprofit fee' do      
+  describe 'POST create with nonprofit fee' do
     let!(:mock_response) { MockApiResponseHelper::MockSquareApiResponse.new }
     let!(:seller_id) { 21 }
     let!(:fee_id) { 3 }
@@ -56,9 +55,9 @@ RSpec.describe ChargesController, type: :controller do
           square_location_id: square_location_id
         )
         fee = create(
-          :fee, 
+          :fee,
           id: fee_id,
-          active: true, 
+          active: true,
           multiplier: 0.1
         )
         nonprofit = create(
@@ -75,18 +74,18 @@ RSpec.describe ChargesController, type: :controller do
         )
 
         payment_params = create_payment_params(seller: seller, campaign: campaign)
-        
+
         allow(SquareManager::PaymentCreator)
           .to receive(:call)
           .with(payment_params)
           .and_return(mock_response)
 
         cparams = create_charge_params(
-                    seller: seller, 
-                    is_square: true, 
-                    campaign: campaign, 
-                    is_distribution: false
-                  )
+          seller: seller,
+          is_square: true,
+          campaign: campaign,
+          is_distribution: false
+        )
         response = post :create, params: cparams, as: :json
         payment_intent = PaymentIntent.find_by(campaign_id: campaign_id, fee_id: fee_id)
         expect(payment_intent).to_not eq nil
@@ -98,9 +97,9 @@ RSpec.describe ChargesController, type: :controller do
       it 'should create a payment_intent that has the project_id, campaign_id and fee_id' do
         project = create(:project, id: project_id, square_location_id: square_location_id)
         fee = create(
-          :fee, 
+          :fee,
           id: fee_id,
-          active: true, 
+          active: true,
           multiplier: 0.1
         )
         nonprofit = create(
@@ -127,10 +126,10 @@ RSpec.describe ChargesController, type: :controller do
         cparams = create_charge_params(is_square: true, campaign: campaign, is_distribution: false)
         response = post :create, params: cparams, as: :json
         payment_intent = PaymentIntent.find_by(
-                          campaign_id: campaign_id, 
-                          project_id: project_id, 
-                          fee_id: fee_id
-                         ) 
+          campaign_id: campaign_id,
+          project_id: project_id,
+          fee_id: fee_id
+        )
         expect(payment_intent).to_not eq nil
         expect(response.status).to eq 200
       end
@@ -162,45 +161,43 @@ RSpec.describe ChargesController, type: :controller do
     params
   end
 
-  def default_line_items 
-    { 
-      'amount' => 50, 
-      'currency' => 'usd', 
-      'quantity' => 1, 
-      'item_type' => 'donation' 
+  def default_line_items
+    {
+      'amount' => 50,
+      'currency' => 'usd',
+      'quantity' => 1,
+      'item_type' => 'donation'
     }
   end
 
-  # TODO (billy-yuan): Update create_line_items so that transaction fees can be
+  # TODO: (billy-yuan): Update create_line_items so that transaction fees can be
   # included as a separate line_items group
   def create_line_items(extra_line_items = {})
     line_items = default_line_items
     extra_line_items.each do |extra_line_item, value|
-      if value
-        line_items[extra_line_item] = value
-      end
+      line_items[extra_line_item] = value if value
     end
     [line_items]
   end
 
   def create_payment_params(
-    seller: nil, 
-    seller_has_nonprofit: false, 
-    campaign: nil, 
+    seller: nil,
+    seller_has_nonprofit: false,
+    campaign: nil,
     project: nil,
     line_items: nil
   )
     campaign_id = campaign.id if campaign
     project_id = campaign.project_id if campaign
     location_id = get_location_id(
-                    project: project, 
-                    seller: seller, 
-                    seller_has_nonprofit: seller_has_nonprofit
-                  )
+      project: project,
+      seller: seller,
+      seller_has_nonprofit: seller_has_nonprofit
+    )
     cparams = create_charge_params(
-                is_square: true, 
-                campaign: campaign
-              )
+      is_square: true,
+      campaign: campaign
+    )
     line_items = create_line_items(project_id: project_id)
 
     {

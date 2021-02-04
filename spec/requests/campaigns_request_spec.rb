@@ -47,7 +47,7 @@ RSpec.describe 'Campaigns API', type: :request do
     end
 
     context 'with some basic pagination' do
-      subject { get '/campaigns/?inactive=true'}
+      subject { get '/campaigns/?inactive=true' }
       it 'returns 2 records with default pagination' do
         subject
         expect(json).not_to be_empty
@@ -380,31 +380,31 @@ RSpec.describe 'Campaigns API', type: :request do
       it 'Creates seller and distributor pair' do
         subject
         expect(json['seller_distributor_pairs']).to eq([
-          # Directly related seller/dist
-          {
-            'distributor_id' => campaign.distributor.id,
-            'distributor_image_url' => campaign.distributor.image_url,
-            'distributor_website_url' => campaign.distributor.website_url,
-            'distributor_name' => campaign.distributor.name,
-            'seller_id' => campaign.seller.seller_id,
-            'seller_image_url' => campaign.seller.hero_image_url,
-            'seller_name' => campaign.seller.name,
-            'seller_non_profit_location_id' => campaign.seller.non_profit_location_id,
-            'seller_city' => nil
-          },
-          # Seller/dist pair
-          {
-            'distributor_id' => distributor.id,
-            'distributor_image_url' => distributor.image_url,
-            'distributor_website_url' => distributor.website_url,
-            'distributor_name' => distributor.name,
-            'seller_id' => seller.seller_id,
-            'seller_image_url' => seller.hero_image_url,
-            'seller_name' => seller.name,
-            'seller_non_profit_location_id' => seller.non_profit_location_id,
-            'seller_city' => nil
-          }
-        ])
+                                                         # Directly related seller/dist
+                                                         {
+                                                           'distributor_id' => campaign.distributor.id,
+                                                           'distributor_image_url' => campaign.distributor.image_url,
+                                                           'distributor_website_url' => campaign.distributor.website_url,
+                                                           'distributor_name' => campaign.distributor.name,
+                                                           'seller_id' => campaign.seller.seller_id,
+                                                           'seller_image_url' => campaign.seller.hero_image_url,
+                                                           'seller_name' => campaign.seller.name,
+                                                           'seller_non_profit_location_id' => campaign.seller.non_profit_location_id,
+                                                           'seller_city' => nil
+                                                         },
+                                                         # Seller/dist pair
+                                                         {
+                                                           'distributor_id' => distributor.id,
+                                                           'distributor_image_url' => distributor.image_url,
+                                                           'distributor_website_url' => distributor.website_url,
+                                                           'distributor_name' => distributor.name,
+                                                           'seller_id' => seller.seller_id,
+                                                           'seller_image_url' => seller.hero_image_url,
+                                                           'seller_name' => seller.name,
+                                                           'seller_non_profit_location_id' => seller.non_profit_location_id,
+                                                           'seller_city' => nil
+                                                         }
+                                                       ])
       end
 
       it 'Returns status code 200' do
@@ -428,31 +428,31 @@ RSpec.describe 'Campaigns API', type: :request do
       it 'Creates seller and distributor pair' do
         subject
         expect(json['seller_distributor_pairs']).to eq([
-          # Directly related seller/dist
-          {
-            'distributor_id' => campaign.distributor.id,
-            'distributor_image_url' => campaign.distributor.image_url,
-            'distributor_website_url' => campaign.distributor.website_url,
-            'distributor_name' => campaign.distributor.name,
-            'seller_id' => campaign.seller.seller_id,
-            'seller_image_url' => campaign.seller.hero_image_url,
-            'seller_name' => campaign.seller.name,
-            'seller_non_profit_location_id' => campaign.seller.non_profit_location_id,
-            'seller_city' => campaign.seller.locations.first.city
-          },
-          # Seller/dist pair
-          {
-            'distributor_id' => distributor.id,
-            'distributor_image_url' => distributor.image_url,
-            'distributor_website_url' => distributor.website_url,
-            'distributor_name' => distributor.name,
-            'seller_id' => seller.seller_id,
-            'seller_image_url' => seller.hero_image_url,
-            'seller_name' => seller.name,
-            'seller_non_profit_location_id' => seller.non_profit_location_id,
-            'seller_city' => seller.locations.first.city
-          }
-        ])
+                                                         # Directly related seller/dist
+                                                         {
+                                                           'distributor_id' => campaign.distributor.id,
+                                                           'distributor_image_url' => campaign.distributor.image_url,
+                                                           'distributor_website_url' => campaign.distributor.website_url,
+                                                           'distributor_name' => campaign.distributor.name,
+                                                           'seller_id' => campaign.seller.seller_id,
+                                                           'seller_image_url' => campaign.seller.hero_image_url,
+                                                           'seller_name' => campaign.seller.name,
+                                                           'seller_non_profit_location_id' => campaign.seller.non_profit_location_id,
+                                                           'seller_city' => campaign.seller.locations.first.city
+                                                         },
+                                                         # Seller/dist pair
+                                                         {
+                                                           'distributor_id' => distributor.id,
+                                                           'distributor_image_url' => distributor.image_url,
+                                                           'distributor_website_url' => distributor.website_url,
+                                                           'distributor_name' => distributor.name,
+                                                           'seller_id' => seller.seller_id,
+                                                           'seller_image_url' => seller.hero_image_url,
+                                                           'seller_name' => seller.name,
+                                                           'seller_non_profit_location_id' => seller.non_profit_location_id,
+                                                           'seller_city' => seller.locations.first.city
+                                                         }
+                                                       ])
       end
 
       it 'Returns status code 200' do

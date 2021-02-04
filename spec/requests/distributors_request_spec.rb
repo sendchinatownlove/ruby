@@ -3,13 +3,12 @@
 require 'rails_helper'
 
 RSpec.describe 'Distributors', type: :request do
-
   describe 'GET /distributors' do
     let!(:distributors) do
       (1..10).map { create :distributor }
     end
 
-    before { get "/distributors" }
+    before { get '/distributors' }
 
     it 'returns the distributor' do
       expect(json.size).to eq distributors.size

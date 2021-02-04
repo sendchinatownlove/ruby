@@ -46,6 +46,8 @@ class ContactsController < ApplicationController
     ret[:unique_seller_tickets] = tickets.map(&:participating_seller_id)
                                          .to_set.size
 
+    ret[:lny_redepmtions] = Redemption.where(contact: @contact).size
+
     ret
   end
 

@@ -77,7 +77,11 @@
 #                  rails_direct_uploads POST   /rails/active_storage/direct_uploads(.:format)                                           active_storage/direct_uploads#create
 
 Rails.application.routes.draw do
+  resources :rewards, only: [:index]
   resources :nonprofits
+  get 'auth/google', to: 'authorization#google'
+  post 'auth/passwordless', to: 'authorization#passwordless'
+  get 'auth/callback', to: 'authorization#callback'
   post 'contacts/:contact_id/lyft_rewards/:token/redeem', to: 'contact_lyft_rewards#redeem'
   post 'campaigns/:id/seller_distributor', action: :associate_seller_distributor, controller: 'campaigns'
   post 'campaigns/:id/gift_card', action: :generate_campaign_gift_cards, controller: 'campaigns'
@@ -88,6 +92,10 @@ Rails.application.routes.draw do
     resources :lyft_rewards, controller: 'contact_lyft_rewards', only: %i[index create]
     resources :rewards, controller: 'contact_rewards', only: [:create]
     resources :tickets, controller: 'contact_tickets'
+    resources :crawl_receipts, controller: 'contact_crawl_receipts', only: %i[index]
+    resources :redemptions, controller: 'contact_redemptions'
+  end
+  resources :crawl_receipts do
   end
   resources :charges do
   end
@@ -115,5 +123,9 @@ Rails.application.routes.draw do
   resources :tickets do
   end
   resources :webhooks do
+  end
+  resources :gcs do
+  end
+  resources :redemptions do
   end
 end
