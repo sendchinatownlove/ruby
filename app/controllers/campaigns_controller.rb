@@ -2,7 +2,7 @@
 include Pagy::Backend
 
 class CampaignsController < ApplicationController
-  before_action :set_campaign, only: %i[show update]
+  before_action :set_campaign, only: %i[show update generate_campaign_gift_cards]
   after_action { pagy_headers_merge(@pagy) if @pagy }
 
   # GET /campaigns
@@ -52,9 +52,8 @@ class CampaignsController < ApplicationController
 
   # POST /campaigns/:id/gift_card
   def generate_campaign_gift_cards
-    request_params = params.permit(:gift_cards => [:distributor_id, :gift_card_amount, :seller_id])
+    generate_campaign_gift_cards_params
     gift_cards = request_params['gift_cards']
-    set_campaign
 
     total_amount_to_allocate = 0
     gift_cards.each do |gift_card|
@@ -143,6 +142,10 @@ class CampaignsController < ApplicationController
     ret[:seller_id] = @seller.id
 
     ret
+  end
+
+  def generate_campaign_gift_cards_params
+    params.require(:gift_cards => [:distributor_id, :gift_card_amount, :seller_id])
   end
 
   def set_campaign
