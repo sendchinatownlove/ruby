@@ -16,7 +16,14 @@ class AuthorizationController < ApplicationController
       email: params[:email]
     )
 
-    # TODO: Add redirect and send e-mail.
+    EmailManager::MagicLinkSender.call(
+      {
+        email: params[:email],
+        magic_link_url: session.link
+      }
+    )
+
+    # Redirect to Check Email page in UI.
   end
 
   def callback
