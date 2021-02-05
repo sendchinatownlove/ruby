@@ -14,7 +14,6 @@ module WebhookManager
 
     def call
       ActiveRecord::Base.transaction do
-        seller = Seller.find_by(seller_id: seller_id)
         item = WebhookManager::ItemCreator.call({
                                                   item_type: :gift_card,
                                                   seller_id: seller_id,

@@ -47,7 +47,6 @@ RSpec.describe PaymentIntent, type: :model do
       it { should validate_uniqueness_of(:square_payment_id) }
       it { should have_many(:items) }
       it { should belong_to(:purchaser) }
-      it { should belong_to(:recipient) }
 
       let!(:payment_intent) do
         create(
