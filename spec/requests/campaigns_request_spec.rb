@@ -365,7 +365,7 @@ RSpec.describe 'Campaigns API', type: :request do
       )
     end
 
-    context 'Without a seller locaiton' do
+    context 'Without a seller location' do
       let!(:seller) { create :seller }
       let!(:campaign) do
         create(
@@ -458,6 +458,65 @@ RSpec.describe 'Campaigns API', type: :request do
       it 'Returns status code 200' do
         subject
         expect(response).to have_http_status(200)
+      end
+    end
+  end
+
+  context 'POST /campaigns/:id/gift_card' do
+    let!(:project) { create :project }
+
+    subject do
+      post(
+        "/campaigns/#{campaign.id}/gift_card",
+        params: {
+          gift_cards: [{
+            distributor_id: campaign.seller_distributor_pairs[0]['distributor_id'],
+            seller_id: campaign.seller_distributor_pairs[0]['seller_id'],
+            gift_card_amount: 200,
+          }]
+        },
+        as: :json
+      )
+    end
+    
+    context 'Failure states' do
+      let!(:campaign) do
+        create(
+          :campaign,
+          :with_sellers_distributors,
+          project_id: project.id,
+          seller_id: nil,
+        )
+      end
+
+      it 'Fails if no gift cards are included' do
+        post(
+          "/campaigns/#{campaign.id}/gift_card",
+          params: {},
+          as: :json
+        )
+        expect(json).to eq({'message'=>'param is missing or the value is empty: gift_cards'})
+      end
+  
+      it 'Raises invalid parameter error if there are not enough unallocated funds' do
+        subject
+        expect(json).to eq({'message'=>'Request amount exceeds unallocated amount in campaign. Unallocated amount: 0'})
+      end
+    end
+
+    context 'Success state' do
+      let(:payment_intent) { create :payment_intent, :with_campaign, :with_line_items, successful: true }
+      let(:campaign) do
+        campaign = Campaign.find(payment_intent.campaign_id)
+        campaign.update!('project_id': project.id, 'seller_id': nil)
+        FactoryBot.create :campaigns_sellers_distributor, campaign_id: campaign.id
+        FactoryBot.create :campaigns_sellers_distributor, campaign_id: campaign.id
+        campaign
+      end
+
+      it 'Creates gift card successfully' do
+        subject
+        expect(json).to eq({'unallocated_amount'=>400})
       end
     end
   end

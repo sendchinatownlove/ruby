@@ -39,4 +39,25 @@ describe WebhookManager::ItemCreator, '#call' do
       expect(item.campaign).to eq(campaign)
     end
   end
+
+  context 'with mega gam campaign' do
+    let!(:campaign) { create(:campaign, :with_project, seller: nil) }
+
+    it 'it creates mega gam item' do
+      WebhookManager::ItemCreator.call({
+        item_type: 'gift_card',
+        seller_id: seller.seller_id,
+        project_id: campaign.project_id,
+        campaign_id: campaign.id,
+      })
+  
+      item = Item.find_by(project_id: campaign.project_id)
+      expect(item.seller).to eq(seller)
+      expect(item.purchaser).to eq(nil)
+      expect(item.item_type).to eq('gift_card')
+      expect(item.payment_intent).to eq(nil)
+      expect(item.campaign).to eq(campaign)
+      expect(item.project).to eq(campaign.project)
+    end
+  end
 end

@@ -233,7 +233,7 @@ ActiveRecord::Schema.define(version: 2021_01_29_084819) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "is_lyft_sponsored", default: false
-    t.boolean "active"
+    t.boolean "active", default: true
   end
 
   create_table "payment_intents", force: :cascade do |t|
