@@ -29,6 +29,64 @@ RSpec.describe 'Gift Cards API', type: :request do
 
   let!(:gift_card_id) { gift_card_detail.gift_card_id }
 
+  context 'GET /gift_cards' do
+    context 'with no session' do
+      before { get '/gift_cards' }
+
+      it 'returns a 401' do
+        expect(response).to have_http_status(401)
+      end
+    end
+
+    context 'with an invalid contact' do
+      before do
+        allow_any_instance_of(GiftCardsController).to receive(:get_session_user)
+          .and_return({
+                        email: 'test@foo.com'
+                      })
+        get '/gift_cards'
+      end
+
+      it 'returns a 403' do
+        expect(response).to have_http_status(403)
+      end
+    end
+
+    context 'with a valid contact' do
+      let(:contact) { create(:contact) }
+      let!(:gift_card_detail_0) do
+        create(
+          :gift_card_detail,
+          recipient_id: contact.id
+        )
+      end
+      let!(:gift_card_detail_1) do
+        create(
+          :gift_card_detail,
+          recipient_id: contact.id
+        )
+      end
+
+      before do
+        allow_any_instance_of(GiftCardsController).to receive(:get_session_user).and_return(contact)
+        get '/gift_cards'
+      end
+
+      it 'returns a 200' do
+        expect(response).to have_http_status(200)
+      end
+
+      it 'returns the gift card details' do
+        expect(json).not_to be_empty
+        expect(json.size).to eq 2
+
+        expect(response.headers['Current-Page'].to_i).to eq 1
+        expect(response.headers['Total-Pages'].to_i).to eq 1
+        expect(response.headers['Total-Count'].to_i).to eq 2
+      end
+    end
+  end
+
   context 'GET /gift_cards/:id' do
     before { get "/gift_cards/#{gift_card_id}" }
 
