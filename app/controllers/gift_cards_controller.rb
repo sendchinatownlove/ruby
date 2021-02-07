@@ -14,7 +14,15 @@ class GiftCardsController < ApplicationController
     contact = Contact.find_by(email: user[:email])
     return head :forbidden unless contact
 
-    @pagy, @records = pagy(GiftCardDetail.where(recipient_id: contact[:id]))
+    gift_cards = GiftCardDetail
+                 .joins(item: [campaign: :distributor])
+                 .where({
+                          distributors: {
+                            contact_id: contact[:id]
+                          }
+                        })
+
+    @pagy, @records = pagy(gift_cards)
     json_response(@records)
   end
 

@@ -54,16 +54,20 @@ RSpec.describe 'Gift Cards API', type: :request do
 
     context 'with a valid contact' do
       let(:contact) { create(:contact) }
+      let(:distributor) { create(:distributor, contact_id: contact.id) }
+      let(:campaign) { create(:campaign, distributor_id: distributor.id) }
+      let(:item_0) { create(:item, campaign_id: campaign.id) }
+      let(:item_1) { create(:item, campaign_id: campaign.id) }
       let!(:gift_card_detail_0) do
         create(
           :gift_card_detail,
-          recipient_id: contact.id
+          item: item_0
         )
       end
       let!(:gift_card_detail_1) do
         create(
           :gift_card_detail,
-          recipient_id: contact.id
+          item: item_1
         )
       end
 
