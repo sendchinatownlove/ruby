@@ -24,18 +24,42 @@ RSpec.describe 'Authorizations', type: :request do
   end
 
   context 'POST /auth/passwordless' do
-    # TODO: This is a stub for now. Adding a custom SCL e-mail in a future PR.
+    let(:workos_passwordless_session) do
+      WorkOS::Types::PasswordlessSessionStruct.new(
+        id: 'passwordless_session',
+        email: 'distributor@gmail.com',
+        expires_at: Date.today,
+        link: 'https://auth.workos.com/passwordless/id/confirm'
+      )
+    end
 
     before(:each) do
       allow(WorkOS::Passwordless).to receive(:create_session).with(any_args).and_return(
-        nil
+        workos_passwordless_session
       )
+      allow(EmailManager::MagicLinkSender).to receive(:call)
     end
 
     it 'Creates a passwordless session via WorkOS' do
       expect(WorkOS::Passwordless).to receive(:create_session)
         .once
       post '/auth/passwordless'
+    end
+
+    it 'Sends an email' do
+      expect(EmailManager::MagicLinkSender).to receive(:call)
+        .once
+        .with({
+                email: workos_passwordless_session.email,
+                magic_link_url: workos_passwordless_session.link
+              })
+      post(
+        '/auth/passwordless',
+        params: {
+          email: 'distributor@gmail.com'
+        },
+        as: :json
+      )
     end
   end
 

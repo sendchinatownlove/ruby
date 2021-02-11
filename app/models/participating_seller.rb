@@ -5,7 +5,7 @@
 # Table name: participating_sellers
 #
 #  id                :bigint           not null, primary key
-#  active            :boolean
+#  active            :boolean          default(TRUE)
 #  is_lyft_sponsored :boolean          default(FALSE)
 #  name              :string
 #  stamp_url         :string

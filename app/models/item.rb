@@ -33,12 +33,11 @@
 class Item < ApplicationRecord
   belongs_to :campaign, optional: true
   belongs_to :payment_intent, optional: true
-  belongs_to :purchaser, class_name: 'Contact'
+  belongs_to :purchaser, class_name: 'Contact', optional: true
 
-  # Must have seller or project, but not both
   belongs_to :seller, optional: true
   belongs_to :project, optional: true
-  validate :has_project_xor_seller?
+  validate :has_project_or_seller?
 
   enum item_type: %i[donation gift_card]
   has_one :donation_detail
@@ -46,10 +45,10 @@ class Item < ApplicationRecord
 
   private
 
-  def has_project_xor_seller?
-    unless project.present? ^ seller.present?
-      errors.add(:project, 'Project or Seller must exist, but not both')
-      errors.add(:seller, 'Project or Seller must exist, but not both')
+  def has_project_or_seller?
+    unless project.present? || seller.present?
+      errors.add(:project, 'Project or Seller must exist')
+      errors.add(:seller, 'Project or Seller must exist')
     end
   end
 end

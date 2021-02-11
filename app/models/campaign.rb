@@ -71,6 +71,10 @@ class Campaign < ApplicationRecord
     gift_card_amount
   end
 
+  def amount_unallocated
+    amount_raised - amount_allocated
+  end
+
   def last_contribution
     Item.where(
       campaign_id: id,

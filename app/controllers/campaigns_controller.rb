@@ -3,7 +3,7 @@
 include Pagy::Backend
 
 class CampaignsController < ApplicationController
-  before_action :set_campaign, only: %i[show update]
+  before_action :set_campaign, only: %i[show update generate_campaign_gift_cards]
   after_action { pagy_headers_merge(@pagy) if @pagy }
 
   # GET /campaigns
@@ -49,6 +49,37 @@ class CampaignsController < ApplicationController
   def associate_seller_distributor
     CampaignsSellersDistributor.create!(associate_seller_distributor_params)
     json_response(campaign_json)
+  end
+
+  # POST /campaigns/:id/gift_card
+  def generate_campaign_gift_cards
+    request_params = generate_campaign_gift_cards_params
+    gift_cards = request_params['gift_cards']
+    
+    total_amount_to_allocate = gift_cards.reduce(0) { |sum, gift_card| sum + gift_card['gift_card_amount'] }
+    
+    original_amount_unallocated = @campaign.amount_unallocated
+    
+    unless original_amount_unallocated > total_amount_to_allocate
+      raise InvalidParameterError, "Request amount exceeds unallocated amount in campaign. Unallocated amount: #{
+        original_amount_unallocated
+      }"
+    end
+
+    gift_cards.each do |gift_card|
+      WebhookManager::GiftCardCreator.call(
+        {
+          amount: gift_card['gift_card_amount'],
+          single_use: true,
+          project_id: @campaign.project_id,
+          campaign_id: @campaign.id,
+          distributor_id: gift_card['distributor_id'],
+          seller_id: gift_card['seller_id'],
+        }
+      )
+    end
+
+    json_response({'unallocated_amount': original_amount_unallocated - total_amount_to_allocate}, :created)
   end
 
   private
@@ -111,6 +142,11 @@ class CampaignsController < ApplicationController
     ret[:seller_id] = @seller.id
 
     ret
+  end
+
+  def generate_campaign_gift_cards_params
+    params.require(:gift_cards)
+    params.permit(:gift_cards => [:distributor_id, :gift_card_amount, :seller_id])
   end
 
   def set_campaign
