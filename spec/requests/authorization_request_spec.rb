@@ -17,9 +17,9 @@ RSpec.describe 'Authorizations', type: :request do
       get '/auth/google'
     end
 
-    it 'Returns a 302' do
+    it 'Returns a 200' do
       get '/auth/google'
-      expect(response).to have_http_status(302)
+      expect(response).to have_http_status(200)
     end
   end
 
