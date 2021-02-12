@@ -16,32 +16,37 @@ module WebhookManager
     end
 
     def call
-      ActiveRecord::Base.transaction do
-        distributor = Distributor.find_by(id: distributor_id)
-        distributor_contact = nil
-        if distributor
-          distributor_contact = Contact.find_by(id: distributor.contact_id)
+      if payment_intent && payment_intent.recipient.blank?
+        raise InvalidParameterError, 'Payment intent must have a recipient in order to create gift cards'
+      else
+        ActiveRecord::Base.transaction do
+          distributor = Distributor.find_by(id: distributor_id)
+          distributor_contact = nil
+          if distributor
+            distributor_contact = Contact.find_by(id: distributor.contact_id)
+          end
+
+          item = WebhookManager::ItemCreator.call(
+            {
+              item_type: :gift_card,
+              seller_id: seller_id,
+              payment_intent: payment_intent,
+              project_id: project_id,
+              campaign_id: campaign_id,
+            })
+
+          gift_card_detail = GiftCardDetail.create!(
+            expiration: Date.today + 1.year,
+            item: item,
+            gift_card_id: GiftCardIdGenerator.generate_gift_card_id,
+            seller_gift_card_id: GiftCardIdGenerator.generate_seller_gift_card_id(seller_id: seller_id),
+            recipient: payment_intent ? payment_intent.recipient : distributor_contact,
+            single_use: single_use
+          )
+          GiftCardAmount.create!(value: amount, gift_card_detail: gift_card_detail)
+
+          gift_card_detail
         end
-
-        item = WebhookManager::ItemCreator.call({
-                                                  item_type: :gift_card,
-                                                  seller_id: seller_id,
-                                                  payment_intent: payment_intent,
-                                                  project_id: project_id,
-                                                  campaign_id: campaign_id,
-                                                })
-
-        gift_card_detail = GiftCardDetail.create!(
-          expiration: Date.today + 1.year,
-          item: item,
-          gift_card_id: GiftCardIdGenerator.generate_gift_card_id,
-          seller_gift_card_id: GiftCardIdGenerator.generate_seller_gift_card_id(seller_id: seller_id),
-          recipient: payment_intent ? payment_intent.recipient : distributor_contact,
-          single_use: single_use
-        )
-        GiftCardAmount.create!(value: amount, gift_card_detail: gift_card_detail)
-
-        gift_card_detail
       end
     end
   end
