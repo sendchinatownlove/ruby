@@ -7,7 +7,7 @@ class AuthorizationController < ApplicationController
       project_id: ENV['WORKOS_CLIENT_ID'],
       redirect_uri: "#{ENV['SENDCHINATOWNLOVE_API_URL']}/auth/callback"
     )
-    redirect_to authorization_url
+    json_response({ authorization_url: authorization_url })
   end
 
   def passwordless
