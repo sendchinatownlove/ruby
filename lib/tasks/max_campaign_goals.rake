@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 namespace :campaign_goals do
-  task :max, %i[payment_intent_id campaign_id] => [:environment] do |_task, args|
+  task :create_gift_cards_to_max_campaign, %i[payment_intent_id campaign_id] => [:environment] do |_task, args|
     desc 'Max out campaign goals with gift cards'
     Item.transaction do
       campaign = Campaign.find(args.campaign_id)
