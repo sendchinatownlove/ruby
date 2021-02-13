@@ -16,7 +16,7 @@ module WebhookManager
     end
 
     def call
-      if payment_intent && payment_intent.recipient.blank?
+      if payment_intent.present? && payment_intent.recipient.blank?
         raise InvalidParameterError, 'Payment intent must have a recipient in order to create gift cards'
       end
 
