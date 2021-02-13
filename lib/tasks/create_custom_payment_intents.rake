@@ -7,10 +7,10 @@ namespace :custom_payment_intents do
 
     line_items = {
       amount: args.amount,
-      currency: "usd",
+      currency: 'usd',
       seller_id: nil,
-      item_type: "donation",
-      quantity: 1,
+      item_type: 'donation',
+      quantity: 1
     }
 
     PaymentIntent.create!(line_items: line_items.as_json, origin: 'custom', purchaser: contact)

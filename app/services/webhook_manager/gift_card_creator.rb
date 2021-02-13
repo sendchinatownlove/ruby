@@ -33,8 +33,9 @@ module WebhookManager
             seller_id: seller_id,
             payment_intent: payment_intent,
             project_id: project_id,
-            campaign_id: campaign_id,
-          })
+            campaign_id: campaign_id
+          }
+        )
 
         gift_card_detail = GiftCardDetail.create!(
           expiration: Date.today + 1.year,

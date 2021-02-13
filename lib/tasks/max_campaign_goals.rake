@@ -17,7 +17,7 @@ namespace :campaign_goals do
             campaign_id: campaign.id,
             distributor_id: campaign.distributor_id,
             seller_id: campaign.seller.seller_id,
-            payment_intent: payment_intent,
+            payment_intent: payment_intent
           }
         )
       end

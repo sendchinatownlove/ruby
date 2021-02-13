@@ -16,13 +16,13 @@ module WebhookManager
     def call
       seller = Seller.find_by(seller_id: seller_id)
       project = Project.find_by(id: project_id)
-      if seller.present? && project.present?  # Mega GAM item creation will have seller and project.
+      if seller.present? && project.present? # Mega GAM item creation will have seller and project.
         Item.create!(
           seller: seller,
           project: project,
           item_type: item_type,
           payment_intent: payment_intent,
-          campaign_id: campaign_id,
+          campaign_id: campaign_id
         )
       elsif seller.present?
         Item.create!(
@@ -38,7 +38,7 @@ module WebhookManager
           purchaser: payment_intent.purchaser,
           item_type: item_type,
           payment_intent: payment_intent,
-          campaign_id: campaign_id,
+          campaign_id: campaign_id
         )
       end
     end

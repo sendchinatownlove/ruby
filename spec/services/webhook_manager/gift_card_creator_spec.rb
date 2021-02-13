@@ -32,18 +32,18 @@ describe WebhookManager::GiftCardCreator, '#call' do
     end
 
     it 'raises' do
-      expect {subject}.to raise_error
+      expect { subject }.to raise_error
     end
   end
 
   it 'creates gift_card_details without payment intent' do
     gift_card_details = WebhookManager::GiftCardCreator.call({
-      seller_id: campaign.seller_distributor_pairs[0]['seller_id'],
-      amount: 500,
-      single_use: true,
-      distributor_id: campaign.seller_distributor_pairs[0]['distributor_id'],
-      project_id: campaign.project_id
-    })
+                                                               seller_id: campaign.seller_distributor_pairs[0]['seller_id'],
+                                                               amount: 500,
+                                                               single_use: true,
+                                                               distributor_id: campaign.seller_distributor_pairs[0]['distributor_id'],
+                                                               project_id: campaign.project_id
+                                                             })
 
     item = Item.last
     distributor = Distributor.find(campaign.seller_distributor_pairs[0]['distributor_id'])

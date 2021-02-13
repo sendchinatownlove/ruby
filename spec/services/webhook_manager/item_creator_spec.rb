@@ -45,12 +45,12 @@ describe WebhookManager::ItemCreator, '#call' do
 
     it 'it creates mega gam item' do
       WebhookManager::ItemCreator.call({
-        item_type: 'gift_card',
-        seller_id: seller.seller_id,
-        project_id: campaign.project_id,
-        campaign_id: campaign.id,
-      })
-  
+                                         item_type: 'gift_card',
+                                         seller_id: seller.seller_id,
+                                         project_id: campaign.project_id,
+                                         campaign_id: campaign.id
+                                       })
+
       item = Item.find_by(project_id: campaign.project_id)
       expect(item.seller).to eq(seller)
       expect(item.purchaser).to eq(nil)

@@ -98,9 +98,9 @@ RSpec.describe PaymentIntent, type: :model do
         expect do
           payment_intent
         end.to raise_error(
-                 ActiveRecord::RecordInvalid,
-                 'Validation failed: Square payment can\'t be blank, Square location can\'t be blank'
-               )
+          ActiveRecord::RecordInvalid,
+          'Validation failed: Square payment can\'t be blank, Square location can\'t be blank'
+        )
       end
     end
   end
