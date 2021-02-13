@@ -22,6 +22,20 @@ describe WebhookManager::GiftCardCreator, '#call' do
     expect(gift_card_details.recipient).to eq(payment_intent.recipient)
   end
 
+  context 'when the payment intent does not have a recipient' do
+    subject do
+      payment_intent = create :payment_intent
+      payment_intent.update!(recipient: nil)
+
+      payload = new_payload(payment_intent)
+      gift_card_details = WebhookManager::GiftCardCreator.call(payload)
+    end
+
+    it 'raises' do
+      expect {subject}.to raise_error
+    end
+  end
+
   it 'creates gift_card_details without payment intent' do
     gift_card_details = WebhookManager::GiftCardCreator.call({
       seller_id: campaign.seller_distributor_pairs[0]['seller_id'],
