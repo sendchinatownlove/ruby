@@ -47,7 +47,7 @@ RSpec.describe PaymentIntent, type: :model do
       it { should validate_uniqueness_of(:square_payment_id) }
       it { should have_many(:items) }
       it { should belong_to(:purchaser) }
-      it { should belong_to(:recipient) }
+      it { should belong_to(:recipient).optional }
 
       let!(:payment_intent) do
         create(
@@ -98,9 +98,9 @@ RSpec.describe PaymentIntent, type: :model do
         expect do
           payment_intent
         end.to raise_error(
-                 ActiveRecord::RecordInvalid,
-                 'Validation failed: Square payment can\'t be blank, Square location can\'t be blank'
-               )
+          ActiveRecord::RecordInvalid,
+          'Validation failed: Square payment can\'t be blank, Square location can\'t be blank'
+        )
       end
     end
   end

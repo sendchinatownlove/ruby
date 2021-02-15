@@ -16,21 +16,26 @@ module WebhookManager
     end
 
     def call
+      if payment_intent.present? && payment_intent.recipient.blank?
+        raise InvalidParameterError, 'Payment intent must have a recipient in order to create gift cards'
+      end
+
       ActiveRecord::Base.transaction do
-        seller = Seller.find_by(seller_id: seller_id)
         distributor = Distributor.find_by(id: distributor_id)
         distributor_contact = nil
         if distributor
           distributor_contact = Contact.find_by(id: distributor.contact_id)
         end
 
-        item = WebhookManager::ItemCreator.call({
-                                                  item_type: :gift_card,
-                                                  seller_id: seller_id,
-                                                  payment_intent: payment_intent,
-                                                  project_id: project_id,
-                                                  campaign_id: campaign_id,
-                                                })
+        item = WebhookManager::ItemCreator.call(
+          {
+            item_type: :gift_card,
+            seller_id: seller_id,
+            payment_intent: payment_intent,
+            project_id: project_id,
+            campaign_id: campaign_id
+          }
+        )
 
         gift_card_detail = GiftCardDetail.create!(
           expiration: Date.today + 1.year,

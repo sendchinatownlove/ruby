@@ -47,7 +47,7 @@ class PaymentIntent < ApplicationRecord
   validates_uniqueness_of :square_payment_id, allow_nil: true
   has_many :items
   belongs_to :purchaser, class_name: 'Contact'
-  belongs_to :recipient, class_name: 'Contact'
+  belongs_to :recipient, class_name: 'Contact', optional: true
   belongs_to :campaign, optional: true
   belongs_to :project, optional: true
 
