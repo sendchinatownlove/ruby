@@ -38,8 +38,6 @@ class CrawlReceipt < ApplicationRecord
   belongs_to :participating_seller, optional: true
   belongs_to :payment_intent, optional: true
 
-  CRAWL_RECEIPT_MIN_AMOUNT = 10_00
-
   def has_participating_seller_xor_payment_indent?
     unless participating_seller.present? ^ payment_intent.present?
       errors.add('Participating Seller or Payment Intent must exist, but not both')
