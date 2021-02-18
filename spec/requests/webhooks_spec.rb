@@ -185,13 +185,13 @@ RSpec.describe 'Webhooks API', type: :request do
         end
       end
 
-      context 'with too small of a donation' do
+      context 'with a small donation' do
         let(:amount) { 500 }
         let(:item_type) { 'donation' }
         let(:seller_id) { seller1.seller_id }
 
-        it 'does not create a crawl receipt' do
-          expect(CrawlReceipt.where(contact_id: payment_intent.purchaser.id).count).to be(0)
+        it 'creates a crawl receipt' do
+          expect(CrawlReceipt.where(contact_id: payment_intent.purchaser.id).count).to be(1)
          end
       end
 
