@@ -26,6 +26,16 @@ class AuthorizationController < ApplicationController
     # Redirect to Check Email page in UI.
   end
 
+  # auth/validate
+  def validate
+    hasSession = session[:user] != nil
+    if (hasSession)
+      json_response(nil)
+    else
+      json_response(nil, :unauthorized)
+    end
+  end
+
   def callback
     profile = WorkOS::SSO.profile(
       code: params['code'],
