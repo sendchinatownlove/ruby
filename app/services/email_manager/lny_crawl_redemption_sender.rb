@@ -5,28 +5,28 @@ module EmailManager
     def initialize(params)
       @contact_id = params[:contact_id]
       @contact = Contact.find(@contact_id)
+      @redemption_id = params[:redemption_id]
+      @redemption = Redemption.find(@redemption_id)
       @email = @contact.email
     end
 
     def call
       entry_details = "<p><b>Giveaway Entry Details</b></p>"
-      redemptions = Redemption.where(contact: @contact)
-      redemptions.uniq.each do |redemption|
-        reward = redemption.reward
-        selected_basket = reward.name
-        number_of_raffle_tickets_entered = redemptions.where(reward: reward).count
-        entry_details += "
-        <p>
-          • Basket Selected: #{selected_basket}
-        </p>
+      reward = @redemption.reward
+      selected_basket = reward.name
+      number_of_raffle_tickets_entered = 1
 
-        <p>
-          &emsp;• Number of Raffle Tickets Entered: #{number_of_raffle_tickets_entered}
-        </p>
+      entry_details += "
+      <p>
+        • Basket Selected: #{selected_basket}
+      </p>
+
+      <p>
+        &emsp;• Number of Raffle Tickets Entered: #{number_of_raffle_tickets_entered}
+      </p>
       "
-      end
 
-      total_number_of_tickets = redemptions.count
+      total_number_of_tickets = Redemption.where(contact: @contact).count
       entry_details += "<br><p>
       Total number of tickets entered to date: #{total_number_of_tickets}
       </p>"
