@@ -21,7 +21,7 @@ module EmailManager
         </p>
 
         <p>
-          • Number of Raffle Tickets Entered: #{number_of_raffle_tickets_entered}
+          &emsp;• Number of Raffle Tickets Entered: #{number_of_raffle_tickets_entered}
         </p>
       "
       end
