@@ -79,25 +79,33 @@ RSpec.describe 'Gift Cards API', type: :request do
           item_id: item_1.id
         )
       end
-      let(:gift_card_amount12) { create(:gift_card_amount, gift_card_detail_id: gift_card_detail_0.id) }
-      let(:gift_card_amount13) { create(:gift_card_amount, gift_card_detail_id: gift_card_detail_1.id) }
+      let(:gift_card_amount_0) { create(:gift_card_amount, gift_card_detail_id: gift_card_detail_0.id) }
+      let(:gift_card_amount_1) { create(:gift_card_amount, gift_card_detail_id: gift_card_detail_1.id) }
 
       before do
+        contact.reload()
+        seller.reload()
+        location.reload()
+        distributor.reload()
+        campaign.reload()
+        item_0.reload()
+        item_1.reload()
+        gift_card_detail_0.reload()
+        gift_card_detail_1
+        .reload()
+        gift_card_amount_0.reload()
+        gift_card_amount_1.reload()
         allow_any_instance_of(GiftCardsController).to receive(:get_session_user).and_return(contact)
         get '/gift_cards'
       end
 
       it 'returns a 200' do
-        # get '/gift_cards'
         expect(response).to have_http_status(200)
       end
 
       it 'returns the gift card details' do
-        # get '/gift_cards'
-
-        puts json.inspect
         expect(json).not_to be_empty
-        expect(json[:gift_cards].size).to eq 2
+        expect(json['gift_cards'].length).to eq 2
 
         expect(response.headers['Current-Page'].to_i).to eq 1
         expect(response.headers['Total-Pages'].to_i).to eq 1
