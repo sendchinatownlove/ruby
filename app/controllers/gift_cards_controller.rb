@@ -68,6 +68,43 @@ class GiftCardsController < ApplicationController
     # json_response(@records)
   end
 
+  def get_metadata
+    user = get_session_user
+    return head :unauthorized unless user
+
+    contact = Contact.find_by(email: user[:email])
+    return head :forbidden unless contact
+
+    gift_cards = GiftCardDetail
+    .left_joins(
+      :gift_card_amount,
+      item: [
+        seller: :locations,
+        campaign: [:distributor],
+      ])
+    .left_joins(
+      :gift_card_amount,
+      item: [
+        seller: :locations,
+        campaign: [campaigns_sellers_distributors: :distributor],
+      ])
+    .where({
+      distributors: {
+        contact_id: contact[:id]
+      }})
+    .where("expiration > ?", DateTime.current.to_date)
+    .select(
+      'gift_card_details.expiration',
+      'gift_card_amounts.value',
+      'gift_card_details.updated_at'
+    )
+    .order(updated_at: :desc)
+    count = gift_cards.length
+    sum = gift_cards.sum("gift_card_amounts.value")
+    time = Time.zone.parse(gift_cards[0][:updated_at].to_s)
+    json_response({ count: count, sum: sum, updated_at: time })
+  end
+
   # GET /gift_cards/:id
   def show
     json_response(item_gift_card_detail_json)
