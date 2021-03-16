@@ -16,9 +16,18 @@ class GiftCardsController < ApplicationController
 
     # NOTE This query  does not fetch seller name
     gift_cards = GiftCardDetail
-    .joins(:gift_card_amount)
-    .joins(item: [seller: :locations])
-    .joins(item: [campaign: :distributor])
+    .left_joins(
+      :gift_card_amount,
+      item: [
+        seller: :locations,
+        campaign: [:distributor],
+      ])
+    .left_joins(
+      :gift_card_amount,
+      item: [
+        seller: :locations,
+        campaign: [campaigns_sellers_distributors: :distributor],
+      ])
     .where({
       distributors: {
         contact_id: contact[:id]
@@ -28,6 +37,7 @@ class GiftCardsController < ApplicationController
         'gift_card_amounts.value',
         'gift_card_details.seller_gift_card_id',
         'sellers.id',
+        'distributors.id as distributor_id',
         'locations.address1',
         'locations.address2',
         'locations.city',
@@ -63,8 +73,10 @@ class GiftCardsController < ApplicationController
       hash[row['id']] = {id: row['id'], **reduced}
     end
 
+    distributor = Distributor.find(gift_cards.first[:distributor_id])
+
     @pagy, @records = pagy(gift_cards)
-    json_response({:gift_cards => @records, :seller_names => mapped_localized_names})
+    json_response({:gift_cards => @records, :seller_names => mapped_localized_names, :distributor => distributor})
     # json_response(@records)
   end
 
