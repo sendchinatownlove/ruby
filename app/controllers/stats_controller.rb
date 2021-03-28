@@ -8,10 +8,25 @@ class StatsController < ApplicationController
         # render json: @result
         return @result
       end
+
+    def gam_count
+        @GiftCardDetail = GiftCardDetail.where("single_use": true)
+        return @GiftCardDetail.length + 5140
+    end 
     def index
         # some other stuff going on...
         # donation_totals()
-        show2(donation_totals()) 
+        show2(donation_totals(), sellers_total(), transaction_totals(), gam_count()) 
+    end
+
+    def sellers_total
+        @sellers = Seller.all
+        return @sellers.length()
+    end
+
+    def transaction_totals
+        @Item = Item.all
+        return @Item.length()
     end
     
 #   def show
@@ -104,14 +119,16 @@ class StatsController < ApplicationController
   
           SQL
         end 
-        def show2(donation_totals)
-            puts (donation_totals.values())
-            box1 = donation_totals.values()[4] #"$10,000"
-            box2 = "7,489"
-            box3 = "$36000"
-            box4 = "20,102"
-            box5 = "27"
-            box6 = "29"
+        def show2(donation_totals, sellers_total, transaction_totals, gam_count)
+            # puts (donation_totals)
+            # pry
+            
+            box1 =  "$%s" % ActionController::Base.helpers.number_with_precision( donation_totals.getvalue(0,5), :precision => 0, :delimiter => ',')  #"$10,000"
+            box2 =  ActionController::Base.helpers.number_with_precision( gam_count, :precision => 0, :delimiter => ',') 
+            box3 = "36,573" 
+            box4 = ActionController::Base.helpers.number_with_precision( transaction_totals, :precision => 0, :delimiter => ',') 
+            box5 = sellers_total
+            box6 = "$47,689"
             render html:  <<-HERDOC
             <div class="" data-sr-id="3"
             style="; visibility: visible;  -webkit-transform: translateY(0) scale(1); opacity: 1;transform: translateY(0) scale(1); opacity: 1;-webkit-transition: -webkit-transform 0.3s ease-in 0.3s, opacity 0.3s ease-in 0.3s; transition: transform 0.3s ease-in 0.3s, opacity 0.3s ease-in 0.3s; ">
