@@ -1,11 +1,6 @@
 class StatsController < ApplicationController
     def donation_totals
-        
         @result = ActiveRecord::Base.connection.execute(donation_query())
-        # result.each do |row|
-        #     puts row
-        # end
-        # render json: @result
         return @result
       end
 
@@ -29,9 +24,6 @@ class StatsController < ApplicationController
         return @Item.length()
     end
     
-#   def show
-#      render json: {}
-#   end
 
   def donation_query
     query = <<-SQL 
