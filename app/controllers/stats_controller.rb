@@ -6,10 +6,12 @@ class StatsController < ApplicationController
 
     def gam_count
         @GiftCardDetail = GiftCardDetail.where("single_use": true)
+        # Magic constant to track orders not in GAM 
+        # TODO(stanzheng) pull magic constant from GAM spreadsheet
         return @GiftCardDetail.length + 5140
     end 
     def index
-        show2(donation_totals(), sellers_total(), transaction_totals(), gam_count()) 
+        show(donation_totals(), sellers_total(), transaction_totals(), gam_count()) 
     end
 
     def sellers_total
@@ -109,7 +111,7 @@ class StatsController < ApplicationController
   
           SQL
         end 
-        def show2(donation_totals, sellers_total, transaction_totals, gam_count)
+        def show(donation_totals, sellers_total, transaction_totals, gam_count)
             # puts (donation_totals)
             # pry
             
@@ -563,9 +565,4 @@ class StatsController < ApplicationController
               .html_safe# render :text => @model_object.html_content
           end
         
-          def item_gift_card_detail_json
-            @message = <<-HERDOC
-            <div class="sc-kfYqjs fWaWOh"><div class="sc-fKgIGh bGktlx"><div class="sc-bCwgka gWffEH">Metric1</div><br><div class="sc-iwaifL ctfufu">Raised</div><br><br><div class="sc-bCwgka gWffEH">Metric2</div><br><div class="sc-iwaifL ctfufu">Donations and vouchers purchased</div></div><div class="sc-fKgIGh bGktlx"><div class="sc-bCwgka gWffEH">Metric2</div><br><div class="sc-iwaifL ctfufu">Meals Donated</div><br><br><div class="sc-bCwgka gWffEH">Metric2</div><br><div class="sc-iwaifL ctfufu">Merchants directly supported</div></div><div class="sc-fKgIGh bGktlx"><div class="sc-bCwgka gWffEH">Metric3</div><br><div class="sc-iwaifL ctfufu">Raised from 2020 Food Crawl</div><br><br><div class="sc-bCwgka gWffEH">Metric2</div><br><div class="sc-iwaifL ctfufu">Raised for Light Up Chinatown</div></div></div>
-            HERDOC
-          end
 end
