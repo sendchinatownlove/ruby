@@ -9,8 +9,6 @@ class StatsController < ApplicationController
         return @GiftCardDetail.length + 5140
     end 
     def index
-        # some other stuff going on...
-        # donation_totals()
         show2(donation_totals(), sellers_total(), transaction_totals(), gam_count()) 
     end
 
