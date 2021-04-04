@@ -1,5 +1,5 @@
 
-donation_query = <<-SQL 
+$donation_query = <<-SQL 
 
 -- All donations and giftcards purchased 
 -- User level transactions
@@ -81,5 +81,4 @@ with giftcards as (
     -- merchant
     /*order by 1 */
 values
-
-        SQL
+SQL

@@ -1,22 +1,10 @@
 
-# class Config
-#     class << self ; attr_accessor :donation_query ; end
-#     self.donation_query = ''
-#   end
-  
-#   begin
-#     require_relative 'stats_helpers/donations.rb'
-#   rescue LoadError
-#   end
+
+require_relative 'stats_helpers/donations.rb'
+require_relative 'stats_helpers/stats_html.rb'
 
 class StatsController < ApplicationController
     def donation_totals
-        require_relative 'stats_helpers/donations.rb'
-        # total_donations = "./stats_helpers/donations.rb"
-        # require_relative total_donations 
-        # query ||= ''
-        # puts query
-        # total_donations = ""
         @result = ActiveRecord::Base.connection.execute($donation_query)
         return @result
       end
@@ -43,9 +31,6 @@ class StatsController < ApplicationController
     
 
     def show(donation_totals, sellers_total, transaction_totals, gam_count)
-        # puts (donation_totals)
-        # pry
-        require_relative 'stats_helpers/stats_html.rb'
         box1 =  "$%s" % ActionController::Base.helpers.number_with_precision( donation_totals.getvalue(0,5), :precision => 0, :delimiter => ',')  #"$10,000"
         box2 =  ActionController::Base.helpers.number_with_precision( gam_count, :precision => 0, :delimiter => ',') 
         box3 = "36,573" 

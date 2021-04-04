@@ -1,6 +1,6 @@
 def stats_html(box1, box2, box3, box4, box5, box6)
 
-    return <<-HERDOC
+    return <<-HTML.chomp
             <div class="" data-sr-id="3"
             style="; visibility: visible;  -webkit-transform: translateY(0) scale(1); opacity: 1;transform: translateY(0) scale(1); opacity: 1;-webkit-transition: -webkit-transform 0.3s ease-in 0.3s, opacity 0.3s ease-in 0.3s; transition: transform 0.3s ease-in 0.3s, opacity 0.3s ease-in 0.3s; ">
             <div class="wsite-multicol">
@@ -440,5 +440,5 @@ def stats_html(box1, box2, box3, box4, box5, box6)
                 </div>
             </div>
         </div>
-            HERDOC
+            HTML
 end 
