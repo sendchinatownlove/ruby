@@ -114,11 +114,11 @@ end
     refunded: true,
     amount: 40_000
   }
-].each do |attributes|
+].each do |attributes, ind|
   seller = Seller.find_by(seller_id: 'shunfa-bakery')
   contact = Contact.find_or_create_by!(email: attributes[:email])
-  payment_intent = PaymentIntent.create!(purchaser: contact, recipient: contact, square_location_id: seller.square_location_id, square_payment_id: Faker::Alphanumeric.alpha(number: 64))
-  item = Item.create!(purchaser: contact, item_type: attributes[:item_type], refunded: attributes[:refunded], seller_id: seller.id, payment_intent_id: payment_intent.id)
+  payment_intent = PaymentIntent.create!(purchaser: contact, recipient: contact, square_location_id: seller.square_location_id, square_payment_id: Faker::Alphanumeric.alpha(number: 64), origin: 'square')
+  item = Item.create!(purchaser: contact, item_type: attributes[:item_type], refunded: attributes[:refunded], seller_id: seller.id, payment_intent_id: payment_intent.id, campaign_id: ind)
   DonationDetail.create!(item_id: item.id, amount: attributes[:amount])
 end
 
@@ -212,7 +212,7 @@ end
 end
 
 seller = Seller.find_by(seller_id: 'shunfa-bakery')
-contact = Contact.find_or_create_by!(name: 'Apex for Youth', email: 'distributor@apexforyouth.com')
+contact = Contact.find_or_create_by!(name: 'Apex for Youth', email: ENV['SEED_DIST_EMAIL'])
 distributor = Distributor.create contact: contact, image_url: 'https://storage.googleapis.com/sendchinatownlove-assets/public/assets/apex-for-youth/apex-for-youth-logo.png', website_url: 'apexforyouth.com', name: 'Apex for Youth'
 location = Location.create(address1: '123 Mott St.', city: 'Zoo York', neighborhood: 'Chinatown', state: 'NY', zip_code: '12345')
 nonprofit = Nonprofit.create(name: 'Non Profit', fee_id: Fee.first[:id])
