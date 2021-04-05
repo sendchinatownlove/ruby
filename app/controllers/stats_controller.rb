@@ -5,8 +5,7 @@ require_relative 'stats_helpers/stats_html.rb'
 
 class StatsController < ApplicationController
     def donation_totals
-        @result = ActiveRecord::Base.connection.execute($donation_query)
-        return @result
+        return ActiveRecord::Base.connection.execute($donation_query)
       end
 
     def gam_count
@@ -20,16 +19,13 @@ class StatsController < ApplicationController
     end
 
     def sellers_total
-        @sellers = Seller.all
-        return @sellers.length()
+        return Seller.all.count()
     end
 
     def transaction_totals
-        @Item = Item.all
-        return @Item.length()
+        return Item.all.count()
     end
     
-
     def show(donation_totals, sellers_total, transaction_totals, gam_count)
         box1 =  "$%s" % ActionController::Base.helpers.number_with_precision( donation_totals.getvalue(0,5), :precision => 0, :delimiter => ',')  #"$10,000"
         box2 =  ActionController::Base.helpers.number_with_precision( gam_count, :precision => 0, :delimiter => ',') 
@@ -39,5 +35,4 @@ class StatsController < ApplicationController
         box6 = "$47,689"
         render html: stats_html(box1, box2, box3, box4, box5, box6).html_safe# render :text => @model_object.html_content
     end
-    
 end
