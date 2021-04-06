@@ -20,13 +20,17 @@ Rails.application.configure do
         'https://merchant.sendchinatownlove.com',
         'https://www.merchant.sendchinatownlove.com',
         'https://sendchinatownlove.github.io',
-        'https://www.sendchinatownlove.github.io'
+        'https://www.sendchinatownlove.github.io', 
+        'https://sendchinatownlove.com'
       )
       resource '/campaigns',
                methods: [:get],
                headers: :any,
                expose: %w[Total-Count Total-Pages Page-Items Current-Page]
       resource '*', headers: :any, methods: :any
+      resource '/stats',
+               methods: [:get],
+               headers: :any
     end
   end
 
