@@ -12,7 +12,7 @@ Rails.application.configure do
   # and those relying on copy on write to perform better.
   # Rake tasks automatically ignore this option for performance.
   config.eager_load = true
-  config.autoloader = :classic
+
   # Configure CORS
   config.middleware.insert_before 0, Rack::Cors do
     allow do
