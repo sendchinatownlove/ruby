@@ -18,6 +18,7 @@ class StatsController < ApplicationController
         return @GiftCardDetail.length + outside_db_contributions
     end 
     def index
+        response.headers.delete "X-Frame-Options"
         show(donation_totals(), sellers_total(), transaction_totals(), gam_count()) 
     end
 
