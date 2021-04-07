@@ -20,8 +20,9 @@ Rails.application.configure do
         'https://merchant.sendchinatownlove.com',
         'https://www.merchant.sendchinatownlove.com',
         'https://sendchinatownlove.github.io',
-        'https://www.sendchinatownlove.github.io', 
-        'https://sendchinatownlove.com'
+        'https://www.sendchinatownlove.github.io',
+        'https://sendchinatownlove.com',
+        'https://www.sendchinatownlove.com'
       )
       resource '/campaigns',
                methods: [:get],
