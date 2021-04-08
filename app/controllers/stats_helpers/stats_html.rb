@@ -1,37 +1,83 @@
 def stats_html(box1, box2, box3, box4, box5, box6)
 
     return <<-HTML.chomp
-    <div style="display: flex; flex-wrap: wrap; justify-content: center; font-family: 'Open Sans', sans-serif; color: white; font-weight:bold;">
-    <div style="display: flex; flex-direction: column; align-items: center; width: 30%; margin: 30px 0px;">
-        <div style="font-size: 50px; margin: 15px 0px;" id="statsbox1">$516,051</div>
-        <div style="font-size: 16px;">Raised</div>
-    </div>
+    <div>
+        <style>
+            .container {
+                display: flex; 
+                flex-direction: row;
+                flex-wrap: wrap; 
+                justify-content: center; 
+                font-family: 'Open Sans', sans-serif; 
+                color: white; 
+                font-weight:bold; 
+                background-color: #A9262E; 
+                height: 100%; 
+                width: 100%;
+            }
 
-    <div style="display: flex; flex-direction: column; align-items: center; width: 30%; margin: 30px 0px;">
-        <div style="font-size: 50px; margin: 15px 0px;" id="statsbox2">13,818</div>
-        <div style="font-size: 16px;">Meals donated</div>
-    </div>
+            .stats-box {
+                display: flex; 
+                flex-direction: column; 
+                align-items: center; 
+                width: 30%; 
+                margin: 30px 0px;
+                text-align: center;
+            }
 
-    <div style="display: flex; flex-direction: column; align-items: center; width: 30%; margin: 30px 0px;">
-        <div style="font-size: 50px; margin: 15px 0px;" id="statsbox3">36,573</div>
-        <div style="font-size: 16px;">Raised from 2 Food Crawls</div>
-    </div>
+            .stats-text {
+                font-size: 50px; 
+                margin: 15px 0px;
+            }
 
-    <div style="display: flex; flex-direction: column; align-items: center; width: 30%; margin: 30px 0px;">
-        <div style="font-size: 50px; margin: 15px 0px;" id="statsbox4">53,737</div>
-        <div style="font-size: 16px;">Donations and vouchers purchased</div>
-    </div>
+            .stats-description-text {
+                font-size: 16px;
+            }
 
-    <div style="display: flex; flex-direction: column; align-items: center; width: 30%; margin: 30px 0px;">
-        <div style="font-size: 50px; margin: 15px 0px;" id="statsbox5">30</div>
-        <div style="font-size: 16px;">Merchants directly supported</div>
-    </div>
+            @media only screen and (max-width: 680px) {
+                .container {
+                    flex-direction: column;
+                    align-items: center;
+                }
 
-    <div style="display: flex; flex-direction: column; align-items: center; width: 30%; margin: 30px 0px;">
-        <div style="font-size: 50px; margin: 15px 0px;" id="statsbox6">$47,689</div>
-        <div style="font-size: 16px;">Raised for Light Up Chinatown</div>
+                .stats-box {
+                    width: 100%; 
+                    margin: 20px 0px;
+                }
+            }
+        </style>
+        <div class="container"> 
+            <div class="stats-box">
+                <div style="font-size: 50px; margin: 15px 0px;" id="statsbox1">$516,051</div>
+                <div style="font-size: 16px;">Raised</div>
+            </div>
+
+            <div class="stats-box">
+                <div class="stats-text" id="statsbox2">13,818</div>
+                <div class="stats-description-text">Meals donated</div>
+            </div>
+
+            <div class="stats-box">
+                <div class="stats-text" id="statsbox3">$36,573</div>
+                <div class="stats-description-text">Raised from 2 Food Crawls</div>
+            </div>
+
+            <div class="stats-box">
+                <div class="stats-text" id="statsbox4">20,102</div>
+                <div class="stats-description-text">Donations and vouchers purchased</div>
+            </div>
+
+            <div class="stats-box">
+                <div class="stats-text" id="statsbox5">28</div>
+                <div class="stats-description-text">Merchants directly supported</div>
+            </div>
+
+            <div class="stats-box">
+                <div class="stats-text" id="statsbox6">$47,689</div>
+                <div class="stats-description-text">Raised for Light Up Chinatown</div>
+            </div>
+        </div>
     </div>
-</div>
 <script>
 function quotation(id, text) {
     var q = document.getElementById(id);

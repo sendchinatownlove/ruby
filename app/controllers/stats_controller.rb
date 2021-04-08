@@ -1,6 +1,7 @@
 
 
 require_relative 'stats_helpers/donations.rb'
+require_relative 'stats_helpers/progressbar.rb'
 require_relative 'stats_helpers/stats_html.rb'
 
 class StatsController < ApplicationController
@@ -26,6 +27,28 @@ class StatsController < ApplicationController
         return Seller.all.count()
     end
 
+
+    def progress_bar_totals
+        query = ActiveRecord::Base.connection.execute($progress_bar_query)
+        
+        if query.getvalue(0,0) == nil
+            return 0
+        end
+
+        total = query.getvalue(0,0) + query.getvalue(1,0) + query.getvalue(2,0)
+        return total
+    end
+
+    def num_days_remaining
+        currentDate = Time.now
+        endDate = Date.new(2021, 4, 26)
+        remainingDays = (endDate.to_date - currentDate.to_date).round
+        if remainingDays <= 0 
+             return 0
+        end
+        return (endDate.to_date - currentDate.to_date).round
+    end
+ 
     def transaction_totals
         return Item.all.count()
     end
@@ -37,7 +60,7 @@ class StatsController < ApplicationController
         transaction_totals  = ActionController::Base.helpers.number_with_precision( transaction_totals, :precision => 0, :delimiter => ',') 
         sellers_total
         luc_raised          = "$47,689"
-        response = {:box1 => donation_totals, :box2 => gam_count, :box3 => foodcrawl_raised, :box4 => transaction_totals, :box5 => sellers_total, :box6 => luc_raised }
+        response = {:box1 => donation_totals, :box2 => gam_count, :box3 => foodcrawl_raised, :box4 => transaction_totals, :box5 => sellers_total, :box6 => luc_raised, :progressBarTotal => progress_bar_totals, :numDaysRemaining => num_days_remaining}
         render :json => response
     end
 end
