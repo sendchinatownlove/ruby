@@ -43,7 +43,7 @@ class StatsController < ApplicationController
         currentDate = Time.now
         endDate = Date.new(2021, 4, 26)
         remainingDays = (endDate.to_date - currentDate.to_date).round
-        if remainingDays <= 0 
+        if remainingDays <= 0
              return 0
         end
         return (endDate.to_date - currentDate.to_date).round
