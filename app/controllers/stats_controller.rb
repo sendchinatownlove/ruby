@@ -37,6 +37,7 @@ class StatsController < ApplicationController
         transaction_totals  = ActionController::Base.helpers.number_with_precision( transaction_totals, :precision => 0, :delimiter => ',') 
         sellers_total
         luc_raised          = "$47,689"
-        render html: stats_html(donation_totals, gam_count, foodcrawl_raised, transaction_totals, sellers_total, luc_raised).html_safe# render :text => @model_object.html_content
+        response = {:box1 => donation_totals, :box2 => gam_count, :box3 => foodcrawl_raised, :box4 => transaction_totals, :box5 => sellers_total, :box6 => luc_raised }
+        render :json => response
     end
 end
