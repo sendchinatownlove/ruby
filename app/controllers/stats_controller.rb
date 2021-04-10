@@ -31,11 +31,23 @@ class StatsController < ApplicationController
     def progress_bar_totals
         query = ActiveRecord::Base.connection.execute($progress_bar_query)
         
-        if query.getvalue(0,0) == nil
-            return 0
+        total_gift_cards = 0
+        total_gam = 0
+        total_donations = 0
+
+        if query.getvalue(0,0) != nil 
+            total_gift_cards = query.getvalue(0,0)
         end
 
-        total = query.getvalue(0,0) + query.getvalue(1,0) + query.getvalue(2,0)
+        if query.getvalue(1,0) != nil 
+            total_gam = query.getvalue(1,0)
+        end
+
+        if query.getvalue(2,0) != nil 
+            total_donations = query.getvalue(2,0)
+        end
+
+        total = total_gift_cards + total_gam + total_donations
         return total
     end
 
