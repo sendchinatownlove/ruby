@@ -12,7 +12,7 @@ Rails.application.configure do
   # and those relying on copy on write to perform better.
   # Rake tasks automatically ignore this option for performance.
   config.eager_load = true
-
+  config.autoloader = :classic
   # Configure CORS
   config.middleware.insert_before 0, Rack::Cors do
     allow do
@@ -20,7 +20,9 @@ Rails.application.configure do
         'https://merchant.sendchinatownlove.com',
         'https://www.merchant.sendchinatownlove.com',
         'https://sendchinatownlove.github.io',
-        'https://www.sendchinatownlove.github.io'
+        'https://www.sendchinatownlove.github.io',
+        'https://sendchinatownlove.com',
+        'https://www.sendchinatownlove.com'
       )
       resource '/campaigns',
                methods: [:get],
@@ -41,6 +43,9 @@ Rails.application.configure do
                headers: :any,
                credentials: true
       resource '*', headers: :any, methods: :any
+      resource '/stats',
+               methods: [:get],
+               headers: :any
     end
   end
 

@@ -475,6 +475,10 @@ end
   {
     contact_id: lny_contact1.id,
     reward_id: Reward.first.id
+  },
+  {
+    contact_id: lny_contact1.id,
+    reward_id: Reward.last.id
   }
 ].each do |attributes|
   Redemption.find_or_create_by(attributes)

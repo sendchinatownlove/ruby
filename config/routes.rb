@@ -130,4 +130,6 @@ Rails.application.routes.draw do
   end
   resources :redemptions do
   end
+  resources :stats do
+  end
 end

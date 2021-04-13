@@ -21,7 +21,8 @@ Rails.application.configure do
   config.middleware.insert_before 0, Rack::Cors do
     allow do
       origins 'localhost:3000', '127.0.0.1:3000',
-              'localhost:4000', '127.0.0.1:4000'
+              'localhost:4000', '127.0.0.1:4000', 
+              'https://sendchinatownlove.com'
       resource '/campaigns',
                methods: [:get],
                headers: :any,
@@ -41,6 +42,9 @@ Rails.application.configure do
                headers: :any,
                credentials: true
       resource '*', headers: :any, methods: :any
+      resource '/stats',
+               methods: [:get],
+               headers: :any
     end
   end
 

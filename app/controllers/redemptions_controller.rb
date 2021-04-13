@@ -20,6 +20,8 @@ class RedemptionsController < ApplicationController
         receipts_to_redeem[i].update!(redemption: @redemption)
       end
 
+      EmailManager::LnyCrawlRedemptionSender.call(contact_id: @contact.id, redemption_id: @redemption.id)
+
       json_response(@redemption, :created)
     end
   end
