@@ -32,6 +32,7 @@ class GiftCardsController < ApplicationController
       distributors: {
         contact_id: contact[:id]
       }})
+    .where("expiration > ?", DateTime.current.to_date)
       .select(
         'gift_card_details.expiration',
         'gift_card_amounts.value',
