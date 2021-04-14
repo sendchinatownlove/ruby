@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 module WebhookManager
-   class CrawlReceiptCreator < BaseService
+  class CrawlReceiptCreator < BaseService
     attr_reader :payment_intent, :amount, :contact_id, :payment_intent_id
 
     def initialize(params)
@@ -10,9 +12,9 @@ module WebhookManager
     end
 
     def call
-      if Time.now <= Time.find_zone('EST').local(2021,3,1) && Time.now >= Time.find_zone('EST').local(2021,2,1)
+      if Time.now <= Time.find_zone('EST').local(2021, 3, 1) && Time.now >= Time.find_zone('EST').local(2021, 2, 1)
         CrawlReceipt.create!(amount: amount, payment_intent_id: payment_intent_id, contact_id: contact_id, receipt_url: ' ')
       end
     end
-  end
+ end
 end

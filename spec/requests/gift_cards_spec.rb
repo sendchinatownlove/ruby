@@ -55,17 +55,21 @@ RSpec.describe 'Gift Cards API', type: :request do
     context 'with a valid contact' do
       let!(:contact) { create(:contact) }
       let!(:seller) { create(:seller) }
-      let!(:location) { create(:location, seller_id: seller.id)}
+      let!(:location) { create(:location, seller_id: seller.id) }
       let!(:distributor) { create(:distributor, contact_id: contact.id) }
       let!(:campaign) { create(:campaign, distributor_id: distributor.id, seller_id: seller.id) }
-      let!(:item_0) { create(:item,
-        campaign_id: campaign.id,
-        seller_id: seller.id,
-        purchaser_id: contact.id) }
-      let!(:item_1) { create(:item,
-        campaign_id: campaign.id,
-        seller_id: seller.id,
-        purchaser_id: contact.id) }
+      let!(:item_0) do
+        create(:item,
+               campaign_id: campaign.id,
+               seller_id: seller.id,
+               purchaser_id: contact.id)
+      end
+      let!(:item_1) do
+        create(:item,
+               campaign_id: campaign.id,
+               seller_id: seller.id,
+               purchaser_id: contact.id)
+      end
 
       let!(:gift_card_detail_0) do
         create(
@@ -83,18 +87,18 @@ RSpec.describe 'Gift Cards API', type: :request do
       let(:gift_card_amount_1) { create(:gift_card_amount, gift_card_detail_id: gift_card_detail_1.id) }
 
       before do
-        contact.reload()
-        seller.reload()
-        location.reload()
-        distributor.reload()
-        campaign.reload()
-        item_0.reload()
-        item_1.reload()
-        gift_card_detail_0.reload()
+        contact.reload
+        seller.reload
+        location.reload
+        distributor.reload
+        campaign.reload
+        item_0.reload
+        item_1.reload
+        gift_card_detail_0.reload
         gift_card_detail_1
-        .reload()
-        gift_card_amount_0.reload()
-        gift_card_amount_1.reload()
+          .reload
+        gift_card_amount_0.reload
+        gift_card_amount_1.reload
         allow_any_instance_of(GiftCardsController).to receive(:get_session_user).and_return(contact)
         get '/gift_cards'
       end

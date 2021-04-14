@@ -29,7 +29,7 @@ Rails.application.configure do
                headers: :any,
                expose: %w[Total-Count Total-Pages Page-Items Current-Page]
       resource '/auth',
-               methods: [:get, :post, :put, :delete],
+               methods: %i[get post put delete],
                headers: :any,
                expose: %w[Total-Count Total-Pages Page-Items Current-Page],
                credentials: true

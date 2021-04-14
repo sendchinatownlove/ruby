@@ -16,68 +16,68 @@ class GiftCardsController < ApplicationController
 
     # NOTE This query  does not fetch seller name
     gift_cards = GiftCardDetail
-    .left_joins(
-      :gift_card_amount,
-      item: [
-        seller: :locations,
-        campaign: [:distributor],
-      ])
-    .left_joins(
-      :gift_card_amount,
-      item: [
-        seller: :locations,
-        campaign: [campaigns_sellers_distributors: :distributor],
-      ])
-    .where({
-      distributors: {
-        contact_id: contact[:id]
-      }})
-    .where("expiration > ?", DateTime.current.to_date)
-      .select(
-        'gift_card_details.expiration',
-        'gift_card_amounts.value',
-        'gift_card_details.seller_gift_card_id',
-        'sellers.id',
-        'distributors.id as distributor_id',
-        'locations.address1',
-        'locations.address2',
-        'locations.city',
-        'locations.state',
-        'locations.zip_code')
+                 .left_joins(
+                   :gift_card_amount,
+                   item: [
+                     seller: :locations,
+                     campaign: [:distributor]
+                   ]
+                 )
+                 .left_joins(
+                   :gift_card_amount,
+                   item: [
+                     seller: :locations,
+                     campaign: [campaigns_sellers_distributors: :distributor]
+                   ]
+                 )
+                 .where({
+                          distributors: {
+                            contact_id: contact[:id]
+                          }
+                        })
+                 .where('expiration > ?', DateTime.current.to_date)
+                 .select(
+                   'gift_card_details.expiration',
+                   'gift_card_amounts.value',
+                   'gift_card_details.seller_gift_card_id',
+                   'sellers.id',
+                   'distributors.id as distributor_id',
+                   'locations.address1',
+                   'locations.address2',
+                   'locations.city',
+                   'locations.state',
+                   'locations.zip_code'
+                 )
 
-
-=begin
-    Seller Names is done in a separate query to
-    fetch both zh-CN and EN seller name at the same time.
-=end
+    #     Seller Names is done in a separate query to
+    #     fetch both zh-CN and EN seller name at the same time.
 
     ar_sellers = gift_cards.pluck('sellers.id').uniq
 
     # Select all localized seller names in a separate query
     query2 = Seller
-        .select('sellers.id',"json_agg('[' || seller_translations.locale  || ',' || seller_translations.name || ']')")
-        .joins("INNER JOIN seller_translations ON sellers.id = seller_translations.seller_id ")
-        .where(:id => ar_sellers)
-        .group('sellers.id')
-        .to_sql
+             .select('sellers.id', "json_agg('[' || seller_translations.locale  || ',' || seller_translations.name || ']')")
+             .joins('INNER JOIN seller_translations ON sellers.id = seller_translations.seller_id ')
+             .where(id: ar_sellers)
+             .group('sellers.id')
+             .to_sql
 
     seller_names = Seller.connection.select_all(query2)
 
-
-    mapped_localized_names = seller_names.each_with_object({}) do |row,hash|
+    mapped_localized_names = seller_names.each_with_object({}) do |row, hash|
       arr = JSON.parse(row['json_agg'])
       reduced = arr.each_with_object({}) do |val, reducedLocale|
-        locale,name = val[1,val.length - 2].split(',')
+        locale, name = val[1, val.length - 2].split(',')
         reducedLocale[locale.to_sym] = name
       end
 
-      hash[row['id']] = {id: row['id'], **reduced}
+      hash[row['id']] = { id: row['id'], **reduced }
     end
 
     distributor = Distributor.find(gift_cards.first[:distributor_id])
 
     @pagy, @records = pagy(gift_cards)
-    json_response({:gift_cards => @records, :seller_names => mapped_localized_names, :distributor => distributor})
+    json_response({ gift_cards: @records, seller_names: mapped_localized_names, distributor: distributor })
     # json_response(@records)
   end
 
@@ -89,31 +89,34 @@ class GiftCardsController < ApplicationController
     return head :forbidden unless contact
 
     gift_cards = GiftCardDetail
-    .left_joins(
-      :gift_card_amount,
-      item: [
-        seller: :locations,
-        campaign: [:distributor],
-      ])
-    .left_joins(
-      :gift_card_amount,
-      item: [
-        seller: :locations,
-        campaign: [campaigns_sellers_distributors: :distributor],
-      ])
-    .where({
-      distributors: {
-        contact_id: contact[:id]
-      }})
-    .where("expiration > ?", DateTime.current.to_date)
-    .select(
-      'gift_card_details.expiration',
-      'gift_card_amounts.value',
-      'gift_card_details.updated_at'
-    )
-    .order(updated_at: :desc)
+                 .left_joins(
+                   :gift_card_amount,
+                   item: [
+                     seller: :locations,
+                     campaign: [:distributor]
+                   ]
+                 )
+                 .left_joins(
+                   :gift_card_amount,
+                   item: [
+                     seller: :locations,
+                     campaign: [campaigns_sellers_distributors: :distributor]
+                   ]
+                 )
+                 .where({
+                          distributors: {
+                            contact_id: contact[:id]
+                          }
+                        })
+                 .where('expiration > ?', DateTime.current.to_date)
+                 .select(
+                   'gift_card_details.expiration',
+                   'gift_card_amounts.value',
+                   'gift_card_details.updated_at'
+                 )
+                 .order(updated_at: :desc)
     count = gift_cards.length
-    sum = gift_cards.sum("gift_card_amounts.value")
+    sum = gift_cards.sum('gift_card_amounts.value')
     time = Time.zone.parse(gift_cards[0][:updated_at].to_s)
     json_response({ count: count, sum: sum, updated_at: time })
   end

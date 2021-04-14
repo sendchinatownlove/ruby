@@ -55,11 +55,11 @@ class CampaignsController < ApplicationController
   def generate_campaign_gift_cards
     request_params = generate_campaign_gift_cards_params
     gift_cards = request_params['gift_cards']
-    
+
     total_amount_to_allocate = gift_cards.reduce(0) { |sum, gift_card| sum + gift_card['gift_card_amount'] }
-    
+
     original_amount_unallocated = @campaign.amount_unallocated
-    
+
     unless original_amount_unallocated > total_amount_to_allocate
       raise InvalidParameterError, "Request amount exceeds unallocated amount in campaign. Unallocated amount: #{
         original_amount_unallocated
@@ -74,12 +74,12 @@ class CampaignsController < ApplicationController
           project_id: @campaign.project_id,
           campaign_id: @campaign.id,
           distributor_id: gift_card['distributor_id'],
-          seller_id: gift_card['seller_id'],
+          seller_id: gift_card['seller_id']
         }
       )
     end
 
-    json_response({'unallocated_amount': original_amount_unallocated - total_amount_to_allocate}, :created)
+    json_response({ 'unallocated_amount': original_amount_unallocated - total_amount_to_allocate }, :created)
   end
 
   private
@@ -146,7 +146,7 @@ class CampaignsController < ApplicationController
 
   def generate_campaign_gift_cards_params
     params.require(:gift_cards)
-    params.permit(:gift_cards => [:distributor_id, :gift_card_amount, :seller_id])
+    params.permit(gift_cards: %i[distributor_id gift_card_amount seller_id])
   end
 
   def set_campaign

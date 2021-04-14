@@ -425,12 +425,12 @@ end
 [
   {
     name: 'The Grand Prize Package',
-    total_value: 10000,
+    total_value: 10_000,
     image_url: 'https://images.ctfassets.net/4w8qvp17lo47/1fnONK6KJf37PPkkZqlreq/412c146662ed3c46fce3ba72ab715074/Rewarding_yourself_is_important_when_it_comes_to_diabetes_management_prediabetes_type_2_diabetes.jpg'
   },
   {
     name: 'Rabbit/Longevity',
-    total_value: 80000,
+    total_value: 80_000,
     image_url: 'https://static.independent.co.uk/s3fs-public/thumbnails/image/2019/01/07/11/bunny-rabbit.jpg'
   }
 ].each do |attributes|
@@ -465,7 +465,7 @@ lny_merchant = ParticipatingSeller.first
     participating_seller_id: lny_merchant.id,
     amount: 1800,
     receipt_url: 'receipt-url.com'
-  },
+  }
 ].each do |attributes|
   CrawlReceipt.find_or_create_by(attributes)
 end

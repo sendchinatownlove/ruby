@@ -71,7 +71,7 @@ group :development, :staging do
   gem 'spring-watcher-listen', '~> 2.0.0'
 end
 
-group :test do
+group :development,:test do
   gem 'factory_bot_rails', '~> 4.0'
   gem 'shoulda-matchers', '~> 4.3'
   gem 'database_cleaner'
