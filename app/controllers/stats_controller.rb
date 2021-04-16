@@ -28,7 +28,7 @@ class StatsController < ApplicationController
     end
 
     def progress_bar_totals
-        query = ActiveRecord::Base.connection.execute($progress_bar_query)
+        query = ActiveRecord::Base.connection.execute($april_progress_bar_query)
         
         total = 0
         query.each do |type|
