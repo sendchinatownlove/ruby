@@ -15,6 +15,7 @@ class GiftCardsController < ApplicationController
     return head :forbidden unless contact
 
     # NOTE This query  does not fetch seller name
+    # Fetches all GAM and Mega GAM giftcards tied to a distributor
     gift_cards = GiftCardDetail
                  .left_joins(
                    :gift_card_amount,
@@ -81,6 +82,7 @@ class GiftCardsController < ApplicationController
     # json_response(@records)
   end
 
+  # Fetches all metatdata for GAM and Mega GAM giftcards tied to a distributor
   def get_metadata
     user = get_session_user
     return head :unauthorized unless user

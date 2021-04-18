@@ -29,6 +29,7 @@ RSpec.describe 'Gift Cards API', type: :request do
 
   let!(:gift_card_id) { gift_card_detail.gift_card_id }
 
+  # Does not test fetch seller names
   context 'GET /gift_cards' do
     context 'with no session' do
       before { get '/gift_cards' }
