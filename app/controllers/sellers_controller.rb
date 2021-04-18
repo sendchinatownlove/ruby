@@ -11,14 +11,17 @@ class SellersController < ApplicationController
       raise InvalidParameterError, query.errors.full_messages.to_sentence
     end
 
-    @sellers = Seller.order("#{query.sort_key} #{query.sort_order}")
-
-    sellers = @sellers.map do |seller|
+    Rails.cache.fetch("sellers", expires_in: 60.seconds) do
+      @sellers = Seller.order("#{query.sort_key} #{query.sort_order}")
+      if stale?(@seller)
+      sellers = @sellers.map do |seller|
       SellersHelper.generate_seller_json(
         seller: seller
       )
-    end
-    json_response(sellers)
+      end
+      json_response(sellers)
+      end
+    end    
   end
 
   # POST /sellers
