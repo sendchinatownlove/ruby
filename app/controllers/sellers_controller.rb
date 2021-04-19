@@ -9,7 +9,7 @@ class SellersController < ApplicationController
 
     raise InvalidParameterError, query.errors.full_messages.to_sentence unless query.valid?
 
-    Rails.cache.fetch('sellers', expires_in: 60.seconds) do
+    Rails.cache.fetch('sellers', expires_in: 60.minutes) do
       @sellers = Seller.order("#{query.sort_key} #{query.sort_order}")
       if stale?(@seller)
         sellers = @sellers.map do |seller|
