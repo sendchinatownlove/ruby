@@ -7,18 +7,19 @@ class SellersController < ApplicationController
   def index
     query = Validate::GetSellersQuery.new(params)
 
-    unless query.valid?
-      raise InvalidParameterError, query.errors.full_messages.to_sentence
-    end
+    raise InvalidParameterError, query.errors.full_messages.to_sentence unless query.valid?
 
-    @sellers = Seller.order("#{query.sort_key} #{query.sort_order}")
-
-    sellers = @sellers.map do |seller|
-      SellersHelper.generate_seller_json(
-        seller: seller
-      )
+    Rails.cache.fetch('sellers', expires_in: 60.minutes) do
+      @sellers = Seller.order("#{query.sort_key} #{query.sort_order}")
+      if stale?(@seller)
+        sellers = @sellers.map do |seller|
+          SellersHelper.generate_seller_json(
+            seller: seller
+          )
+        end
+        json_response(sellers)
+      end
     end
-    json_response(sellers)
   end
 
   # POST /sellers
