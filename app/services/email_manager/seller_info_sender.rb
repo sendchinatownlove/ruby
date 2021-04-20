@@ -27,8 +27,8 @@ module EmailManager
         </html>
       EOF
       EmailManager::Sender.send_receipt(
-        from: 'receipts@sendchinatownlove.com',
-        to: 'receipts@sendchinatownlove.com',
+        from: 'bvillaroman@gmail.com',
+        to: 'bvillaroman@gmail.com',
         subject: subject,
         html: html
       )  

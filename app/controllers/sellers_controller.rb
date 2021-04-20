@@ -84,6 +84,7 @@ class SellersController < ApplicationController
   end
 
   def send_seller_info
-    EmailManager::SellerInfoSender.call(seller_id: @seller.id, merchant_dashboard_link: CONCAT('https://merchant.sendchinatownlove.com/', @seller.id, '/dashboard/', @seller.gift_cards_access_token))
+    @seller = Seller.find_by!(seller_id: params[:id])
+    EmailManager::SellerInfoSender.call(seller_id: params[:id], merchant_dashboard_link: CONCAT('https://merchant.sendchinatownlove.com/', params[:id], '/dashboard/', @seller.gift_cards_access_token))
   end
 end
