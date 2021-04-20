@@ -2,6 +2,7 @@
 
 class SellersController < ApplicationController
   before_action :set_seller, only: %i[show update]
+  after_action :send_seller_info
 
   # GET /sellers
   def index
@@ -81,4 +82,7 @@ class SellersController < ApplicationController
   def set_seller
     @seller = Seller.find_by!(seller_id: params[:id])
   end
+
+  def send_seller_info
+    EmailManager::SellerInfoSender.call(seller_id: @seller.id, merchant_dashboard_link: @seller.website_url)
 end
