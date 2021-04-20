@@ -5,6 +5,7 @@ class SellersController < ApplicationController
 
   # GET /sellers
   def index
+    response.headers.delete 'X-Frame-Options'
     query = Validate::GetSellersQuery.new(params)
 
     raise InvalidParameterError, query.errors.full_messages.to_sentence unless query.valid?
