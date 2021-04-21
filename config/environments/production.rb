@@ -13,6 +13,7 @@ Rails.application.configure do
   # Rake tasks automatically ignore this option for performance.
   config.eager_load = true
   config.autoloader = :classic
+  config.action_controller.perform_caching = true
   # Configure CORS
   config.middleware.insert_before 0, Rack::Cors do
     allow do
@@ -93,6 +94,19 @@ Rails.application.configure do
 
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
+  config.action_controller.perform_caching = true
+
+  config.cache_store = :mem_cache_store,
+                       (ENV['MEMCACHIER_SERVERS'] || '').split(','),
+                       { username: ENV['MEMCACHIER_USERNAME'],
+                         password: ENV['MEMCACHIER_PASSWORD'],
+                         failover: true,
+                         socket_timeout: 1.5,
+                         socket_failure_delay: 0.2,
+                         down_retry_delay: 60,
+                         pool_size: 5 }
+
+
 
   # Use a real queuing backend for Active Job (and separate queues per
   # environment).

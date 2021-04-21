@@ -1,8 +1,6 @@
-# frozen_string_literal: true
-
-require_relative 'stats_helpers/donations.rb'
-require_relative 'stats_helpers/progressbar.rb'
-require_relative 'stats_helpers/stats_html.rb'
+require_relative 'stats_helpers/donations'
+require_relative 'stats_helpers/progressbar'
+require_relative 'stats_helpers/stats_html'
 
 class StatsController < ApplicationController
   def donation_totals
@@ -12,7 +10,7 @@ class StatsController < ApplicationController
   end
 
   def gam_count
-    @GiftCardDetail = GiftCardDetail.where("single_use": true)
+    @GiftCardDetail = GiftCardDetail.where(single_use: true)
     # Magic constant to track orders not in GAM
     outside_db_contributions = 5140
     # TODO(stanzheng) pull magic constant from GAM spreadsheet
@@ -29,7 +27,7 @@ class StatsController < ApplicationController
   end
 
   def progress_bar_totals
-    query = ActiveRecord::Base.connection.execute($progress_bar_query)
+    query = ActiveRecord::Base.connection.execute($april_progress_bar_query)
 
     total = 0
     query.each do |type|
@@ -53,13 +51,16 @@ class StatsController < ApplicationController
   end
 
   def show(donation_totals, sellers_total, transaction_totals, gam_count)
-    donation_totals = '$%s' % ActionController::Base.helpers.number_with_precision(donation_totals, precision: 0, delimiter: ',') # "$10,000"
-    gam_count = ActionController::Base.helpers.number_with_precision(gam_count, precision: 0, delimiter: ',')
-    foodcrawl_raised = '36,573'
-    transaction_totals = ActionController::Base.helpers.number_with_precision(transaction_totals, precision: 0, delimiter: ',')
+    donation_totals = '$%s' % ActionController::Base.helpers.number_with_precision(donation_totals, precision: 0, delimiter: ',')  # "$10,000"
+    gam_count           = ActionController::Base.helpers.number_with_precision(gam_count, precision: 0,
+                                                                                          delimiter: ',')
+    foodcrawl_raised    = '36,573'
+    transaction_totals  = ActionController::Base.helpers.number_with_precision(transaction_totals,
+                                                                               precision: 0, delimiter: ',')
     sellers_total
     luc_raised = '$47,689'
-    response = { box1: donation_totals, box2: gam_count, box3: foodcrawl_raised, box4: transaction_totals, box5: sellers_total, box6: luc_raised, progressBarTotal: progress_bar_totals, numDaysRemaining: num_days_remaining }
+    response = { box1: donation_totals, box2: gam_count, box3: foodcrawl_raised,
+                 box4: transaction_totals, box5: sellers_total, box6: luc_raised, progressBarTotal: progress_bar_totals, numDaysRemaining: num_days_remaining }
     render json: response
   end
 end
