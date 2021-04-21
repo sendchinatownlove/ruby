@@ -29,6 +29,20 @@ Rails.application.configure do
                methods: [:get],
                headers: :any,
                expose: %w[Total-Count Total-Pages Page-Items Current-Page]
+      resource '/auth',
+               methods: %i[get post put delete],
+               headers: :any,
+               expose: %w[Total-Count Total-Pages Page-Items Current-Page],
+               credentials: true
+      resource '/gift_cards',
+               methods: [:get],
+               headers: :any,
+               expose: %w[Total-Count Total-Pages Page-Items Current-Page],
+               credentials: true
+      resource '/gift_cards/metadata',
+               methods: [:get],
+               headers: :any,
+               credentials: true
       resource '*', headers: :any, methods: :any
       resource '/stats',
                methods: [:get],

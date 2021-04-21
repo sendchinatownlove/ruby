@@ -97,7 +97,6 @@ RSpec.describe 'Webhooks API', type: :request do
       end
     end
 
-
     describe 'donations' do
       before do
         # Add stub for header verification
@@ -127,7 +126,7 @@ RSpec.describe 'Webhooks API', type: :request do
 
           it 'creates a crawl receipt' do
             expect(CrawlReceipt.where(contact_id: payment_intent.purchaser.id).count).to be(1)
-           end
+          end
 
           it 'returns status code 200' do
             expect(response).to have_http_status(200)
@@ -192,7 +191,7 @@ RSpec.describe 'Webhooks API', type: :request do
 
         it 'creates a crawl receipt' do
           expect(CrawlReceipt.where(contact_id: payment_intent.purchaser.id).count).to be(1)
-         end
+        end
       end
 
       context 'with donation' do
@@ -216,7 +215,7 @@ RSpec.describe 'Webhooks API', type: :request do
         end
 
         it 'creates a crawl receipt' do
-         expect(CrawlReceipt.where(contact_id: payment_intent.purchaser.id).count).to be(1)
+          expect(CrawlReceipt.where(contact_id: payment_intent.purchaser.id).count).to be(1)
         end
 
         it 'returns status code 200' do
@@ -421,7 +420,7 @@ RSpec.describe 'Webhooks API', type: :request do
 
         it 'creates a crawl receipt' do
           expect(CrawlReceipt.where(contact_id: payment_intent.purchaser.id).count).to be(1)
-         end
+        end
 
         it 'returns status code 200' do
           expect(response).to have_http_status(200)

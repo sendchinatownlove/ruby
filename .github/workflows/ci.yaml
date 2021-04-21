@@ -41,6 +41,7 @@ jobs:
         THINK_CHINATOWN_LOCATION_ID: ${{ secrets.THINK_CHINATOWN_LOCATION_ID }}
         THINK_CHINATOWN_WEBHOOK_SIGNATURE_KEY: ${{ secrets.THINK_CHINATOWN_WEBHOOK_SIGNATURE_KEY }}
         APEX_WEBHOOK_SIGNATURE_KEY: apex_webhook_spec_test_string
+        SEED_DIST_EMAIL: 123@example.com
       run: |
         sudo apt-get -yqq install libpq-dev
         gem install bundler

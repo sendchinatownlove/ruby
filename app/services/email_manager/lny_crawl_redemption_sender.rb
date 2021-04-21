@@ -11,7 +11,7 @@ module EmailManager
     end
 
     def call
-      entry_details = "<p><b>Giveaway Entry Details</b></p>"
+      entry_details = '<p><b>Giveaway Entry Details</b></p>'
       reward = @redemption.reward
       selected_basket = reward.name
       number_of_raffle_tickets_entered = 1

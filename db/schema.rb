@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_29_084819) do
+ActiveRecord::Schema.define(version: 2021_04_05_210045) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -25,12 +25,12 @@ ActiveRecord::Schema.define(version: 2021_01_29_084819) do
     t.bigint "seller_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.bigint "distributor_id"
+    t.bigint "distributor_id", null: false
     t.integer "target_amount", default: 100000, null: false
     t.integer "price_per_meal", default: 500
+    t.integer "fee_id"
     t.bigint "nonprofit_id"
     t.datetime "start_date"
-    t.integer "fee_id"
     t.bigint "project_id"
     t.string "neighborhood"
     t.index ["distributor_id"], name: "index_campaigns_on_distributor_id"

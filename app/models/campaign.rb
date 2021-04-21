@@ -16,7 +16,7 @@
 #  valid              :boolean          default(TRUE)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
-#  distributor_id     :bigint
+#  distributor_id     :bigint           not null
 #  fee_id             :integer
 #  location_id        :bigint
 #  nonprofit_id       :bigint

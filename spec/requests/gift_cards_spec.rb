@@ -29,6 +29,7 @@ RSpec.describe 'Gift Cards API', type: :request do
 
   let!(:gift_card_id) { gift_card_detail.gift_card_id }
 
+  # Does not test fetch seller names
   context 'GET /gift_cards' do
     context 'with no session' do
       before { get '/gift_cards' }
@@ -53,25 +54,52 @@ RSpec.describe 'Gift Cards API', type: :request do
     end
 
     context 'with a valid contact' do
-      let(:contact) { create(:contact) }
-      let(:distributor) { create(:distributor, contact_id: contact.id) }
-      let(:campaign) { create(:campaign, distributor_id: distributor.id) }
-      let(:item_0) { create(:item, campaign_id: campaign.id) }
-      let(:item_1) { create(:item, campaign_id: campaign.id) }
+      let!(:contact) { create(:contact) }
+      let!(:seller) { create(:seller) }
+      let!(:location) { create(:location, seller_id: seller.id) }
+      let!(:distributor) { create(:distributor, contact_id: contact.id) }
+      let!(:campaign) { create(:campaign, distributor_id: distributor.id, seller_id: seller.id) }
+      let!(:item_0) do
+        create(:item,
+               campaign_id: campaign.id,
+               seller_id: seller.id,
+               purchaser_id: contact.id)
+      end
+      let!(:item_1) do
+        create(:item,
+               campaign_id: campaign.id,
+               seller_id: seller.id,
+               purchaser_id: contact.id)
+      end
+
       let!(:gift_card_detail_0) do
         create(
           :gift_card_detail,
-          item: item_0
+          item_id: item_0.id
         )
       end
       let!(:gift_card_detail_1) do
         create(
           :gift_card_detail,
-          item: item_1
+          item_id: item_1.id
         )
       end
+      let(:gift_card_amount_0) { create(:gift_card_amount, gift_card_detail_id: gift_card_detail_0.id) }
+      let(:gift_card_amount_1) { create(:gift_card_amount, gift_card_detail_id: gift_card_detail_1.id) }
 
       before do
+        contact.reload
+        seller.reload
+        location.reload
+        distributor.reload
+        campaign.reload
+        item_0.reload
+        item_1.reload
+        gift_card_detail_0.reload
+        gift_card_detail_1
+          .reload
+        gift_card_amount_0.reload
+        gift_card_amount_1.reload
         allow_any_instance_of(GiftCardsController).to receive(:get_session_user).and_return(contact)
         get '/gift_cards'
       end
@@ -82,7 +110,7 @@ RSpec.describe 'Gift Cards API', type: :request do
 
       it 'returns the gift card details' do
         expect(json).not_to be_empty
-        expect(json.size).to eq 2
+        expect(json['gift_cards'].length).to eq 2
 
         expect(response.headers['Current-Page'].to_i).to eq 1
         expect(response.headers['Total-Pages'].to_i).to eq 1
