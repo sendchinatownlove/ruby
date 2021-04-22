@@ -28,7 +28,7 @@ class Redemption < ApplicationRecord
   private
 
   def unredeem_receipts
-    CrawlReceipt.where(redemption_id: self.id).each do |receipt|
+    CrawlReceipt.where(redemption_id: id).each do |receipt|
       receipt.update_attribute(:redemption_id, nil)
       receipt.save!
     end

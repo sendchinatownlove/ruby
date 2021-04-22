@@ -3,9 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe 'CrawlReceipts', type: :request do
-
   before do
-    Timecop.freeze(Time.find_zone('EST').local(2021,2,15))
+    Timecop.freeze(Time.find_zone('EST').local(2021, 2, 15))
   end
 
   after do

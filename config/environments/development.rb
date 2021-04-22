@@ -21,12 +21,26 @@ Rails.application.configure do
   config.middleware.insert_before 0, Rack::Cors do
     allow do
       origins 'localhost:3000', '127.0.0.1:3000',
-              'localhost:4000', '127.0.0.1:4000', 
+              'localhost:4000', '127.0.0.1:4000',
               'https://sendchinatownlove.com'
       resource '/campaigns',
                methods: [:get],
                headers: :any,
                expose: %w[Total-Count Total-Pages Page-Items Current-Page]
+      resource '/auth',
+               methods: %i[get post put delete],
+               headers: :any,
+               expose: %w[Total-Count Total-Pages Page-Items Current-Page],
+               credentials: true
+      resource '/gift_cards',
+               methods: [:get],
+               headers: :any,
+               expose: %w[Total-Count Total-Pages Page-Items Current-Page],
+               credentials: true
+      resource '/gift_cards/metadata',
+               methods: [:get],
+               headers: :any,
+               credentials: true
       resource '*', headers: :any, methods: :any
       resource '/stats',
                methods: [:get],

@@ -114,11 +114,11 @@ end
     refunded: true,
     amount: 40_000
   }
-].each do |attributes|
+].each do |attributes, ind|
   seller = Seller.find_by(seller_id: 'shunfa-bakery')
   contact = Contact.find_or_create_by!(email: attributes[:email])
-  payment_intent = PaymentIntent.create!(purchaser: contact, recipient: contact, square_location_id: seller.square_location_id, square_payment_id: Faker::Alphanumeric.alpha(number: 64))
-  item = Item.create!(purchaser: contact, item_type: attributes[:item_type], refunded: attributes[:refunded], seller_id: seller.id, payment_intent_id: payment_intent.id)
+  payment_intent = PaymentIntent.create!(purchaser: contact, recipient: contact, square_location_id: seller.square_location_id, square_payment_id: Faker::Alphanumeric.alpha(number: 64), origin: 'square')
+  item = Item.create!(purchaser: contact, item_type: attributes[:item_type], refunded: attributes[:refunded], seller_id: seller.id, payment_intent_id: payment_intent.id, campaign_id: ind)
   DonationDetail.create!(item_id: item.id, amount: attributes[:amount])
 end
 
@@ -212,7 +212,7 @@ end
 end
 
 seller = Seller.find_by(seller_id: 'shunfa-bakery')
-contact = Contact.find_or_create_by!(name: 'Apex for Youth', email: 'distributor@apexforyouth.com')
+contact = Contact.find_or_create_by!(name: 'Apex for Youth', email: ENV['SEED_DIST_EMAIL'])
 distributor = Distributor.create contact: contact, image_url: 'https://storage.googleapis.com/sendchinatownlove-assets/public/assets/apex-for-youth/apex-for-youth-logo.png', website_url: 'apexforyouth.com', name: 'Apex for Youth'
 location = Location.create(address1: '123 Mott St.', city: 'Zoo York', neighborhood: 'Chinatown', state: 'NY', zip_code: '12345')
 nonprofit = Nonprofit.create(name: 'Non Profit', fee_id: Fee.first[:id])
@@ -425,12 +425,12 @@ end
 [
   {
     name: 'The Grand Prize Package',
-    total_value: 10000,
+    total_value: 10_000,
     image_url: 'https://images.ctfassets.net/4w8qvp17lo47/1fnONK6KJf37PPkkZqlreq/412c146662ed3c46fce3ba72ab715074/Rewarding_yourself_is_important_when_it_comes_to_diabetes_management_prediabetes_type_2_diabetes.jpg'
   },
   {
     name: 'Rabbit/Longevity',
-    total_value: 80000,
+    total_value: 80_000,
     image_url: 'https://static.independent.co.uk/s3fs-public/thumbnails/image/2019/01/07/11/bunny-rabbit.jpg'
   }
 ].each do |attributes|
@@ -465,7 +465,7 @@ lny_merchant = ParticipatingSeller.first
     participating_seller_id: lny_merchant.id,
     amount: 1800,
     receipt_url: 'receipt-url.com'
-  },
+  }
 ].each do |attributes|
   CrawlReceipt.find_or_create_by(attributes)
 end
