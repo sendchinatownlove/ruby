@@ -25,4 +25,16 @@
 class DeliveryOption < ApplicationRecord
   belongs_to :seller
   belongs_to :delivery_type
+
+  RETURN_ORDER = {
+    "Phone" => 0,
+    "Caviar" => 1,
+    "Chowbus" => 2,
+    "DoorDash" => 3,
+    "Grubhub" => 4,
+    "Hungry Panda" => 5,
+    "Postmates" => 6,
+    "Seamless" => 7,
+    "Uber Eats" => 8,
+  }
 end

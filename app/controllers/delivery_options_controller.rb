@@ -6,14 +6,18 @@ class DeliveryOptionsController < ApplicationController
 
   # GET /sellers/:seller_id/delivery_options
   def index
-    delivery_options = @seller.delivery_options.map do |delivery_option|
+    sorted_delivery_options = []
+    # Build array of delivery options in order of how DeliveryOption::ReturnOrder is set up
+    @seller.delivery_options.each do |delivery_option|
       delivery_type = delivery_option.delivery_type
       json = delivery_option.as_json
       json['delivery_type'] = delivery_type.as_json
-      json
+      order = DeliveryOption::RETURN_ORDER[delivery_type[:name]]
+      sorted_delivery_options[order] = json
     end
 
-    json_response(delivery_options.sort_by { |de| de['delivery_type']['name'].to_i })
+    sorted_delivery_options = sorted_delivery_options.select{ |ele| !ele.nil?}
+    json_response(sorted_delivery_options)
   end
 
   # POST /sellers/:seller_id/delivery_options
