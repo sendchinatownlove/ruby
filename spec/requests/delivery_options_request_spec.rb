@@ -8,9 +8,10 @@ RSpec.describe 'DeliveryOptions', type: :request do
   let(:current_time) { Time.current.utc.iso8601(3).to_s }
   let!(:seller) { create(:seller) }
   let(:seller_id) { seller.seller_id }
+  # make it reference the actual thing
   let(:delivery_type) { create(:delivery_type) }
   let(:delivery_type_id) { delivery_type.id }
-  let!(:delivery_options) { create_list(:delivery_option, 20, delivery_type_id: delivery_type_id, seller_id: seller.id) }
+  let!(:delivery_options) { create_list(:delivery_option, 1, delivery_type_id: delivery_type_id, seller_id: seller.id) }
   let(:id) { delivery_options.first.id }
 
   # Test suite for GET /sellers/:seller_id/delivery_options
@@ -23,7 +24,7 @@ RSpec.describe 'DeliveryOptions', type: :request do
       end
 
       it 'returns all seller delivery_options' do
-        expect(json.size).to eq(20)
+        expect(json.size).to eq(1)
         expect(json[0]['delivery_type']['name']).not_to be_nil
       end
     end
