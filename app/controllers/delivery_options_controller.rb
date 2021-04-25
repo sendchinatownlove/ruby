@@ -22,7 +22,18 @@ class DeliveryOptionsController < ApplicationController
 
   # POST /sellers/:seller_id/delivery_options
   def create
-    json_response(@seller.delivery_options.create!(create_delivery_option_params), :created)
+    create_delivery_option_params
+    delivery_type = DeliveryType.find_by(delivery_type_id: params[:delivery_type_id])
+    existing_delivery_option = DeliveryOption.find_by(delivery_type_id: delivery_type.id, seller_id: @seller.id)
+
+    # If the existing delivery option exists, return an error
+    if (!existing_delivery_option.nil?)
+      json_response({message: "Error Delivery Option with type: #{params[:delivery_type_id]} exists already, update Delivery Option with id: #{existing_delivery_option.id}"}, 400)
+    else
+      delivery_option = @seller.delivery_options.create!(url: params[:url], phone_number: params[:phone_number], delivery_type: delivery_type)
+
+      json_response(delivery_option, :created)
+    end
   end
 
   # PUT /sellers/:seller_id/delivery_options/:id
