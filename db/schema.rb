@@ -25,7 +25,7 @@ ActiveRecord::Schema.define(version: 2021_04_22_000931) do
     t.bigint "seller_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.bigint "distributor_id", null: false
+    t.bigint "distributor_id"
     t.integer "target_amount", default: 100000, null: false
     t.integer "price_per_meal", default: 500
     t.integer "fee_id"
