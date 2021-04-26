@@ -6,19 +6,34 @@ class DeliveryOptionsController < ApplicationController
 
   # GET /sellers/:seller_id/delivery_options
   def index
-    delivery_options = @seller.delivery_options.map do |delivery_option|
+    sorted_delivery_options = []
+    # Build array of delivery options in order of how DeliveryOption::ReturnOrder is set up
+    @seller.delivery_options.each do |delivery_option|
       delivery_type = delivery_option.delivery_type
       json = delivery_option.as_json
       json['delivery_type'] = delivery_type.as_json
-      json
+      order = DeliveryOption::RETURN_ORDER[delivery_type[:name]]
+      sorted_delivery_options[order] = json
     end
 
-    json_response(delivery_options.sort_by { |de| de['delivery_type']['name'].to_i })
+    sorted_delivery_options = sorted_delivery_options.select{ |ele| !ele.nil?}
+    json_response(sorted_delivery_options)
   end
 
   # POST /sellers/:seller_id/delivery_options
   def create
-    json_response(@seller.delivery_options.create!(create_delivery_option_params), :created)
+    create_delivery_option_params
+    delivery_type = DeliveryType.find_by(delivery_type_id: params[:delivery_type_id])
+    existing_delivery_option = DeliveryOption.find_by(delivery_type_id: delivery_type.id, seller_id: @seller.id)
+
+    # If the existing delivery option exists, return an error
+    if (!existing_delivery_option.nil?)
+      json_response({message: "Error Delivery Option with type: #{params[:delivery_type_id]} exists already, update Delivery Option with id: #{existing_delivery_option.id}"}, 400)
+    else
+      delivery_option = @seller.delivery_options.create!(url: params[:url], phone_number: params[:phone_number], delivery_type: delivery_type)
+
+      json_response(delivery_option, :created)
+    end
   end
 
   # PUT /sellers/:seller_id/delivery_options/:id

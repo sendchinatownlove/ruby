@@ -16,7 +16,8 @@ RSpec.describe 'Campaigns API', type: :request do
       active: true,
       seller_id: @seller.id,
       project_id: nil,
-      location_id: @location.id
+      location_id: @location.id,
+      distributor_id: distributor.id
     )
   end
   let!(:inactive_campaign) do

@@ -4,11 +4,12 @@
 #
 # Table name: delivery_types
 #
-#  id         :bigint           not null, primary key
-#  icon_url   :string
-#  name       :string           not null
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
+#  id               :bigint           not null, primary key
+#  icon_url         :string
+#  name             :string           not null
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  delivery_type_id :string
 #
 require 'rails_helper'
 

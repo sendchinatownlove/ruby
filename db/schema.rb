@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_05_210045) do
+ActiveRecord::Schema.define(version: 2021_04_22_000931) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -25,7 +25,7 @@ ActiveRecord::Schema.define(version: 2021_04_05_210045) do
     t.bigint "seller_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.bigint "distributor_id", null: false
+    t.bigint "distributor_id"
     t.integer "target_amount", default: 100000, null: false
     t.integer "price_per_meal", default: 500
     t.integer "fee_id"
@@ -98,6 +98,7 @@ ActiveRecord::Schema.define(version: 2021_04_05_210045) do
     t.string "icon_url"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "delivery_type_id"
   end
 
   create_table "distributors", force: :cascade do |t|
