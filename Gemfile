@@ -44,6 +44,7 @@ gem 'rubocop'
 gem 'connection_pool'
 gem 'actionpack-action_caching'
 gem 'dalli'
+gem 'redis'
 
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 gem 'rack-cors'

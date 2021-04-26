@@ -22,6 +22,8 @@ Rails.application.configure do
         'https://www.merchant.sendchinatownlove.com',
         'https://sendchinatownlove.github.io',
         'https://www.sendchinatownlove.github.io',
+        'localhost:3000', '127.0.0.1:3000',
+        'localhost:4000', '127.0.0.1:4000',
         'https://sendchinatownlove.com',
         'https://www.sendchinatownlove.com'
       )
@@ -82,17 +84,9 @@ Rails.application.configure do
   # config.cache_store = :mem_cache_store
   config.action_controller.perform_caching = true
 
-  config.cache_store = :mem_cache_store,
-                       (ENV['MEMCACHIER_SERVERS'] || '').split(','),
-                       { username: ENV['MEMCACHIER_USERNAME'],
-                         password: ENV['MEMCACHIER_PASSWORD'],
-                         failover: true,
-                         socket_timeout: 1.5,
-                         socket_failure_delay: 0.2,
-                         down_retry_delay: 60,
-                         pool_size: 5 }
-
-
+  Rails.application.configure do
+    config.cache_store = :redis_cache_store, { url: ENV['REDIS_URL'] }
+  end
 
   # Use a real queuing backend for Active Job (and separate queues per
   # environment).
