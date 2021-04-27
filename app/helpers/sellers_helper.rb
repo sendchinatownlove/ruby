@@ -27,6 +27,14 @@ module SellersHelper
     json
   end
 
+  def self.collect_contribution_amounts(seller)
+    return {
+      donation_amount: seller.donation_amount,
+      gift_card_amount: seller.gift_card_amount,
+      gift_a_meal_amount: seller.gift_a_meal_amount
+    }
+  end
+
   private
 
   def self.get_deprecated_distributor(seller:)
