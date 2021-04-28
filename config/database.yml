@@ -92,6 +92,11 @@ test:
 #   production:
 #     url: <%= ENV['DATABASE_URL'] %>
 #
+staging:
+  <<: *default
+  database: myapp_development
+  password: <%= ENV['MYAPP_DATABASE_PASSWORD'] %>
+
 production:
   <<: *default
   database: myapp_production
