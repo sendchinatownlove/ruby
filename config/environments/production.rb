@@ -23,7 +23,8 @@ Rails.application.configure do
         'https://sendchinatownlove.github.io',
         'https://www.sendchinatownlove.github.io',
         'https://sendchinatownlove.com',
-        'https://www.sendchinatownlove.com'
+        'https://www.sendchinatownlove.com',
+        'localhost:3000', '127.0.0.1:3000',
       )
       resource '/campaigns',
                methods: [:get],
