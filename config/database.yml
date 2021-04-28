@@ -94,8 +94,7 @@ test:
 #
 staging:
   <<: *default
-  database: myapp_staging
-  username: myapp
+  database: myapp_development
   password: <%= ENV['MYAPP_DATABASE_PASSWORD'] %>
 
 production:
