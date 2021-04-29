@@ -22,8 +22,6 @@ Rails.application.configure do
         'https://www.merchant.sendchinatownlove.com',
         'https://sendchinatownlove.github.io',
         'https://www.sendchinatownlove.github.io',
-        'localhost:3000', '127.0.0.1:3000',
-        'localhost:4000', '127.0.0.1:4000',
         'https://sendchinatownlove.com',
         'https://www.sendchinatownlove.com'
       )
