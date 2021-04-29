@@ -14,7 +14,7 @@ module EmailManager
     # rubocop:disable Layout/LineLength
     def call
       amount_string = EmailManager::Sender.format_amount(amount: amount)
-      gift_card_url = 'merchant.sendchinatownlove.com/voucher/' + gift_card_detail.gift_card_id
+      gift_card_url = 'https://merchant.sendchinatownlove.com/voucher/' + gift_card_detail.gift_card_id
       html = '<!DOCTYPE html>' \
            '<html>' \
            '<head>' \

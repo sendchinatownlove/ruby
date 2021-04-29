@@ -14,7 +14,7 @@ with i as (
 	where line_items is not null
 	and line_items like '%seller_id%'
 	and i.refunded = false
-	and pi2.created_at >= '2020-04-13' and pi2.created_at <= '2021-04-25'
+	and pi2.created_at >= '2021-04-13'
 )
 select sum(amount)
 from pws

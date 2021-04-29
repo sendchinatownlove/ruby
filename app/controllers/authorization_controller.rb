@@ -44,6 +44,6 @@ class AuthorizationController < ApplicationController
 
     session[:user] = profile.to_json
 
-    redirect_to '/'
+    redirect_to ENV['DISTRIBUTOR_DASHBOARD_URL'] || '/'
   end
 end

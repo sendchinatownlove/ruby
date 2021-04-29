@@ -16,7 +16,8 @@ RSpec.describe 'Campaigns API', type: :request do
       active: true,
       seller_id: @seller.id,
       project_id: nil,
-      location_id: @location.id
+      location_id: @location.id,
+      distributor_id: distributor.id
     )
   end
   let!(:inactive_campaign) do
@@ -472,20 +473,20 @@ RSpec.describe 'Campaigns API', type: :request do
           gift_cards: [{
             distributor_id: campaign.seller_distributor_pairs[0]['distributor_id'],
             seller_id: campaign.seller_distributor_pairs[0]['seller_id'],
-            gift_card_amount: 200,
+            gift_card_amount: 200
           }]
         },
         as: :json
       )
     end
-    
+
     context 'Failure states' do
       let!(:campaign) do
         create(
           :campaign,
           :with_sellers_distributors,
           project_id: project.id,
-          seller_id: nil,
+          seller_id: nil
         )
       end
 
@@ -495,12 +496,12 @@ RSpec.describe 'Campaigns API', type: :request do
           params: {},
           as: :json
         )
-        expect(json).to eq({'message'=>'param is missing or the value is empty: gift_cards'})
+        expect(json).to eq({ 'message' => 'param is missing or the value is empty: gift_cards' })
       end
-  
+
       it 'Raises invalid parameter error if there are not enough unallocated funds' do
         subject
-        expect(json).to eq({'message'=>'Request amount exceeds unallocated amount in campaign. Unallocated amount: 0'})
+        expect(json).to eq({ 'message' => 'Request amount exceeds unallocated amount in campaign. Unallocated amount: 0' })
       end
     end
 
@@ -516,7 +517,7 @@ RSpec.describe 'Campaigns API', type: :request do
 
       it 'Creates gift card successfully' do
         subject
-        expect(json).to eq({'unallocated_amount'=>400})
+        expect(json).to eq({ 'unallocated_amount' => 400 })
       end
     end
   end

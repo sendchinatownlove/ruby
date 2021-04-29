@@ -23,6 +23,26 @@ class SellersController < ApplicationController
     end
   end
 
+  # GET /sellers/total_contributions
+  def get_contributions
+    @sellers = Seller.all
+    totals = {
+      donation_amount: 0,
+      gift_card_amount: 0,
+      gift_a_meal_amount: 0
+    }
+
+    @sellers.each do |seller|
+      seller_contributions = SellersHelper.collect_contribution_amounts(seller)
+
+      totals[:donation_amount] += seller_contributions[:donation_amount]
+      totals[:gift_card_amount] += seller_contributions[:gift_card_amount]
+      totals[:gift_a_meal_amount] += seller_contributions[:gift_a_meal_amount]
+
+    end
+    json_response(totals)
+  end
+
   # POST /sellers
   def create
     @seller = Seller.create!(seller_params)
