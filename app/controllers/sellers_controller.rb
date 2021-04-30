@@ -9,17 +9,17 @@ class SellersController < ApplicationController
 
     raise InvalidParameterError, query.errors.full_messages.to_sentence unless query.valid?
 
-    Rails.cache.fetch('sellers', expires_in: 60.minutes) do
+    sellers = Rails.cache.read('sellers')
+    if sellers.nil?
+      Rails.cache.write('key', sellers, expires_in: 60.minutes)
       @sellers = Seller.order("#{query.sort_key} #{query.sort_order}")
-      if stale?(@seller)
-        sellers = @sellers.map do |seller|
-          SellersHelper.generate_seller_json(
-            seller: seller
-          )
-        end
-        json_response(sellers)
+      sellers = @sellers.map do |seller|
+        SellersHelper.generate_seller_json(
+          seller: seller
+        )
       end
     end
+    json_response(sellers)
   end
 
   # GET /sellers/total_contributions
@@ -37,7 +37,6 @@ class SellersController < ApplicationController
       totals[:donation_amount] += seller_contributions[:donation_amount]
       totals[:gift_card_amount] += seller_contributions[:gift_card_amount]
       totals[:gift_a_meal_amount] += seller_contributions[:gift_a_meal_amount]
-
     end
     json_response(totals)
   end

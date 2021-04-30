@@ -1,7 +1,3 @@
-require_relative 'stats_helpers/donations'
-require_relative 'stats_helpers/progressbar'
-require_relative 'stats_helpers/stats_html'
-
 class StatsController < ApplicationController
   def donation_totals
     outside_db_contributions = 123_572
@@ -18,7 +14,6 @@ class StatsController < ApplicationController
   end
 
   def index
-    response.headers.delete 'X-Frame-Options'
     show(donation_totals, sellers_total, transaction_totals, gam_count)
   end
 
