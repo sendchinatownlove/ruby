@@ -127,7 +127,11 @@ GEM
       rexml
       signet (~> 0.14)
       webrick
+    google-apis-drive_v3 (0.5.0)
+      google-apis-core (~> 0.1)
     google-apis-iamcredentials_v1 (0.2.0)
+      google-apis-core (~> 0.1)
+    google-apis-sheets_v4 (0.4.0)
       google-apis-core (~> 0.1)
     google-apis-storage_v1 (0.3.0)
       google-apis-core (~> 0.1)
@@ -145,6 +149,11 @@ GEM
       google-cloud-core (~> 1.2)
       googleauth (~> 0.9)
       mini_mime (~> 1.0)
+    google_drive (3.0.7)
+      google-apis-drive_v3 (>= 0.5.0, < 1.0.0)
+      google-apis-sheets_v4 (>= 0.4.0, < 1.0.0)
+      googleauth (>= 0.5.0, < 1.0.0)
+      nokogiri (>= 1.5.3, < 2.0.0)
     googleauth (0.16.0)
       faraday (>= 0.17.3, < 2.0)
       jwt (>= 1.4, < 3.0)
@@ -363,6 +372,7 @@ DEPENDENCIES
   globalize (~> 5.3.0)
   globalize-accessors
   google-cloud-storage
+  google_drive
   listen (>= 3.0.5, < 3.2)
   newrelic_rpm
   pagy (~> 3.8)

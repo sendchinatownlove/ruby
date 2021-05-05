@@ -18,6 +18,7 @@ class StatsController < ApplicationController
   end
 
   def sellers_total
+    LiveStats.pull()
     Seller.all.count
   end
 
