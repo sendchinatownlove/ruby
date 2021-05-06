@@ -34,6 +34,11 @@ class StatsController < ApplicationController
     outside_db_luc_raised = 47, 689
 
     if ENV['GOOGLEDRIVE_SECRET']
+      data = Rails.cache.read('spreadsheet_data')
+      if data.nil?
+        data = LiveStats.pull
+        Rails.cache.write('spreadsheet_data', data, expires_in: 60.minutes)
+      end
       data = LiveStats.pull
       outside_db_fundaising_contributions = data['outside_db_fundaising_contributions'].to_i
       outside_db_gam_contributions = data['outside_db_gam_contributions'].to_i
