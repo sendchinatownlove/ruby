@@ -18,7 +18,6 @@ class StatsController < ApplicationController
   end
 
   def sellers_total
-    LiveStats.pull()
     Seller.all.count
   end
 
@@ -47,6 +46,9 @@ class StatsController < ApplicationController
   end
 
   def show(donation_totals, sellers_total, transaction_totals, gam_count)
+    if ENV['GOOGLEDRIVE_SECRET']
+      LiveStats.pull()
+    end
     donation_totals = '$%s' % ActionController::Base.helpers.number_with_precision(donation_totals, precision: 0, delimiter: ',')  # "$10,000"
     gam_count           = ActionController::Base.helpers.number_with_precision(gam_count, precision: 0,
                                                                                           delimiter: ',')
