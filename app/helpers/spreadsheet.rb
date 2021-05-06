@@ -29,7 +29,6 @@ module LiveStats
       # p ws[row.to_s]
       (1..ws.num_cols).each do |col|
         if row == 0
-          p ws[row, col]
           continue
         else 
           values[ws[row, 1]] = ws[row, col]

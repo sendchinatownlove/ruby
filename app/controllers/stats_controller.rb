@@ -1,16 +1,19 @@
+require_relative 'stats_helpers/donations'
+require_relative 'stats_helpers/progressbar'
+require_relative 'stats_helpers/spreadsheet'
+
+
 class StatsController < ApplicationController
   def donation_totals
-    outside_db_contributions = 123_572
     query = ActiveRecord::Base.connection.execute($donation_query)
-    query.getvalue(0, 5) + outside_db_contributions
+    query.getvalue(0, 5) 
   end
 
   def gam_count
     @GiftCardDetail = GiftCardDetail.where(single_use: true)
     # Magic constant to track orders not in GAM
-    outside_db_contributions = 5140
     # TODO(stanzheng) pull magic constant from GAM spreadsheet
-    @GiftCardDetail.length + outside_db_contributions
+    @GiftCardDetail.length 
   end
 
   def index
@@ -27,19 +30,40 @@ class StatsController < ApplicationController
   end
 
   def show(donation_totals, sellers_total, transaction_totals, gam_count)
+    puts "~~~~~~"
+    outside_db_gam_contributions = 0
+    outside_db_fundaising_contributions = 0
+    outside_db_fundaising_foodcrawl_raised = 0
+    outside_db_luc_raised = 0
+
     if ENV['GOOGLEDRIVE_SECRET']
-      LiveStats.pull()
+      puts "@@@@@@@@@" 
+      data = LiveStats.pull()
+      p data
+      outside_db_fundaising_contributions              = data["outside_db_fundaising_contributions"].to_i 
+      outside_db_gam_contributions = data["outside_db_gam_contributions"].to_i 
+      outside_db_fundaising_foodcrawl_raised = data["outside_db_fundaising_foodcrawl_raised"]
+      outside_db_luc_raised =  data["outside_db_luc_raised"]
     end
+    # box1
+    donation_totals = donation_totals + outside_db_fundaising_contributions
     donation_totals = '$%s' % ActionController::Base.helpers.number_with_precision(donation_totals, precision: 0, delimiter: ',')  # "$10,000"
+    
+    # box2
+    gam_count           = gam_count + outside_db_gam_contributions
     gam_count           = ActionController::Base.helpers.number_with_precision(gam_count, precision: 0,
-                                                                                          delimiter: ',')
-    foodcrawl_raised    = '36,573'
-    transaction_totals  = ActionController::Base.helpers.number_with_precision(transaction_totals,
+                                                                                    delimiter: ',')
+    # box3
+    foodcrawl_raised    = outside_db_fundaising_foodcrawl_raised
+
+    # box4
+    total_vouchers_giftcards  = ActionController::Base.helpers.number_with_precision(transaction_totals,
                                                                                precision: 0, delimiter: ',')
-    sellers_total
-    luc_raised = '$47,689'
+    # box 6
+    luc_raised = outside_db_luc_raised
+
     response = { box1: donation_totals, box2: gam_count, box3: foodcrawl_raised,
-                 box4: transaction_totals, box5: sellers_total, box6: luc_raised}
+                 box4: total_vouchers_giftcards, box5: sellers_total, box6: luc_raised}
     render json: response
   end
 end
