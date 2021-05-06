@@ -1,6 +1,6 @@
-require_relative 'stats_helpers/donations'
-require_relative 'stats_helpers/progressbar'
-require_relative 'stats_helpers/spreadsheet'
+# require_relative 'stats_helpers/donations'
+# require_relative 'stats_helpers/progressbar'
+# require_relative 'stats_helpers/spreadsheet'
 
 
 class StatsController < ApplicationController
