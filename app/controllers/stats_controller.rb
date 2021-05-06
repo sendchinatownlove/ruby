@@ -33,8 +33,8 @@ class StatsController < ApplicationController
     puts "~~~~~~"
     outside_db_gam_contributions = 0
     outside_db_fundaising_contributions = 0
-    outside_db_fundaising_foodcrawl_raised = 0
-    outside_db_luc_raised = 0
+    outside_db_fundaising_foodcrawl_raised = 36,573
+    outside_db_luc_raised = 47,689
 
     if ENV['GOOGLEDRIVE_SECRET']
       puts "@@@@@@@@@" 
