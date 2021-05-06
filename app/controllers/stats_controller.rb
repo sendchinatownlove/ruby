@@ -21,25 +21,6 @@ class StatsController < ApplicationController
     Seller.all.count
   end
 
-  def progress_bar_totals
-    query = ActiveRecord::Base.connection.execute($april_progress_bar_query)
-
-    total = 0
-    query.each do |type|
-      total += type['sum'] unless type['sum'].nil?
-    end
-
-    total
-  end
-
-  def num_days_remaining
-    currentDate = Time.now
-    endDate = Date.new(2021, 4, 26)
-    remainingDays = (endDate.to_date - currentDate.to_date).round
-    return 0 if remainingDays <= 0
-
-    (endDate.to_date - currentDate.to_date).round
-  end
 
   def transaction_totals
     Item.all.count
@@ -58,7 +39,7 @@ class StatsController < ApplicationController
     sellers_total
     luc_raised = '$47,689'
     response = { box1: donation_totals, box2: gam_count, box3: foodcrawl_raised,
-                 box4: transaction_totals, box5: sellers_total, box6: luc_raised, progressBarTotal: progress_bar_totals, numDaysRemaining: num_days_remaining }
+                 box4: transaction_totals, box5: sellers_total, box6: luc_raised}
     render json: response
   end
 end
