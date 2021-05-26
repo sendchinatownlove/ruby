@@ -33,6 +33,8 @@ If you don't have rvm, gem install rvm:
 - Follow the following guide to fill the .env file in
 https://docs.google.com/document/d/1UPNCwjWS_T7XT5AXsewphu6NvNdV7TQLSJub-RBRAG0/edit?ts=5ec88e82
 
+Windows specific setup docs [here](https://www.notion.so/SCL-Ruby-Backend-Setup-for-Windows-1f050639a93c43ad8c0611fe819fa2fa)
+
 
 ### Create and migrate database
 - Run the server (see below) and create and migrate your DB:
