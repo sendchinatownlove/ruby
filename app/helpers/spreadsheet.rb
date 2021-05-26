@@ -1,4 +1,4 @@
-require "google_drive"
+require 'google_drive'
 
 # Creates a session. This will prompt the credential via command line for the
 # first time and save it to config.json file for later usages.
@@ -13,15 +13,14 @@ require "google_drive"
 # Or https://docs.google.com/a/someone.com/spreadsheets/d/pz7XtlQC-PYx-jrVMJErTcg/edit?usp=drive_web
 # ws = session.file_by_id("1RFbedwlWR2I0d0ELllCeha9QCdZK_PQyJt_RcaerexU").worksheets[0]
 
-
-
 module LiveStats
   def self.pull
     $google_config = ENV['GOOGLEDRIVE_SECRET']
     session = GoogleDrive::Session.from_service_account_key(StringIO.new($google_config))
-    ws = session.file_by_id("1RFbedwlWR2I0d0ELllCeha9QCdZK_PQyJt_RcaerexU").worksheets.select { |sheet| sheet.title == "Cat" }[0]
+    ws = session.file_by_id('1RFbedwlWR2I0d0ELllCeha9QCdZK_PQyJt_RcaerexU').worksheets.select do |sheet|
+           sheet.title == 'Cat'
+         end [0]
     # collection = session.collection_by_title("Static Content")
-
 
     values = {}
     # Dumps all cells.
@@ -30,12 +29,11 @@ module LiveStats
       (1..ws.num_cols).each do |col|
         if row == 0
           continue
-        else 
+        else
           values[ws[row, 1]] = ws[row, col]
         end
       end
     end
-    return values 
-  end 
-end 
-
+    values
+  end
+end
