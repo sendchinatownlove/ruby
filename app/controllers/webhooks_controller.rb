@@ -92,6 +92,11 @@ class WebhooksController < ApplicationController
       square_location_id: square_location_id
     )
 
+    ## No Payment Intent means payment flow came in an ecommerce payment with no payment intent
+    if payment_intent.nil? 
+      return 
+    end 
+
     # TODO(jtmckibb): Each payment has an associated FSM. If we see the start
     #                 of a payment, we should expect for it to be completed.
     #                 If it isn't, then we should record it. Similarly with
