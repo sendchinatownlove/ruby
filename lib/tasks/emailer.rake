@@ -110,7 +110,7 @@ namespace :emailer do
       else 
         curr_table += '</table></html>'
 
-        Rails.logger.info("Sending notification for #{seller_name} to #{args.email} from the last #{args.time_range}")
+        Rails.logger.info("Sending notification for #{curr_name} to #{curr_email} for unused voucher balances.")
         EmailManager::Sender.send_receipt(to: curr_email, html: curr_table, subject: 'Hello from Send Chinatown Love 👋 : Unused Voucher Balances 💸')
 
         curr_name = row['name']
