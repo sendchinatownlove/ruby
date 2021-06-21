@@ -18,7 +18,7 @@ module LiveStats
     $google_config = ENV['GOOGLEDRIVE_SECRET']
     session = GoogleDrive::Session.from_service_account_key(StringIO.new($google_config))
     ws = session.file_by_id('1RFbedwlWR2I0d0ELllCeha9QCdZK_PQyJt_RcaerexU').worksheets.select do |sheet|
-           sheet.title == 'Cat'
+           sheet.title == 'outside_funds'
          end [0]
     # collection = session.collection_by_title("Static Content")
 
