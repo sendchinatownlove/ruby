@@ -30,8 +30,9 @@ class StatsController < ApplicationController
   def show(donation_totals, sellers_total, transaction_totals, gam_count)
     outside_db_gam_contributions = 0
     outside_db_fundaising_contributions = 0
-    outside_db_fundaising_foodcrawl_raised = 36, 573
-    outside_db_luc_raised = 47, 689
+    outside_db_meals = 0
+    outside_db_fundaising_foodcrawl_raised = 0
+    outside_db_luc_raised = 0
 
     if ENV['GOOGLEDRIVE_SECRET']
       data = Rails.cache.read('spreadsheet_data')
@@ -40,18 +41,19 @@ class StatsController < ApplicationController
         Rails.cache.write('spreadsheet_data', data, expires_in: 60.minutes)
       end
       data = LiveStats.pull
-      outside_db_fundaising_contributions = data['outside_db_fundaising_contributions'].to_i
-      outside_db_gam_contributions = data['outside_db_gam_contributions'].to_i
-      outside_db_fundaising_foodcrawl_raised = data['outside_db_fundaising_foodcrawl_raised']
-      outside_db_luc_raised =  data['outside_db_luc_raised']
+      outside_db_fundaising_contributions += data['outside_db_fundaising_contributions'].to_i
+      outside_db_gam_contributions += data['outside_db_gam_contributions'].to_i
+      outside_db_meals +=  data['outside_db_meals'].to_i
+      outside_db_fundaising_foodcrawl_raised += data['outside_db_fundaising_foodcrawl_raised'].to_i
+      outside_db_luc_raised +=  data['outside_db_luc_raised'].to_i
     end
     # box1
-    donation_totals += outside_db_fundaising_contributions
+    donation_totals += outside_db_fundaising_contributions+ outside_db_gam_contributions + outside_db_fundaising_foodcrawl_raised + outside_db_luc_raised
     donation_totals = '$%s' % ActionController::Base.helpers.number_with_precision(donation_totals, precision: 0, delimiter: ',') # "$10,000"
 
     # box2
-    gam_count += outside_db_gam_contributions
-    gam_count           = ActionController::Base.helpers.number_with_precision(gam_count, precision: 0,
+    gam_count += outside_db_meals
+    gam_count = ActionController::Base.helpers.number_with_precision(gam_count, precision: 0,
                                                                                           delimiter: ',')
     # box3
     foodcrawl_raised    = outside_db_fundaising_foodcrawl_raised

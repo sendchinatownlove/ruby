@@ -33,7 +33,7 @@ module LiveStats
           values[ws[row, 1]] = ws[row, col]
         end
       end
-    end
+    end 
     values
   end
 end
