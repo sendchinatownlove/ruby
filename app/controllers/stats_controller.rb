@@ -56,14 +56,14 @@ class StatsController < ApplicationController
     gam_count = ActionController::Base.helpers.number_with_precision(gam_count, precision: 0,
                                                                                           delimiter: ',')
     # box3
-    foodcrawl_raised    =  ActionController::Base.helpers.number_with_precision(outside_db_fundaising_foodcrawl_raised, precision: 0,
+    foodcrawl_raised    =  '$' + ActionController::Base.helpers.number_with_precision(outside_db_fundaising_foodcrawl_raised, precision: 0,
       delimiter: ',')
 
     # box4
     total_vouchers_giftcards = ActionController::Base.helpers.number_with_precision(transaction_totals,
                                                                                     precision: 0, delimiter: ',')
     # box 6
-    luc_raised = ActionController::Base.helpers.number_with_precision(outside_db_luc_raised,
+    luc_raised = '$' + ActionController::Base.helpers.number_with_precision(outside_db_luc_raised,
       precision: 0, delimiter: ',')
 
     response = { box1: donation_totals, box2: gam_count, box3: foodcrawl_raised,
