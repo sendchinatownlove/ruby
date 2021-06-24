@@ -98,4 +98,5 @@ gem 'pagy', '~> 3.8'
 # GCS gem
 gem 'google-cloud-storage'
 
+gem "google_drive"
 gem 'workos'
