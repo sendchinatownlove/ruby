@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-
+require_relative '../../app/helpers/unused_cards_sql.rb'
 namespace :emailer do
   desc 'email task runner'
   task :vouchers_to_merchant, %i[seller_id email time_range] => [:environment] do |_task, args|
@@ -82,5 +82,41 @@ namespace :emailer do
 
     Rails.logger.info("Sending #{r.rows.length} vouchers for #{seller_name} to #{args.email} from the last #{args.time_range}")
     EmailManager::Sender.send_receipt(to: args.email, html: html)
+  end
+
+  task :unused_voucher_to_customer => [:environment] do |_task, args|
+    desc 'Resend unused vouchers to customers'
+   
+    # query for all gift cards info for that seller
+    query = ActiveRecord::Base.connection.execute($unused_vouchers_sql_query)
+   
+    curr_email = query[0]['email']
+    curr_name = query[0]['name']
+
+    email_template_header = '<html><style> table {border: 1px solid black}</style>'\
+                            "Hi #{curr_name},<br /><br />"\
+                            '<p>Looks like you’ve got at least one voucher from Send Chinatown Love (SCL) '\
+                            'with a remaining balance! Visiting our merchants in person and spending these '\
+                            'dollars helps them stay in business. Feel free to bring your friends!</p>'\
+                            '<p>Vouchers are easy to use, just click the corresponding link on your mobile device, '\
+                            'show the merchant the five digit code, and follow the on-screen steps!</p>'\
+                            '<table><tr><th>Merchant</th><th>Amount Remaining</th><th>Link</th></tr>'
+
+    curr_table = email_template_header.dup
+
+    query.each do |row|
+      if curr_email == row['email']
+        curr_table += "<tr><td>#{row['seller_name']}</td><td>#{'$' + (row['value'] / 100).to_s }</td><td><a href='#{row['redeem_url']}' target='_blank'>Redeem Voucher</a></td></tr>"  
+      else 
+        curr_table += '</table></html>'
+
+        Rails.logger.info("Sending notification for #{curr_name} to #{curr_email} for unused voucher balances.")
+        EmailManager::Sender.send_receipt(to: curr_email, html: curr_table, subject: 'Hello from Send Chinatown Love 👋 : Unused Voucher Balances 💸')
+
+        curr_name = row['name']
+        curr_email = row['email']
+        curr_table = email_template_header.dup
+      end
+    end
   end
 end

@@ -34,4 +34,36 @@ class GiftCardAmount < ApplicationRecord
       .order(:gift_card_detail_id, created_at: :asc)
       .to_sql
   end
+
+  def self.remaining_balance_cards_not_single_use_sql
+    GiftCardAmount
+      .select('select distinct on(gift_card_detail_id) *
+      from gift_card_amounts gca 
+      left join gift_card_details gcd on
+      gca.gift_card_detail_id = gcd.id 
+      where not exists ( 
+        select 1 
+        from gift_card_amounts gca2  
+        where value < 100 
+        and gift_card_detail_id = gca.gift_card_detail_id 
+      ) and gcd.single_use = false ')
+      .order(:gift_card_detail_id, created_at: :asc)
+      .to_sql
+  end
+
+  def self.remaining_balance_cards_single_use_sql
+    GiftCardAmount
+      .select('select distinct on(gift_card_detail_id) *
+      from gift_card_amounts gca 
+      left join gift_card_details gcd on
+      gca.gift_card_detail_id = gcd.id 
+      where not exists ( 
+        select 1 
+        from gift_card_amounts gca2  
+        where value < 100 
+        and gift_card_detail_id = gca.gift_card_detail_id 
+      ) and gcd.single_use = true')
+      .order(:gift_card_detail_id, created_at: :asc)
+      .to_sql
+  end
 end
