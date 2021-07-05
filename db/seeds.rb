@@ -23,6 +23,7 @@
     founded_year: 2013,
     website_url: nil,
     menu_url: nil,
+    gallery_image_urls: ["https://storage.googleapis.com/sendchinatownlove-assets/public/assets/tings-gift-shop/tings-gift-shop-gallery-1.png","https://storage.googleapis.com/sendchinatownlove-assets/public/assets/tings-gift-shop/tings-gift-shop-gallery-2.png","https://storage.googleapis.com/sendchinatownlove-assets/public/assets/tings-gift-shop/tings-gift-shop-gallery-3.png","https://storage.googleapis.com/sendchinatownlove-assets/public/assets/tings-gift-shop/tings-gift-shop-gallery-4.png","https://storage.googleapis.com/sendchinatownlove-assets/public/assets/tings-gift-shop/tings-gift-shop-gallery-5.png","https://storage.googleapis.com/sendchinatownlove-assets/public/assets/tings-gift-shop/tings-gift-shop-gallery-6.png","https://storage.googleapis.com/sendchinatownlove-assets/public/assets/tings-gift-shop/tings-gift-shop-gallery-7.png","https://storage.googleapis.com/sendchinatownlove-assets/public/assets/tings-gift-shop/tings-gift-shop-gallery-8.png","https://storage.googleapis.com/sendchinatownlove-assets/public/assets/tings-gift-shop/tings-gift-shop-gallery-9.png"]
     # See instructions for setting this up at
     # https://docs.google.com/document/d/1UPNCwjWS_T7XT5AXsewphu6NvNdV7TQLSJub-RBRAG0/edit
     square_location_id: ENV['SQUARE_LOCATION_ID']
@@ -43,6 +44,7 @@
     business_type: nil,
     num_employees: 4,
     founded_year: 2018,
+    gallery_image_urls: ["https://storage.googleapis.com/sendchinatownlove-assets/public/assets/tings-gift-shop/tings-gift-shop-gallery-1.png","https://storage.googleapis.com/sendchinatownlove-assets/public/assets/tings-gift-shop/tings-gift-shop-gallery-2.png","https://storage.googleapis.com/sendchinatownlove-assets/public/assets/tings-gift-shop/tings-gift-shop-gallery-3.png","https://storage.googleapis.com/sendchinatownlove-assets/public/assets/tings-gift-shop/tings-gift-shop-gallery-4.png","https://storage.googleapis.com/sendchinatownlove-assets/public/assets/tings-gift-shop/tings-gift-shop-gallery-5.png","https://storage.googleapis.com/sendchinatownlove-assets/public/assets/tings-gift-shop/tings-gift-shop-gallery-6.png","https://storage.googleapis.com/sendchinatownlove-assets/public/assets/tings-gift-shop/tings-gift-shop-gallery-7.png","https://storage.googleapis.com/sendchinatownlove-assets/public/assets/tings-gift-shop/tings-gift-shop-gallery-8.png","https://storage.googleapis.com/sendchinatownlove-assets/public/assets/tings-gift-shop/tings-gift-shop-gallery-9.png"]
     website_url: nil,
     menu_url: nil,
     square_location_id: 'E4R1NCMHG7B2Y',
