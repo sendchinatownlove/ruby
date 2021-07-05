@@ -44,4 +44,22 @@ namespace :one_time_tasks do
       delivery_type.update(icon_url: DELIVERY_TYPE_IMG_URLS[index], delivery_type_id: DELIVERY_TYPE_IDS[index])
     end
   end
+
+  desc 'Updates sellers gallery image urls'
+  task update_gallery_urls: :environment do
+    sellers = Seller.all
+    regex = /(\.png)$/
+    result_str = "Updating gallery images for:"
+    Seller.all.each do |seller|
+      gallery = seller.gallery_image_urls
+      filtered = gallery.filter {|img| img.match(regex)}
+      if gallery.nil? || filtered.length == 0
+        next
+      end
+      updated = filtered.map {|s| s.gsub!(regex, ".jpg")}
+        result_str += " #{seller.seller_id};"
+      seller.update({gallery_image_urls: updated})
+    end
+    puts result_str
+  end
 end
