@@ -52,13 +52,14 @@ namespace :one_time_tasks do
     result_str = "Updating gallery images for:"
     Seller.all.each do |seller|
       gallery = seller.gallery_image_urls
+      og_filtered = gallery.filter {|img| !img.match(regex)}
       filtered = gallery.filter {|img| img.match(regex)}
       if gallery.nil? || filtered.length == 0
         next
       end
-      updated = filtered.map {|s| s.gsub!(regex, ".jpg")}
-        result_str += " #{seller.seller_id};"
-      seller.update({gallery_image_urls: updated})
+      updated = og_filtered.concat filtered.map {|s| s.gsub!(regex, ".jpg")}
+      result_str += " #{seller.seller_id};"
+      # seller.update({gallery_image_urls: updated})
     end
     puts result_str
   end
