@@ -59,7 +59,7 @@ namespace :one_time_tasks do
       end
       updated = og_filtered.concat filtered.map {|s| s.gsub!(regex, ".jpg")}
       result_str += " #{seller.seller_id};"
-      # seller.update({gallery_image_urls: updated})
+      seller.update({gallery_image_urls: updated})
     end
     puts result_str
   end
