@@ -95,11 +95,15 @@ namespace :emailer do
 
     email_template_header = '<html><style> table {border: 1px solid black}</style>'\
                             "Hi #{curr_name},<br /><br />"\
-                            '<p>Looks like you’ve got at least one voucher from Send Chinatown Love (SCL) '\
-                            'with a remaining balance! Visiting our merchants in person and spending these '\
-                            'dollars helps them stay in business. Feel free to bring your friends!</p>'\
-                            '<p>Vouchers are easy to use, just click the corresponding link on your mobile device, '\
-                            'show the merchant the five digit code, and follow the on-screen steps!</p>'\
+                            '<p>Thank you for Sending Chinatown Love by supporting '\
+                            'our merchants with voucher purchases. '\
+                            'We hope you have been able to visit a Chinatown since New York City’s reopening.</p>'\
+                            '<p>We\'ve raised over a million dollars in donations and gift cards, '\
+                            'which helped 32 merchants through the darker days of COVID-19! '\
+                            'With that said, we are deciding to retire our voucher program '\
+                            'so that we can focus on other programs such as Gift-A-Meal (GAM) and Business Development. '\
+                            'Any non-redeemed vouchers will be converted to a direct donation to the merchant. '\
+                            'If you have any questions about how to use your voucher please reply to this email and we will be able to help.</p>'\
                             '<table><tr><th>Merchant</th><th>Amount Remaining</th><th>Link</th></tr>'
 
     curr_table = email_template_header.dup
@@ -109,6 +113,7 @@ namespace :emailer do
         curr_table += "<tr><td>#{row['seller_name']}</td><td>#{'$' + (row['value'] / 100).to_s }</td><td><a href='#{row['redeem_url']}' target='_blank'>Redeem Voucher</a></td></tr>"  
       else 
         curr_table += '</table></html>'
+        curr_table += '<p>Send Chinatown Love</p>'
 
         Rails.logger.info("Sending notification for #{curr_name} to #{curr_email} for unused voucher balances.")
         EmailManager::Sender.send_receipt(to: curr_email, html: curr_table, subject: 'Hello from Send Chinatown Love 👋 : Unused Voucher Balances 💸')
