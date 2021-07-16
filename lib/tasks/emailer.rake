@@ -112,11 +112,10 @@ namespace :emailer do
       if curr_email == row['email']
         curr_table += "<tr><td>#{row['seller_name']}</td><td>#{'$' + (row['value'] / 100).to_s }</td><td><a href='#{row['redeem_url']}' target='_blank'>Redeem Voucher</a></td></tr>"  
       else 
-        curr_table += '</table></html>'
-        curr_table += '<p>Send Chinatown Love</p>'
+        curr_table += '</table><p>Send Chinatown Love</p></html>'
 
         Rails.logger.info("Sending notification for #{curr_name} to #{curr_email} for unused voucher balances.")
-        EmailManager::Sender.send_receipt(to: curr_email, html: curr_table, subject: 'Hello from Send Chinatown Love 👋 : Unused Voucher Balances 💸')
+        EmailManager::Sender.send_receipt(to: curr_email, html: curr_table, subject: 'Sunsetting Vouchers Program')
 
         curr_name = row['name']
         curr_email = row['email']
