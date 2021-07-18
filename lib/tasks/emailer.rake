@@ -98,7 +98,7 @@ namespace :emailer do
                             '<p>Thank you for Sending Chinatown Love by supporting '\
                             'our merchants with voucher purchases. '\
                             'We hope you have been able to visit a Chinatown since New York City’s reopening.</p>'\
-                            '<p>Since our founding in March 2020, we've raised over a million dollars in donations , '\
+                            '<p>Since our founding in March 2020, we\'ve raised over a million dollars in donations , '\
                             'and gift cards, which helped <strong>32 merchants</strong> through the darker days of COVID-19! '\
                             'With that said, we are deciding to retire our voucher program '\
                             'so that we can focus on other programs such as Gift-A-Meal (GAM) and Business Development.</p>'\
@@ -106,10 +106,10 @@ namespace :emailer do
                             'meals and supplies to Chinatown citizens. '\
                             '<a href="https://www.instagram.com/p/CPSL2WlHhN9/" target="_blank">We provided 2760 meals so far to New Yorkers in need.</a></p>'\
                             '<p>Business Development is where we provide digital services with our merchants and provide opportunities to '\
-                            'collaborate with outside partners.'\
-                            '<a href="https://www.instagram.com/p/CKfyFeFn-Es/?utm_source=ig_web_copy_link">Examples of those are our food crawls that have driven traffic to Chinatown.</a>'\
+                            'collaborate with outside partners. '\
+                            '<a href="https://www.instagram.com/p/CKfyFeFn-Es/?utm_source=ig_web_copy_link">Examples of those are our food crawls that have driven traffic to Chinatown.</a> '\
                             'Your contribution with help Send Chinatown Love continue to provide aid and support to the community. '\
-                            'Any non-redeemed vouchers will be converted to a direct donation to the merchant and no action needs to be taken.'\
+                            'Any non-redeemed vouchers will be converted to a direct donation to the merchant and no action needs to be taken. '\
                             'If you have any questions about how to use your voucher please reply to this email and we will be able to help.</p>'\
                             '<table><tr><th>Merchant</th><th>Amount Remaining</th><th>Link</th></tr>'
 
