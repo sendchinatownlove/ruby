@@ -94,11 +94,11 @@ namespace :emailer do
     curr_name = query[0]['name']
 
     email_template_header = '<html><style> table {border: 1px solid black}</style>'\
-                            "Dear #{curr_name},<br /><br />"\
+                            "Dear #{curr_name},<br />"\
                             '<p>Thank you for Sending Chinatown Love by supporting our merchants. '\
                             'We hope you have been able to visit one of NYC\' Chinatowns since the city\'s reopening. '\
-                            'We are retiring out voucher program by <strong>September 1st, 2021.</strong>></p>'\
-                            '<p>Since our founding in March 2020, we\'ve raised over a million dollars in donations , '\
+                            'We are retiring out voucher program by <strong>September 1st, 2021.</strong></p>'\
+                            '<p>Since our founding in March 2020, we\'ve raised over a million dollars in donations '\
                             'and vouchers, which helped <strong>32 merchants</strong> through the darker days of COVID-19! '\
                             'With that said, we are deciding to retire our voucher program '\
                             'so that we can focus on other programs such as Gift-A-Meal (GAM) and Business Development.</p>'\
@@ -108,7 +108,7 @@ namespace :emailer do
                             '<a href="https://www.instagram.com/p/CPSL2WlHhN9/" target="_blank">So far, '\
                             'we\'ve provided 2760 meals so far to New Yorkers in need.</a></p>'\
                             '<p>Business Development is where we provide pro-bono services to our merchants to '\
-                            'help their small business grow.</p>'\
+                            'help their small businesses grow.</p>'\
                             '<p>Any non-redeemed vouchers by September 1st, 2021 <strong>will be converted to '\
                             'a direct donation to the merchant</strong> and <strong>no action needs to be taken on your part.</strong> '\
                             'Your contribution with help Send Chinatown Love continue to provide aid and support to the community. '\
