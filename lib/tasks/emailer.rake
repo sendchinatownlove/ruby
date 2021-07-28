@@ -95,21 +95,23 @@ namespace :emailer do
 
     email_template_header = '<html><style> table {border: 1px solid black}</style>'\
                             "Dear #{curr_name},<br /><br />"\
-                            '<p>Thank you for Sending Chinatown Love by supporting '\
-                            'our merchants with voucher purchases. '\
-                            'We hope you have been able to visit a Chinatown since New York City’s reopening.</p>'\
+                            '<p>Thank you for Sending Chinatown Love by supporting our merchants. '\
+                            'We hope you have been able to visit one of NYC\' Chinatowns since the city\'s reopening. '\
+                            'We are retiring out voucher program by <strong>September 1st, 2021.</strong>></p>'\
                             '<p>Since our founding in March 2020, we\'ve raised over a million dollars in donations , '\
-                            'and gift cards, which helped <strong>32 merchants</strong> through the darker days of COVID-19! '\
+                            'and vouchers, which helped <strong>32 merchants</strong> through the darker days of COVID-19! '\
                             'With that said, we are deciding to retire our voucher program '\
                             'so that we can focus on other programs such as Gift-A-Meal (GAM) and Business Development.</p>'\
-                            'Gift-a-Meal is a program where we work with our merchants and community partners to provide '\
+                            '<a href="https://merchant.sendchinatownlove.com/gift-a-meal-home" target="_blank">Gift-a-Meal</a> '\
+                            'is a program where we work with our merchants and community partners to provide '\
                             'meals and supplies to Chinatown citizens. '\
-                            '<a href="https://www.instagram.com/p/CPSL2WlHhN9/" target="_blank">We provided 2760 meals so far to New Yorkers in need.</a></p>'\
-                            '<p>Business Development is where we provide digital services with our merchants and provide opportunities to '\
-                            'collaborate with outside partners. '\
-                            '<a href="https://www.instagram.com/p/CKfyFeFn-Es/?utm_source=ig_web_copy_link">Examples of those are our food crawls that have driven traffic to Chinatown.</a> '\
+                            '<a href="https://www.instagram.com/p/CPSL2WlHhN9/" target="_blank">So far, '\
+                            'we\'ve provided 2760 meals so far to New Yorkers in need.</a></p>'\
+                            '<p>Business Development is where we provide pro-bono services to our merchants to '\
+                            'help their small business grow.</p>'\
+                            '<p>Any non-redeemed vouchers by September 1st, 2021 <strong>will be converted to '\
+                            'a direct donation to the merchant</strong> and <strong>no action needs to be taken on your part.</strong> '\
                             'Your contribution with help Send Chinatown Love continue to provide aid and support to the community. '\
-                            'Any non-redeemed vouchers will be converted to a direct donation to the merchant and no action needs to be taken. '\
                             'If you have any questions about how to use your voucher please reply to this email and we will be able to help.</p>'\
                             '<table><tr><th>Merchant</th><th>Amount Remaining</th><th>Link</th></tr>'
 
@@ -122,7 +124,7 @@ namespace :emailer do
         curr_table += '</table><p>Send Chinatown Love</p></html>'
 
         Rails.logger.info("Sending notification for #{curr_name} to #{curr_email} for unused voucher balances.")
-        EmailManager::Sender.send_receipt(to: curr_email, html: curr_table, subject: 'Sunsetting Vouchers Program')
+        EmailManager::Sender.send_receipt(to: curr_email, html: curr_table, subject: 'Retiring Vouchers Program', from: 'support@sendchinatownlove.com')
 
         curr_name = row['name']
         curr_email = row['email']

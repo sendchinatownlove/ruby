@@ -8,22 +8,23 @@ module EmailManager
 
     def self.send_receipt(to:,
                           html:,
-                          subject: 'Receipt from Send Chinatown Love')
+                          subject: 'Receipt from Send Chinatown Love',
+                          from: 'receipts@sendchinatownlove.com')
       api_key = ENV['MAILGUN_API_KEY']
       # rubocop:disable Layout/LineLength
       api_url = "https://api:#{api_key}@api.mailgun.net/v2/m.sendchinatownlove.com/messages"
       # rubocop:enable Layout/LineLength
 
       RestClient.post api_url,
-                      from: 'receipts@sendchinatownlove.com',
+                      from: from,
                       to: to,
                       subject: subject,
                       html: html
 
       # Send to Receipts Eng so that they know what their receipts in prod looks like
       RestClient.post api_url,
-                      from: 'receipts@sendchinatownlove.com',
-                      to: 'receipts@sendchinatownlove.com',
+                      from: from,
+                      to: from,
                       subject: subject,
                       html: html
     end
