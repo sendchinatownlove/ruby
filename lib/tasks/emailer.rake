@@ -120,8 +120,9 @@ namespace :emailer do
 
     query.each do |row|
       corrected = false if curr_email.include? 'imiss'
-      # where the last emailer run broke (and had the email name bug), this email was corrupted but now fixed in the database
-      # omitting most details for privacy reasons 
+      # this where the last emailer run broke (which had the email name bug), this email had a typo,
+      # but is now fixed in the database, omitting most details for privacy reasons.
+      # including 'CORRECTED' in the header for those that we're emailing twice 
 
       if curr_email == row['email']
         curr_table += "<tr><td>#{row['seller_name']}</td><td>#{'$' + (row['value'] / 100).to_s }</td><td><a href='#{row['redeem_url']}' target='_blank'>Redeem Voucher</a></td></tr>"  
