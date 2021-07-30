@@ -106,7 +106,7 @@ namespace :emailer do
                             'is a program where we work with our merchants and community partners to provide '\
                             'meals and supplies to Chinatown citizens. '\
                             '<a href="https://www.instagram.com/p/CPSL2WlHhN9/" target="_blank">So far, '\
-                            'we\'ve provided 2760 meals so far to New Yorkers in need.</a></p>'\
+                            'we\'ve provided over 240,000 meals so far to New Yorkers in need.</a></p>'\
                             '<p>Business Development is where we provide pro-bono services to our merchants to '\
                             'help their small businesses grow.</p>'\
                             '<p>Any non-redeemed vouchers by September 1st, 2021 <strong>will be converted to '\
