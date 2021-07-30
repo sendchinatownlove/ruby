@@ -120,6 +120,8 @@ namespace :emailer do
 
     query.each do |row|
       corrected = false if curr_email.include? 'imiss'
+      # where the last emailer run broke (and had the email name bug), this email was corrupted but now fixed in the database
+      # omitting most details for privacy reasons 
 
       if curr_email == row['email']
         curr_table += "<tr><td>#{row['seller_name']}</td><td>#{'$' + (row['value'] / 100).to_s }</td><td><a href='#{row['redeem_url']}' target='_blank'>Redeem Voucher</a></td></tr>"  
@@ -131,7 +133,6 @@ namespace :emailer do
 
         begin
           EmailManager::Sender.send_receipt(to: curr_email, html: curr_table, subject: "#{corrected ? 'CORRECTED: ' : ''}Retiring Vouchers Program", from: 'support@sendchinatownlove.com')
-          # puts curr_email, curr_table, subject
         rescue
           Rails.logger.warn("error sending email to #{curr_email}, skipping")
         end
