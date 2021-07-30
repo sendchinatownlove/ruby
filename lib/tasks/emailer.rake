@@ -92,9 +92,10 @@ namespace :emailer do
    
     curr_email = query[0]['email']
     curr_name = query[0]['name']
+    corrected = true
 
     email_template_header = '<html><style> table {border: 1px solid black}</style>'\
-                            "Dear #{curr_name},<br />"\
+                            "Dear SCL Supporter,<br />"\
                             '<p>Thank you for Sending Chinatown Love by supporting our merchants. '\
                             'We hope you have been able to visit one of NYC\' Chinatowns since the city\'s reopening. '\
                             'We are retiring out voucher program by <strong>September 1st, 2021.</strong></p>'\
@@ -118,13 +119,22 @@ namespace :emailer do
     curr_table = email_template_header.dup
 
     query.each do |row|
+      corrected = false if curr_email.include? 'imiss'
+
       if curr_email == row['email']
         curr_table += "<tr><td>#{row['seller_name']}</td><td>#{'$' + (row['value'] / 100).to_s }</td><td><a href='#{row['redeem_url']}' target='_blank'>Redeem Voucher</a></td></tr>"  
+        curr_table.sub! 'SCL Supporter', curr_name if !curr_name.empty?
       else 
         curr_table += '</table><p>Send Chinatown Love</p></html>'
 
         Rails.logger.info("Sending notification for #{curr_name} to #{curr_email} for unused voucher balances.")
-        EmailManager::Sender.send_receipt(to: curr_email, html: curr_table, subject: 'Retiring Vouchers Program', from: 'support@sendchinatownlove.com')
+
+        begin
+          EmailManager::Sender.send_receipt(to: curr_email, html: curr_table, subject: "#{corrected ? 'CORRECTED: ' : ''}Retiring Vouchers Program", from: 'support@sendchinatownlove.com')
+          # puts curr_email, curr_table, subject
+        rescue
+          Rails.logger.warn("error sending email to #{curr_email}, skipping")
+        end
 
         curr_name = row['name']
         curr_email = row['email']
